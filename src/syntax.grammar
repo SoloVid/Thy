@@ -1,0 +1,168 @@
+@top Script { statement (newline statement)* }
+
+@skip { space | LineComment }
+
+statement {
+  staticStatement |
+  declaration |
+  controlFlowStatement |
+  complexExpression
+}
+
+staticStatement {
+  definition |
+  assignment |
+  Comment
+}
+
+declaration {
+  namespaceDeclaration |
+  givenDeclaration
+}
+
+namespaceDeclaration {
+  kw<"namespace"> ScopedValueIdentifier
+}
+
+givenDeclaration {
+  kw<"given"> identifier+
+}
+
+definition {
+  ClassDefinition |
+  FunctionDefinition
+}
+
+ClassDefinition {
+  kw<"export">? kw<"class"> identifier TypeList classBody
+}
+
+classBody {
+  indent staticStatement (newline staticStatement)* outdent
+}
+
+TypeList {
+  ScopedTypeIdentifier*
+}
+
+controlFlowStatement {
+  ifStatement |
+  forStatement |
+  whileStatement
+}
+
+ifStatement {
+  kw<"if"> ExpressionOneLine Block
+  (kw<"elseif"> ExpressionOneLine Block)*
+  (kw<"else"> Block)?
+}
+
+forStatement {
+  kw<"for"> (ScopedValueIdentifier | Number) Block
+}
+
+whileStatement {
+  kw<"while"> ExpressionOneLine Block
+}
+
+variableDeclaration {
+  ScopedValueIdentifier kw<"will be"> ScopedTypeIdentifier
+}
+
+assignment {
+  ScopedValueIdentifier ScopedTypeIdentifier? kw<"is"> complexExpression
+}
+
+complexExpression {
+  instantiation |
+  ExpressionOneLine |
+  functionCallWithLambda
+}
+
+instantiation {
+  ScopedTypeIdentifier ArgumentListWithLambda
+}
+
+ExpressionOneLine {
+  functionCallOneLine |
+  specialExpression |
+  simpleExpression
+}
+
+functionCallOneLine {
+  ScopedValueIdentifier ArgumentListOneLine
+}
+
+ArgumentListOneLine {
+  simpleExpression*
+}
+
+functionCallWithLambda {
+  ScopedValueIdentifier ArgumentList
+}
+
+ArgumentListWithLambda {
+  simpleExpression* (lambda (kw<"and"> ArgumentList)?)?
+}
+
+specialExpression {
+  UnaryExpression | BinaryExpression
+}
+
+BinaryExpression {
+  ExpressionOneLine (kw<"and"> | kw<"or"> | kw<"gt"> | kw<"gte"> | kw<"lt"> | kw<"lte">) ExpressionOneLine
+}
+
+UnaryExpression {
+  kw<"not"> ExpressionOneLine
+}
+
+simpleExpression {
+  Null |
+  True |
+  False |
+  Number |
+  String |
+  ScopedValueIdentifier
+}
+
+Comment {
+  TypeIdentifier RestOfLine
+}
+
+lambda { Block }
+
+Block {
+  indent statement (newline statement)* outdent
+}
+
+ScopedTypeIdentifier {
+  TypeIdentifier ("." (TypeIdentifier | Number))*
+}
+
+ScopedValueIdentifier {
+  ValueIdentifier ("." (ValueIdentifier | Number))*
+}
+
+// Keywords
+
+kw<term> { @specialize[@name={term}]<identifier, term> }
+
+@tokens {
+  True { "true" }
+  False { "false" }
+  Null { "null" }
+  newline { $[\n\r] }
+  space { $[ \t\n\r]+ }
+
+  TypeIdentifier { $[A-Z]$[a-zA-Z]+ }
+  ValueIdentifier { $[a-z]$[a-zA-Z]+ }
+
+  String { "." (![.] | "..")* "." }
+
+  RestOfLine { ![\n]* }
+
+  "(" ")"
+}
+
+@detectDelim
