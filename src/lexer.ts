@@ -1,17 +1,28 @@
 import { createToken, createTokenInstance, Lexer, CstParser, IToken } from "chevrotain"
 import * as _ from 'lodash'
 
-const True = createToken({ name: "True", pattern: /true/ })
-const False = createToken({ name: "False", pattern: /false/ })
-const Null = createToken({ name: "Null", pattern: /null/ })
-const If = createToken({ name: "If", pattern: /if/ })
+// Reserved words
+const At = createToken({ name: "At", pattern: /at/ })
+const And = createToken({ name: "And", pattern: /and/ })
+const Class = createToken({ name: "Class", pattern: /class/ })
 const ElseIf = createToken({ name: "ElseIf", pattern: /elseif/ })
 const Else = createToken({ name: "Else", pattern: /else/ })
+const False = createToken({ name: "False", pattern: /false/ })
 const For = createToken({ name: "For", pattern: /for/ })
-const While = createToken({ name: "While", pattern: /while/ })
-const Is = createToken({ name: "Is", pattern: /is/ })
 const Fun = createToken({ name: "Fun", pattern: /fun/ })
-const Class = createToken({ name: "Class", pattern: /class/ })
+const Given = createToken({ name: "Given", pattern: /given/ })
+const Gte = createToken({ name: "Gte", pattern: /gte/ })
+const Gt = createToken({ name: "Gt", pattern: /gt/ })
+const If = createToken({ name: "If", pattern: /if/ })
+const Is = createToken({ name: "Is", pattern: /is/ })
+const Lte = createToken({ name: "Lte", pattern: /lte/ })
+const Lt = createToken({ name: "Lt", pattern: /lt/ })
+const Not = createToken({ name: "Not", pattern: /not/ })
+const Null = createToken({ name: "Null", pattern: /null/ })
+const Or = createToken({ name: "Or", pattern: /or/ })
+const Return = createToken({ name: "Return", pattern: /return/ })
+const True = createToken({ name: "True", pattern: /true/ })
+const While = createToken({ name: "While", pattern: /while/ })
 
 const StringLiteral = createToken({
     name: "StringLiteral",
@@ -22,7 +33,7 @@ const NumberLiteral = createToken({
     pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
 })
 
-const IdentifierExpression = createToken({ name: "Identifier", pattern: /[a-zA-Z]+(\.([a-zA-Z]+|[0-9]+))*/ })
+const IdentifierExpression = createToken({ name: "IdentifierExpression", pattern: /[a-zA-Z]+(\.([a-zA-Z]+))*/ })
 
 // newlines are not skipped, by setting their group to "nl" they are saved in the lexer result
 // and thus we can check before creating an indentation token that the last token matched was a newline.
@@ -32,35 +43,34 @@ const Newline = createToken({
     // group: "nl"
 })
 
-function isStartOfLine(offset: number, matchedTokens: IToken[], groups: { [groupName: string]: IToken[] }) {
-    // const noTokensMatchedYet = _.isEmpty(matchedTokens)
-    // const newLines = groups.nl
-    // const noNewLinesMatchedYet = _.isEmpty(newLines)
-    // const isFirstLine = noTokensMatchedYet && noNewLinesMatchedYet
-    // const isStartOfLine =
-    //     // only newlines matched so far
-    //     (noTokensMatchedYet && !noNewLinesMatchedYet) ||
-    //     // Both newlines and other Tokens have been matched AND the offset is just after the last newline
-    //     (!noTokensMatchedYet &&
-    //         !noNewLinesMatchedYet &&
-    //         // _.last(matchedTokens)?.tokenType === Newline)
-    //         offset === _.last(newLines)!.startOffset + 1)
-    // return isFirstLine || isStartOfLine
-
-    const noTokensMatchedYet2 = _.isEmpty(matchedTokens)
+function isStartOfLine(matchedTokens: IToken[]): boolean {
     const lastTokenType = _.last(matchedTokens)?.tokenType
-    // if (isFirstLine || isStartOfLine) {
-    //     console.log(`${matchedTokens.length} matched tokens`)
-    //     console.log('Should see Newline last, but seeing ' + lastTokenType?.name);
-    // }
-    return noTokensMatchedYet2 || lastTokenType === Newline
+    return lastTokenType === Newline || lastTokenType === Indent || lastTokenType === Outdent
+
+}
+
+function matchMultilineComment(text: string, offset: number, matchedTokens: IToken[], groups: { [groupName: string]: IToken[] }) {
+    if (isStartOfLine(matchedTokens)) {
+        const regex = /[A-Z]{3,}(?=[\r\n])/y
+        regex.lastIndex = offset
+        const openResult = regex.exec(text)
+        if (openResult !== null) {
+            // console.log('Maybe multiline match')
+            // console.log(openResult)
+            const tag = openResult[0]
+            // console.log(tag)
+            const indentLevel = _.last(indentStack)!
+            const fullCommentRegex = new RegExp(`${tag}(.|\\r|\\n)*?\\n {${indentLevel}}${tag}(?=[\\r\\n])`, 'my')
+            fullCommentRegex.lastIndex = offset
+            return fullCommentRegex.exec(text)
+        }
+    }
+    return null
 }
 
 function matchComment(text: string, offset: number, matchedTokens: IToken[], groups: { [groupName: string]: IToken[] }) {
-    const lastTokenType = _.last(matchedTokens)?.tokenType
-    // indentation can only be matched at the start of a line.
-    if (isStartOfLine(offset, matchedTokens, groups) || lastTokenType == Indent || lastTokenType == Outdent) {
-        const regex = / *[A-Z][^\r\n]*/y
+    if (isStartOfLine(matchedTokens)) {
+        const regex = /[A-Z][^\r\n]*/y
         regex.lastIndex = offset
         return regex.exec(text)
     }
@@ -92,10 +102,7 @@ function matchIndentBase(text: string, offset: number, matchedTokens: IToken[], 
         const compareOffset = lastIndentAnalysisOffset
         lastIndentAnalysisOffset = offset
         if (newlineOffset < compareOffset && offset !== compareOffset) {
-            console.log(`false positive ${newlineOffset} vs ${compareOffset}`)
             return null
-        } else {
-            console.log(`Good to go ${newlineOffset} vs ${compareOffset}`)
         }
         let match
         let currIndentLevel: number | undefined = undefined
@@ -113,16 +120,13 @@ function matchIndentBase(text: string, offset: number, matchedTokens: IToken[], 
         }
 
         const prevIndentLevel = _.last(indentStack)!
-        console.log(`Current indent level: ${currIndentLevel} vs ${prevIndentLevel}`)
         // deeper indentation
         if (currIndentLevel > prevIndentLevel && type === "indent") {
-            console.log("indent")
             indentStack.push(currIndentLevel)
             return match
         }
         // shallower indentation
         else if (currIndentLevel < prevIndentLevel && type === "outdent") {
-            console.log("outdent")
             const matchIndentIndex = _.findLastIndex(
                 indentStack,
                 (stackIndentDepth) => stackIndentDepth === currIndentLevel
@@ -181,6 +185,13 @@ const Outdent = createToken({
     line_breaks: false
 })
 
+const MultilineComment = createToken({
+    name: "MultilineComment",
+    pattern: matchMultilineComment,
+    // custom token patterns should explicitly specify the line_breaks option
+    line_breaks: true
+})
+
 const Comment = createToken({
     name: "Comment",
     pattern: matchComment,
@@ -200,19 +211,34 @@ const allTokens = [
     // Outdent must appear before Indent for handling zero spaces outdents.
     Outdent,
     Indent,
+    MultilineComment,
     Comment,
     Spaces,
-    True,
-    False,
-    Null,
-    If,
+
+    // Keywords
+    At,
+    And,
+    Class,
     ElseIf,
     Else,
+    False,
     For,
-    While,
-    Is,
     Fun,
-    Class,
+    Given,
+    Gte,
+    Gt,
+    If,
+    Is,
+    Lte,
+    Lt,
+    Not,
+    Null,
+    Or,
+    Return,
+    True,
+    While,
+
+    // Variable expressions
     NumberLiteral,
     IdentifierExpression,
     StringLiteral,
