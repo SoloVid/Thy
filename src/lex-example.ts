@@ -1,4 +1,5 @@
 import { lexer } from "./lexer"
+import { MobyParser } from "./parser"
 
 export function runLexExample() {
     const lexingResult = lexer.tokenize(`
@@ -41,8 +42,10 @@ print obj.q
 
 Object literal. const lobj = { pa: a, pb: b }
 lobj is
-  pa a
-  pb b
+  pa is a
+  pb is b
+  pc is
+    m is 5
 
 Multiline comment. Do I want this? Could aid mobile dev significantly bc no comment out hotkey.
 ZZZ
@@ -64,9 +67,15 @@ and
 and d
 `)
 
-lexingResult.tokens.map(t => {return {
-    image: t.image,
-    tokenType: t.tokenType.name
-}}).forEach(e => console.log(e))
-console.error(lexingResult.errors)
+  lexingResult.tokens.map(t => {return {
+      image: t.image,
+      tokenType: t.tokenType.name
+  }}).forEach(e => console.log(e))
+  console.error(lexingResult.errors)
+
+  const parser = new MobyParser()
+  parser.input = lexingResult.tokens;
+  const cstOutput = (parser as any).script()
+  console.log(cstOutput)
+  console.error(parser.errors)
 }

@@ -34,11 +34,15 @@ definition {
 }
 
 ClassDefinition {
-  kw<"export">? kw<"class"> identifier TypeList classBody
+  kw<"export">? kw<"class"> identifier TypeList newline classBody
 }
 
 classBody {
-  indent staticStatement (newline staticStatement)* outdent
+  indent (staticStatement (newline staticStatement)*)? outdent
+}
+
+FunctionDefinition {
+  kw<"export">? kw<"fun"> identifier ScopedTypeIdentifier? (identifier ScopedTypeIdentifier)* newline Block
 }
 
 TypeList {
@@ -48,21 +52,38 @@ TypeList {
 controlFlowStatement {
   ifStatement |
   forStatement |
-  whileStatement
+  whileStatement |
+  returnStatement |
+  throwStatement |
+  tryStatement
 }
 
 ifStatement {
-  kw<"if"> ExpressionOneLine Block
-  (kw<"elseif"> ExpressionOneLine Block)*
-  (kw<"else"> Block)?
+  kw<"if"> oneLineExpression newline Block
+  (newline kw<"and">? kw<"elseif"> oneLineExpression newline Block)*
+  (newline kw<"and">? kw<"else"> newline Block)?
 }
 
 forStatement {
-  kw<"for"> (ScopedValueIdentifier | Number) Block
+  kw<"for"> (ScopedValueIdentifier | Number) newline Block
 }
 
 whileStatement {
-  kw<"while"> ExpressionOneLine Block
+  kw<"while"> oneLineExpression newline Block
+}
+
+returnStatement {
+  kw<"return"> complexExpression
+}
+
+throwStatement {
+  kw<"throw"> complexExpression
+}
+
+tryStatement {
+  kw<"try"> newline Block
+  (newline kw<"and">? kw<"catch"> oneLineExpression newline Block)*
+  (newline kw<"and">? kw<"finally"> newline Block)?
 }
 
 variableDeclaration {
@@ -75,7 +96,7 @@ assignment {
 
 complexExpression {
   instantiation |
-  ExpressionOneLine |
+  oneLineExpression |
   functionCallWithLambda
 }
 
@@ -83,10 +104,14 @@ instantiation {
   ScopedTypeIdentifier ArgumentListWithLambda
 }
 
-ExpressionOneLine {
-  functionCallOneLine |
+oneLineExpression {
   specialExpression |
   simpleExpression
+}
+
+simpleExpression {
+  functionCallOneLine |
+  atomicExpression
 }
 
 functionCallOneLine {
@@ -94,7 +119,7 @@ functionCallOneLine {
 }
 
 ArgumentListOneLine {
-  simpleExpression*
+  atomicExpression*
 }
 
 functionCallWithLambda {
@@ -102,7 +127,7 @@ functionCallWithLambda {
 }
 
 ArgumentListWithLambda {
-  simpleExpression* (lambda (kw<"and"> ArgumentList)?)?
+  atomicExpression* (newline lambda (newline kw<"and"> ArgumentListWithLambda)?)?
 }
 
 specialExpression {
@@ -110,24 +135,20 @@ specialExpression {
 }
 
 BinaryExpression {
-  ExpressionOneLine (kw<"and"> | kw<"or"> | kw<"gt"> | kw<"gte"> | kw<"lt"> | kw<"lte">) ExpressionOneLine
+  simpleExpression (kw<"is"> | kw<"and"> | kw<"or"> | kw<"gt"> | kw<"gte"> | kw<"lt"> | kw<"lte">) simpleExpression
 }
 
 UnaryExpression {
-  kw<"not"> ExpressionOneLine
+  kw<"not"> simpleExpression
 }
 
-simpleExpression {
+atomicExpression {
   Null |
   True |
   False |
   Number |
   String |
   ScopedValueIdentifier
-}
-
-Comment {
-  TypeIdentifier RestOfLine
 }
 
 lambda { Block }

@@ -24,20 +24,20 @@ const Return = createToken({ name: "Return", pattern: /return/ })
 const True = createToken({ name: "True", pattern: /true/ })
 const While = createToken({ name: "While", pattern: /while/ })
 
-const StringLiteral = createToken({
+export const StringLiteral = createToken({
     name: "StringLiteral",
     pattern: /\.([^\.]|\.\.)*\./
 })
-const NumberLiteral = createToken({
+export const NumberLiteral = createToken({
     name: "NumberLiteral",
     pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
 })
 
-const IdentifierExpression = createToken({ name: "IdentifierExpression", pattern: /[a-zA-Z]+(\.([a-zA-Z]+))*/ })
+export const IdentifierExpression = createToken({ name: "IdentifierExpression", pattern: /[a-zA-Z]+(\.([a-zA-Z]+))*/ })
 
 // newlines are not skipped, by setting their group to "nl" they are saved in the lexer result
 // and thus we can check before creating an indentation token that the last token matched was a newline.
-const Newline = createToken({
+export const Newline = createToken({
     name: "Newline",
     pattern: /\n|\r\n?/,
     // group: "nl"
@@ -172,40 +172,40 @@ const matchIndent = _.partialRight(matchIndentBase, "indent")
 const matchOutdent = _.partialRight(matchIndentBase, "outdent")
 
 // define the indentation tokens using custom token patterns
-const Indent = createToken({
+export const Indent = createToken({
     name: "Indent",
     pattern: matchIndent,
     // custom token patterns should explicitly specify the line_breaks option
     line_breaks: false
 })
-const Outdent = createToken({
+export const Outdent = createToken({
     name: "Outdent",
     pattern: matchOutdent,
     // custom token patterns should explicitly specify the line_breaks option
     line_breaks: false
 })
 
-const MultilineComment = createToken({
+export const MultilineComment = createToken({
     name: "MultilineComment",
     pattern: matchMultilineComment,
     // custom token patterns should explicitly specify the line_breaks option
     line_breaks: true
 })
 
-const Comment = createToken({
+export const Comment = createToken({
     name: "Comment",
     pattern: matchComment,
     // custom token patterns should explicitly specify the line_breaks option
     line_breaks: false
 })
 
-const Spaces = createToken({
+export const Spaces = createToken({
     name: "Spaces",
     pattern: / +/,
     group: Lexer.SKIPPED
 })
 
-const allTokens = [
+export const allTokens = [
     Newline,
     // indentation tokens must appear before Spaces, otherwise all indentation will always be consumed as spaces.
     // Outdent must appear before Indent for handling zero spaces outdents.
