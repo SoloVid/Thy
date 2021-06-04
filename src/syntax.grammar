@@ -3,166 +3,91 @@
 @skip { space | LineComment }
 
 statement {
-  staticStatement |
-  declaration |
-  controlFlowStatement |
-  complexExpression
-}
-
-staticStatement {
-  definition |
-  assignment |
-  Comment
-}
-
-declaration {
-  namespaceDeclaration |
-  givenDeclaration
-}
-
-namespaceDeclaration {
-  kw<"namespace"> ScopedValueIdentifier
-}
-
-givenDeclaration {
-  kw<"given"> identifier+
-}
-
-definition {
-  ClassDefinition |
-  FunctionDefinition
-}
-
-ClassDefinition {
-  kw<"export">? kw<"class"> identifier TypeList newline classBody
-}
-
-classBody {
-  indent (staticStatement (newline staticStatement)*)? outdent
+  FunctionDefinition |
+  FunctionCallStatement |
+  Assignment |
+  Declaration |
+  TypeStatement
 }
 
 FunctionDefinition {
-  kw<"export">? kw<"fun"> identifier ScopedTypeIdentifier? (identifier ScopedTypeIdentifier)* newline Block
+  kw<"export">? kw<"async">? kw<"fun"> TypeParameters? ValueIdentifier Type? Block
 }
 
-TypeList {
-  ScopedTypeIdentifier*
+FunctionCallStatement {
+  kw<"yield">? FunctionCall
 }
 
-controlFlowStatement {
-  ifStatement |
-  forStatement |
-  whileStatement |
-  returnStatement |
-  throwStatement |
-  tryStatement
+FunctionCall {
+  ScopedValueIdentifier TypeArguments? Arguments
 }
 
-ifStatement {
-  kw<"if"> oneLineExpression newline Block
-  (newline kw<"and">? kw<"elseif"> oneLineExpression newline Block)*
-  (newline kw<"and">? kw<"else"> newline Block)?
+Assignment {
+  kw<"export">? ScopedValueIdentifier kw<"is"> FunctionCall
 }
 
-forStatement {
-  kw<"for"> (ScopedValueIdentifier | Number) newline Block
+Declaration {
+  kw<"export">? ValueIdentifier kw<"be"> Type
 }
 
-whileStatement {
-  kw<"while"> oneLineExpression newline Block
-}
-
-returnStatement {
-  kw<"return"> complexExpression
-}
-
-throwStatement {
-  kw<"throw"> complexExpression
-}
-
-tryStatement {
-  kw<"try"> newline Block
-  (newline kw<"and">? kw<"catch"> oneLineExpression newline Block)*
-  (newline kw<"and">? kw<"finally"> newline Block)?
-}
-
-variableDeclaration {
-  ScopedValueIdentifier kw<"will be"> ScopedTypeIdentifier
-}
-
-assignment {
-  ScopedValueIdentifier ScopedTypeIdentifier? kw<"is"> complexExpression
-}
-
-complexExpression {
-  instantiation |
-  oneLineExpression |
-  functionCallWithLambda
-}
-
-instantiation {
-  ScopedTypeIdentifier ArgumentListWithLambda
-}
-
-oneLineExpression {
-  specialExpression |
-  simpleExpression
-}
-
-simpleExpression {
-  functionCallOneLine |
-  atomicExpression
-}
-
-functionCallOneLine {
-  ScopedValueIdentifier ArgumentListOneLine
-}
-
-ArgumentListOneLine {
-  atomicExpression*
-}
-
-functionCallWithLambda {
-  ScopedValueIdentifier ArgumentList
-}
-
-ArgumentListWithLambda {
-  atomicExpression* (newline lambda (newline kw<"and"> ArgumentListWithLambda)?)?
-}
-
-specialExpression {
-  UnaryExpression | BinaryExpression
-}
-
-BinaryExpression {
-  simpleExpression (kw<"is"> | kw<"and"> | kw<"or"> | kw<"gt"> | kw<"gte"> | kw<"lt"> | kw<"lte">) simpleExpression
-}
-
-UnaryExpression {
-  kw<"not"> simpleExpression
+Arguments {
+  atomicExpression* (Block (kw<"and"> Arguments)?)?
 }
 
 atomicExpression {
-  Null |
-  True |
-  False |
   Number |
   String |
   ScopedValueIdentifier
 }
 
-lambda { Block }
-
 Block {
-  indent statement (newline statement)* outdent
+  indent Script outdent
 }
 
 ScopedTypeIdentifier {
-  TypeIdentifier ("." (TypeIdentifier | Number))*
+  // TODO: Might switch identifier prefixes to only allow ValueIdentifier
+  (identifier ".")* TypeIdentifier
 }
 
 ScopedValueIdentifier {
-  ValueIdentifier ("." (ValueIdentifier | Number))*
+  // TODO: Might switch identifier prefixes to only allow ValueIdentifier
+  (identifier ".")* ValueIdentifier
+}
+
+identifier {
+  TypeIdentifier | ValueIdentifier
+}
+
+Type {
+  // First identifier is the base type. Additional identifiers are type arguments.
+  ScopedTypeIdentifier ScopedTypeIdentifier*
+}
+
+TypeParameters {
+  TypeIdentifier*
+}
+
+TypeArguments {
+  ScopedTypeIdentifier*
+}
+
+TypeStatement {
+  TypeAliasDefinition |
+  TypeGenericDefinition |
+  TypeFunctionDefinition
+}
+
+TypeAliasDefinition {
+  kw<"export">? kw<"type"> TypeIdentifier kw<"is"> Type
+}
+
+TypeGenericDefinition {
+  // Provides local `extends Blah` capability for generic parameters.
+  kw<"type"> TypeIdentifier kw<"be"> Type
+}
+
+TypeFunctionDefinition {
+  kw<"export">? kw<"type"> kw<"fun"> TypeIdentifier Block
 }
 
 // Keywords
@@ -170,9 +95,6 @@ ScopedValueIdentifier {
 kw<term> { @specialize[@name={term}]<identifier, term> }
 
 @tokens {
-  True { "true" }
-  False { "false" }
-  Null { "null" }
   newline { $[\n\r] }
   space { $[ \t\n\r]+ }
 

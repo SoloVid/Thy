@@ -2,27 +2,53 @@ import { createToken, createTokenInstance, Lexer, CstParser, IToken } from "chev
 import * as _ from 'lodash'
 
 // Reserved words
-const At = createToken({ name: "At", pattern: /at/ })
-const And = createToken({ name: "And", pattern: /and/ })
-const Class = createToken({ name: "Class", pattern: /class/ })
-const ElseIf = createToken({ name: "ElseIf", pattern: /elseif/ })
-const Else = createToken({ name: "Else", pattern: /else/ })
-const False = createToken({ name: "False", pattern: /false/ })
-const For = createToken({ name: "For", pattern: /for/ })
+
+// Continues argument list on next line
+const And = createToken({ name: "Return", pattern: /return/ })
+
+// Like ES async
+// Why different from function call? It goes with fun.
+const Async = createToken({ name: "Return", pattern: /return/ })
+
+// Like ES await
+// We can treat this as just a function call through parsing.
+// const Await = createToken({ name: "Return", pattern: /return/ })
+// Variable declaration with deferred assignment (a la ES `let`)
+const Be = createToken({ name: "Return", pattern: /return/ })
+
+// For `defer if condition\n  return`
+// Only necessary if await is allowed inline with function call.
+// const Defer = createToken({ name: "Return", pattern: /return/ })
+
+// Kind of like mixture of ES `export` and `public`
+// Why different from function call? It requires identifier name.
+const Export = createToken({ name: "Return", pattern: /return/ })
+
+// Like ES `function`, but also `class`
 const Fun = createToken({ name: "Fun", pattern: /fun/ })
-const Given = createToken({ name: "Given", pattern: /given/ })
-const Gte = createToken({ name: "Gte", pattern: /gte/ })
-const Gt = createToken({ name: "Gt", pattern: /gt/ })
-const If = createToken({ name: "If", pattern: /if/ })
+
+// For function parameters and potentially imports
+// Why different from function call?
+// Only needs to be a specifically lexed token because its use is different in typeFun (and maybe with imports?).
+// const Given = createToken({ name: "Given", pattern: /given/ })
+
+// Assignment (usually with implicit `const` declaration)
 const Is = createToken({ name: "Is", pattern: /is/ })
-const Lte = createToken({ name: "Lte", pattern: /lte/ })
-const Lt = createToken({ name: "Lt", pattern: /lt/ })
-const Not = createToken({ name: "Not", pattern: /not/ })
-const Null = createToken({ name: "Null", pattern: /null/ })
-const Or = createToken({ name: "Or", pattern: /or/ })
-const Return = createToken({ name: "Return", pattern: /return/ })
-const True = createToken({ name: "True", pattern: /true/ })
-const While = createToken({ name: "While", pattern: /while/ })
+
+// Like ES return
+// Only needs to be a specifically lexed token because its use is different in typeFun.
+// Actually it needn't be grammatically different, just semantically different.
+// const Return = createToken({ name: "Return", pattern: /return/ })
+
+// Like TypeScript type
+const Type = createToken({ name: "Return", pattern: /return/ })
+
+// Serves role of TypeScript parameterized type
+// Just use "type fun" instead since "type" is already a keyword.
+// const TypeFun = createToken({ name: "Return", pattern: /return/ })
+
+// Shorthand for `defer await`; actually just what defer would have been.
+const Yield = createToken({ name: "Return", pattern: /return/ })
 
 export const StringLiteral = createToken({
     name: "StringLiteral",
