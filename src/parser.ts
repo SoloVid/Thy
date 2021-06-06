@@ -25,30 +25,36 @@ export class MobyParser extends CstParser {
         this.OR([
             { ALT: () => this.CONSUME(t.MultilineComment) },
             { ALT: () => this.CONSUME(t.Comment) },
+            // { ALT: () => this.SUBRULE(this.unparsedStatement) },
+            { ALT: () => this.SUBRULE(this.typeStatement) },
             { ALT: () => this.SUBRULE(this.functionDefinition) },
-            { ALT: () => this.SUBRULE(this.functionCallStatement) },
             { ALT: () => this.SUBRULE(this.constantAssignment) },
             { ALT: () => this.SUBRULE(this.variableAssignment) },
-            { ALT: () => this.SUBRULE(this.declaration) },
-            { ALT: () => this.SUBRULE(this.typeStatement) },
+            { ALT: () => this.SUBRULE(this.variableDeclaration) },
+            { ALT: () => this.SUBRULE(this.functionCallStatement) },
+            { ALT: () => {} },
         ])
     })
 
-    // unparsedStatement = this.RULE("unparsedStatement", () => {
-    //     this.MANY(() => {
-    //         this.OR([
-    //             { ALT: () => this.CONSUME(t.And) },
-    //             { ALT: () => this.CONSUME(t.Async) },
-    //             { ALT: () => this.CONSUME(t.Be) },
-    //             { ALT: () => this.CONSUME(t.Export) },
-    //             { ALT: () => this.CONSUME(t.Fun) },
-    //             { ALT: () => this.CONSUME(t.Is) },
-    //             { ALT: () => this.CONSUME(t.To) },
-    //             { ALT: () => this.CONSUME(t.Type) },
-    //             { ALT: () => this.CONSUME(t.Yield) },
-    //         ])
-    //     })
-    // })
+    unparsedStatement = this.RULE("unparsedStatement", () => {
+        this.MANY(() => {
+            this.OR([
+                { ALT: () => this.CONSUME(t.And) },
+                { ALT: () => this.CONSUME(t.Async) },
+                { ALT: () => this.CONSUME(t.Be) },
+                { ALT: () => this.CONSUME(t.Export) },
+                { ALT: () => this.CONSUME(t.Fun) },
+                { ALT: () => this.CONSUME(t.Is) },
+                { ALT: () => this.CONSUME(t.To) },
+                { ALT: () => this.CONSUME(t.Type) },
+                { ALT: () => this.SUBRULE(this.block) },
+                { ALT: () => this.CONSUME(t.NumberLiteral) },
+                { ALT: () => this.CONSUME(t.ScopedTypeIdentifier) },
+                { ALT: () => this.CONSUME(t.ScopedValueIdentifier) },
+                { ALT: () => this.CONSUME(t.StringLiteral) },
+            ])
+        })
+    })
 
     functionDefinition = this.RULE("functionDefinition", () => {
         this.exportOrPrivate()
@@ -88,7 +94,7 @@ export class MobyParser extends CstParser {
         this.SUBRULE(this.functionCall)
     })
 
-    declaration = this.RULE("declaration", () => {
+    variableDeclaration = this.RULE("declaration", () => {
         this.exportOrPrivate()
         this.SUBRULE(this.unscopedValueIdentifier)
         this.CONSUME(t.Be)
