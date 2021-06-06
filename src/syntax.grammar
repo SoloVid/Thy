@@ -11,7 +11,7 @@ statement {
 }
 
 FunctionDefinition {
-  kw<"export">? kw<"async">? kw<"fun"> TypeParameters? ValueIdentifier Type? Block
+  kw<"export">? kw<"async">? kw<"fun"> TypeParameters? ValueIdentifier ParameterizedType? Block
 }
 
 FunctionCallStatement {
@@ -27,7 +27,7 @@ Assignment {
 }
 
 Declaration {
-  kw<"export">? ValueIdentifier kw<"be"> Type
+  kw<"export">? ValueIdentifier kw<"be"> ParameterizedType
 }
 
 Arguments {
@@ -45,20 +45,14 @@ Block {
 }
 
 ScopedTypeIdentifier {
-  // TODO: Might switch identifier prefixes to only allow ValueIdentifier
-  (identifier ".")* TypeIdentifier
+  (ValueIdentifier ".")* TypeIdentifier
 }
 
 ScopedValueIdentifier {
-  // TODO: Might switch identifier prefixes to only allow ValueIdentifier
-  (identifier ".")* ValueIdentifier
+  (ValueIdentifier ".")* ValueIdentifier
 }
 
-identifier {
-  TypeIdentifier | ValueIdentifier
-}
-
-Type {
+ParameterizedType {
   // First identifier is the base type. Additional identifiers are type arguments.
   ScopedTypeIdentifier ScopedTypeIdentifier*
 }
@@ -78,12 +72,12 @@ TypeStatement {
 }
 
 TypeAliasDefinition {
-  kw<"export">? kw<"type"> TypeIdentifier kw<"is"> Type
+  kw<"export">? kw<"type"> TypeIdentifier kw<"is"> ParameterizedType
 }
 
 TypeGenericDefinition {
   // Provides local `extends Blah` capability for generic parameters.
-  kw<"type"> TypeIdentifier kw<"be"> Type
+  kw<"type"> TypeIdentifier kw<"be"> ParameterizedType
 }
 
 TypeFunctionDefinition {
@@ -92,7 +86,7 @@ TypeFunctionDefinition {
 
 // Keywords
 
-kw<term> { @specialize[@name={term}]<identifier, term> }
+kw<term> { @specialize[@name={term}]<ValueIdentifier, term> }
 
 @tokens {
   newline { $[\n\r] }

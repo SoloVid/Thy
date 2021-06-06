@@ -1,8 +1,3 @@
-import { lexer } from "./lexer"
-import { MobyParser } from "./parser"
-
-export function runLexExample() {
-    const lexingResult = lexer.tokenize(`
 namespace blahBlah
 
   fun main
@@ -148,7 +143,7 @@ namespace blahBlah
   ZZZ
   NMC
     Other Comment
-    NMC
+  NMC
   callMe .hey mom... a
     given a
     given b
@@ -158,17 +153,3 @@ namespace blahBlah
     given x
     print x
   and d
-`)
-
-  lexingResult.tokens.map(t => {return {
-      image: t.image,
-      tokenType: t.tokenType.name
-  }}).forEach(e => console.log(e))
-  console.error(lexingResult.errors)
-
-  const parser = new MobyParser()
-  parser.input = lexingResult.tokens;
-  const cstOutput = (parser as any).script()
-  console.log(cstOutput)
-  console.error(parser.errors)
-}

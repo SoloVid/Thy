@@ -1,12 +1,18 @@
 
 ## Open Questions
 
+- I came up with an idea for a shorthand for some cases: `that`
+    - It might be nice to be able to handle some cases less verbosely. e.g. `compare.equals a b // if that ...`
+    - Do I want to support an implicit temporary capture variable like `that`?
+- Interfaces? I don't think the current language spec supports defining them. :/
+    - Maybe this is just a type fun with no return call.
 - How to allow rest parameters / var-args / whatever other languages call them?
     - This is necessary at least because of how if/else will be implemented.
     - DECISION: Don't allow rest parameters. Forget about elseif. if/else can just be if + optional params for else.
 - Will it be a problem to have the same built-in functions (e.g. `if`) to support async and sync usage?
     - Compiling to TypeScript problem? No.
     - Language purity? Undecided.
+    - DECISION: No. Default parameters and union types make this a non-issue.
 - Possibly related to previous question about `if`, allow method overloading and/or union types?
 - How to handle imports?
     - Stick with implicit used by splitTime at present?
@@ -29,13 +35,14 @@
         - multiply / divide / mod
         - exponent?
 - typeFun? This is pretty complex, but it could be simple and powerful as a language feature.
-- ES properties (getter/setter)?
+    - DECISION: Yes, but I've cut out function calls.
 - async functions
-    - Should blocks be automatically detected as async? I'm currently leaning yes.
-    - Should async functions be explicitly marked? I'm currently leaning yes.
-    - Should async function be typed with Promise<X>? I'm currently leaning no.
+    - Should blocks be automatically detected as async? Yes.
+    - Should async functions be explicitly marked? Yes (for the sake of callers).
+    - Should async function be typed with Promise<X>? No (it's always Promise anyway, and you can't nest Promise types).
 - TypeScript interoperability
     - Should interoperability go both ways? Or just one way?
+    - DECISION: It should be interoperable both ways. However, we'll only guarantee that all valid code in this language can be used by TypeScript, not necessarily the other way around.
 - Should `await` be special syntactically?
     - Special: `myVar is await myFunc arg`
     - Not special: `waitForMyFunc is myFunc arg // myVar is await waitForMyFunc`?
@@ -45,9 +52,13 @@
 - Should `new` be a special function for interoperability with TypeScript?
     - I'd like this to be no, but I'm not sure if that significantly drops the usability of this language.
     - Primary alternative is to support a conventional `newBlah` naming scheme that maps one-to-one with TypeScript class instantiation.
+    - DECISION: No, `newBlah` will always map to `new Blah()` in TypeScript and vice versa.
+        - Defining a function called `new` in this language will produce an error in TypeScript.
+        - Defining a function called `newBlah` in TypeScript will be inaccessible in this language.
 - Should capitalized scopes be allowed?
     - TypeScript code might expose static class methods or capitalized namespaces.
     - Should this language support accessing those?
+    - DECISION: No, don't support capitalized scopes. If existing TypeScript has this and needs to be used, the TypeScript code can be refactored or wrappers written.
 
 ## Overview of Language Strategy
 
@@ -55,6 +66,9 @@
 
 - Every level is just a block of code
 - Every (almost) operation is just a function call
+
+A function call looks like `functionName [TypeArgument ...] [argument ...]`.
+Every argument must be a single term.
 
 ## Reserved Words
 
@@ -76,8 +90,11 @@ These keywords need to be recognized by the lexer since they are part of the lan
 These "functions" allow non-special grammar, but their behavior is significantly different from functions you can write in this language.
 
 - await - affects standard language control flow
+- get - array access or define as getter
 - given - not really a runtime call
+- namespace - takes as a parameter an identifier that may or may not already have a value
 - return - affects standard language control flow
+- set - array mutate or define as setter
 - throw - affects standard language control flow
 
 ### Reserved Value Names
@@ -91,7 +108,6 @@ These values/functions operate a lot like stuff you can write in this language, 
 - for - container for for-loop functions
 - if - function
 - loop - function
-- namespace - function
 - null - value
 - switch - function
 - true - value
@@ -203,8 +219,8 @@ fun newThing Thing
 
     aa be A
 
-    aIsNull is equal a null
-    if aIsNull
+    compare.equal a null
+    if that
         aa is newA
     and else
         aa is a
@@ -217,8 +233,7 @@ This fairly strictly translates to the following TypeScript:
 ```typescript
 function newThing(a: NullableA): Thing {
     let aa: A
-    const aIsNull = a === null
-    if (aIsNull) {
+    if (a === null) {
         aa = newA()
     } else {
         aa = a
@@ -260,6 +275,105 @@ I think the name clash should just be disallowed. e.g. `fun newThing Thing` woul
 because we don't want to create a class called `Thing` that clashes with the type `Thing`.
 Dynamically picking some alternative name will just either make our lives harder or cause a different collision.
 
+Unfortunately, classes and closures are not equivalent in ECMAScript.
+Namely, functions in the closure case (which is logically what's happening in this language) do not have `this`.
+In ECMAScript, functions have a bound `this` which comes from the pre-dot part in a function call.
+When you pass a method as a function value, it won't have this bound.
+
+```moby
+fun newMyClass
+    myField is 5
+    fun myMethod
+        print myField
+inst is newMyClass
+Expect print 5.
+call inst.myMethod
+```
+should translate to
+```typescript
+class MyClass {
+    myField = 5
+    myMethod() {
+        print(this.myField)
+    }
+}
+const inst = new MyClass()
+// Would print undefined.
+call(inst.myMethod)
+```
+but is more literally
+```typescript
+function newMyClass() {
+    let myField = 5
+    function myMethod() {
+        print(myField)
+    }
+    return { myField, myMethod }
+}
+const inst = newMyClass()
+// Would print 5.
+call(inst.myMethod)
+```
+
+I think the solution here long-term may be to call bind at the call site for the limited cases this happens.
+```typescript
+call(inst.myMethod.bind(inst))
+```
+though this has the side effect that you can't compare two such functions.
+This also requires type-aware context to pull off at the call site.
+
+An easier short-term solution I think may be something like just ignoring this problem,
+but I'd like to be able to clearly document what the rule here is,
+and I'd like that rule not to be divergent depending on whether you use `newBlah` or `makeBlah` as a function name.
+
+## Interfile Dependencies
+
+WIP: Haven't quite thought through everything here yet.
+
+```moby
+File one.moby
+
+namespace my.space
+    fun a
+        print .himom.
+```
+
+```moby
+File two.moby
+
+namespace my.space
+    fun b
+        print .hello.
+```
+
+```moby
+File three.moby
+
+given my.space
+
+my.space.a
+my.space.b
+```
+
+If we wanted just a single moby file compiled from these, I believe the result could be:
+```moby
+namespace global
+    namespace my.space
+        fun a
+            print .himom.
+namespace global
+    namespace my.space
+        fun b
+            print .hello.
+namespace global
+    given my.space
+    my.space.a
+    my.space.b
+```
+
+`namespace` accepts a scoped value identifier as its first parameter and a block as its second.
+It does a merge thing (similar to TypeScript namespace) to that identifier with the return value from the block.
+
 ## Parameters
 
 ### Optional Parameters
@@ -269,3 +383,42 @@ Optional parameters can be specified by passing two values to `given` (second be
 TypeScript can handle this with a simple `= <default value>` tacked onto the parameter declaration.
 
 Unlike TypeScript, don't allow explicit forcing of default value by passing something like undefined.
+
+## Getter/Setter (ES properties)
+
+Getter/setter from TypeScript should be fully usable regardless.
+
+Here is a somewhat-minimally language-wrecking implementation for getter/setter pattern.
+
+```moby
+fun newMyClass MyInterface
+    getSetField1 is get
+        return 4
+    and set
+        given n
+        doSet n
+
+    getSetField2 is set
+        given n
+        doSet n
+    and get
+        return 4
+```
+
+```typescript
+class MyClass implements MyInterface {
+    get getSetField1() {
+        return 4
+    }
+    set getSetField1(n) {
+        doSet(n)
+    }
+
+    set getSetField2(n) {
+        doSet(n)
+    }
+    get getSetField2() {
+        return 4
+    }
+}
+```
