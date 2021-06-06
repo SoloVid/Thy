@@ -2,19 +2,13 @@
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
 	"name": "Mobile Lang",
 	"patterns": [
-		{
-			"include": "#script-parts"
-		}
+		{"include": "#script-parts"}
 	],
 	"repository": {
 		"script-parts": {
 			"patterns": [
-				{
-					"include": "#comments"
-				},
-				{
-					"include": "#code-lines"
-				}
+				{"include": "#comments"},
+				{"include": "#code-lines"}
 			]
 		},
 		"comments": {
@@ -48,7 +42,8 @@
 							"name": "meta.line.content.mob",
 							"patterns": [
 								{ "include": "#type-definitions" },
-								{ "include": "#functions" },
+								{ "include": "#function-definitions" },
+								{ "include": "#constant-assignments" },
 								{ "include": "#assignments" },
 								{ "include": "#declarations" },
 								{ "include": "#yields" },
@@ -60,18 +55,34 @@
 				}
 			]
 		},
-		"functions": {
+		"function-definitions": {
 			"patterns": [
 				{
 					"name": "meta.function.prototype.mob",
-					"match": "(?:(export) +)?(?:(async) +)?(fun) +(?:(.+?) +)?([a-z][^ ]*)( +.+)?$",
+					"match": "(?:(export) +)?(?:(private) +)?(?:(async) +)?(fun) +(?:(.+?) +)?([a-z][^ ]*)( +.+)?$",
 					"captures": {
 						"1": {"name": "keyword.control.export.mob"},
-						"2": {"name": "storage.modifier.async.mob"},
-						"3": {"name": "storage.type.function.mob"},
-						"4": {"patterns": [{"include": "#type-identifiers"}]},
-						"5": {"name": "entity.name.function.mob"},
-						"6": {"patterns": [{"include": "#type-identifiers"}]}
+						"2": {"name": "storage.modifier.private.mob"},
+						"3": {"name": "storage.modifier.async.mob"},
+						"4": {"name": "storage.type.function.mob"},
+						"5": {"patterns": [{"include": "#type-identifiers"}]},
+						"6": {"name": "entity.name.function.mob"},
+						"7": {"patterns": [{"include": "#type-identifiers"}]}
+					}
+				}
+			]
+		},
+		"constant-assignments": {
+			"patterns": [
+				{
+					"name": "meta.assignment.mob",
+					"match": "(?:(export) +)?(?:(private) +)?([^ ]+) +(is|to) +(.+)$",
+					"captures": {
+						"1": {"name": "keyword.control.export.mob"},
+						"2": {"name": "storage.modifier.private.mob"},
+						"3": {"patterns": [{"include": "#value-identifiers"}]},
+						"4": {"name": "keyword.operator.mob"},
+						"5": {"patterns": [{"include": "#calls"}]}
 					}
 				}
 			]
@@ -80,12 +91,11 @@
 			"patterns": [
 				{
 					"name": "meta.assignment.mob",
-					"match": "(?:(export) +)?([^ ]+) +(is|to) +(.+)$",
+					"match": "([^ ]+) +(to) +(.+)$",
 					"captures": {
-						"1": {"name": "keyword.control.export.mob"},
-						"2": {"patterns": [{"include": "#value-identifiers"}]},
-						"3": {"name": "keyword.operator.mob"},
-						"4": {"patterns": [{"include": "#calls"}]}
+						"1": {"patterns": [{"include": "#value-identifiers"}]},
+						"2": {"name": "keyword.operator.mob"},
+						"3": {"patterns": [{"include": "#calls"}]}
 					}
 				}
 			]
@@ -99,11 +109,9 @@
 						"1": {
 							"patterns": [{"include": "#value-identifiers"}]
 						},
-						"2": {
-							"name": "keyword.operator.mob"
-						},
+						"2": {"name": "keyword.operator.mob"},
 						"3": {
-							"patterns": [{"include": "#calls"}]
+							"patterns": [{"include": "#type-identifiers"}]
 						}
 					}
 				}
@@ -117,7 +125,12 @@
 						"1": {"name":"storage.type.type.mob"},
 						"2": {"patterns": [{"include": "#type-identifiers"}]},
 						"3": {"name": "keyword.operator.assignment.mob"},
-						"4": {"patterns": [{"include": "#type-identifiers"}]}
+						"4": {
+							"patterns": [
+								{"include": "#value-identifiers"},
+								{"include": "#type-identifiers"}
+							]
+						}
 					}
 				},
 				{
@@ -136,15 +149,9 @@
 					"name": "meta.yield.mob",
 					"match": "(yield) (.+)$",
 					"captures": {
-						"1": {
-							"name": "keyword.control.yield.mob"
-						},
+						"1": {"name": "keyword.control.yield.mob"},
 						"2": {
-							"patterns": [
-								{
-									"include": "#calls"
-								}
-							]
+							"patterns": [{"include": "#calls"}]
 						}
 					}
 				}
@@ -166,7 +173,7 @@
 			"patterns": [
 				{
 					"name": "meta.call.mob",
-					"match": "([^ ]+)( .+)?$",
+					"match": "([^ ]+)( .*)?$",
 					"captures": {
 						"1": {
 							"patterns": [
@@ -179,10 +186,11 @@
 											"patterns": [
 												{
 													"name": "entity.name.function.mob",
-													"match": "[a-z].*"
+													"match": "\\b[a-z].*"
 												},
 												{
-													"name": "invalid.illegal.mob"
+													"name": "invalid.illegal.mob",
+													"match": ".+"
 												}
 											]
 										}
@@ -228,11 +236,11 @@
 			"patterns": [
 				{
 					"name": "keyword.control.mob",
-					"match": "(?<!\\.)\\b(await|return|throw)\\b"
+					"match": "(?<!\\.)\\b(await|return|throw|namespace)\\b"
 				},
 				{
 					"name": "storage.type.mob",
-					"match": "(?<!\\.)\\b(given|namespace)\\b"
+					"match": "(?<!\\.)\\b(given)\\b"
 				},
 				{
 					"name": "support.function.mob",
@@ -245,14 +253,6 @@
 				{
 					"name": "variable.language.that.mob",
 					"match": "(?<!\\.)\\b(that)\\b"
-				},
-				{
-					"name": "constant.language.mob",
-					"match": "(?<!\\.)\\b(true|false|null)\\b"
-				},
-				{
-					"name": "support.constant.mob",
-					"match": "(?<!\\.)\\b(catch|finally|else|for)\\b"
 				}
 			]
 		},
