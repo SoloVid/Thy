@@ -4,51 +4,35 @@ import * as _ from 'lodash'
 // Reserved words
 
 // Continues argument list on next line
-const And = createToken({ name: "Return", pattern: /return/ })
+export const And = createToken({ name: "And", pattern: /and/ })
 
 // Like ES async
 // Why different from function call? It goes with fun.
-const Async = createToken({ name: "Return", pattern: /return/ })
+export const Async = createToken({ name: "Async", pattern: /async/ })
 
-// Like ES await
-// We can treat this as just a function call through parsing.
-// const Await = createToken({ name: "Return", pattern: /return/ })
 // Variable declaration with deferred assignment (a la ES `let`)
-const Be = createToken({ name: "Return", pattern: /return/ })
-
-// For `defer if condition\n  return`
-// Only necessary if await is allowed inline with function call.
-// const Defer = createToken({ name: "Return", pattern: /return/ })
+export const Be = createToken({ name: "Return", pattern: /return/ })
 
 // Kind of like mixture of ES `export` and `public`
 // Why different from function call? It requires identifier name.
-const Export = createToken({ name: "Return", pattern: /return/ })
+export const Export = createToken({ name: "Export", pattern: /export/ })
 
 // Like ES `function`, but also `class`
-const Fun = createToken({ name: "Fun", pattern: /fun/ })
+export const Fun = createToken({ name: "Fun", pattern: /fun/ })
 
-// For function parameters and potentially imports
-// Why different from function call?
-// Only needs to be a specifically lexed token because its use is different in typeFun (and maybe with imports?).
-// const Given = createToken({ name: "Given", pattern: /given/ })
+// Assignment (implicit `const` declaration)
+export const Is = createToken({ name: "Is", pattern: /is/ })
 
-// Assignment (usually with implicit `const` declaration)
-const Is = createToken({ name: "Is", pattern: /is/ })
+export const Private = createToken({name: "Private", pattern: /private/ })
 
-// Like ES return
-// Only needs to be a specifically lexed token because its use is different in typeFun.
-// Actually it needn't be grammatically different, just semantically different.
-// const Return = createToken({ name: "Return", pattern: /return/ })
+// Assignment (for `let` variables)
+export const To = createToken({ name: "To", pattern: /to/ })
 
 // Like TypeScript type
-const Type = createToken({ name: "Return", pattern: /return/ })
-
-// Serves role of TypeScript parameterized type
-// Just use "type fun" instead since "type" is already a keyword.
-// const TypeFun = createToken({ name: "Return", pattern: /return/ })
+export const Type = createToken({ name: "Type", pattern: /type/ })
 
 // Shorthand for `defer await`; actually just what defer would have been.
-const Yield = createToken({ name: "Return", pattern: /return/ })
+export const Yield = createToken({ name: "Yield", pattern: /yield/ })
 
 export const StringLiteral = createToken({
     name: "StringLiteral",
@@ -59,7 +43,8 @@ export const NumberLiteral = createToken({
     pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
 })
 
-export const IdentifierExpression = createToken({ name: "IdentifierExpression", pattern: /[a-zA-Z]+(\.([a-zA-Z]+))*/ })
+export const ScopedTypeIdentifier = createToken({ name: "ScopedTypeIdentifier", pattern: /([a-z][a-zA-Z]*\.)*([A-Z][a-zA-Z]*)/ })
+export const ScopedValueIdentifier = createToken({ name: "ScopedValueIdentifier", pattern: /([a-z][a-zA-Z]*\.)*([a-z][a-zA-Z]*)/ })
 
 // newlines are not skipped, by setting their group to "nl" they are saved in the lexer result
 // and thus we can check before creating an indentation token that the last token matched was a newline.
@@ -81,10 +66,7 @@ function matchMultilineComment(text: string, offset: number, matchedTokens: ITok
         regex.lastIndex = offset
         const openResult = regex.exec(text)
         if (openResult !== null) {
-            // console.log('Maybe multiline match')
-            // console.log(openResult)
             const tag = openResult[0]
-            // console.log(tag)
             const indentLevel = _.last(indentStack)!
             const fullCommentRegex = new RegExp(`${tag}(.|\\r|\\n)*?\\n {${indentLevel}}${tag}(?=[\\r\\n])`, 'my')
             fullCommentRegex.lastIndex = offset
@@ -242,31 +224,20 @@ export const allTokens = [
     Spaces,
 
     // Keywords
-    At,
     And,
-    Class,
-    ElseIf,
-    Else,
-    False,
-    For,
+    Async,
+    Be,
+    Export,
     Fun,
-    Given,
-    Gte,
-    Gt,
-    If,
     Is,
-    Lte,
-    Lt,
-    Not,
-    Null,
-    Or,
-    Return,
-    True,
-    While,
+    To,
+    Type,
+    Yield,
 
     // Variable expressions
     NumberLiteral,
-    IdentifierExpression,
+    ScopedTypeIdentifier,
+    ScopedValueIdentifier,
     StringLiteral,
 ]
 

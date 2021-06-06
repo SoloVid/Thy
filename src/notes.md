@@ -1,22 +1,6 @@
 
 ## Open Questions
 
-- I came up with an idea for a shorthand for some cases: `that`
-    - It might be nice to be able to handle some cases less verbosely. e.g. `compare.equals a b // if that ...`
-    - Do I want to support an implicit temporary capture variable like `that`?
-    - DECISION: Yes, but may limit it like no that produced by assignment and that can't be used as function to call.
-- Interfaces? I don't think the current language spec supports defining them. :/
-    - Maybe this is just a type fun with no return call.
-    - DECISION: Yep, that works for me.
-- How to allow rest parameters / var-args / whatever other languages call them?
-    - This is necessary at least because of how if/else will be implemented.
-    - DECISION: Don't allow rest parameters. Forget about elseif. if/else can just be if + optional params for else.
-- Will it be a problem to have the same built-in functions (e.g. `if`) to support async and sync usage?
-    - Compiling to TypeScript problem? No.
-    - Language purity? Undecided.
-    - DECISION: No. Default parameters and union types make this a non-issue.
-- Possibly related to previous question about `if`, allow method overloading and/or union types?
-    - DECISION: No method overloading. Union types are ok.
 - How to handle imports?
     - Stick with implicit used by splitTime at present?
     - Use `given` for some explicit importing?
@@ -37,31 +21,6 @@
         - add / subtract
         - multiply / divide / mod
         - exponent?
-- typeFun? This is pretty complex, but it could be simple and powerful as a language feature.
-    - DECISION: Yes, but I've cut out function calls.
-- async functions
-    - Should blocks be automatically detected as async? Yes.
-    - Should async functions be explicitly marked? Yes (for the sake of callers).
-    - Should async function be typed with Promise<X>? No (it's always Promise anyway, and you can't nest Promise types).
-- TypeScript interoperability
-    - Should interoperability go both ways? Or just one way?
-    - DECISION: It should be interoperable both ways. However, we'll only guarantee that all valid code in this language can be used by TypeScript, not necessarily the other way around.
-- Should `await` be special syntactically?
-    - Special: `myVar is await myFunc arg`
-    - Not special: `waitForMyFunc is myFunc arg // myVar is await waitForMyFunc`?
-        - If it isn't special, it might absolve the desire for distinction between `defer` and `yield`
-        - `defer await myFunc arg` would not be allowed, so the limit would be `defer await waitForMyFunc`
-    - DECISION: not special
-- Should `new` be a special function for interoperability with TypeScript?
-    - I'd like this to be no, but I'm not sure if that significantly drops the usability of this language.
-    - Primary alternative is to support a conventional `newBlah` naming scheme that maps one-to-one with TypeScript class instantiation.
-    - DECISION: No, `newBlah` will always map to `new Blah()` in TypeScript and vice versa.
-        - Defining a function called `new` in this language will produce an error in TypeScript.
-        - Defining a function called `newBlah` in TypeScript will be inaccessible in this language.
-- Should capitalized scopes be allowed?
-    - TypeScript code might expose static class methods or capitalized namespaces.
-    - Should this language support accessing those?
-    - DECISION: No, don't support capitalized scopes. If existing TypeScript has this and needs to be used, the TypeScript code can be refactored or wrappers written.
 
 ## Overview of Language Strategy
 

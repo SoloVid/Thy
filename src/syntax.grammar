@@ -6,13 +6,13 @@ statement {
   FunctionDefinition |
   FunctionCallStatement |
   ConstantAssignment |
-  Assignment |
+  VariableAssignment |
   Declaration |
   TypeStatement
 }
 
 FunctionDefinition {
-  kw<"export">? kw<"private">? kw<"async">? kw<"fun"> TypeParameters? ValueIdentifier ParameterizedType? Block
+  (kw<"export"> | kw<"private">)? kw<"async">? kw<"fun"> TypeParameters? ValueIdentifier ParameterizedType? Block
 }
 
 FunctionCallStatement {
@@ -24,15 +24,15 @@ FunctionCall {
 }
 
 ConstantAssignment {
-  kw<"export">? kw<"private">? ScopedValueIdentifier kw<"is"> FunctionCall
+  (kw<"export"> | kw<"private">)? ValueIdentifier kw<"is"> FunctionCall
 }
 
-Assignment {
+VariableAssignment {
   ScopedValueIdentifier kw<"to"> FunctionCall
 }
 
 Declaration {
-  kw<"export">? kw<"private">? ValueIdentifier kw<"be"> ParameterizedType
+  (kw<"export"> | kw<"private">)? ValueIdentifier kw<"be"> ParameterizedType
 }
 
 Arguments {
@@ -77,7 +77,7 @@ TypeStatement {
 }
 
 TypeAliasDefinition {
-  kw<"export">? kw<"type"> TypeIdentifier kw<"is"> ParameterizedType
+  (kw<"export"> | kw<"private">)? kw<"type"> TypeIdentifier kw<"is"> ParameterizedType
 }
 
 TypeGenericDefinition {
@@ -86,7 +86,7 @@ TypeGenericDefinition {
 }
 
 TypeFunctionDefinition {
-  kw<"export">? kw<"type"> kw<"fun"> TypeIdentifier Block
+  (kw<"export"> | kw<"private">)? kw<"type"> kw<"fun"> TypeIdentifier Block
 }
 
 // Keywords
