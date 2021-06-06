@@ -44,12 +44,14 @@ namespace blahBlah
     default
       doFallback
 
-  fun typedFun ReturnType
+  private async fun typedFun ReturnType
     given A pA
     given B pB pBDefault
+    asyncAdd pA pB
+    await that
     return pA plus pB
 
-  fun U generalizedFun RT U
+  export fun U generalizedFun RT U
     given AT U pA
     given BT U pB
 
@@ -78,11 +80,6 @@ namespace blahBlah
     type MX is MyType X
     type OY is YOtherType Y
     type Result is All MX OY
-    Maybe we should return a list here instead of an intersection.
-    I don't know if I actually want to support unions/intersections.
-    I may just want to support intersection for interfaces like Java.
-    The primary use case of unions is for nullability.
-    I can just have Null type (with type parameter) for that though.
     return Result
 
   Class definition. class Thing<T> implements Interfaces<T, Yo>
@@ -95,8 +92,8 @@ namespace blahBlah
     w be String
 
     Constructor body.
-    q is qq
-    w is we
+    private q is qq
+    w to we
 
     field1 is get
       return 5
@@ -131,7 +128,7 @@ namespace blahBlah
     pa is a
     pb is b
     pc is
-      m is 5
+      m is val 5
 
   Multiline comment. Do I want this? Could aid mobile dev significantly bc no comment out hotkey.
   ZZZ
@@ -153,3 +150,12 @@ namespace blahBlah
     given x
     print x
   and d
+
+  try
+    doSomething
+      throw .my error.
+  and catch
+    given e
+    print e
+  and finally
+    print .*sigh*.

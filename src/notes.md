@@ -4,8 +4,10 @@
 - I came up with an idea for a shorthand for some cases: `that`
     - It might be nice to be able to handle some cases less verbosely. e.g. `compare.equals a b // if that ...`
     - Do I want to support an implicit temporary capture variable like `that`?
+    - DECISION: Yes, but may limit it like no that produced by assignment and that can't be used as function to call.
 - Interfaces? I don't think the current language spec supports defining them. :/
     - Maybe this is just a type fun with no return call.
+    - DECISION: Yep, that works for me.
 - How to allow rest parameters / var-args / whatever other languages call them?
     - This is necessary at least because of how if/else will be implemented.
     - DECISION: Don't allow rest parameters. Forget about elseif. if/else can just be if + optional params for else.
@@ -14,6 +16,7 @@
     - Language purity? Undecided.
     - DECISION: No. Default parameters and union types make this a non-issue.
 - Possibly related to previous question about `if`, allow method overloading and/or union types?
+    - DECISION: No method overloading. Union types are ok.
 - How to handle imports?
     - Stick with implicit used by splitTime at present?
     - Use `given` for some explicit importing?
@@ -82,6 +85,8 @@ These keywords need to be recognized by the lexer since they are part of the lan
 - export - modifier for fun and declarations
 - fun - type parameters plus return type requires special syntax not supported by function call
 - is - denotes preceding identifier as not a function call
+- private - modifier for fun and declarations
+- to - denotes preceding identifier as not a function call
 - type - type-related operations just start breaking the standard language stuff
 - yield - unlike standard function calls, this can (and must) precede another function call on the same line
 

@@ -5,13 +5,14 @@
 statement {
   FunctionDefinition |
   FunctionCallStatement |
+  ConstantAssignment |
   Assignment |
   Declaration |
   TypeStatement
 }
 
 FunctionDefinition {
-  kw<"export">? kw<"async">? kw<"fun"> TypeParameters? ValueIdentifier ParameterizedType? Block
+  kw<"export">? kw<"private">? kw<"async">? kw<"fun"> TypeParameters? ValueIdentifier ParameterizedType? Block
 }
 
 FunctionCallStatement {
@@ -22,12 +23,16 @@ FunctionCall {
   ScopedValueIdentifier TypeArguments? Arguments
 }
 
+ConstantAssignment {
+  kw<"export">? kw<"private">? ScopedValueIdentifier kw<"is"> FunctionCall
+}
+
 Assignment {
-  kw<"export">? ScopedValueIdentifier kw<"is"> FunctionCall
+  ScopedValueIdentifier kw<"to"> FunctionCall
 }
 
 Declaration {
-  kw<"export">? ValueIdentifier kw<"be"> ParameterizedType
+  kw<"export">? kw<"private">? ValueIdentifier kw<"be"> ParameterizedType
 }
 
 Arguments {
