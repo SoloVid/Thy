@@ -1,0 +1,269 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Mobile Lang",
+	"patterns": [
+		{
+			"include": "#script-parts"
+		}
+	],
+	"repository": {
+		"script-parts": {
+			"patterns": [
+				{
+					"include": "#comments"
+				},
+				{
+					"include": "#code-lines"
+				}
+			]
+		},
+		"comments": {
+			"patterns": [
+				{
+					"begin": "^(\\s*)([A-Z]{3,}.*)$",
+					"end": "^(\\1)(\\2)$",
+					"beginCaptures": {
+						"2": { "name": "comment.block.mob" }
+					},
+					"contentName": "comment.block.mob",
+					"endCaptures": {
+						"2": { "name": "comment.block.mob" }
+					}
+				},
+				{
+					"match": "^\\s*([A-Z].*)$",
+					"captures": {
+						"1": { "name": "comment.line.mob" }
+					}
+				}
+			]
+		},
+		"code-lines": {
+			"patterns": [
+				{
+					"name": "meta.line.mob",
+					"match": "^(\\s*)([a-z].+)$",
+					"captures": {
+						"2": {
+							"name": "meta.line.content.mob",
+							"patterns": [
+								{ "include": "#type-definitions" },
+								{ "include": "#functions" },
+								{ "include": "#assignments" },
+								{ "include": "#declarations" },
+								{ "include": "#yields" },
+								{ "include": "#call-continuations" },
+								{ "include": "#calls" }
+							]
+						}
+					}
+				}
+			]
+		},
+		"functions": {
+			"patterns": [
+				{
+					"name": "meta.function.prototype.mob",
+					"match": "(?:(export) +)?(?:(async) +)?(fun) +(?:(.+?) +)?([a-z][^ ]*)( +.+)?$",
+					"captures": {
+						"1": {"name": "keyword.control.export.mob"},
+						"2": {"name": "storage.modifier.async.mob"},
+						"3": {"name": "storage.type.function.mob"},
+						"4": {"patterns": [{"include": "#type-identifiers"}]},
+						"5": {"name": "entity.name.function.mob"},
+						"6": {"patterns": [{"include": "#type-identifiers"}]}
+					}
+				}
+			]
+		},
+		"assignments": {
+			"patterns": [
+				{
+					"name": "meta.assignment.mob",
+					"match": "(?:(export) +)?([^ ]+) +(is|to) +(.+)$",
+					"captures": {
+						"1": {"name": "keyword.control.export.mob"},
+						"2": {"patterns": [{"include": "#value-identifiers"}]},
+						"3": {"name": "keyword.operator.mob"},
+						"4": {"patterns": [{"include": "#calls"}]}
+					}
+				}
+			]
+		},
+		"declarations": {
+			"patterns": [
+				{
+					"name": "meta.declaration.mob",
+					"match": "([^ ]+) +(be) +(.+)$",
+					"captures": {
+						"1": {
+							"patterns": [{"include": "#value-identifiers"}]
+						},
+						"2": {
+							"name": "keyword.operator.mob"
+						},
+						"3": {
+							"patterns": [{"include": "#calls"}]
+						}
+					}
+				}
+			]
+		},
+		"type-definitions": {
+			"patterns": [
+				{
+					"match": "(type) +([^ ]+) +(is|be) +(.+)$",
+					"captures": {
+						"1": {"name":"storage.type.type.mob"},
+						"2": {"patterns": [{"include": "#type-identifiers"}]},
+						"3": {"name": "keyword.operator.assignment.mob"},
+						"4": {"patterns": [{"include": "#type-identifiers"}]}
+					}
+				},
+				{
+					"match": "(type) +(fun) +([^ ]+)$",
+					"captures": {
+						"1": {"name":"storage.type.type.mob"},
+						"2": {"name":"storage.type.function.mob"},
+						"3": {"patterns": [{"include": "#type-identifiers"}]}
+					}
+				}
+			]
+		},
+		"yields": {
+			"patterns": [
+				{
+					"name": "meta.yield.mob",
+					"match": "(yield) (.+)$",
+					"captures": {
+						"1": {
+							"name": "keyword.control.yield.mob"
+						},
+						"2": {
+							"patterns": [
+								{
+									"include": "#calls"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"call-continuations": {
+			"patterns": [
+				{
+					"name": "meta.call.continuation.mob",
+					"match": "(and)( .*)?$",
+					"captures": {
+						"1": {"name": "keyword.operator.and.mob"},
+						"2": {"patterns": [{"include": "#values"}]}
+					}
+				}
+			]
+		},
+		"calls": {
+			"patterns": [
+				{
+					"name": "meta.call.mob",
+					"match": "([^ ]+)( .+)?$",
+					"captures": {
+						"1": {
+							"patterns": [
+								{"include": "#special-functions"},
+								{
+									"match": "(?:(.+?)\\.)?([^. ]+)",
+									"captures": {
+										"1": {"patterns": [{"include": "#values"}]},
+										"2": {
+											"patterns": [
+												{
+													"name": "entity.name.function.mob",
+													"match": "[a-z].*"
+												},
+												{
+													"name": "invalid.illegal.mob"
+												}
+											]
+										}
+									}
+								}
+							]
+						},
+						"2": {
+							"name": "meta.arguments.mob",
+							"patterns": [
+								{"include": "#type-identifiers"},
+								{"include": "#values"}
+							]
+						}
+					}
+				}
+			]
+		},
+		"values": {
+			"patterns": [
+				{"include": "#strings"},
+				{"include": "#numeric-literals"},
+				{"include": "#special-values"},
+				{"include": "#value-identifiers"}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.other.mob",
+			"begin": "(?<![a-z])\\.",
+			"end": "\\.(?!\\.)",
+			"patterns": [
+				{
+					"name": "constant.character.escape.mob",
+					"match": "\\.\\."
+				}
+			]
+		},
+		"numeric-literals": {
+			"name": "constant.numeric.mob",
+			"match": "[0-9]+(\\.[0-9]+)?"
+		},
+		"special-functions": {
+			"patterns": [
+				{
+					"name": "keyword.control.mob",
+					"match": "(?<!\\.)\\b(await|return|throw)\\b"
+				},
+				{
+					"name": "storage.type.mob",
+					"match": "(?<!\\.)\\b(given|namespace)\\b"
+				},
+				{
+					"name": "support.function.mob",
+					"match": "(?<!\\.)\\b(get|set|if|loop|switch)\\b"
+				}
+			]
+		},
+		"special-values": {
+			"patterns": [
+				{
+					"name": "variable.language.that.mob",
+					"match": "(?<!\\.)\\b(that)\\b"
+				},
+				{
+					"name": "constant.language.mob",
+					"match": "(?<!\\.)\\b(true|false|null)\\b"
+				},
+				{
+					"name": "support.constant.mob",
+					"match": "(?<!\\.)\\b(catch|finally|else|for)\\b"
+				}
+			]
+		},
+		"type-identifiers": {
+			"name": "entity.name.type.mob",
+			"match": "\\b[A-Z][a-zA-Z0-9]*\\b"
+		},
+		"value-identifiers": {
+			"name": "variable.other.mob",
+			"match": "\\b[a-z][a-zA-Z0-9]*\\b"
+		}
+	},
+	"scopeName": "source.moby"
+}
