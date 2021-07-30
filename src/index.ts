@@ -1,33 +1,14 @@
-// import {parser} from "./syntax.grammar"
-// import {LezerLanguage, LanguageSupport, indentNodeProp, foldNodeProp, foldInside, delimitedIndent} from "@codemirror/language"
-// import {styleTags, tags as t} from "@codemirror/highlight"
-import { runLexExample } from "./lex-example"
+import { parseForCst } from "./parse-for-cst"
+import { readProgram } from "./read-program"
 
-// export const EXAMPLELanguage = LezerLanguage.define({
-//   parser: parser.configure({
-//     props: [
-//       indentNodeProp.add({
-//         Application: delimitedIndent({closing: ")", align: false})
-//       }),
-//       foldNodeProp.add({
-//         Application: foldInside
-//       }),
-//       styleTags({
-//         Identifier: t.variableName,
-//         Boolean: t.bool,
-//         String: t.string,
-//         LineComment: t.lineComment,
-//         "( )": t.paren
-//       })
-//     ]
-//   }),
-//   languageData: {
-//     commentTokens: {line: ";"}
-//   }
-// })
+async function run() {
+    try {
+        const source = await readProgram("example-program.thy")
+        const cst = parseForCst(source)
+        console.log(cst)
+    } catch (e: unknown) {
+        console.error(e)
+    }
+}
 
-// export function EXAMPLE() {
-//   return new LanguageSupport(EXAMPLELanguage)
-// }
-
-runLexExample()
+run()

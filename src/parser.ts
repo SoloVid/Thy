@@ -1,17 +1,19 @@
 import { CstParser } from "chevrotain"
-import * as t from "./lexer"
-import { allTokens } from "./lexer"
+import { TokenTypes } from "./token-types"
 
-export class MobyParser extends CstParser {
-    constructor() {
-        super(allTokens)
+export class Parser extends CstParser {
+    private readonly t: TokenTypes
+
+    constructor(tokenTypes: TokenTypes) {
+        super(tokenTypes.allTokens)
+        this.t = tokenTypes
 
         this.performSelfAnalysis()
     }
 
     script = this.RULE("script", () => {
         this.MANY_SEP({
-            SEP: t.StatementSeparator,
+            SEP: this.t.StatementSeparator,
             DEF: () => {
                 this.SUBRULE(this.statement)
             }
@@ -20,8 +22,8 @@ export class MobyParser extends CstParser {
 
     statement = this.RULE("statement", () => {
         this.OR([
-            { ALT: () => this.CONSUME(t.MultilineComment) },
-            { ALT: () => this.CONSUME(t.Comment) },
+            { ALT: () => this.CONSUME(this.t.MultilineComment) },
+            { ALT: () => this.CONSUME(this.t.Comment) },
             { ALT: () => this.SUBRULE(this.typeStatement) },
             { ALT: () => this.SUBRULE(this.constantAssignment) },
             { ALT: () => this.SUBRULE(this.variableAssignment) },
@@ -34,13 +36,13 @@ export class MobyParser extends CstParser {
 
     functionCallStatement = this.RULE("functionCallStatement", () => {
         this.OPTION(() => {
-            this.CONSUME(t.Yield)
+            this.CONSUME(this.t.Yield)
         })
         this.SUBRULE(this.namedFunctionCall)
     })
 
     namedFunctionCall = this.RULE("namedFunctionCall", () => {
-        this.CONSUME(t.ScopedValueIdentifier)
+        this.CONSUME(this.t.ScopedValueIdentifier)
         this.SUBRULE(this.typeArguments)
         this.SUBRULE(this.argumentsRule)
     })
@@ -55,20 +57,20 @@ export class MobyParser extends CstParser {
     constantAssignment = this.RULE("constantAssignment", () => {
         this.exportOrPrivate()
         this.SUBRULE(this.unscopedValueIdentifier)
-        this.CONSUME(t.Is)
+        this.CONSUME(this.t.Is)
         this.SUBRULE(this.functionCall)
     })
 
     variableAssignment = this.RULE("variableAssignment", () => {
         this.SUBRULE(this.unscopedValueIdentifier)
-        this.CONSUME(t.To)
+        this.CONSUME(this.t.To)
         this.SUBRULE(this.functionCall)
     })
 
     variableDeclaration = this.RULE("declaration", () => {
         this.exportOrPrivate()
         this.SUBRULE(this.unscopedValueIdentifier)
-        this.CONSUME(t.Be)
+        this.CONSUME(this.t.Be)
         this.SUBRULE(this.parameterizedType)
     })
 
@@ -87,31 +89,31 @@ export class MobyParser extends CstParser {
 
     atomicExpression = this.RULE("atomicExpression", () => {
         this.OR([
-            { ALT: () => this.CONSUME(t.NumberLiteral) },
-            { ALT: () => this.CONSUME(t.StringLiteral) },
-            { ALT: () => this.CONSUME(t.ScopedValueIdentifier) },
+            { ALT: () => this.CONSUME(this.t.NumberLiteral) },
+            { ALT: () => this.CONSUME(this.t.StringLiteral) },
+            { ALT: () => this.CONSUME(this.t.ScopedValueIdentifier) },
         ])
     })
 
     block = this.RULE("block", () => {
-        this.CONSUME(t.StartBlock)
+        this.CONSUME(this.t.StartBlock)
         this.SUBRULE(this.script)
-        this.CONSUME(t.EndBlock)
+        this.CONSUME(this.t.EndBlock)
     })
 
     unscopedTypeIdentifier = this.RULE("unscopedTypeIdentifier", () => {
         // TODO: Can we actually check here that it is unscoped?
-        this.CONSUME(t.ScopedTypeIdentifier)
+        this.CONSUME(this.t.ScopedTypeIdentifier)
     })
 
     unscopedValueIdentifier = this.RULE("unscopedValueIdentifier", () => {
         // TODO: Can we actually check here that it is unscoped?
-        this.CONSUME(t.ScopedValueIdentifier)
+        this.CONSUME(this.t.ScopedValueIdentifier)
     })
 
     parameterizedType = this.RULE("parameterizedType", () => {
         this.AT_LEAST_ONE(() => {
-            this.CONSUME(t.ScopedTypeIdentifier)
+            this.CONSUME(this.t.ScopedTypeIdentifier)
         })
     })
 
@@ -123,7 +125,7 @@ export class MobyParser extends CstParser {
 
     typeArguments = this.RULE("typeArguments", () => {
         this.MANY(() => {
-            this.CONSUME(t.ScopedTypeIdentifier)
+            this.CONSUME(this.t.ScopedTypeIdentifier)
         })
     })
 
@@ -136,9 +138,9 @@ export class MobyParser extends CstParser {
 
     typeDefinition = this.RULE("typeDefinition", () => {
         this.exportOrPrivate()
-        this.CONSUME(t.Type)
+        this.CONSUME(this.t.Type)
         this.SUBRULE(this.unscopedTypeIdentifier)
-        this.CONSUME(t.Is)
+        this.CONSUME(this.t.Is)
         this.OR2([
             { ALT: () => this.SUBRULE(this.parameterizedType) },
             { ALT: () => this.SUBRULE(this.functionCall) },
@@ -146,7 +148,7 @@ export class MobyParser extends CstParser {
     })
 
     typeSpecialCall = this.RULE("typeSpecialCall", () => {
-        this.CONSUME(t.Type)
+        this.CONSUME(this.t.Type)
         // This is specifically for `type given` and `type return`, but we'll sort that out later.
         this.SUBRULE(this.functionCall)
     })
@@ -154,8 +156,8 @@ export class MobyParser extends CstParser {
     private exportOrPrivate() {
         this.OPTION(() => {
             this.OR([
-                { ALT: () => this.CONSUME(t.Export) },
-                { ALT: () => this.CONSUME(t.Private) },
+                { ALT: () => this.CONSUME(this.t.Export) },
+                { ALT: () => this.CONSUME(this.t.Private) },
             ])
         })
     }
