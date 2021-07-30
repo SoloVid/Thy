@@ -1,12 +1,10 @@
-import { createToken, createTokenInstance, Lexer, CstParser, IToken } from "chevrotain"
-import { allTokens } from "./lexer"
+import { CstParser } from "chevrotain"
 import * as t from "./lexer"
+import { allTokens } from "./lexer"
 
 export class MobyParser extends CstParser {
     constructor() {
-        super(allTokens, {
-            // maxLookahead: 20,
-        })
+        super(allTokens)
 
         this.performSelfAnalysis()
     }
@@ -18,45 +16,21 @@ export class MobyParser extends CstParser {
                 this.SUBRULE(this.statement)
             }
         })
-        // this.MANY(() => {
-        //     this.OPTION(() => {
-        //         this.SUBRULE(this.statement)
-        //     })
-        //     this.CONSUME1(t.StatementSeparator)
-        // })
     })
 
     statement = this.RULE("statement", () => {
         this.OR([
             { ALT: () => this.CONSUME(t.MultilineComment) },
             { ALT: () => this.CONSUME(t.Comment) },
-            // { ALT: () => this.SUBRULE(this.unparsedStatement) },
             { ALT: () => this.SUBRULE(this.typeStatement) },
             { ALT: () => this.SUBRULE(this.constantAssignment) },
             { ALT: () => this.SUBRULE(this.variableAssignment) },
             { ALT: () => this.SUBRULE(this.variableDeclaration) },
             { ALT: () => this.SUBRULE(this.functionCallStatement) },
-            { ALT: () => { console.warn('something unexpected: ' + JSON.stringify(this.LA(1))) } },
+            // This case is primarily for blank lines.
+            { ALT: () => {} },
         ])
     })
-
-    // unparsedStatement = this.RULE("unparsedStatement", () => {
-    //     this.MANY(() => {
-    //         this.OR([
-    //             { ALT: () => this.CONSUME(t.And) },
-    //             { ALT: () => this.CONSUME(t.Be) },
-    //             { ALT: () => this.CONSUME(t.Export) },
-    //             { ALT: () => this.CONSUME(t.Is) },
-    //             { ALT: () => this.CONSUME(t.To) },
-    //             { ALT: () => this.CONSUME(t.Type) },
-    //             { ALT: () => this.SUBRULE(this.block) },
-    //             { ALT: () => this.CONSUME(t.NumberLiteral) },
-    //             { ALT: () => this.CONSUME(t.ScopedTypeIdentifier) },
-    //             { ALT: () => this.CONSUME(t.ScopedValueIdentifier) },
-    //             { ALT: () => this.CONSUME(t.StringLiteral) },
-    //         ])
-    //     })
-    // })
 
     functionCallStatement = this.RULE("functionCallStatement", () => {
         this.OPTION(() => {
@@ -119,16 +93,10 @@ export class MobyParser extends CstParser {
         ])
     })
 
-    // newlineIndent = this.RULE("newlineIndent", () => {
-    //     this.CONSUME2(t.Newline)
-    //     this.CONSUME(t.Indent)
-    // })
-
     block = this.RULE("block", () => {
-        this.CONSUME(t.Indent)
-        // this.SUBRULE(this.newlineIndent)
+        this.CONSUME(t.StartBlock)
         this.SUBRULE(this.script)
-        this.CONSUME(t.Outdent)
+        this.CONSUME(t.EndBlock)
     })
 
     unscopedTypeIdentifier = this.RULE("unscopedTypeIdentifier", () => {

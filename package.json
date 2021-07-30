@@ -12,8 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "chevrotain": "^9.0.1",
-    "lezer": "^0.13.0",
-    "lodash": "^4.17.21"
+    "lezer": "^0.13.0"
   },
   "devDependencies": {
     "@tsconfig/node14": "^1.0.1",
