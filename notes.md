@@ -21,6 +21,8 @@
         - add / subtract
         - multiply / divide / mod
         - exponent?
+- What happens when you put non-type implementation in a TypeFun?
+    - Compiler error?
 
 ## Overview of Language Strategy
 
@@ -39,10 +41,8 @@ Every argument must be a single term.
 These keywords need to be recognized by the lexer since they are part of the language grammar.
 
 - and - continues function call on new line
-- async - modifier for fun
 - be - denotes preceding identifier as not a function call
 - export - modifier for fun and declarations
-- fun - type parameters plus return type requires special syntax not supported by function call
 - is - denotes preceding identifier as not a function call
 - private - modifier for fun and declarations
 - to - denotes preceding identifier as not a function call
@@ -54,9 +54,9 @@ These keywords need to be recognized by the lexer since they are part of the lan
 These "functions" allow non-special grammar, but their behavior is significantly different from functions you can write in this language.
 
 - await - affects standard language control flow
+- fun - define a function
 - get - array access or define as getter
 - given - not really a runtime call
-- namespace - takes as a parameter an identifier that may or may not already have a value
 - return - affects standard language control flow
 - set - array mutate or define as setter
 - throw - affects standard language control flow
@@ -74,6 +74,7 @@ These values/functions operate a lot like stuff you can write in this language, 
 - loop - function
 - null - value
 - switch - function
+- thy - function / value
 - true - value
 - try - function
 - val - function
@@ -82,11 +83,39 @@ These values/functions operate a lot like stuff you can write in this language, 
 
 - Array (1 type parameter)
 - Bool/Boolean (which? both?)
-- Null
+- If (4 type parameters)
+- Null (0 or 1 type parameters)
 - Number
 - String
+- TypeFun
 - Unknown
 - Void
+
+## Building Blocks
+
+These are the fundamental building blocks of the language:
+
+- Code blocks
+- Values
+- Types
+
+### Code Blocks
+
+A code block is a section of code delimited by indentation.
+It can be `given` types and values and return a single value along with any number of types.
+
+### Values
+
+Values, variables. Tomato, potato.
+
+### Types
+
+Types are purely a compile-time aid for static code analysis.
+
+Types can be used in three places:
+- `type` statements
+- Variable declarations (`be`)
+- Function calls (as type arguments)
 
 ## Return values
 
@@ -292,51 +321,61 @@ and I'd like that rule not to be divergent depending on whether you use `newBlah
 
 ## Interfile Dependencies
 
+Namespaces are the primary means of dependency management in this language.
+
+Logically, a call to the `namespace` "function" does a couple things:
+- Declare part of a namespace object by name within the current scope.
+- Run the code inside the block some time (no guarantees when it will be run except that it will be run after the preceding non-namespace statements).
+- Run the block with correct dependencies injected after they are available.
+- Provide the partial namespace object to the calling context.
+
 WIP: Haven't quite thought through everything here yet.
 
 ```moby
 File one.moby
 
-namespace my.space
-    fun a
+thy.scope .my.space.
+    a is fun
         print .himom.
 ```
 
 ```moby
 File two.moby
 
-namespace my.space
-    fun b
+thy.scope .my.space.
+    b is fun
         print .hello.
 ```
 
 ```moby
 File three.moby
 
-given my.space
+a is thy .my.space.a.
+b is thy .my.space.b.
 
-my.space.a
-my.space.b
+a
+b
 ```
 
 If we wanted just a single moby file compiled from these, I believe the result could be:
 ```moby
-namespace global
-    namespace my.space
+thy.scope .global.
+    given thy
+    thy.scope .my.space.
         fun a
             print .himom.
-namespace global
-    namespace my.space
+thy.scope .global.
+    given thy
+    thy.scope .my.space.
         fun b
             print .hello.
-namespace global
-    given my.space
-    my.space.a
-    my.space.b
+thy.scope .global.
+    given thy
+    a is thy .my.space.a.
+    b is thy .my.space.b.
+    a
+    b
 ```
-
-`namespace` accepts a scoped value identifier as its first parameter and a block as its second.
-It does a merge thing (similar to TypeScript namespace) to that identifier with the return value from the block.
 
 ## Parameters
 

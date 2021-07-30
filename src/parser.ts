@@ -2,11 +2,10 @@ import { createToken, createTokenInstance, Lexer, CstParser, IToken } from "chev
 import { allTokens } from "./lexer"
 import * as t from "./lexer"
 
-
 export class MobyParser extends CstParser {
     constructor() {
         super(allTokens, {
-            maxLookahead: 20
+            // maxLookahead: 20,
         })
 
         this.performSelfAnalysis()
@@ -14,11 +13,17 @@ export class MobyParser extends CstParser {
 
     script = this.RULE("script", () => {
         this.MANY_SEP({
-            SEP: t.Newline,
+            SEP: t.StatementSeparator,
             DEF: () => {
                 this.SUBRULE(this.statement)
             }
         })
+        // this.MANY(() => {
+        //     this.OPTION(() => {
+        //         this.SUBRULE(this.statement)
+        //     })
+        //     this.CONSUME1(t.StatementSeparator)
+        // })
     })
 
     statement = this.RULE("statement", () => {
@@ -27,58 +32,50 @@ export class MobyParser extends CstParser {
             { ALT: () => this.CONSUME(t.Comment) },
             // { ALT: () => this.SUBRULE(this.unparsedStatement) },
             { ALT: () => this.SUBRULE(this.typeStatement) },
-            { ALT: () => this.SUBRULE(this.functionDefinition) },
             { ALT: () => this.SUBRULE(this.constantAssignment) },
             { ALT: () => this.SUBRULE(this.variableAssignment) },
             { ALT: () => this.SUBRULE(this.variableDeclaration) },
             { ALT: () => this.SUBRULE(this.functionCallStatement) },
-            { ALT: () => {} },
+            { ALT: () => { console.warn('something unexpected: ' + JSON.stringify(this.LA(1))) } },
         ])
     })
 
-    unparsedStatement = this.RULE("unparsedStatement", () => {
-        this.MANY(() => {
-            this.OR([
-                { ALT: () => this.CONSUME(t.And) },
-                { ALT: () => this.CONSUME(t.Async) },
-                { ALT: () => this.CONSUME(t.Be) },
-                { ALT: () => this.CONSUME(t.Export) },
-                { ALT: () => this.CONSUME(t.Fun) },
-                { ALT: () => this.CONSUME(t.Is) },
-                { ALT: () => this.CONSUME(t.To) },
-                { ALT: () => this.CONSUME(t.Type) },
-                { ALT: () => this.SUBRULE(this.block) },
-                { ALT: () => this.CONSUME(t.NumberLiteral) },
-                { ALT: () => this.CONSUME(t.ScopedTypeIdentifier) },
-                { ALT: () => this.CONSUME(t.ScopedValueIdentifier) },
-                { ALT: () => this.CONSUME(t.StringLiteral) },
-            ])
-        })
-    })
-
-    functionDefinition = this.RULE("functionDefinition", () => {
-        this.exportOrPrivate()
-        this.OPTION2(() => {
-            this.CONSUME(t.Async)
-        })
-        this.CONSUME(t.Fun)
-        this.SUBRULE(this.typeParameters)
-        this.SUBRULE(this.unscopedValueIdentifier)
-        this.SUBRULE(this.parameterizedType)
-        this.SUBRULE(this.block)
-    })
+    // unparsedStatement = this.RULE("unparsedStatement", () => {
+    //     this.MANY(() => {
+    //         this.OR([
+    //             { ALT: () => this.CONSUME(t.And) },
+    //             { ALT: () => this.CONSUME(t.Be) },
+    //             { ALT: () => this.CONSUME(t.Export) },
+    //             { ALT: () => this.CONSUME(t.Is) },
+    //             { ALT: () => this.CONSUME(t.To) },
+    //             { ALT: () => this.CONSUME(t.Type) },
+    //             { ALT: () => this.SUBRULE(this.block) },
+    //             { ALT: () => this.CONSUME(t.NumberLiteral) },
+    //             { ALT: () => this.CONSUME(t.ScopedTypeIdentifier) },
+    //             { ALT: () => this.CONSUME(t.ScopedValueIdentifier) },
+    //             { ALT: () => this.CONSUME(t.StringLiteral) },
+    //         ])
+    //     })
+    // })
 
     functionCallStatement = this.RULE("functionCallStatement", () => {
         this.OPTION(() => {
             this.CONSUME(t.Yield)
         })
-        this.SUBRULE(this.functionCall)
+        this.SUBRULE(this.namedFunctionCall)
     })
 
-    functionCall = this.RULE("functionCall", () => {
+    namedFunctionCall = this.RULE("namedFunctionCall", () => {
         this.CONSUME(t.ScopedValueIdentifier)
         this.SUBRULE(this.typeArguments)
         this.SUBRULE(this.argumentsRule)
+    })
+
+    functionCall = this.RULE("functionCall", () => {
+        this.OR([
+            { ALT: () => this.SUBRULE(this.namedFunctionCall) },
+            { ALT: () => this.SUBRULE(this.argumentsStartingWithBlockRule) }
+        ])
     })
 
     constantAssignment = this.RULE("constantAssignment", () => {
@@ -102,13 +99,15 @@ export class MobyParser extends CstParser {
     })
 
     argumentsRule = this.RULE("argumentsRule", () => {
-        this.MANY(() => {
-            this.SUBRULE(this.atomicExpression)
-            this.OPTION(() => {
-                this.SUBRULE(this.block)
-                this.CONSUME(t.And)
-                this.SUBRULE(this.argumentsRule)
-            })
+        this.MANY(() => this.SUBRULE(this.atomicExpression))
+        this.OPTION(() => this.SUBRULE(this.argumentsStartingWithBlockRule))
+    })
+
+    argumentsStartingWithBlockRule = this.RULE("argumentsStartingWithBlockRule", () => {
+        this.SUBRULE(this.block)
+        this.OPTION(() => {
+            // this.CONSUME(t.And)
+            this.SUBRULE(this.argumentsRule)
         })
     })
 
@@ -120,8 +119,14 @@ export class MobyParser extends CstParser {
         ])
     })
 
+    // newlineIndent = this.RULE("newlineIndent", () => {
+    //     this.CONSUME2(t.Newline)
+    //     this.CONSUME(t.Indent)
+    // })
+
     block = this.RULE("block", () => {
         this.CONSUME(t.Indent)
+        // this.SUBRULE(this.newlineIndent)
         this.SUBRULE(this.script)
         this.CONSUME(t.Outdent)
     })
@@ -156,33 +161,26 @@ export class MobyParser extends CstParser {
 
     typeStatement = this.RULE("typeStatement", () => {
         this.OR([
-            { ALT: () => this.SUBRULE(this.typeAliasDefinition) },
-            { ALT: () => this.SUBRULE(this.typeGenericDefinition) },
-            { ALT: () => this.SUBRULE(this.typeFunctionDefinition) },
+            { ALT: () => this.SUBRULE(this.typeDefinition) },
+            { ALT: () => this.SUBRULE(this.typeSpecialCall) },
         ])
     })
 
-    typeAliasDefinition = this.RULE("typeAliasDefinition", () => {
+    typeDefinition = this.RULE("typeDefinition", () => {
         this.exportOrPrivate()
         this.CONSUME(t.Type)
         this.SUBRULE(this.unscopedTypeIdentifier)
         this.CONSUME(t.Is)
-        this.SUBRULE(this.parameterizedType)
+        this.OR2([
+            { ALT: () => this.SUBRULE(this.parameterizedType) },
+            { ALT: () => this.SUBRULE(this.functionCall) },
+        ])
     })
 
-    typeGenericDefinition = this.RULE("typeGenericDefinition", () => {
+    typeSpecialCall = this.RULE("typeSpecialCall", () => {
         this.CONSUME(t.Type)
-        this.SUBRULE(this.unscopedTypeIdentifier)
-        this.CONSUME(t.Be)
-        this.SUBRULE(this.parameterizedType)
-    })
-
-    typeFunctionDefinition = this.RULE("typeFunctionDefinition", () => {
-        this.exportOrPrivate()
-        this.CONSUME(t.Type)
-        this.CONSUME(t.Fun)
-        this.SUBRULE(this.unscopedTypeIdentifier)
-        this.SUBRULE(this.block)
+        // This is specifically for `type given` and `type return`, but we'll sort that out later.
+        this.SUBRULE(this.functionCall)
     })
 
     private exportOrPrivate() {

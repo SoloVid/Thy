@@ -1,6 +1,8 @@
-namespace blahBlah
+TS a la import { hey as hey } from ...
+hey is thy .blah.blah.hey.
 
-  fun main
+thy.scope .blahBlah.blah.
+  main is fun
     Assign literal. const a = 5
     a is val 5
     Assign value. const b = a
@@ -44,49 +46,74 @@ namespace blahBlah
     default
       doFallback
 
-  private async fun typedFun ReturnType
+  TS: type FunctionType = (pA: A) => ReturnType
+  More strictly something like: type FunctionType = typeof makeFunction((pA: A): ReturnType => {})
+  type FunctionType is fun
+    given A pA
+    type return ReturnType
+
+  private typedFun is fun
     given A pA
     given B pB pBDefault
+    type ReturnType is Promise InnerReturnType
+    type return ReturnType
     asyncAdd pA pB
     await that
     return pA plus pB
 
-  export fun U generalizedFun RT U
+  export generalizedFun is fun
+    type given Unknown U
     given AT U pA
     given BT U pB
+    type ReturnType is RT U
+    type return ReturnType
 
-  How to do conditional types? Maybe don't support?
   TS: type ConditionalType<T> = T extends A ? AImplication : BImplication
-  type fun ConditionalType
-    given T
+  type ConditionalType is fun
+    type given Unknown T
     type Result is If T A AImplication BImplication
-    return Result
+    type return Result
+
+  This doesn't have a TS direct representation. Closest thing is: type ConditionalTypeAlias<T> = ConditionalType<T>
+  type ConditionalTypeAlias is TypeFun ConditionalType
+  TS: type ConditionalTypeInst = ConditionalType // no arguments passed
+  type ConditionalTypeInst is ConditionalType
+
+  TypeScript: interface MyInterface1 { field1: number; field2: string; }
+  type MyInterface1 is
+    field1 be Number
+    field2 be String
 
   TypeScript: interface MyType<T> { field1: number; field2: T[]; }
-  type fun MyType
-    given T
-    type field1 is Number
-    type field2 is Array T
+  More strictly something like: type MyType<T> = typeof (() => { return { field1: null as number, field2: [null as T] } })()
+  type MyType is fun
+    type given Unknown T
+    type Result is
+      field1 be Number
+      field2 be Array T
+    type return Result
 
   TS type Interfaces<X extends number, Y extends X[] = boolean[]> = MyType<X> & YOtherType<Y>
-  type fun Interfaces
-    type X be Number
-    given X
-    Won't allow stuff to separate givens from top of fun, but needed here in typeFun.
-    type Y be Array X
+  type Interfaces is fun
+    type given Number X
+    Won't allow non-type statements to separate givens from top of fun, but needed here in type fun.
+    type YParent is Array X
     type DefaultY is Array Boolean
-    given Y DefaultY
+    type given YParent Y DefaultY
 
     type MX is MyType X
     type OY is YOtherType Y
     type Result is All MX OY
-    return Result
+    type return Result
 
   Class definition. class Thing<T> implements Interfaces<T, Yo>
-  fun T newThing Interfaces T Yo
+  newThing is fun
+    type given Unknown T
     Constructor parameters.
     given Q qq
     given String we
+    type ReturnType is Interfaces T Yo
+    type return ReturnType
 
     Class members.
     w be String
@@ -101,10 +128,10 @@ namespace blahBlah
       given n
       doSet n
 
-    Require 'export' or not? If default is to export everything, maybe that's fine because there is no type for the class.
-    fun method Void
+    method is fun
       given x
       given y
+      type return Void
       print x
       print y
 

@@ -12,14 +12,9 @@ statement {
 Definition {
   (kw<"export"> | kw<"private">)?
   (
-    FunctionDefinition |
     ConstantAssignment |
     VariableDeclaration
   )
-}
-
-FunctionDefinition {
-  kw<"async">? kw<"fun"> TypeParameters? ValueIdentifier ParameterizedType? Block
 }
 
 FunctionCallStatement {
@@ -27,7 +22,7 @@ FunctionCallStatement {
 }
 
 FunctionCall {
-  ScopedValueIdentifier TypeArguments? Arguments
+  ScopedValueIdentifier TypeArguments Arguments
 }
 
 ConstantAssignment {
@@ -65,8 +60,7 @@ ScopedValueIdentifier {
 }
 
 ParameterizedType {
-  // First identifier is the base type. Additional identifiers are type arguments.
-  ScopedTypeIdentifier ScopedTypeIdentifier*
+  ScopedTypeIdentifier TypeArguments
 }
 
 TypeParameters {
@@ -74,7 +68,7 @@ TypeParameters {
 }
 
 TypeArguments {
-  ScopedTypeIdentifier*
+  ScopedTypeIdentifier* (Block (kw<"and"> TypeArguments)?)?
 }
 
 TypeStatement {
@@ -83,13 +77,17 @@ TypeStatement {
   TypeFunctionDefinition
 }
 
-TypeAliasDefinition {
-  (kw<"export"> | kw<"private">)? kw<"type"> TypeIdentifier kw<"is"> ParameterizedType
+TypeGiven {
+  // Base type, injected type name, default type
+  kw<"type"> kw<"given"> ScopedTypeIdentifier ScopedTypeIdentifier ScopedTypeIdentifier?
 }
 
-TypeGenericDefinition {
-  // Provides local `extends Blah` capability for generic parameters.
-  kw<"type"> TypeIdentifier kw<"be"> ParameterizedType
+TypeReturn {
+  kw<"type"> kw<"return"> ScopedTypeIdentifier
+}
+
+TypeAliasDefinition {
+  (kw<"export"> | kw<"private">)? kw<"type"> TypeIdentifier kw<"is"> (ParameterizedType | FunctionCall)
 }
 
 TypeFunctionDefinition {
@@ -107,7 +105,7 @@ kw<term> { @specialize[@name={term}]<ValueIdentifier, term> }
   TypeIdentifier { $[A-Z]$[a-zA-Z]+ }
   ValueIdentifier { $[a-z]$[a-zA-Z]+ }
 
-  String { "." (![.] | "..")* "." }
+  String { "." (![.] | ".." | ("." $[a-zA-Z]))* "." }
 
   RestOfLine { ![\n]* }
 

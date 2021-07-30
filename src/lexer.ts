@@ -1,62 +1,55 @@
 import { createToken, createTokenInstance, Lexer, CstParser, IToken } from "chevrotain"
-import * as _ from 'lodash'
+import * as _ from "lodash";
 
 // Reserved words
 
 // Continues argument list on next line
-export const And = createToken({ name: "And", pattern: /and/ })
-
-// Like ES async
-// Why different from function call? It goes with fun.
-export const Async = createToken({ name: "Async", pattern: /async/ })
+// export const And = createToken({ name: "And", pattern: /and/ })
 
 // Variable declaration with deferred assignment (a la ES `let`)
-export const Be = createToken({ name: "Return", pattern: /return/ })
+export const Be = createToken({ name: "Be", pattern: /be/ })
 
 // Kind of like mixture of ES `export` and `public`
 // Why different from function call? It requires identifier name.
-export const Export = createToken({ name: "Export", pattern: /export/ })
-
-// Like ES `function`, but also `class`
-export const Fun = createToken({ name: "Fun", pattern: /fun/ })
+export const Export = createToken({ name: "Export", pattern: /export\b/ })
 
 // Assignment (implicit `const` declaration)
-export const Is = createToken({ name: "Is", pattern: /is/ })
+export const Is = createToken({ name: "Is", pattern: /is\b/ })
 
-export const Private = createToken({name: "Private", pattern: /private/ })
+export const Private = createToken({name: "Private", pattern: /private\b/ })
 
 // Assignment (for `let` variables)
-export const To = createToken({ name: "To", pattern: /to/ })
+export const To = createToken({ name: "To", pattern: /to\b/ })
 
 // Like TypeScript type
-export const Type = createToken({ name: "Type", pattern: /type/ })
+export const Type = createToken({ name: "Type", pattern: /type\b/ })
 
 // Shorthand for `defer await`; actually just what defer would have been.
-export const Yield = createToken({ name: "Yield", pattern: /yield/ })
+export const Yield = createToken({ name: "Yield", pattern: /yield\b/ })
 
 export const StringLiteral = createToken({
     name: "StringLiteral",
-    pattern: /\.([^\.]|\.\.)*\./
+    pattern: /\.([^\.]|\.\.|\.[a-zA-Z])*\./
 })
 export const NumberLiteral = createToken({
     name: "NumberLiteral",
     pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
 })
 
-export const ScopedTypeIdentifier = createToken({ name: "ScopedTypeIdentifier", pattern: /([a-z][a-zA-Z]*\.)*([A-Z][a-zA-Z]*)/ })
-export const ScopedValueIdentifier = createToken({ name: "ScopedValueIdentifier", pattern: /([a-z][a-zA-Z]*\.)*([a-z][a-zA-Z]*)/ })
+export const ScopedTypeIdentifier = createToken({ name: "ScopedTypeIdentifier", pattern: /([a-z][a-zA-Z0-9]*\.)*([A-Z][a-zA-Z0-9]*)/ })
+export const ScopedValueIdentifier = createToken({ name: "ScopedValueIdentifier", pattern: /([a-z][a-zA-Z0-9]*\.)*([a-z][a-zA-Z0-9]*)/ })
 
 // newlines are not skipped, by setting their group to "nl" they are saved in the lexer result
 // and thus we can check before creating an indentation token that the last token matched was a newline.
-export const Newline = createToken({
-    name: "Newline",
+export const StatementSeparator = createToken({
+    name: "StatementSeparator",
     pattern: /\n|\r\n?/,
     // group: "nl"
 })
 
 function isStartOfLine(matchedTokens: IToken[]): boolean {
-    const lastTokenType = _.last(matchedTokens)?.tokenType
-    return lastTokenType === Newline || lastTokenType === Indent || lastTokenType === Outdent
+    const lastTokenType = matchedTokens[matchedTokens.length - 1]?.tokenType
+    return lastTokenType === undefined || lastTokenType === StatementSeparator || lastTokenType === Indent
 
 }
 
@@ -67,7 +60,7 @@ function matchMultilineComment(text: string, offset: number, matchedTokens: ITok
         const openResult = regex.exec(text)
         if (openResult !== null) {
             const tag = openResult[0]
-            const indentLevel = _.last(indentStack)!
+            const indentLevel = indentStack[indentStack.length - 1]
             const fullCommentRegex = new RegExp(`${tag}(.|\\r|\\n)*?\\n {${indentLevel}}${tag}(?=[\\r\\n])`, 'my')
             fullCommentRegex.lastIndex = offset
             return fullCommentRegex.exec(text)
@@ -87,7 +80,6 @@ function matchComment(text: string, offset: number, matchedTokens: IToken[], gro
 
 // State required for matching the indentations
 let indentStack = [0]
-let lastIndentAnalysisOffset = -1
 
 /**
 * This custom Token matcher uses Lexer context ("matchedTokens" and "groups" arguments)
@@ -102,77 +94,49 @@ let lastIndentAnalysisOffset = -1
 * @returns {*}
 */
 function matchIndentBase(text: string, offset: number, matchedTokens: IToken[], groups: { [groupName: string]: IToken[] }, type: string) {
-    const noTokensMatchedYet = _.isEmpty(matchedTokens)
-    const lastToken = _.last(matchedTokens)
-    // indentation can only be matched at the start of a line.
-    if (noTokensMatchedYet || lastToken?.tokenType === Newline) {
-        const newlineOffset = lastToken?.endOffset ?? -1
-        const compareOffset = lastIndentAnalysisOffset
-        lastIndentAnalysisOffset = offset
-        if (newlineOffset < compareOffset && offset !== compareOffset) {
-            return null
-        }
-        let match
-        let currIndentLevel: number | undefined = undefined
-
-        const wsRegExp = / +/y
-        wsRegExp.lastIndex = offset
-        match = wsRegExp.exec(text)
-        // possible non-empty indentation
-        if (match !== null) {
-            currIndentLevel = match[0].length
-        }
-        // "empty" indentation means indentLevel of 0.
-        else {
-            currIndentLevel = 0
-        }
-
-        const prevIndentLevel = _.last(indentStack)!
-        // deeper indentation
-        if (currIndentLevel > prevIndentLevel && type === "indent") {
-            indentStack.push(currIndentLevel)
-            return match
-        }
-        // shallower indentation
-        else if (currIndentLevel < prevIndentLevel && type === "outdent") {
-            const matchIndentIndex = _.findLastIndex(
-                indentStack,
-                (stackIndentDepth) => stackIndentDepth === currIndentLevel
-            )
-
-            // any outdent must match some previous indentation level.
-            if (matchIndentIndex === -1) {
-                throw Error(`invalid outdent at offset: ${offset}`)
-            }
-
-            const numberOfDedents = indentStack.length - matchIndentIndex - 1
-
-            // This is a little tricky
-            // 1. If there is no match (0 level indent) than this custom token
-            //    matcher would return "null" and so we need to add all the required outdents ourselves.
-            // 2. If there was match (> 0 level indent) than we need to add minus one number of outsents
-            //    because the lexer would create one due to returning a none null result.
-            let iStart = match !== null ? 1 : 0
-            for (let i = iStart; i < numberOfDedents; i++) {
-                indentStack.pop()
-                matchedTokens.push(
-                    createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN)
-                )
-            }
-
-            // even though we are adding fewer outdents directly we still need to update the indent stack fully.
-            if (iStart === 1) {
-                indentStack.pop()
-            }
-            return match
-        } else {
-            // same indent, this should be lexed as simple whitespace and ignored
-            return null
-        }
-    } else {
-        // indentation cannot be matched under other circumstances
+    const regex = /(?:\n|(?:\r\n?))( *(?=[^\r\n]))(and(?=[ \r\n]))?/y
+    regex.lastIndex = offset
+    const match = regex.exec(text)
+    if (match === null) {
         return null
     }
+    const currIndentLevel = match[1].length
+    const prevIndentLevel = indentStack[indentStack.length - 1]
+    // deeper indentation
+    if (currIndentLevel > prevIndentLevel && type === "indent") {
+        indentStack.push(currIndentLevel)
+        return match
+    }
+    // shallower indentation
+    else if (currIndentLevel < prevIndentLevel && type === "outdent") {
+        const matchIndentIndex = indentStack.lastIndexOf(currIndentLevel)
+
+        // any outdent must match some previous indentation level.
+        if (matchIndentIndex === -1) {
+            throw Error(`invalid outdent at offset: ${offset}`)
+        }
+
+        const numberOfDedents = indentStack.length - matchIndentIndex - 1
+
+        for (let i = 0; i < numberOfDedents - 1; i++) {
+            indentStack.pop()
+            matchedTokens.push(
+                createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN)
+            )
+        }
+        indentStack.pop()
+        if (match[2] === "and") {
+            // Let Chevrotain generate the last outdent token.
+            return match
+        } else {
+            // Generate the last outdent token here and let Chevrotain generate a newline token.
+            matchedTokens.push(
+                createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN)
+            )
+            return null
+        }
+    }
+    return null
 }
 
 // customize matchIndentBase to create separate functions of Indent and Outdent.
@@ -184,13 +148,13 @@ export const Indent = createToken({
     name: "Indent",
     pattern: matchIndent,
     // custom token patterns should explicitly specify the line_breaks option
-    line_breaks: false
+    line_breaks: true
 })
 export const Outdent = createToken({
     name: "Outdent",
     pattern: matchOutdent,
     // custom token patterns should explicitly specify the line_breaks option
-    line_breaks: false
+    line_breaks: true
 })
 
 export const MultilineComment = createToken({
@@ -214,21 +178,20 @@ export const Spaces = createToken({
 })
 
 export const allTokens = [
-    Newline,
     // indentation tokens must appear before Spaces, otherwise all indentation will always be consumed as spaces.
     // Outdent must appear before Indent for handling zero spaces outdents.
     Outdent,
     Indent,
+    StatementSeparator,
     MultilineComment,
     Comment,
     Spaces,
 
     // Keywords
-    And,
-    Async,
+    // And,
     Be,
     Export,
-    Fun,
+    Private,
     Is,
     To,
     Type,

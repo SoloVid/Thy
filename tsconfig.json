@@ -1,11 +1,10 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "target": "es6",
-    "module": "es2020",
-    "newLine": "lf",
-    "declaration": true,
-    "moduleResolution": "node"
-  },
-  "include": ["src/*.ts"]
+    "extends": "@tsconfig/node14/tsconfig.json",
+    "compilerOptions": {
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "rootDir": "src",
+        "outDir": "lib"
+    }
 }

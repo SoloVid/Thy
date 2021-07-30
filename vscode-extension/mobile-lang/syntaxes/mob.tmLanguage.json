@@ -42,7 +42,6 @@
 							"name": "meta.line.content.mob",
 							"patterns": [
 								{ "include": "#type-definitions" },
-								{ "include": "#function-definitions" },
 								{ "include": "#constant-assignments" },
 								{ "include": "#assignments" },
 								{ "include": "#declarations" },
@@ -55,28 +54,11 @@
 				}
 			]
 		},
-		"function-definitions": {
-			"patterns": [
-				{
-					"name": "meta.function.prototype.mob",
-					"match": "(?:(export) +)?(?:(private) +)?(?:(async) +)?(fun) +(?:(.+?) +)?([a-z][^ ]*)( +.+)?$",
-					"captures": {
-						"1": {"name": "keyword.control.export.mob"},
-						"2": {"name": "storage.modifier.private.mob"},
-						"3": {"name": "storage.modifier.async.mob"},
-						"4": {"name": "storage.type.function.mob"},
-						"5": {"patterns": [{"include": "#type-identifiers"}]},
-						"6": {"name": "entity.name.function.mob"},
-						"7": {"patterns": [{"include": "#type-identifiers"}]}
-					}
-				}
-			]
-		},
 		"constant-assignments": {
 			"patterns": [
 				{
 					"name": "meta.assignment.mob",
-					"match": "(?:(export) +)?(?:(private) +)?([^ ]+) +(is|to) +(.+)$",
+					"match": "(?:(export) +)?(?:(private) +)?([^ ]+) +(is|to)( +.*)?$",
 					"captures": {
 						"1": {"name": "keyword.control.export.mob"},
 						"2": {"name": "storage.modifier.private.mob"},
@@ -104,13 +86,15 @@
 			"patterns": [
 				{
 					"name": "meta.declaration.mob",
-					"match": "([^ ]+) +(be) +(.+)$",
+					"match": "(?:(export) +)?(?:(private) +)?([^ ]+) +(be) +(.+)$",
 					"captures": {
-						"1": {
+						"1": {"name": "keyword.control.export.mob"},
+						"2": {"name": "keyword.control.private.mob"},
+						"3": {
 							"patterns": [{"include": "#value-identifiers"}]
 						},
-						"2": {"name": "keyword.operator.mob"},
-						"3": {
+						"4": {"name": "keyword.operator.mob"},
+						"5": {
 							"patterns": [{"include": "#type-identifiers"}]
 						}
 					}
@@ -120,25 +104,39 @@
 		"type-definitions": {
 			"patterns": [
 				{
-					"match": "(type) +([^ ]+) +(is|be) +(.+)$",
+					"match": "\\b(type)\\b( .*)?",
 					"captures": {
 						"1": {"name":"storage.type.type.mob"},
-						"2": {"patterns": [{"include": "#type-identifiers"}]},
-						"3": {"name": "keyword.operator.assignment.mob"},
-						"4": {
+						"2": {
 							"patterns": [
-								{"include": "#value-identifiers"},
+								{
+									"match": "\\b(given|return)\\b(.*)",
+									"captures": {
+										"1": {"name":"storage.type.mob"},
+										"2": {
+											"patterns": [
+												{"include": "#value-identifiers"},
+												{"include": "#type-identifiers"}
+											]
+										}
+									}
+								},
+								{
+									"match": "([^ ]+) +(is) +(.+)$",
+									"captures": {
+										"1": {"patterns": [{"include": "#type-identifiers"}]},
+										"2": {"name": "keyword.operator.assignment.mob"},
+										"3": {
+											"patterns": [
+												{"include": "#value-identifiers"},
+												{"include": "#type-identifiers"}
+											]
+										}
+									}
+								},
 								{"include": "#type-identifiers"}
 							]
 						}
-					}
-				},
-				{
-					"match": "(type) +(fun) +([^ ]+)$",
-					"captures": {
-						"1": {"name":"storage.type.type.mob"},
-						"2": {"name":"storage.type.function.mob"},
-						"3": {"patterns": [{"include": "#type-identifiers"}]}
 					}
 				}
 			]
@@ -179,18 +177,18 @@
 							"patterns": [
 								{"include": "#special-functions"},
 								{
-									"match": "(?:(.+?)\\.)?([^. ]+)",
+									"match": "(?:(.+?)\\.)?(\\b[^. ]+\\b(?!\\.))?",
 									"captures": {
 										"1": {"patterns": [{"include": "#values"}]},
 										"2": {
 											"patterns": [
 												{
 													"name": "entity.name.function.mob",
-													"match": "\\b[a-z].*"
+													"match": "\\b[a-z].*\\b"
 												},
 												{
 													"name": "invalid.illegal.mob",
-													"match": ".+"
+													"match": "\\b.+\\b"
 												}
 											]
 										}
@@ -220,7 +218,7 @@
 		"strings": {
 			"name": "string.quoted.other.mob",
 			"begin": "(?<![a-z])\\.",
-			"end": "\\.(?!\\.)",
+			"end": "\\.(?!\\.)(?![a-zA-Z])",
 			"patterns": [
 				{
 					"name": "constant.character.escape.mob",
@@ -236,15 +234,15 @@
 			"patterns": [
 				{
 					"name": "keyword.control.mob",
-					"match": "(?<!\\.)\\b(await|return|throw|namespace)\\b"
+					"match": "(?<!\\.)\\b(await|return|throw)\\b"
 				},
 				{
 					"name": "storage.type.mob",
-					"match": "(?<!\\.)\\b(given)\\b"
+					"match": "(?<!\\.)\\b(given|namespace)\\b"
 				},
 				{
 					"name": "support.function.mob",
-					"match": "(?<!\\.)\\b(get|set|if|loop|switch)\\b"
+					"match": "(?<!\\.)\\b(fun|get|if|loop|set|switch|val)\\b"
 				}
 			]
 		},
