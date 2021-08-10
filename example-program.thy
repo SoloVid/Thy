@@ -1,19 +1,23 @@
-TS a la import { hey as hey } from ...
-hey is thy .blah.blah.hey.
+TS a la `import { heya as hey } from ...`
+hey is thy .blah.blah.heya.
 
+TS a la `namespace blahBlah.blah`
 thy.scope .blahBlah.blah.
-  main is fun
+  Define a function.
+  main is def
     Assign literal. const a = 5
-    a is val 5
+    a is def 5
     Assign value. const b = a
-    b is val a
+    b is def a
     Assign function result. const c = calc(a, b)
     c is calc a b
+    Just call function
+    print .himom.
 
     This is a comment
-    condition1 is all c d
-    condition2 is equal a b
-    some condition1 condition2
+    check.all c d
+    compare.equal a b
+    check.some beforeThat that
     if that
       doThing a b c
       e is calc d
@@ -31,7 +35,7 @@ thy.scope .blahBlah.blah.
 
   loop
     doWork yo
-    condition is val true
+    condition is def true
     Keyword 'yield' allows a return from the called function to result in return from this function.
     yield if condition
       return
@@ -39,8 +43,10 @@ thy.scope .blahBlah.blah.
   switch myVal
     given case
     given default
-    case 1 2 3
+    case 1 doFirst
+    case 2
       doFirst
+    case 3 doFirst
     case 4
       doOther
     default
@@ -48,11 +54,11 @@ thy.scope .blahBlah.blah.
 
   TS: type FunctionType = (pA: A) => ReturnType
   More strictly something like: type FunctionType = typeof makeFunction((pA: A): ReturnType => {})
-  type FunctionType is fun
+  type FunctionType is def
     given A pA
     type return ReturnType
 
-  private typedFun is fun
+  private typedFun is def
     given A pA
     given B pB pBDefault
     type ReturnType is Promise InnerReturnType
@@ -61,7 +67,7 @@ thy.scope .blahBlah.blah.
     await that
     return pA plus pB
 
-  export generalizedFun is fun
+  export generalizedFun is def
     type given Unknown U
     given AT U pA
     given BT U pB
@@ -69,7 +75,7 @@ thy.scope .blahBlah.blah.
     type return ReturnType
 
   TS: type ConditionalType<T> = T extends A ? AImplication : BImplication
-  type ConditionalType is fun
+  type ConditionalType is def
     type given Unknown T
     type Result is If T A AImplication BImplication
     type return Result
@@ -86,7 +92,7 @@ thy.scope .blahBlah.blah.
 
   TypeScript: interface MyType<T> { field1: number; field2: T[]; }
   More strictly something like: type MyType<T> = typeof (() => { return { field1: null as number, field2: [null as T] } })()
-  type MyType is fun
+  type MyType is def
     type given Unknown T
     type Result is
       field1 be Number
@@ -94,7 +100,7 @@ thy.scope .blahBlah.blah.
     type return Result
 
   TS type Interfaces<X extends number, Y extends X[] = boolean[]> = MyType<X> & YOtherType<Y>
-  type Interfaces is fun
+  type Interfaces is def
     type given Number X
     Won't allow non-type statements to separate givens from top of fun, but needed here in type fun.
     type YParent is Array X
@@ -107,7 +113,7 @@ thy.scope .blahBlah.blah.
     type return Result
 
   Class definition. class Thing<T> implements Interfaces<T, Yo>
-  newThing is fun
+  newThing is def
     type given Unknown T
     Constructor parameters.
     given Q qq
@@ -116,19 +122,19 @@ thy.scope .blahBlah.blah.
     type return ReturnType
 
     Class members.
-    w be String
+    w be String ..
 
     Constructor body.
     private q is qq
     w to we
 
-    field1 is get
+    field1 is getter
       return 5
-    and set
+    and setter
       given n
       doSet n
 
-    method is fun
+    method is def
       given x
       given y
       type return Void
@@ -136,9 +142,13 @@ thy.scope .blahBlah.blah.
       print y
 
   Array initialization. const arr = []
-  arr is newArray
+  arr is array
   With values. const arr = [1, 2, 3]
-  arr is newArray 1 2 3
+  arr is array
+    given a
+    a 1
+    a 2
+    a 3
   Array index write. arr[5] = "blah"
   set arr 5 .blah.
   Array index access. const el = arr[5]
@@ -148,14 +158,12 @@ thy.scope .blahBlah.blah.
   obj is newMyClass a b
   print obj.q
 
-  My paradigm is trending toward requiring 'export' on everything in this block.
-  Maybe I could make the rule that the default is to export everything unless some member is explicitly exported.
   Object literal. const lobj = { pa: a, pb: b, pc: { m: 5 } }
   lobj is
     pa is a
     pb is b
     pc is
-      m is val 5
+      m is def 5
 
   Multiline comment. Do I want this? Could aid mobile dev significantly bc no comment out hotkey.
   ZZZ
