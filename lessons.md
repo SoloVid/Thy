@@ -153,7 +153,7 @@ The program above prints `Heya, Joe` to the screen.
 ### That in Thy
 
 Thy has a special **keyword** `that` which holds the value **returned**
-by the **function** **called** in the previous line.
+by the **function** **called** in the immediately preceding **statement**.
 
 We could rewrite the previous two **programs** a little more simply with `that`:
 
@@ -543,6 +543,9 @@ The `if` **function** will check to see if the first **argument** is `true` or `
 If it is `true`, the second **argument** (i.e. the first **block**) will be executed.
 Otherwise, the fourth **argument** (i.e. the second **block**) will be executed.
 
+_Many other popular languages provide `if` as a `keyword` (like `is` and `and` in Thy) rather than a `function`,
+but the usage is pretty similar._
+
 If this explanation all sounds too complicated regarding how `if` works,
 just look back at the example and don't stress over this formal description.
 
@@ -562,14 +565,175 @@ if that
 
 In this shorter form, nothing happens in what would be the `else` case of the previous example.
 
-_Many other popular languages provide `if` as a `keyword` (like `is` and `and` in Thy) rather than a `function`,
-but the usage is pretty similar._
+#### Returning Values
+
+`if` can also **return** a **value**.
+
+```thy
+Assume iLikeYou is already defined.
+moneyInCard is if iLikeYou
+  return 50
+and else
+  return 1
+```
+
+In this example, `moneyInCard` will be set to `50` if `iLikeYou` is `true`,
+but otherwise it will be set to `1`.
+
+### Yield
+
+Sometimes it is useful to **return** early from a **function**.
+For example, division by zero is problematic, so we may want to avoid
+executing certain calculations if some **variable** is zero.
+
+#### Without Yield
+
+We could address this with a simple `if`:
+
+```thy
+def doCalc
+  given Number a
+  Maybe have some other parameters here...
+  compare.equal a 0
+  if that
+    return 0
+  and else
+    math.divide 123 a
+    return that
+```
+
+This approach is fine, but the indentation could start to get out of hand with additional factors.
+
+#### With Yield
+
+Thy provides the **keyword** `yield` to solve this problem.
+`yield` can be placed before a **function** **call** **statement**
+to indicate that this **block** _might_ **return** at this line.
+
+Before you get lost with more description, let's look at our previous example modified to use `yield`:
+
+```thy
+def doCalc
+  given Number a
+  compare.equal a 0
+  yield if that
+    return 0
+  math.divide 123 a
+  return that
+```
+
+Notice that the `if` line now starts with `yield`
+and that the `else` line and corresponding indentation have been removed.
+
+`yield` here means, "If the `if` call returns a value, return that value."
+
+So if the condition `that` is true,
+1) the `if` **function** calls our **block**
+2) which **returns** `0`,
+so 3) the `if` **function** **returns** that `0`,
+and 4) finally `yield` receives the **value** `0`
+5) which it promptly **returns** (from `doCalc`).
+
+On the other hand, if the condition `that` is not true,
+1) the `if` **function** doesn't call our **block**,
+so 2) the `if` **function** does not **return** a **value**,
+and 3) `yield` receives no **value**
+and so 4) it does not **return** (from `doCalc`).
+**Program** execution would continue on with line 6.
+
+#### Note on Other Languages
+
+`yield` is not a standard **keyword** across programming languages.
+I am not aware of another language that uses the `yield` **keyword**
+to mean the same thing it means in Thy.
+
+Ruby has a `yield` **keyword** which is the most similar idea to `yield` in Thy,
+but it is still pretty different.
+In Ruby, it calls the one **block** parameter passed to the **function**.
+
+Python and JavaScript have a `yield` **keyword**,
+but it is a completely different concept related to generator **functions**.
 
 ### Looping Code
 
+Next exciting piece of functionality: loops!
+
+It's pretty common to write a program that has some core loop of **statements**
+that run over and over again until some condition is met.
+There's only one more thing we need in Thy to make this happen: the `loop` **function**.
+
+```thy
+loop
+  Assume getUserInput is already defined and returns string provided by user.
+  input is getUserInput
+  compare.equal input .exit.
+  yield if that
+    return
+  print .AAAANNNDD we're still going!.
+  print input
+print .exited.
+```
+
+This program...
+
+1. Gets some input string from the user.
+2. If the input is `exit`, `loop` returns (go to step 5).
+3. Prints `AAAANNNDD we're still going!` then the input string from the user.
+4. Runs the `loop` **block** again (go to step 1).
+5. Prints `exited` and finishes.
+
 ### Fake User Input
+
+TODO: Need this? Could have semi-random string generator function that helps make some fun programs here in intro.
 
 Up to this point, we've printed lots of **values** to the screen for the user to see,
 but we haven't be able to receive any **input** from the user to use in our programs.
 Although we're still not ready to do that (and it's outside the scope of this intro programming crash course),
 we can imagine a **function** that could ask the user for some **input** and **return** the value back to us.
+
+## Arrays and Objects
+
+TODO: Teach arrays (and objects?)
+
+## Summary of Basics
+
+And that's a wrap!
+At this point you've learned (more than) all of the critically essential building blocks of programming.
+If you understand all these concepts well, you can program anything.
+
+Make sure you understand these core concepts:
+
+- **Program** execution (one **statement** after another in order)
+- **Variables**
+- Control flow (`return`, `if`, and `loop`)
+- **Functions**
+- **Arrays**
+
+If you don't immediately feel confident you understand what I'm talking about with any of those five concepts,
+go back now and fill in the gaps from these introductory lessons.
+Since this curriculum is simultaneously an introduction to Thy in addition to programming in general,
+the lesson sequence doesn't perfectly align with this simple 5-concept theory,
+but I've tried to keep the lessons as close to this model as possible
+while still catering to what makes Thy unique.
+
+There are still a bunch of things left to learn, but you must master these basics for programming proficiency.
+
+## Future Topics
+
+- Mutable variables
+- `export`, `private`, and implicit returns
+- Exception handling
+- Types
+  - Basic types on everything
+  - Templated types
+- Formalization of language rules
+- Asynchronous (and parallel?) Programming
+- Standard library functions
+- Dependency 
+- Compiling
+  - Interoperability with TypeScript
+- Tooling
+- Undefined behaviors
+  - Assigning void
+  - Wasn't there one other main one?
+- Classes?
