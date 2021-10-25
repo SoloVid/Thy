@@ -20,6 +20,7 @@
 ## Overview of Language Strategy
 
 - No special characters
+- Naturalness (compared to mainstream programming)
 - Strong static types
 - Simple compiler
 - Simple rules

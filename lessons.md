@@ -41,10 +41,10 @@ In this example, lines 1, 3, and 4 do not do anything, but the other two lines p
 
 ### Summary
 
-You're now a programmer! There's still a lot more to learn, but you're off to a great start!
-
 - A **program** is a series of **statements** for the computer to execute in order.
 - In Thy, each **statement** is on its own line, but some lines don't do anything.
+
+You're now a programmer! There's still a lot more to learn, but you're off to a great start!
 
 ## Variables
 
@@ -57,7 +57,8 @@ print message
 ```
 
 The `message is` part creates a **variable** called `message` and assigns it the **value** to the right.
-So after line 1, `message` holds the **string** `Hello there! (etc)`.
+(`is` is our first Thy **keyword**.)
+So after line 1, `message` (a name we made up) holds the **string** `Hello there! (etc)`.
 Instead of using the **string** _literal_ `.Hello there! (etc).` (notice the periods) with `print`,
 we are instead using the **variable** `message` (notice no periods) which holds the same **string** **value**.
 
@@ -137,7 +138,7 @@ product is math.multiply a b
 print product
 ```
 
-The program above calculates the product of `1` and `2.5`, and it prints the result to the screen.
+The **program** above calculates the product of `1` and `2.5`, and it prints the result to the screen.
 
 ```thy
 greeting is def .Heya, .
@@ -147,7 +148,7 @@ Prints "Heya, Joe"
 print message
 ```
 
-The program above prints `Heya, Joe` to the screen.
+The **program** above prints `Heya, Joe` to the screen.
 "Concatenate" is a fancy word (but you'll see it a lot) that means put together.
 
 ### That in Thy
@@ -184,7 +185,7 @@ but **use it with care** as naming **values** with **variables** can make your *
 
 ## Writing Functions
 
-In the last lesson, we described **functions** as code written elsewhere.
+In the last lesson, we described a **function** as code written elsewhere.
 That ought to spark your curiosity to wonder, "Can I write my own function?"
 Yes! You can write your own function.
 
@@ -202,7 +203,7 @@ printHi
 ```
 
 On lines 2 and 3, we **define** our **function**.
-On line 6, we call that **function** (with no **arguments**).
+On line 6, we **call** that **function** (with no **arguments**).
 
 Notice that our **function** is **defined** with an indented (two spaces) **block** of code.
 We can put as many lines as we would like inside our **function**:
@@ -218,7 +219,7 @@ printStuff is def
 printStuff
 ```
 
-The important part is that the **block** of code for the **function** ends when the indentation decreases again.
+The important part is that a **block** of code ends when the indentation decreases again.
 
 ### Function with Parameters
 
@@ -231,7 +232,7 @@ By specifying **parameters** in our **function**!
 > the **arguments** are the **values** **passed** in when the **function** is **called** and
 > the **parameters** are the corresponding **variables** within the **function** **definition**.
 
-Let's define a function which greets someone by name:
+Let's **define** a **function** which greets someone by name:
 
 ```thy
 greet is def
@@ -270,7 +271,7 @@ For now, know that `Number` and `Bool` are two other **types** we'll be using in
 ### Function with Return
 
 In the last lesson, we talked about **functions** **returning** **values**.
-To **return** **values** from your own **function**, use the `return` **keyword**:
+To **return** a **value** from your own **function**, use the `return` **keyword** (not **function**):
 
 ```thy
 getFavoriteNumber is def
@@ -282,7 +283,7 @@ print fav
 
 ### Putting It All Together
 
-To put all this together, let's write a function that calculates the length of the hypotenuse
+To put all this together, let's write a **function** that calculates the length of the hypotenuse
 of a right triangle using the Pythagorean Theorem.
 
 ```thy
@@ -306,7 +307,7 @@ You should have learned how to write your own **function** in Thy.
 ## Functions as Values
 
 Remember how I said that a **function** is a **value**?
-You may not have noticed how I said that in passing, but this is a really important concept!
+Maybe not, but this is a really important concept!
 A **function** is a **value** just like a **string** or a **number**--it just has a different **type**.
 
 ### Named Functions
@@ -431,8 +432,7 @@ You could actually **define** `def` (we'll name it `fun` here) like this:
 ```thy
 fun is def
   given Function block
-  return
-    return block
+  return block
 ```
 
 Unfortunately this alternate **definition** of `def` has two problems:
@@ -493,6 +493,22 @@ Why would you want to do this?
 Mainly this feature can make your code more readable
 (which is a _super important_ part of programming) in some cases,
 but there are some specific use cases we'll learn later that this construct is nice for.
+
+This construct does get us one step closer to a complete **definition** of the `def` **function**:
+
+```thy
+def is
+  return
+    given Function block
+    return block
+```
+
+If this looks really weird, that's ok! That's why `def` is provided for you!
+
+### Summary
+
+- A **function** is a **value**.
+- Named **functions** (stored in **variables**) are interchangeable with **blocks** (**function** **literals**).
 
 ## Control Flow
 
@@ -606,7 +622,7 @@ This approach is fine, but the indentation could start to get out of hand with a
 
 #### With Yield
 
-Thy provides the **keyword** `yield` to solve this problem.
+Thy provides the **keyword** (not a **function**) `yield` to solve this problem.
 `yield` can be placed before a **function** **call** **statement**
 to indicate that this **block** _might_ **return** at this line.
 
@@ -627,19 +643,19 @@ and that the `else` line and corresponding indentation have been removed.
 
 `yield` here means, "If the `if` call returns a value, return that value."
 
-So if the condition `that` is true,
-1) the `if` **function** calls our **block**
-2) which **returns** `0`,
-so 3) the `if` **function** **returns** that `0`,
-and 4) finally `yield` receives the **value** `0`
-5) which it promptly **returns** (from `doCalc`).
+So if the condition `that` is true...
+1. The `if` **function** calls our **block**.
+2. Our block **returns** `0`.
+3. The `if` **function** **returns** that `0`.
+4. `yield` receives the **value** `0`.
+5. `yield` promptly **returns** (from `doCalc`).
 
-On the other hand, if the condition `that` is not true,
-1) the `if` **function** doesn't call our **block**,
-so 2) the `if` **function** does not **return** a **value**,
-and 3) `yield` receives no **value**
-and so 4) it does not **return** (from `doCalc`).
-**Program** execution would continue on with line 6.
+On the other hand, if the condition `that` is not true...
+1. The `if` **function** doesn't call our **block**.
+2. The `if` **function** does not **return** a **value**.
+3. `yield` receives no **value**.
+4. `yield` does not **return** (from `doCalc`).
+5. (**Program** execution would continue on with line 6.)
 
 #### Note on Other Languages
 
@@ -649,7 +665,7 @@ to mean the same thing it means in Thy.
 
 Ruby has a `yield` **keyword** which is the most similar idea to `yield` in Thy,
 but it is still pretty different.
-In Ruby, it calls the one **block** parameter passed to the **function**.
+In Ruby, it **calls** the one **block** parameter passed to the **function**.
 
 Python and JavaScript have a `yield` **keyword**,
 but it is a completely different concept related to generator **functions**.
