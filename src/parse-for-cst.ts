@@ -1,6 +1,6 @@
 import { createTokenInstance, CstNode, Lexer } from "chevrotain"
 import { Parser } from "./parser"
-import { TokenTypes } from "./token-types"
+import { TokenTypes } from "./tokenizer/token-types.chevrotain"
 
 export async function parseForCst(source: string): Promise<CstNode> {
     const tokenTypes = new TokenTypes()

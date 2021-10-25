@@ -1,7 +1,8 @@
 import { CstParser } from "chevrotain"
-import { TokenTypes } from "./token-types"
+import { ParserRules } from "./parser-rules"
+import { TokenTypes } from "./tokenizer/token-types.chevrotain"
 
-export class Parser extends CstParser {
+export class Parser extends CstParser implements ParserRules {
     private readonly t: TokenTypes
 
     constructor(tokenTypes: TokenTypes) {
@@ -15,12 +16,12 @@ export class Parser extends CstParser {
         this.MANY_SEP({
             SEP: this.t.StatementSeparator,
             DEF: () => {
-                this.SUBRULE(this.statement)
+                this.SUBRULE(this.line)
             }
         })
     })
 
-    statement = this.RULE("statement", () => {
+    line = this.RULE("line", () => {
         this.OR([
             { ALT: () => this.CONSUME(this.t.MultilineComment) },
             { ALT: () => this.CONSUME(this.t.Comment) },
@@ -102,13 +103,19 @@ export class Parser extends CstParser {
     })
 
     unscopedTypeIdentifier = this.RULE("unscopedTypeIdentifier", () => {
-        // TODO: Can we actually check here that it is unscoped?
         this.CONSUME(this.t.ScopedTypeIdentifier)
+        // const token = this.CONSUME(this.t.ScopedTypeIdentifier)
+        // if (token.image.includes(".")) {
+        //     throw new Error(`Expected unscoped identifier but received ${token.image}`)
+        // }
     })
 
     unscopedValueIdentifier = this.RULE("unscopedValueIdentifier", () => {
-        // TODO: Can we actually check here that it is unscoped?
         this.CONSUME(this.t.ScopedValueIdentifier)
+        // const token = this.CONSUME(this.t.ScopedValueIdentifier)
+        // if (token.image.includes(".")) {
+        //     throw new Error(`Expected unscoped identifier but received ${token.image}`)
+        // }
     })
 
     parameterizedType = this.RULE("parameterizedType", () => {
