@@ -6,6 +6,7 @@ import { numberTokenizer } from "./number-tokenizer";
 import type { SingleTokenizer } from "./single-tokenizer";
 import { stringLiteralTokenizer } from "./string-tokenizer";
 import type { Token } from "./token";
+import { tEndBlock, TokenType } from "./token-type";
 import { statementSeparatorTokenizer, whitespaceTokenizer } from "./whitespace-tokenizer";
 
 
@@ -54,32 +55,56 @@ export function makeTokenizer(source: string): Tokenizer {
         }
     }
 
+    const lineOffsets = [0]
+
+    function makeTokenHere(type: TokenType, text: string) {
+        const currentOffset = state.offset
+        const currentLine = lineOffsets.length - 1
+        const currentColumn = currentOffset - lineOffsets[currentLine]
+        return {
+            type: type,
+            text: text,
+            offset: currentOffset,
+            line: currentLine,
+            column: currentColumn
+        }
+    }
+
     function tryTokenizers() {
         for (const tokenizer of tokenizers) {
             const match = tokenizer.match(state)
             if (match !== null) {
-                const currentOffset = state.offset
+                const token = tokenizer.type === null ? null : makeTokenHere(tokenizer.type, match)
+
+                for (let i = 0; i < match.length; i++) {
+                    const c = match.charAt(i)
+                    if (c === "\n") {
+                        lineOffsets.push(state.offset + i + 1)
+                    }
+                }
+
                 state.offset += match.length
 
-                if (tokenizer.type === null) {
-                    return null
-                }
-
-                return {
-                    type: tokenizer.type,
-                    text: match,
-                    offset: currentOffset
-                }
+                return token
             }
         }
         throw new Error(`Unable to match token at ${state.offset}`)
     }
+
+    let closingEndBlocks: null | number = null
 
     return {
         getNextToken() {
             let token = null
             while (token === null) {
                 if (state.offset >= source.length) {
+                    if (closingEndBlocks === null) {
+                        closingEndBlocks = indentation.currentIndentLevels
+                    }
+                    if (closingEndBlocks > 0) {
+                        closingEndBlocks--;
+                        return makeTokenHere(tEndBlock, "")
+                    }
                     return null
                 }
                 token = tryTokenizers()
