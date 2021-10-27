@@ -11,9 +11,9 @@ export interface IndentTokenizers {
 export function makeIndentTokenizers(): IndentTokenizers {
     // State required for matching the indentations
     const indentStack = [0]
-    const regex = /(?:\n|(?:\r\n?))( *(?=[^\r\n]))(and(?=[ \r\n]))?/y
 
     function matchIndent(state: TokenizerState) {
+        const regex = /(?:\r?\n)( *(?=[^ \r\n]))/y
         regex.lastIndex = state.offset
         const match = regex.exec(state.text)
         if (match === null) {
@@ -49,6 +49,7 @@ export function makeIndentTokenizers(): IndentTokenizers {
         }
         lastOutdentOffset = state.offset
 
+        const regex = /(?<=\n)( *(?=[^ \r\n]))/y
         regex.lastIndex = state.offset
         const match = regex.exec(state.text)
         if (match === null) {
@@ -76,13 +77,7 @@ export function makeIndentTokenizers(): IndentTokenizers {
         outdentsOutstanding = numOutdents - 1
 
         indentStack.pop()
-        if (match[2] === "and") {
-            // Consume all the text through "and". We don't want a statement separator to be generated.
-            return match[0]
-        } else {
-            // Generate an outdent token, but don't consume any text. We want a statement separator to be generated.
-            return ""
-        }
+        return ""
     }
 
     return {

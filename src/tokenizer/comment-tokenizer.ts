@@ -1,5 +1,5 @@
 import { TokenizerState } from "./single-tokenizer"
-import { tComment, tMultilineComment, tStartBlock, tStatementSeparator } from "./token-type"
+import { tComment, tEndBlock, tMultilineComment, tStartBlock, tStatementTerminator } from "./token-type"
 
 export const multilineCommentTokenizer = {
     type: tMultilineComment,
@@ -11,7 +11,7 @@ export const commentTokenizer = {
 }
 
 function isStartOfLine(state: TokenizerState): boolean {
-    return state.lastTokenType === null || state.lastTokenType === tStatementSeparator || state.lastTokenType === tStartBlock
+    return [null, tStatementTerminator, tStartBlock, tEndBlock].includes(state.lastTokenType)
 }
 
 export function matchMultilineComment(state: TokenizerState): string | null {
@@ -28,7 +28,7 @@ export function matchMultilineComment(state: TokenizerState): string | null {
 
     const tag = openResult[0]
     const indentWidth = state.currentIndentWidth
-    const fullCommentRegex = new RegExp(`${tag}(.|\\r|\\n)*?\\n {${indentWidth}}${tag}(?=[\\r\\n])`, 'my')
+    const fullCommentRegex = new RegExp(`(${tag}.*\\r?\\n)(((^ {${indentWidth}}.*)|(^ *))\\r?\\n)* {${indentWidth}}${tag}(?=[\\r\\n])`, 'my')
     fullCommentRegex.lastIndex = state.offset
     const result = fullCommentRegex.exec(state.text)
     if (result === null) {

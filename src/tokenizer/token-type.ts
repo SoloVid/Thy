@@ -2,12 +2,13 @@ export type TokenType = string
 
 export const tEndBlock = "EndBlock"
 export const tStartBlock = "StartBlock"
-export const tStatementSeparator = "StatementSeparator"
+export const tStatementTerminator = "StatementTerminator"
 export const tMultilineComment = "MultilineComment"
 export const tComment = "Comment"
 export const tSpace = "Space"
 
 // Keywords
+export const tAnd = "And"
 export const tIs = "Is"
 export const tBe = "Be"
 export const tTo = "To"

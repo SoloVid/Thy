@@ -1,4 +1,5 @@
 import { parseForCst } from "./parse-for-cst"
+import { parse } from "./parser/parser"
 import { readProgram } from "./read-program"
 import { makeTokenizer } from "./tokenizer/tokenizer"
 
@@ -6,11 +7,17 @@ async function run() {
     try {
         const source = await readProgram("example-program.thy")
         const tokenizer = makeTokenizer(source)
-        let token = tokenizer.getNextToken()
-        while (token !== null) {
-            console.log(token)
-            token = tokenizer.getNextToken()
-        }
+
+        // let token = tokenizer.getNextToken()
+        // while (token !== null) {
+        //     console.log(`${token.line}:${token.type}:${JSON.stringify(token.text)}`)
+        //     // console.log(token)
+        //     token = tokenizer.getNextToken()
+        // }
+
+        const tree = parse(tokenizer)
+        console.log(tree)
+
         // const cst = await parseForCst(source)
         // console.log(cst)
     } catch (e: unknown) {

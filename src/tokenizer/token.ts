@@ -5,8 +5,8 @@ export interface OneTokenizer {
     match(text: string, offset: number): string | null
 }
 
-export interface Token {
-    type: TokenType
+export interface Token<T extends TokenType = TokenType> {
+    type: string//T
     /** Literal text of token from source. */
     text: string
     /** 0-based index of character relative to start of file. */
