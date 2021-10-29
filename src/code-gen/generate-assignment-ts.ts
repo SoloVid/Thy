@@ -1,4 +1,4 @@
-import { tBe, tIs } from "../tokenizer/token-type";
+import { tVarDeclAssign, tConstDeclAssign } from "../tokenizer/token-type";
 import { Assignment } from "../tree/assignment";
 import { Call } from "../tree/call";
 import { TreeNode } from "../tree/tree-node";
@@ -14,10 +14,10 @@ export function tryGenerateAssignmentTs(node: TreeNode, state: GeneratorState): 
 export function generateAssignmentTs(a: Assignment, state: GeneratorState): string {
     const callTs = generateTs(a.call, state)
     const assignPart = `${a.variable.text} = ${callTs}`
-    if (a.operator.type === tIs) {
+    if (a.operator.type === tConstDeclAssign) {
         return `const ${assignPart}`
     }
-    if (a.operator.type === tBe) {
+    if (a.operator.type === tVarDeclAssign) {
         return `let ${assignPart}`
     }
     return assignPart

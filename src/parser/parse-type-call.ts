@@ -1,5 +1,5 @@
 import assert from "assert";
-import { tAnd, tEndBlock, tStatementTerminator } from "../tokenizer/token-type";
+import { tStatementContinuation, tEndBlock, tStatementTerminator } from "../tokenizer/token-type";
 import type { TypeCall } from "../tree/type-call";
 import { parseAtomOrBlock } from "./parse-call";
 import type { ParserState } from "./parser-state";
@@ -28,7 +28,7 @@ export function parseTypeCall(state: ParserState): TypeCall {
 
         nextToken = state.buffer.peekToken()
         if (arg.type === "block") {
-            const continuation = nextToken!.type === tAnd
+            const continuation = nextToken!.type === tStatementContinuation
             moreArguments = continuation
             if (continuation) {
                 state.buffer.consumeToken()

@@ -2,16 +2,15 @@ export type TokenType = string
 
 export const tEndBlock = "EndBlock"
 export const tStartBlock = "StartBlock"
+export const tStatementContinuation = "StatementContinuation"
 export const tStatementTerminator = "StatementTerminator"
-// export const tMultilineComment = "MultilineComment"
 export const tComment = "Comment"
 export const tSpace = "Space"
 
 // Keywords
-export const tAnd = "And"
-export const tIs = "Is"
-export const tBe = "Be"
-export const tTo = "To"
+export const tConstDeclAssign = "ConstantAssignment"
+export const tVarDeclAssign = "VarDeclAssign"
+export const tNoDeclAssign = "NoDeclAssign"
 export const tExport = "Export"
 export const tPrivate = "Private"
 export const tType = "Type"

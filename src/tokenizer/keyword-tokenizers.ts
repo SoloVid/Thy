@@ -1,10 +1,10 @@
 import { makeSingleRegexTokenizer } from "./single-regex-tokenizer";
-import { tAnd, tBe, tExport, tIs, tPrivate, tTo, tType, tYield } from "./token-type";
+import { tStatementContinuation, tVarDeclAssign, tExport, tConstDeclAssign, tPrivate, tNoDeclAssign, tType, tYield } from "./token-type";
 
-export const andTokenizer = makeSingleRegexTokenizer(tAnd, /\r?\n *and\b/)
-export const isTokenizer = makeSingleRegexTokenizer(tIs, /\bis\b/)
-export const beTokenizer = makeSingleRegexTokenizer(tBe, /\bbe\b/)
-export const toTokenizer = makeSingleRegexTokenizer(tTo, /\bto\b/)
+export const andTokenizer = makeSingleRegexTokenizer(tStatementContinuation, /\r?\n *and\b/)
+export const isTokenizer = makeSingleRegexTokenizer(tConstDeclAssign, /\bis\b/)
+export const beTokenizer = makeSingleRegexTokenizer(tVarDeclAssign, /\bbe\b/)
+export const toTokenizer = makeSingleRegexTokenizer(tNoDeclAssign, /\bto\b/)
 export const exportTokenizer = makeSingleRegexTokenizer(tExport, /\bexport\b/)
 export const privateTokenizer = makeSingleRegexTokenizer(tPrivate, /\bprivate\b/)
 export const typeTokenizer = makeSingleRegexTokenizer(tType, /\btype\b/)

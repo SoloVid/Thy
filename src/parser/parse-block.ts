@@ -1,5 +1,5 @@
 import assert from "assert";
-import { tBe, tComment, tEndBlock, tExport, tIs, tPrivate, tStartBlock, tStatementTerminator, tTo, tType, tYield } from "../tokenizer/token-type";
+import { tVarDeclAssign, tComment, tEndBlock, tExport, tConstDeclAssign, tPrivate, tStartBlock, tStatementTerminator, tNoDeclAssign, tType, tYield } from "../tokenizer/token-type";
 import type { Block } from "../tree/block";
 import { parseAssignment } from "./parse-assignment";
 import { parseCall } from "./parse-call";
@@ -38,7 +38,7 @@ export function parseBlock(state: ParserState): Block {
             }
         } else if (nextToken.type === tType) {
             const possiblyOperatorToken = state.buffer.peekToken(2)
-            if (possiblyOperatorToken !== null && possiblyOperatorToken.type === tIs) {
+            if (possiblyOperatorToken !== null && possiblyOperatorToken.type === tConstDeclAssign) {
                 ideas.push(parseTypeAssignment(state))
             } else {
                 ideas.push(parseTypeCall(state))
@@ -47,7 +47,7 @@ export function parseBlock(state: ParserState): Block {
             ideas.push(parseYieldCall(state))
         } else {
             const afterToken = state.buffer.peekToken(1)
-            if (afterToken !== null && [tIs, tBe, tTo].includes(afterToken.type)) {
+            if (afterToken !== null && [tConstDeclAssign, tVarDeclAssign, tNoDeclAssign].includes(afterToken.type)) {
                 ideas.push(parseAssignment(state))
             } else {
                 ideas.push(parseCall(state))
