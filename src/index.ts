@@ -1,3 +1,4 @@
+import { generateTs } from "./code-gen/generate-ts"
 import { parseForCst } from "./parse-for-cst"
 import { parse } from "./parser/parser"
 import { readProgram } from "./read-program"
@@ -17,6 +18,8 @@ async function run() {
 
         const tree = parse(tokenizer)
         console.log(tree)
+
+        console.log(generateTs(tree))
 
         // const cst = await parseForCst(source)
         // console.log(cst)
