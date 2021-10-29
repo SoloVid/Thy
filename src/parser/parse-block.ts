@@ -1,5 +1,5 @@
 import assert from "assert";
-import { tBe, tComment, tEndBlock, tExport, tIs, tMultilineComment, tPrivate, tStartBlock, tStatementTerminator, tTo, tType, tYield } from "../tokenizer/token-type";
+import { tBe, tComment, tEndBlock, tExport, tIs, tPrivate, tStartBlock, tStatementTerminator, tTo, tType, tYield } from "../tokenizer/token-type";
 import type { Block } from "../tree/block";
 import { parseAssignment } from "./parse-assignment";
 import { parseCall } from "./parse-call";
@@ -16,7 +16,7 @@ export function parseBlock(state: ParserState): Block {
 
     let nextToken = state.buffer.peekToken()
     while (nextToken !== null && nextToken.type !== tEndBlock) {
-        if (nextToken.type === tComment || nextToken.type === tMultilineComment) {
+        if (nextToken.type === tComment) {
             ideas.push({
                 type: "non-code",
                 token: state.buffer.consumeToken()

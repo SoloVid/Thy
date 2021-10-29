@@ -1,8 +1,8 @@
 import { TokenizerState } from "./single-tokenizer"
-import { tComment, tEndBlock, tMultilineComment, tStartBlock, tStatementTerminator } from "./token-type"
+import { tComment, tEndBlock, tStartBlock, tStatementTerminator } from "./token-type"
 
 export const multilineCommentTokenizer = {
-    type: tMultilineComment,
+    type: tComment,
     match: matchMultilineComment
 }
 export const commentTokenizer = {

@@ -3,7 +3,7 @@ export type TokenType = string
 export const tEndBlock = "EndBlock"
 export const tStartBlock = "StartBlock"
 export const tStatementTerminator = "StatementTerminator"
-export const tMultilineComment = "MultilineComment"
+// export const tMultilineComment = "MultilineComment"
 export const tComment = "Comment"
 export const tSpace = "Space"
 

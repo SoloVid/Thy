@@ -1,7 +1,7 @@
 import { makeSingleRegexTokenizer } from "./single-regex-tokenizer";
 import { tAnd, tBe, tExport, tIs, tPrivate, tTo, tType, tYield } from "./token-type";
 
-export const andTokenizer = makeSingleRegexTokenizer(tAnd, /\band\b/)
+export const andTokenizer = makeSingleRegexTokenizer(tAnd, /\r?\n *and\b/)
 export const isTokenizer = makeSingleRegexTokenizer(tIs, /\bis\b/)
 export const beTokenizer = makeSingleRegexTokenizer(tBe, /\bbe\b/)
 export const toTokenizer = makeSingleRegexTokenizer(tTo, /\bto\b/)

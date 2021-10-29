@@ -19,17 +19,18 @@ export function makeTokenizer(source: string): Tokenizer {
     const indentation = makeIndentTokenizers()
 
     const tokenizers: readonly SingleTokenizer[] = [
+
         // indentation tokens must appear before Spaces, otherwise all indentation will always be consumed as spaces.
         // Outdent must appear before Indent for handling zero spaces outdents.
-        indentation.indent,
-        statementTerminatorTokenizer,
         indentation.outdent,
+        indentation.indent,
+        andTokenizer,
+        statementTerminatorTokenizer,
         multilineCommentTokenizer,
         commentTokenizer,
         whitespaceTokenizer,
 
         // Keywords
-        andTokenizer,
         isTokenizer,
         beTokenizer,
         toTokenizer,

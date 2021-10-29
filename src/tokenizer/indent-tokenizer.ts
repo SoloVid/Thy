@@ -49,14 +49,20 @@ export function makeIndentTokenizers(): IndentTokenizers {
         }
         lastOutdentOffset = state.offset
 
-        const regex = /(?<=\n)( *(?=[^ \r\n]))/y
+        // const regex = /(?<=\n)( *(?=[^ \r\n]))/y
+        const regex = /\r?\n([ \r\n]*(?=[^ \r\n]))/y
         regex.lastIndex = state.offset
         const match = regex.exec(state.text)
         if (match === null) {
             return null
         }
 
-        const currIndentLevel = match[1].length
+        const lines = match[1].split("\n")
+        if (lines.length === 0) {
+            return null
+        }
+        const lastLineIndentation = lines[lines.length - 1]
+        const currIndentLevel = lastLineIndentation.length
         const prevIndentLevel = indentStack[indentStack.length - 1]
 
         // Indentation is not shallower, so it isn't an outdent.
