@@ -15,7 +15,7 @@ export function parseTypeAssignment(state: ParserState): TypeAssignment {
     const isTypeCall = [tScopedTypeIdentifier, tUnscopedTypeIdentifier].includes(funcToken!.type)
     const call = isTypeCall ? parseTypeCall(state) : parseCall(state)
     return {
-        type: "assignment",
+        type: "type-assignment",
         modifier,
         variable,
         operator,

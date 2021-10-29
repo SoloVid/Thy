@@ -17,7 +17,7 @@ export function parseCall(state: ParserState): Call {
     const args: Call['args'] = []
 
     let nextToken = state.buffer.peekToken()
-    // If we're immediately invoking a block, there's no reason (and readability suffers) for type args to be allowed.
+    // If we're immediately invoking a block, there's no reason (and readability suffers) for arguments to be allowed.
     if (func.type === 'atom') {
         // TODO: verify assertion
         while ([tScopedTypeIdentifier, tUnscopedTypeIdentifier].includes(nextToken!.type)) {
@@ -28,23 +28,24 @@ export function parseCall(state: ParserState): Call {
             })
             nextToken = state.buffer.peekToken()
         }
-    }
-    // TODO: verify non-null assertions (x4 I think?)
-    let moreArguments = ![tStatementTerminator, tEndBlock].includes(nextToken!.type)
-    while (moreArguments) {
-        // TODO: put "that" handling in here
-        const arg = parseAtomOrBlock(state)
-        args.push(arg)
 
-        nextToken = state.buffer.peekToken()
-        if (arg.type === "block") {
-            const continuation = nextToken!.type === tAnd
-            moreArguments = continuation
-            if (continuation) {
-                state.buffer.consumeToken()
+        // TODO: verify non-null assertions (x4 I think?)
+        let moreArguments = ![tStatementTerminator, tEndBlock].includes(nextToken!.type)
+        while (moreArguments) {
+            // TODO: put "that" handling in here
+            const arg = parseAtomOrBlock(state)
+            args.push(arg)
+
+            nextToken = state.buffer.peekToken()
+            if (arg.type === "block") {
+                const continuation = nextToken!.type === tAnd
+                moreArguments = continuation
+                if (continuation) {
+                    state.buffer.consumeToken()
+                }
+            } else {
+                moreArguments = ![tStatementTerminator, tEndBlock].includes(nextToken!.type)
             }
-        } else {
-            moreArguments = ![tStatementTerminator, tEndBlock].includes(nextToken!.type)
         }
     }
 

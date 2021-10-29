@@ -5,7 +5,7 @@ import type { TokenRange } from "./token-range";
 import type { TypeCall } from "./type-call";
 
 export interface TypeAssignment extends TokenRange {
-    type: "assignment"
+    type: "type-assignment"
     modifier: Token<typeof tExport | typeof tPrivate> | null
     variable: Token<typeof tUnscopedTypeIdentifier>
     operator: Token<typeof tIs>
