@@ -1,0 +1,109 @@
+// type FT = (o: { a: { other: boolean } }) => void
+// type FT = (o: { a: boolean }) => void
+// type FT = (a: boolean) => void
+type FT = () => void
+function doFoo(f: FT) {
+
+}
+
+// const o0 = null
+const o0 = {
+    a: 'aa'
+}
+
+const o = {
+    // ...o0,
+    ... (typeof o0 === 'object' ? o0 ?? {} : {}) as (typeof o0 extends object ? {readonly [K in keyof typeof o0]: (typeof o0)[K]} : object)
+}
+type O = typeof o
+type Oa = O["a"]
+const a: Oa = "5"
+o.a = "5"
+
+const _1 = {
+    a: 5,
+    b: {
+        c: 7
+    }
+}
+
+type PV<T extends (...args: any[]) => void, I extends number> = TakeFirstTupleTypeOrVoid<Parameters<Parameters<T>[I]>>
+type TakeFirstTupleTypeOrVoid<T extends [...any]> = T extends [] ? void : T[0]
+doFoo((_2a: PV<typeof doFoo, 0>) => {
+    type _2A = typeof _2a
+    const _2m = {
+        ... _1,
+        ... ((typeof _2a === 'object' ? _2a : {}) as (_2A extends object ? _2A : object))
+    }
+    type _2M = typeof _2m
+    const _2 = _2m as { readonly [K in keyof _2M]: _2M[K] }
+    const a = _2.a
+    _2.a = true
+})
+
+type _2TF<T extends [...any]> = T extends [] ? void : T[0]
+type _2PV0 = _2TF<Parameters<Parameters<typeof doFoo>[0]>>
+doFoo((_2a: _2PV0) => {
+    type _2A = typeof _2a
+    const _2 = {
+        ... _1,
+        ... ((typeof _2a === 'object' ? _2a : {}) as (_2A extends object ? _2A : object))
+    } as const
+    const a = _2.a
+    _2.a = true
+})
+
+doFoo((_2a: _FirstParam<Parameters<typeof doFoo>[0]>) => {
+    type _2A = typeof _2a
+    const _2 = {
+        ... _1,
+        ... ((typeof _2a === 'object' ? _2a : {}) as (_2A extends object ? _2A : object))
+    } as const
+    const a = _2.a
+    _2.a = true
+})
+
+doFoo((..._2as) => {
+    type _2As = typeof _2as
+    const _2asB = _2as as (_2As extends [] ? void[] : _2As)
+    const _2a = _2asB[0]
+    type _2A = typeof _2a
+    const _2m = {
+        ... _1,
+        ... ((typeof _2as[0] === 'object' ? _2a : {}) as (_2A extends object ? _2A : object))
+    }
+    type _2M = typeof _2m
+    const _2 = _2m as { readonly [K in keyof _2M]: _2M[K] }
+    const a = _2.a
+    _2.a = true
+})
+
+doFoo((..._2as) => {
+    type _2As = typeof _2as
+    const _2asB = _2as as (_2As extends [] ? void[] : _2As)
+    const _2a = _2asB[0]
+    type _2A = typeof _2a
+    const _2m = {
+        ... _1,
+        ... ((typeof _2a === 'object' ? _2a : {}) as (_2A extends object ? _2A : object))
+    }
+    type _2M = typeof _2m
+    const _2 = _2m as { readonly [K in keyof _2M]: _2M[K] }
+    const a = _2.a
+    _2.a = true
+})
+
+doFoo((_2a?) => {
+    const _2 = {..._1, ...(typeof _2a === 'object' ? _2a : {})}
+})
+
+doFoo((_2a) => {
+    const _2 = {..._1, ...(typeof _2a === 'object' ? _2a : {})}
+})
+
+// These types would be generated basically once per file by Thy.
+// They help make up for TypeScript lacking the ability to infer `void` as single lambda parameter.
+/** Get type of first element in tuple or void if tuple has zero elements. */
+type _FirstElementOrVoid<T extends [...any]> = T extends [] ? void : T[0]
+/** Get type of first parameter (can be void). */
+type _FirstParam<T extends (...args: any) => void> = _FirstElementOrVoid<Parameters<T>>
