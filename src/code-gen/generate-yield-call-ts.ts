@@ -10,5 +10,6 @@ export function tryGenerateYieldCallTs(node: TreeNode, state: GeneratorState): v
 }
 
 export function generateYieldCallTs(yieldCall: YieldCall, state: GeneratorState): string {
+    // TODO: Actually generate yield logic
     return `yield ${generateTs(yieldCall.call, state)}`
 }

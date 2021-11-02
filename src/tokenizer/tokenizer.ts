@@ -1,5 +1,5 @@
 import { commentTokenizer, multilineCommentTokenizer } from "./comment-tokenizer";
-import { scopedTypeIdentifierTokenizer, scopedValueIdentifierTokenizer, unscopedTypeIdentifierTokenizer, unscopedValueIdentifierTokenizer } from "./identifier-tokenizer";
+import { memberAccessOperatorTokenizer, typeIdentifierTokenizer, valueIdentifierTokenizer } from "./identifier-tokenizer";
 import { makeIndentTokenizers } from "./indent-tokenizer";
 import { andTokenizer, beTokenizer, exportTokenizer, isTokenizer, privateTokenizer, toTokenizer, typeTokenizer, yieldTokenizer } from "./keyword-tokenizers";
 import { numberTokenizer } from "./number-tokenizer";
@@ -41,10 +41,9 @@ export function makeTokenizer(source: string): Tokenizer {
 
         // Variable expressions
         numberTokenizer,
-        scopedTypeIdentifierTokenizer,
-        scopedValueIdentifierTokenizer,
-        unscopedTypeIdentifierTokenizer,
-        unscopedValueIdentifierTokenizer,
+        memberAccessOperatorTokenizer,
+        typeIdentifierTokenizer,
+        valueIdentifierTokenizer,
         stringLiteralTokenizer,
     ]
 
@@ -82,6 +81,7 @@ export function makeTokenizer(source: string): Tokenizer {
                     const c = match.charAt(i)
                     if (c === "\n") {
                         lineOffsets.push(state.offset + i + 1)
+                        console.log(`Made it through line ${lineOffsets.length}`)
                     }
                 }
 

@@ -16,10 +16,10 @@ export const tPrivate = "Private"
 export const tType = "Type"
 export const tYield = "Yield"
 
+export const tMemberAccessOperator = "MemberAccessOperator"
+
 // Variable expressions
 export const tNumberLiteral = "NumberLiteral"
-export const tUnscopedTypeIdentifier = "UnscopedTypeIdentifier"
-export const tUnscopedValueIdentifier = "UnscopedValueIdentifier"
-export const tScopedTypeIdentifier = "ScopedTypeIdentifier"
-export const tScopedValueIdentifier = "ScopedValueIdentifier"
+export const tTypeIdentifier = "TypeIdentifier"
+export const tValueIdentifier = "ValueIdentifier"
 export const tStringLiteral = "StringLiteral"

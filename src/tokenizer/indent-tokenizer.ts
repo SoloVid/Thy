@@ -61,6 +61,9 @@ export function makeIndentTokenizers(): IndentTokenizers {
         if (lines.length === 0) {
             return null
         }
+        // if (lines.length > 1) {
+        //     console.log(`OUTDENT MATCHING ${lines.length} LINES`)
+        // }
         const lastLineIndentation = lines[lines.length - 1]
         const currIndentLevel = lastLineIndentation.length
         const prevIndentLevel = indentStack[indentStack.length - 1]

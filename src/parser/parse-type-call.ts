@@ -1,67 +1,42 @@
 import assert from "assert";
-import { tStatementContinuation, tEndBlock, tStatementTerminator } from "../tokenizer/token-type";
+import { tStatementTerminator } from "../tokenizer/token-type";
+import type { Identifier } from "../tree/identifier";
 import type { TypeCall } from "../tree/type-call";
-import { parseAtomOrBlock } from "./parse-call";
+import { parseCall, parseIdentifier } from "./parse-call";
+import { parseCallArgs } from "./parse-call-arguments";
 import type { ParserState } from "./parser-state";
 
 export function parseTypeCall(state: ParserState): TypeCall {
-    const firstToken = state.buffer.peekToken()
-    assert(firstToken !== null)
-
-    const func = {
-        type: "atom",
-        token: state.buffer.consumeToken()
-    } as const
-    // TODO: Verify token type.
-
-    const args: TypeCall['args'] = []
-
-    let nextToken = state.buffer.peekToken()
-
-    // TODO: Don't duplicate all this code with parseCall()
-
-    let moreArguments = ![tStatementTerminator, tEndBlock].includes(nextToken!.type)
-    while (moreArguments) {
-        // TODO: put "that" handling in here
-        const arg = parseAtomOrBlock(state)
-        args.push(arg)
-
-        nextToken = state.buffer.peekToken()
-        if (arg.type === "block") {
-            const continuation = nextToken!.type === tStatementContinuation
-            moreArguments = continuation
-            if (continuation) {
-                state.buffer.consumeToken()
-            }
-        } else {
-            moreArguments = ![tStatementTerminator, tEndBlock].includes(nextToken!.type)
-        }
+    const vanillaCall = parseCall(state)
+    return {
+        type: "type-call" as const,
+        func: vanillaCall.func as Identifier,
+        args: [...vanillaCall.typeArgs, ...vanillaCall.args],
+        firstToken: vanillaCall.firstToken,
+        lastToken: vanillaCall.lastToken
     }
+    
 
-    // TODO: May want to be more precise here because this could give us an EndBlock
-    const lastToken = state.buffer.getPreviousToken()
-    if (nextToken!.type === tStatementTerminator) {
-        // Consume the statement separator.
-        state.buffer.consumeToken()
-    }
+    // const firstToken = state.buffer.peekToken()
 
-    // let nextToken = state.buffer.peekToken()
-    // // TODO: verify assertion
-    // while (nextToken!.type !== tStatementTerminator) {
-    //     // TODO: put "that" handling in here
-    //     args.push(parseAtomOrBlock(state))
-    //     nextToken = state.buffer.peekToken()
+    // const func = parseIdentifier(state)
+    // // TODO: Verify token type.
+
+    // const splitArgs = parseCallArgs(state)
+    // const args: TypeCall['args'] = [...splitArgs.typeArgs, ...splitArgs.args]
+
+    // // TODO: May want to be more precise here because this could give us an EndBlock
+    // const lastToken = state.buffer.getPreviousToken()
+    // if (state.buffer.peekToken().type === tStatementTerminator) {
+    //     // Consume the statement separator.
+    //     state.buffer.consumeToken()
     // }
 
-    // const lastToken = state.buffer.getPreviousToken()
-    // // Consume the statement separator.
-    // state.buffer.consumeToken()
-
-    return {
-        type: "type-call",
-        func,
-        args,
-        firstToken,
-        lastToken
-    }
+    // return {
+    //     type: "type-call",
+    //     func,
+    //     args,
+    //     firstToken,
+    //     lastToken
+    // }
 }

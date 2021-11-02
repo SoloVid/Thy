@@ -16,7 +16,11 @@ async function run() {
         //     token = tokenizer.getNextToken()
         // }
 
-        const tree = parse(tokenizer)
+        const parserOutput = parse(tokenizer)
+        for (const err of parserOutput.errors) {
+            console.error(err)
+        }
+        const tree = parserOutput.top
         console.log(tree)
 
         console.log(generateTs(tree))

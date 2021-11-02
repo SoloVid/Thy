@@ -13,11 +13,23 @@ export function tryGenerateAssignmentTs(node: TreeNode, state: GeneratorState): 
 
 export function generateAssignmentTs(a: Assignment, state: GeneratorState): string {
     const callTs = generateTs(a.call, state)
-    const assignPart = `${a.variable.text} = ${callTs}`
+    const variablePart = generateTs(a.variable)
+    const assignPart = `${variablePart} = ${callTs}`
+    // TODO: Somewhere we need to handle the ghosting problem (error)
     if (a.operator.type === tConstDeclAssign) {
+        // state.localVariables.push({
+        //     token: a.variable,
+        //     name: variableName,
+        //     isConstant: true
+        // })
         return `const ${assignPart}`
     }
     if (a.operator.type === tVarDeclAssign) {
+        // state.localVariables.push({
+        //     token: a.variable,
+        //     name: variableName,
+        //     isConstant: false
+        // })
         return `let ${assignPart}`
     }
     return assignPart

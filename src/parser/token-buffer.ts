@@ -1,9 +1,9 @@
 import assert from "assert";
-import { Token } from "../tokenizer/token";
-import { Tokenizer } from "../tokenizer/tokenizer";
+import type { Token } from "../tokenizer/token";
+import type { Tokenizer } from "../tokenizer/tokenizer";
 
 export interface TokenBuffer {
-    peekToken(howManyAhead?: number): Token | null
+    peekToken(howManyAhead?: number): Token
     consumeToken(): Token
     getPreviousToken(): Token
 }
@@ -12,38 +12,26 @@ export function makeTokenBuffer(tokenizer: Tokenizer): TokenBuffer {
     const upNext: Token[] = []
     let previousToken: Token | null = null
 
-    let atEnd = false
-
     return {
         peekToken(howManyAhead: number = 0) {
-            if (atEnd) {
-                return null
-            }
-
             while (upNext.length <= howManyAhead) {
                 const t = tokenizer.getNextToken()
-                if (t === null) {
-                    atEnd = true
-                    return null
-                }
+                assert(t !== null, endOfStreamErrorMessage)
                 upNext.push(t)
             }
             return upNext[howManyAhead]
         },
         consumeToken() {
-            // TODO: Is this how to handle end consumeToken()?
-            assert(!atEnd)
-
             const t = upNext.length >= 1 ? upNext.shift() : tokenizer.getNextToken()
-            // TODO: Is this how to handle end?
-            assert(t != null)
+            assert(t != null, endOfStreamErrorMessage)
             previousToken = t
             return t
         },
         getPreviousToken() {
-            // TODO: Is this how I want to handle null previousToken?
-            assert(previousToken !== null)
+            assert(previousToken !== null, 'Called getPreviousToken() before any tokens consumed.')
             return previousToken
         }
     }
 }
+
+const endOfStreamErrorMessage = 'Unexpected end of token stream. This is a bug in the tokenizer/parser.'

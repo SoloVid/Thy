@@ -10,14 +10,15 @@ export function tryGenerateCallTs(node: TreeNode, state: GeneratorState): void |
 }
 
 export function generateCallTs(call: Call, state: GeneratorState): string {
+    const childState = state.makeChild()
+    childState.indentLevel++
+    childState.expressionContext = true
+
     if (call.func.type === 'block') {
-        return '<IIFE>'
+        return "(" + generateTs(call.func, childState) + ")()"
     }
 
-    const childState: GeneratorState = {
-        indentLevel: state.indentLevel + 1
-    }
-
+    const functionString = generateTs(call.func)
     const argStrings = call.args.map(a => generateTs(a, childState))
-    return `${call.func.token.text}(${argStrings.join(', ')})`
+    return `${functionString}(${argStrings.join(', ')})`
 }

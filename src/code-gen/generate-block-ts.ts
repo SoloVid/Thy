@@ -14,19 +14,57 @@ export function generateBlockTs(block: Block, state: GeneratorState): string {
     if (state.indentLevel === 0) {
         return generateBlockLinesTs(block.ideas, state)
     }
-    const childState = {
-        indentLevel: state.indentLevel + 1
+    
+    const parameterSpecs: string[] = []
+    const imperativeIdeas: Block["ideas"] = []
+    for (const idea of block.ideas) {
+        const ps = getParameterSpec(idea)
+        if (ps === null) {
+            imperativeIdeas.push(idea)
+        } else {
+            parameterSpecs.push(ps)
+        }
     }
-    return `() => {\n${generateBlockLinesTs(block.ideas, state)}\n${makeIndent(state.indentLevel - 1)}}`
+
+    return `(${parameterSpecs.join(", ")}) => {\n${generateBlockLinesTs(imperativeIdeas, state)}\n${makeIndent(state.indentLevel - 1)}}`
+}
+
+function getParameterSpec(node: TreeNode): string | null {
+    // TODO: Also support `given` call without assignment (ignored parameter)
+    if (node.type !== "assignment") {
+        return null
+    }
+    if (node.call.func.type !== "atom") {
+        return null
+    }
+    if (node.call.func.token.text !== "given") {
+        return null
+    }
+    // TODO: Add type information
+    // TODO: Validate unscoped
+    return `${node.variable.target.text}`
 }
 
 export function generateBlockLinesTs(ideas: Block["ideas"], state: GeneratorState): string {
-    const childState: GeneratorState = {
-        indentLevel: state.indentLevel + 1
+    const childState = state.makeChild()
+    // childState.indentLevel++
+    childState.expressionContext = false
+    childState.yieldContext = false
+
+    const lines = ideas.map(i => generateTs(i, childState))
+    if (childState.localVariables.length > 0) {
+        const impliedReturn = childState.localVariables.map(v => {
+            const ind = makeIndent(childState.indentLevel + 1)
+            if (v.isConstant) {
+                return ind + v.name
+            }
+            return `${ind}get ${v.name}() { return ${v.name} },\n${ind}set ${v.name}(__) { ${v.name} = __ }`
+        })
+        lines.push(`return {\n${impliedReturn.join(",\n")}\n${makeIndent(state.indentLevel)}}`)
     }
 
     // const lines = ideas.map(i => indentString(generateTs(i, childState), state.indentLevel))
-    const lines = ideas.map(i => makeIndent(state.indentLevel) + generateTs(i, state))
+    // const lines = ideas.map(i => makeIndent(state.indentLevel) + generateTs(i, state))
 
-    return lines.join("\n")
+    return lines.map(l => makeIndent(state.indentLevel) + l).join("\n")
 }

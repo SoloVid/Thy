@@ -10,6 +10,7 @@ export function parseYieldCall(state: ParserState): YieldCall {
     const call = parseCall(state)
     return {
         type: "yield-call",
+        yieldToken: yieldToken,
         call,
         firstToken: yieldToken,
         lastToken: call.lastToken
