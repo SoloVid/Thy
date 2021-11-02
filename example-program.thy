@@ -1,8 +1,8 @@
 TS a la `import { heya as hey } from ...`
-hey is thy .blah.blah.heya.
+hey is thy "blah.blah.heya"
 
 TS a la `namespace blahBlah.blah`
-thy.scope .blahBlah.blah.
+thy.scope "blahBlah.blah"
   Define a function.
   main is def
     Assign literal. const a = 5
@@ -12,7 +12,7 @@ thy.scope .blahBlah.blah.
     Assign function result. const c = calc(a, b)
     c is calc a b
     Just call function
-    print .himom.
+    print "himom"
 
     This is a comment
     check.all c d
@@ -25,12 +25,12 @@ thy.scope .blahBlah.blah.
       doOtherThing
 
   for.times 10
-    given i
+    i is given
     e is get arr i
     doBlah
 
   for.elements arr
-    given element
+    element is given
     print element
 
   loop
@@ -41,8 +41,6 @@ thy.scope .blahBlah.blah.
       return
 
   switch myVal
-    given case
-    given default
     case 1 doFirst
     case 2
       doFirst
@@ -55,12 +53,12 @@ thy.scope .blahBlah.blah.
   TS: type FunctionType = (pA: A) => ReturnType
   More strictly something like: type FunctionType = typeof makeFunction((pA: A): ReturnType => {})
   type FunctionType is def
-    given A pA
+    pA is given A
     type return ReturnType
 
   private typedFun is def
-    given A pA
-    given B pB pBDefault
+    pA is given A
+    pB is given B pBDefault
     type ReturnType is Promise InnerReturnType
     type return ReturnType
     asyncAdd pA pB
@@ -68,15 +66,17 @@ thy.scope .blahBlah.blah.
     return pA plus pB
 
   export generalizedFun is def
-    type given Unknown U
-    given AT U pA
-    given BT U pB
+    type U is Given Unknown
+    type ATU is AT U
+    pA is given ATU
+    type BTU is BT U
+    pB is given BTU 
     type ReturnType is RT U
     type return ReturnType
 
   TS: type ConditionalType<T> = T extends A ? AImplication : BImplication
   type ConditionalType is def
-    type given Unknown T
+    type T is Given Unknown
     type Result is If T A AImplication BImplication
     type return Result
 
@@ -93,7 +93,7 @@ thy.scope .blahBlah.blah.
   TypeScript: interface MyType<T> { field1: number; field2: T[]; }
   More strictly something like: type MyType<T> = typeof (() => { return { field1: null as number, field2: [null as T] } })()
   type MyType is def
-    type given Unknown T
+    type T is Given Unknown
     type Result is
       field1 be Number
       field2 be Array T
@@ -101,11 +101,11 @@ thy.scope .blahBlah.blah.
 
   TS type Interfaces<X extends number, Y extends X[] = boolean[]> = MyType<X> & YOtherType<Y>
   type Interfaces is def
-    type given Number X
+    type X is Given Number
     Won't allow non-type statements to separate givens from top of fun, but needed here in type fun.
     type YParent is Array X
     type DefaultY is Array Boolean
-    type given YParent Y DefaultY
+    type Y is Given YParent DefaultY
 
     type MX is MyType X
     type OY is YOtherType Y
@@ -114,15 +114,15 @@ thy.scope .blahBlah.blah.
 
   Class definition. class Thing<T> implements Interfaces<T, Yo>
   newThing is def
-    type given Unknown T
+    type T is Given Unknown
     Constructor parameters.
-    given Q qq
-    given String we
+    qq is given Q
+    qe is given String
     type ReturnType is Interfaces T Yo
     type return ReturnType
 
     Class members.
-    w be String ..
+    w be String ""
 
     Constructor body.
     private q is qq
@@ -131,12 +131,12 @@ thy.scope .blahBlah.blah.
     field1 is getter
       return 5
     and setter
-      given n
+      n is given
       doSet n
 
     method is def
-      given x
-      given y
+      x is given
+      y is given
       type return Void
       print x
       print y
@@ -145,12 +145,12 @@ thy.scope .blahBlah.blah.
   arr is array
   With values. const arr = [1, 2, 3]
   arr is array
-    given a
+    a is given
     a 1
     a 2
     a 3
   Array index write. arr[5] = "blah"
-  set arr 5 .blah.
+  set arr 5 "blah"
   Array index access. const el = arr[5]
   el is get arr 5
 
@@ -176,21 +176,21 @@ thy.scope .blahBlah.blah.
   NMC
     Other Comment
   NMC
-  callMe .hey mom... a
-    given a
-    given b
-    given c
+  callMe "hey mom." a
+    a is given
+    b is given
+    c is given
     print a
   and
-    given x
+    x is given
     print x
   and d
 
   try
     doSomething
-      throw .my error.
+      throw "my error"
   and catch
-    given e
+    e is given
     print e
   and finally
-    print .*sigh*.
+    print "*sigh*"
