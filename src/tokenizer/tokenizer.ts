@@ -50,7 +50,7 @@ export function makeTokenizer(source: string): Tokenizer {
     const state = {
         text: source,
         offset: 0,
-        lastTokenType: null,
+        lastTokenType: null as TokenType | null,
         get currentIndentWidth() {
             return indentation.currentIndentWidth
         }
@@ -62,6 +62,7 @@ export function makeTokenizer(source: string): Tokenizer {
         const currentOffset = state.offset
         const currentLine = lineOffsets.length - 1
         const currentColumn = currentOffset - lineOffsets[currentLine]
+        state.lastTokenType = type
         return {
             type: type,
             text: text,

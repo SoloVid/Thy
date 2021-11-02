@@ -1,8 +1,8 @@
-import { Block } from "../tree/block";
-import { TreeNode } from "../tree/tree-node";
+import type { Block } from "../tree/block";
+import type { TreeNode } from "../tree/tree-node";
 import { generateTs } from "./generate-ts";
-import { GeneratorState } from "./generator-state";
-import { indentString, makeIndent } from "./indent-string";
+import type { GeneratorState } from "./generator-state";
+import { makeIndent } from "./indent-string";
 
 export function tryGenerateBlockTs(node: TreeNode, state: GeneratorState): void | string {
     if (node.type === "block") {

@@ -6,6 +6,9 @@ import { parseCall } from "./parse-call";
 import type { ParserState } from "./parser-state";
 
 export function parseTypeAssignment(state: ParserState): TypeAssignment {
+    // TODO: Validate token
+    // Consume 'type'
+    const typeToken = state.buffer.consumeToken()
     const firstToken = state.buffer.peekToken()
     const modifier = [tExport, tPrivate].includes(firstToken.type) ? state.buffer.consumeToken() : null
     const variable = state.buffer.consumeToken()
@@ -33,6 +36,7 @@ export function parseTypeAssignment(state: ParserState): TypeAssignment {
     return {
         type: "type-assignment",
         modifier,
+        typeToken,
         variable,
         operator,
         call,

@@ -1,6 +1,6 @@
-import { TreeNode } from "../tree/tree-node";
-import { TypeAssignment } from "../tree/type-assignment";
-import { GeneratorState } from "./generator-state";
+import type { TreeNode } from "../tree/tree-node";
+import type { TypeAssignment } from "../tree/type-assignment";
+import type { GeneratorState } from "./generator-state";
 
 export function tryGenerateTypeAssignmentTs(node: TreeNode, state: GeneratorState): void | string {
     if (node.type === "type-assignment") {

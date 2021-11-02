@@ -3,7 +3,8 @@ import type { Token } from "../tokenizer/token";
 import { tConstDeclAssign, tExport, tNoDeclAssign, tPrivate, tVarDeclAssign } from "../tokenizer/token-type";
 import type { Assignment } from "../tree/assignment";
 import type { Identifier } from "../tree/identifier";
-import { parseCall, parseIdentifier } from "./parse-call";
+import { parseCall } from "./parse-call";
+import { parseIdentifier } from "./parse-identifier";
 import type { ParserState } from "./parser-state";
 
 export function parseAssignment(state: ParserState): Assignment {
@@ -45,7 +46,7 @@ export function parseAssignment(state: ParserState): Assignment {
 
 function applyToSymbolTable(state: ParserState, variable: Token<string>, isConstant: boolean): void {
     if (state.context.symbolTable.getSymbolInfo(variable.text) !== null) {
-        state.addError(tokenError(variable, `"${variable}" is already declared in this scope and cannot be re-declared`))
+        state.addError(tokenError(variable, `"${variable.text}" is already declared in this scope and cannot be re-declared`))
     } else if (state.context.symbolTable.isSymbolNameTakenHereOrInChild(variable.text)) {
         state.addError(tokenError(variable, `"${variable.text}" is declared in a child scope and cannot be overshadowed with an alternate declaration here`))
     }

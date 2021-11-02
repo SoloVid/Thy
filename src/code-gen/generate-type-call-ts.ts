@@ -1,6 +1,6 @@
-import { TreeNode } from "../tree/tree-node";
-import { TypeCall } from "../tree/type-call";
-import { GeneratorState } from "./generator-state";
+import type { TreeNode } from "../tree/tree-node";
+import type { TypeCall } from "../tree/type-call";
+import type { GeneratorState } from "./generator-state";
 
 export function tryGenerateTypeCallTs(node: TreeNode, state: GeneratorState): void | string {
     if (node.type === "type-call") {

@@ -2,7 +2,7 @@ import { tokenError } from "../compile-error";
 import type { Token } from "../tokenizer/token";
 import { tEndBlock, tStatementContinuation, tStatementTerminator, tTypeIdentifier } from "../tokenizer/token-type";
 import type { Call } from "../tree/call";
-import { parseArguable } from "./parse-call";
+import { parseArguable } from "./parse-arguable";
 import type { ParserState } from "./parser-state";
 
 export interface Args {

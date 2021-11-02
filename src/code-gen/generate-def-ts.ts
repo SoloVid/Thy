@@ -1,7 +1,7 @@
 import { assert } from "console";
-import { TreeNode } from "../tree/tree-node";
+import type { TreeNode } from "../tree/tree-node";
 import { generateTs } from "./generate-ts";
-import { GeneratorState } from "./generator-state";
+import type { GeneratorState } from "./generator-state";
 
 export function tryGenerateDefTs(node: TreeNode, state: GeneratorState): void | string {
     if (node.type !== "call") {

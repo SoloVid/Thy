@@ -1,7 +1,7 @@
 import assert from "assert";
 import { tComment } from "../tokenizer/token-type";
-import { TreeNode } from "../tree/tree-node";
-import { GeneratorState } from "./generator-state";
+import type { TreeNode } from "../tree/tree-node";
+import type { GeneratorState } from "./generator-state";
 import { makeIndent } from "./indent-string";
 
 export function tryGenerateCommentTs(node: TreeNode, state: GeneratorState): void | string {

@@ -17,14 +17,11 @@ export function parseBlock(state: ParserState): Block {
     const thatStack = {
         indexThat: null as null | number,
         indexBeforeThat: null as null | number,
-        // thatTaken: false,
-        // beforeThatTaken: false
     }
 
     const context: ParserContext = {
         symbolTable: parentContext.symbolTable.makeChild(),
         takeThat() {
-            // thatStack.thatTaken = true
             const i = thatStack.indexThat
             if (i === null) {
                 return null
@@ -35,7 +32,6 @@ export function parseBlock(state: ParserState): Block {
             return idea
         },
         takeBeforeThat() {
-            // thatStack.beforeThatTaken = true
             const i = thatStack.indexBeforeThat
             if (i === null) {
                 return null
@@ -57,9 +53,6 @@ export function parseBlock(state: ParserState): Block {
 
         let nextToken = state.buffer.peekToken()
         while (nextToken.type !== tEndBlock) {
-            // thatStack.thatTaken = false
-            // thatStack.beforeThatTaken = false
-
             const idea = parseLine(state, nextToken)
 
             if (idea.type !== 'blank-line' && idea.type !== 'non-code') {

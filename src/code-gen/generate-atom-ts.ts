@@ -1,6 +1,6 @@
-import { Atom } from "../tree/atom";
-import { TreeNode } from "../tree/tree-node";
-import { GeneratorState } from "./generator-state";
+import type { Atom } from "../tree/atom";
+import type { TreeNode } from "../tree/tree-node";
+import type { GeneratorState } from "./generator-state";
 
 export function tryGenerateAtomTs(node: TreeNode, state: GeneratorState): void | string {
     if (node.type === "atom") {

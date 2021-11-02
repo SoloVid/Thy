@@ -1,5 +1,4 @@
-import { Token } from "../tokenizer/token"
-import { TokenType } from "../tokenizer/token-type"
+import type { Token } from "../tokenizer/token"
 
 export interface GeneratorState {
     expressionContext: boolean
