@@ -82,7 +82,6 @@ export function makeTokenizer(source: string): Tokenizer {
                     const c = match.charAt(i)
                     if (c === "\n") {
                         lineOffsets.push(state.offset + i + 1)
-                        console.log(`Made it through line ${lineOffsets.length}`)
                     }
                 }
 

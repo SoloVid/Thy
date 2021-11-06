@@ -12,7 +12,7 @@ export function tryGenerateBlockTs(node: TreeNode, state: GeneratorState): void 
 
 export function generateBlockTs(block: Block, state: GeneratorState): string {
     if (state.indentLevel === 0) {
-        return generateBlockLinesTs(block.ideas, state)
+        return generateBlockLinesTs(block.ideas, state) + "\n"
     }
     
     const parameterSpecs: string[] = []

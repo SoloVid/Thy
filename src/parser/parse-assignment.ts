@@ -19,7 +19,11 @@ export function parseAssignment(state: ParserState): Assignment {
     if (operator.type === tNoDeclAssign) {
         const symbolInfo = state.context.symbolTable.getSymbolInfo(baseVar.text)
         if (symbolInfo === null) {
-            state.addError(tokenError(baseVar, `"${baseVar.text}" is not declared in this scope`))
+            // If we don't have the symbol info, the only valid possibility is that the variable is an implicit parameter.
+            // Implicit parameters are readonly, but if they're accessing a member they may be able to assign it.
+            if (variable.scopes.length === 0) {
+                state.addError(tokenError(baseVar, `"${baseVar.text}" is not declared in this scope`))
+            }
         } else if (symbolInfo.isConstant) {
             state.addError(tokenError(baseVar, `"${baseVar.text}" is constant and cannot be reassigned`))
         }
