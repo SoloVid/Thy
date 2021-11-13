@@ -1,0 +1,11 @@
+
+in Maven engine
+    1279 return
+        390 with inline call (/return .+\(/)
+        418 trivial value returns (/return [a-zA-Z.0-9]+$/)
+        117 raw returns (/return$/)
+        89 object returns (/(?<!@)return \{/)
+        40 string returns (/return "/)
+        744 non-trivial returns (/return (?![a-zA-Z.0-9]+$)/)
+        
+    
