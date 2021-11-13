@@ -1,9 +1,7 @@
 import fs from "fs/promises"
 import path from "path"
-import { generateTs } from "../../../code-gen/generate-ts"
+import { tsCompiler } from "../../../code-gen/ts-compiler"
 import type { CompileError } from "../../../compile-error"
-import { parse } from "../../../parser/parser"
-import { makeTokenizer } from "../../../tokenizer/tokenizer"
 
 export async function compileAndVerifyOutput(libDir: string, inputFile: string, expectedOutputFile: string) {
     const thySource = await readFile(libDir, inputFile)
@@ -29,16 +27,13 @@ function pathInSrc(libPath: string): string {
 
 export interface CompileResult {
     output: string
-    errors: CompileError[]
+    errors: readonly CompileError[]
 }
 
 async function compileSource(thySource: string): Promise<CompileResult> {
-    const tokenizer = makeTokenizer(thySource)
-    const parserOutput = parse(tokenizer)
-    const tree = parserOutput.top
-    const ts = generateTs(tree)
+    const compilerResult = tsCompiler.compile(thySource)
     return {
-        output: ts,
-        errors: parserOutput.errors
+        output: compilerResult.output,
+        errors: compilerResult.getAllErrors()
     }
 }
