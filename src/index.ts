@@ -1,4 +1,4 @@
-import { generateTs } from "./code-gen/generate-ts"
+import { tsGenerator } from "./code-gen/ts/generate-ts"
 import { parse } from "./parser/parser"
 import { readProgram } from "./read-program"
 import { makeTokenizer } from "./tokenizer/tokenizer"
@@ -6,7 +6,7 @@ import { makeTokenizer } from "./tokenizer/tokenizer"
 async function run() {
     try {
         const source = await readProgram("example-program.thy")
-        const tokenizer = makeTokenizer(source)
+        const tokenizer = makeTokenizer(source, [])
 
         // let token = tokenizer.getNextToken()
         // while (token !== null) {
@@ -22,7 +22,7 @@ async function run() {
         const tree = parserOutput.top
         console.log(tree)
 
-        console.log(generateTs(tree))
+        console.log(tsGenerator(tree))
     } catch (e: unknown) {
         console.error(e)
     }

@@ -2,9 +2,9 @@ import type { Token } from "./tokenizer/token";
 import type { TokenRange } from "./tree/token-range";
 
 export interface CompileError {
-    message: string
-    start: Token
-    end: Token
+    readonly message: string
+    readonly start: Token
+    readonly end: Token
 }
 
 export function tokenError(token: Token, message: string): CompileError {
