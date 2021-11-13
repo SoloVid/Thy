@@ -8,4 +8,5 @@ export interface Identifier<T extends TypeOrValue = TypeOrValue> extends TokenRa
     type: "identifier"
     scopes: Token<typeof tValueIdentifier>[]
     target: Token<T>
+    rawTokens: Token[]
 }

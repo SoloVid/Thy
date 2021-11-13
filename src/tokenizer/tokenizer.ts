@@ -1,3 +1,4 @@
+import { CompileError, tokenError } from "../compile-error";
 import { commentTokenizer, multilineCommentTokenizer } from "./comment-tokenizer";
 import { memberAccessOperatorTokenizer, typeIdentifierTokenizer, valueIdentifierTokenizer } from "./identifier-tokenizer";
 import { makeIndentTokenizers } from "./indent-tokenizer";
@@ -5,17 +6,22 @@ import { andTokenizer, beTokenizer, exportTokenizer, isTokenizer, privateTokeniz
 import { numberTokenizer } from "./number-tokenizer";
 import type { SingleTokenizer } from "./single-tokenizer";
 import { stringLiteralTokenizer } from "./string-tokenizer";
-import type { Token } from "./token";
-import { tEndBlock, TokenType, tStartBlock } from "./token-type";
+import type { SourcePosition, Token } from "./token";
+import { tEndBlock, tErrorToken, TokenType, tStartBlock } from "./token-type";
 import { statementTerminatorTokenizer, whitespaceTokenizer } from "./whitespace-tokenizer";
 
+export const endOfStream = Symbol('endOfStream')
 
 export interface Tokenizer {
     /** Returns null at end of stream. */
     getNextToken(): Token | null
+
+    getCurrentPosition(): SourcePosition
 }
 
-export function makeTokenizer(source: string): Tokenizer {
+export type TokenizerFactory = (source: string, errors: CompileError[]) => Tokenizer
+
+export function makeTokenizer(source: string, errors: CompileError[]): Tokenizer {
     const indentation = makeIndentTokenizers()
 
     const tokenizers: readonly SingleTokenizer[] = [
@@ -58,25 +64,68 @@ export function makeTokenizer(source: string): Tokenizer {
 
     const lineOffsets = [0]
 
-    function makeTokenHere(type: TokenType, text: string) {
+    function startTokenHere(type: TokenType): Omit<Token, "text"> {
         const currentOffset = state.offset
         const currentLine = lineOffsets.length - 1
         const currentColumn = currentOffset - lineOffsets[currentLine]
-        state.lastTokenType = type
         return {
             type: type,
-            text: text,
             offset: currentOffset,
             line: currentLine,
             column: currentColumn
         }
     }
 
-    function tryTokenizers() {
+    function makeTokenHere(type: TokenType, text: string) {
+        state.lastTokenType = type
+        const partial = startTokenHere(type)
+        return {
+            ...partial,
+            text
+        }
+    }
+
+    const noToken = Symbol('noToken')
+    const itsAnError = Symbol('itsAnError')
+
+    let nextToken: Token | null = null
+
+    function getNextValidToken(): Token | typeof endOfStream {
+        let errorCharacters = 0
+        const errorPartialToken = startTokenHere(tErrorToken)
+        while (nextToken === null && state.offset < source.length) {
+            const t = tryTokenizers()
+            if (t === itsAnError) {
+                errorCharacters++
+                state.offset++
+            } else if (t !== noToken) {
+                nextToken = t
+            }
+        }
+
+        if (errorCharacters > 0) {
+            const t = {
+                ...errorPartialToken,
+                text: state.text.substr(state.offset - errorCharacters, errorCharacters)
+            }
+            errors.push(tokenError(t, 'Unexpected token'))
+            return t
+        }
+
+        if (nextToken !== null) {
+            const t = nextToken
+            nextToken = null
+            return t
+        }
+
+        return endOfStream
+    }
+
+    function tryTokenizers(): Token | typeof noToken | typeof itsAnError {
         for (const tokenizer of tokenizers) {
             const match = tokenizer.match(state)
             if (match !== null) {
-                const token = tokenizer.type === null ? null : makeTokenHere(tokenizer.type, match)
+                const token = tokenizer.type === null ? noToken : makeTokenHere(tokenizer.type, match)
 
                 for (let i = 0; i < match.length; i++) {
                     const c = match.charAt(i)
@@ -90,7 +139,7 @@ export function makeTokenizer(source: string): Tokenizer {
                 return token
             }
         }
-        throw new Error(`Unable to match token at ${state.offset}`)
+        return itsAnError
     }
 
     let startTokenGiven = false
@@ -102,21 +151,21 @@ export function makeTokenizer(source: string): Tokenizer {
                 startTokenGiven = true
                 return makeTokenHere(tStartBlock, "")
             }
-            let token = null
-            while (token === null) {
-                if (state.offset >= source.length) {
-                    if (closingEndBlocks === null) {
-                        closingEndBlocks = indentation.currentIndentLevels + 1
-                    }
-                    if (closingEndBlocks > 0) {
-                        closingEndBlocks--;
-                        return makeTokenHere(tEndBlock, "")
-                    }
-                    return null
+            let token = getNextValidToken()
+            if (token === endOfStream) {
+                if (closingEndBlocks === null) {
+                    closingEndBlocks = indentation.currentIndentLevels + 1
                 }
-                token = tryTokenizers()
+                if (closingEndBlocks > 0) {
+                    closingEndBlocks--;
+                    return makeTokenHere(tEndBlock, "")
+                }
+                return null
             }
             return token
+        },
+        getCurrentPosition() {
+            return startTokenHere('not a token')
         }
     }
 }

@@ -1,5 +1,7 @@
 export type TokenType = string
 
+export const tErrorToken = "ErrorToken"
+
 export const tEndBlock = "EndBlock"
 export const tStartBlock = "StartBlock"
 export const tStatementContinuation = "StatementContinuation"
