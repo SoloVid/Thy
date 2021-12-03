@@ -27,9 +27,7 @@ export function parseCallArgs(state: ParserState): Args {
             typeArgs.push(arg)
         } else {
             typeArgumentsEnded = true
-
-            const translatedArg = getArgThat(arg)
-            args.push(translatedArg)
+            args.push(arg)
         }
 
         nextToken = state.buffer.peekToken()
@@ -39,6 +37,7 @@ export function parseCallArgs(state: ParserState): Args {
             if (continuation) {
                 state.buffer.consumeToken()
             }
+            // TODO: What if we get statement/block end right after continuation token?
         } else {
             moreArguments = ![tStatementTerminator, tEndBlock].includes(nextToken.type)
         }
@@ -51,45 +50,5 @@ export function parseCallArgs(state: ParserState): Args {
     return {
         typeArgs,
         args
-    }
-
-    function getArgThat(arg: Call['args'][number]): Call['args'][number] {
-        if (arg.type === 'identifier' && arg.target.text === 'that') {
-            if (arg.scopes.length > 0) {
-                state.addError(tokenError(arg.target, 'that cannot be scoped'))
-                return arg
-            }
-            if (thatTaken !== null) {
-                state.addError(tokenError(arg.target, `that already used`))
-                return arg
-            }
-            const thatCall = state.context.takeThat()
-            if (thatCall === null) {
-                state.addError(tokenError(arg.target, `No preceding call is eligible to satisfy that`))
-                return arg
-            } else {
-                thatTaken = arg.target
-                return thatCall
-            }
-        }
-        if (arg.type === 'identifier' && arg.target.text === 'beforeThat') {
-            if (arg.scopes.length > 0) {
-                state.addError(tokenError(arg.target, 'beforeThat cannot be scoped'))
-                return arg
-            }
-            if (beforeThatTaken !== null) {
-                state.addError(tokenError(arg.target, `that already used`))
-                return arg
-            }
-            const beforeThatCall = state.context.takeBeforeThat()
-            if (beforeThatCall === null) {
-                state.addError(tokenError(arg.target, `No preceding call is eligible to satisfy beforeThat`))
-                return arg
-            } else {
-                beforeThatTaken = arg.target
-                return beforeThatCall
-            }
-        }
-        return arg
     }
 }

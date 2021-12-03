@@ -18,7 +18,7 @@ export function parseCall(state: ParserState): Call {
     // If we're immediately invoking a block, there's no reason (and readability suffers) for arguments to be allowed.
     if (func.type === 'identifier') {
         // This case is fine. Aside from the awkwardness of this logic, nothing needs to change here.
-    } else if (func.type !== 'block') {
+    } else if (func.type !== 'block' && func.type !== "call") {
         state.addError(tokenError(func.token, `${func.token.text} is called as if it were a function when it is not`))
     } else {
         // TODO: What do we do with arguments here?

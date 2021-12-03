@@ -3,7 +3,7 @@ import type { Tokenizer } from "../tokenizer/tokenizer";
 import type { Block } from "../tree/block";
 import { makeSymbolTable } from "../tree/symbol-table";
 import { parseBlock } from "./parse-block";
-import type { ParserState } from "./parser-state";
+import { ParserState, thatNotFound } from "./parser-state";
 import { makeTokenBuffer } from "./token-buffer";
 
 export interface ParserOutput {
@@ -17,8 +17,8 @@ export function parse(tokenizer: Tokenizer): ParserOutput {
         buffer: makeTokenBuffer(tokenizer),
         context: {
             symbolTable: makeSymbolTable(),
-            takeThat: () => null,
-            takeBeforeThat: () => null
+            takeThat: () => thatNotFound,
+            takeBeforeThat: () => thatNotFound
         },
 
         addError(e) {

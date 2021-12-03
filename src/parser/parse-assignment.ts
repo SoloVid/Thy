@@ -2,16 +2,16 @@ import { tokenError, tokenRangeError } from "../compile-error";
 import type { Token } from "../tokenizer/token";
 import { tConstDeclAssign, tExport, tNoDeclAssign, tPrivate, tVarDeclAssign } from "../tokenizer/token-type";
 import type { Assignment } from "../tree/assignment";
-import type { Identifier } from "../tree/identifier";
+import type { PureIdentifier } from "../tree/identifier";
 import { parseCall } from "./parse-call";
-import { parseIdentifier } from "./parse-identifier";
+import { parsePureIdentifier } from "./parse-identifier";
 import type { ParserState } from "./parser-state";
 
 export function parseAssignment(state: ParserState): Assignment {
     // TODO: Validate beginning of assignment?
     const firstToken = state.buffer.peekToken()
     const modifier = [tExport, tPrivate].includes(firstToken.type) ? state.buffer.consumeToken() : null
-    const variable = parseIdentifier(state)
+    const variable = parsePureIdentifier(state)
     const operator = state.buffer.consumeToken()
 
     const baseVar = getBaseOfIdentifier(variable)
@@ -57,9 +57,9 @@ function applyToSymbolTable(state: ParserState, variable: Token<string>, isConst
     state.context.symbolTable.addSymbol(variable, isConstant)
 }
 
-function getBaseOfIdentifier(identifier: Identifier): Token<string> {
+function getBaseOfIdentifier(identifier: PureIdentifier): Token<string> {
     if (identifier.scopes.length > 0) {
-        return identifier.scopes[0]
+        return identifier.scopes[0].token
     }
     return identifier.target
 }

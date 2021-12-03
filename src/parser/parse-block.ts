@@ -1,13 +1,19 @@
 import assert from "assert";
+import { tokenError } from "../compile-error";
 import type { Token } from "../tokenizer/token";
 import { tComment, tConstDeclAssign, tEndBlock, tExport, tNoDeclAssign, tPrivate, tStartBlock, tStatementTerminator, tType, tVarDeclAssign, tYield } from "../tokenizer/token-type";
-import type { Block } from "../tree/block";
+import { Block, ReturnStyle, returnStyle } from "../tree/block";
 import { parseAssignment } from "./parse-assignment";
 import { parseCall } from "./parse-call";
 import { parseTypeAssignment } from "./parse-type-assignment";
 import { parseTypeCall } from "./parse-type-call";
 import { parseYieldCall } from "./parse-yield-call";
-import type { ParserContext, ParserState } from "./parser-state";
+import { ParserContext, ParserState, thatAlreadyUsed, thatNotFound } from "./parser-state";
+
+export const returnKeyword = "return"
+export const allowReturnKeyword = "let"
+export const throwKeyword = "throw"
+export const awaitKeyword = "await"
 
 export function parseBlock(state: ParserState): Block {
     const ideas: (Block['ideas']) = []
@@ -15,27 +21,39 @@ export function parseBlock(state: ParserState): Block {
     const parentContext = state.context
 
     const thatStack = {
+        thatTaken: null as Token | null,
         indexThat: null as null | number,
+        beforeThatTaken: null as Token | null,
         indexBeforeThat: null as null | number,
     }
 
+    let blockReturnStyle: ReturnStyle = returnStyle.implicitExport
+
     const context: ParserContext = {
         symbolTable: parentContext.symbolTable.makeChild(),
-        takeThat() {
+        takeThat(thatToken) {
+            if (thatStack.thatTaken !== null) {
+                return thatAlreadyUsed
+            }
             const i = thatStack.indexThat
             if (i === null) {
-                return null
+                return thatNotFound
             }
+            thatStack.thatTaken = thatToken
             thatStack.indexThat = null
             const idea = ideas.splice(i, 1)[0]
             assert(idea.type === 'call')
             return idea
         },
-        takeBeforeThat() {
+        takeBeforeThat(beforeThatToken) {
+            if (thatStack.beforeThatTaken !== null) {
+                return thatAlreadyUsed
+            }
             const i = thatStack.indexBeforeThat
             if (i === null) {
-                return null
+                return thatNotFound
             }
+            thatStack.beforeThatTaken = beforeThatToken
             thatStack.indexBeforeThat = null
             const idea = ideas.splice(i, 1)[0]
             if (thatStack.indexThat !== null) {
@@ -55,7 +73,49 @@ export function parseBlock(state: ParserState): Block {
         while (nextToken.type !== tEndBlock) {
             const idea = parseLine(state, nextToken)
 
+            // Figure return style from most recent line.
+            // TODO: Handle all cases of return style. yield/let is one not covered.
+            // TODO: Do we really care about the return style here?
+            if (idea.type === "call" && idea.func.type === "atom") {
+                if (idea.func.token.text === awaitKeyword) {
+                    if (blockReturnStyle === returnStyle.explicitExport) {
+                        state.addError(tokenError(idea.func.token, `await is incompatible with export-style return`))
+                    }
+                    blockReturnStyle = returnStyle.asyncReturn
+                } else if (idea.func.token.text === returnKeyword) {
+                    if (blockReturnStyle === returnStyle.explicitExport) {
+                        state.addError(tokenError(idea.func.token, `Explicit return is incompatible with export-style return`))
+                    }
+                    if (blockReturnStyle !== returnStyle.asyncReturn) {
+                        blockReturnStyle = returnStyle.explicitReturn
+                    }
+                }
+            } else if (idea.type === "assignment") {
+                if (idea.modifier?.text === "export") {
+                    if (blockReturnStyle === returnStyle.explicitReturn) {
+                        state.addError(tokenError(idea.modifier, `export is incompatible with explicit return`))
+                    } else if (blockReturnStyle === returnStyle.asyncReturn) {
+                        state.addError(tokenError(idea.modifier, `export is incompatible with await`))
+                    } else {
+                        blockReturnStyle = returnStyle.explicitExport
+                    }
+                }
+                if (idea.call.func.type === "atom" && idea.call.func.token.text === awaitKeyword) {
+                    if (blockReturnStyle === returnStyle.explicitExport) {
+                        state.addError(tokenError(idea.call.func.token, `await is incompatible with export-style return`))
+                    }
+                    blockReturnStyle = returnStyle.asyncReturn
+                }
+            }
+
             if (idea.type !== 'blank-line' && idea.type !== 'non-code') {
+
+                if (thatStack.beforeThatTaken !== null && thatStack.thatTaken === null) {
+                    state.addError(tokenError(thatStack.beforeThatTaken, `beforeThat used without that`))
+                }
+                thatStack.thatTaken = null
+                thatStack.beforeThatTaken = null
+
                 if (idea.type === 'call') {
                     thatStack.indexBeforeThat = thatStack.indexThat
                     thatStack.indexThat = ideas.length
@@ -76,6 +136,7 @@ export function parseBlock(state: ParserState): Block {
             type: 'block',
             symbolTable: context.symbolTable,
             ideas: ideas,
+            returnStyle: blockReturnStyle,
             firstToken: firstToken,
             lastToken: lastToken,
         }
