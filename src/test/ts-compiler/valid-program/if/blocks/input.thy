@@ -1,3 +1,15 @@
+myFun is
+  condition is def true
+  if condition
+    console.log "hi"
+  if condition
+    return 5
+  
+  let if condition
+    console.log "hi"
+  let if condition
+    return 5
+
 condition is def true
 if condition
   console.log "yay"
