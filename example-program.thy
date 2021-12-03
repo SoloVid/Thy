@@ -39,6 +39,8 @@ thy.scope "blahBlah.blah"
     Keyword 'yield' allows a return from the called function to result in return from this function.
     yield if condition
       return
+    let if condition
+      return
 
   switch myVal
     case 1 doFirst
