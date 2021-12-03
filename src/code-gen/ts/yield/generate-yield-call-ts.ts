@@ -3,7 +3,7 @@ import type { YieldCall } from "../../../tree/yield-call";
 import { makeGenerator } from "../../generate-from-options";
 import { generateTs } from "../generate-ts";
 import type { CodeGeneratorFunc, GeneratedSnippets } from "../../generator";
-import type { GeneratorState } from "../../generator-state";
+import { contextType, GeneratorState } from "../../generator-state";
 
 export const tryGenerateYieldCallTs = makeYieldTsGenerator([
 
@@ -19,8 +19,5 @@ export function makeYieldTsGenerator(specializations: CodeGeneratorFunc<YieldCal
 
 export function generateYieldCallTs(yieldCall: YieldCall, state: GeneratorState): GeneratedSnippets {
     // TODO: Actually generate yield logic
-    const childState = state.makeChild()
-    childState.expressionContext = false
-    childState.returnContext = true
-    return generateTs(yieldCall.call, childState)
+    return generateTs(yieldCall.call, state.makeChild({ context: contextType.blockAllowingReturn }))
 }

@@ -11,6 +11,11 @@ export interface GeneratorResult {
 
 export type CodeGenerator = (node: TreeNode) => GeneratorResult
 
+export interface CodeGenResult {
+    readonly output: GeneratedSnippets
+    readonly mightReturn: boolean
+}
+
 export type CodeGeneratorFunc<T> = (node: T, state: GeneratorState) => void | GeneratedSnippets
 export type DefiniteCodeGeneratorFunc<T> = (node: T, state: GeneratorState) => GeneratedSnippets
 

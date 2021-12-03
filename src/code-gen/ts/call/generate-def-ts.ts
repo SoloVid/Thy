@@ -5,15 +5,18 @@ import type { GeneratorState } from "../../generator-state";
 import { tokenError } from "../../../compile-error";
 import { fromToken, fromTokenRange, GeneratedSnippets } from "../../generator";
 
+export const defName = "def"
+
 export function tryGenerateDefTs(node: Call, state: GeneratorState): void | GeneratedSnippets {
-    if (node.func.type !== "atom") {
+    if (node.func.type !== "identifier") {
         return
     }
-    if (node.func.token.text !== "def") {
+    // TODO: Maybe account for scopes?
+    if (node.func.target.text !== defName) {
         return
     }
     if (node.args.length === 0) {
-        state.addError(tokenError(node.func.token, "def requires 1 argument"))
+        state.addError(tokenError(node.func.target, "def requires 1 argument"))
         return fromTokenRange(node, "undefined")
     }
     // TODO: better error handling

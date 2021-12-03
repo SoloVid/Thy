@@ -4,10 +4,12 @@ import { tryGenerateDefTs } from "./generate-def-ts";
 import { makeGenerator } from "../../generate-from-options";
 import { generateTs } from "../generate-ts";
 import { CodeGeneratorFunc, fromComplicated, fromTokenRange, GeneratedSnippets } from "../../generator";
-import type { GeneratorState } from "../../generator-state";
+import { contextType, GeneratorState } from "../../generator-state";
+import { tryGenerateIfTs } from "./generate-if-ts";
 
 export const defaultCallTsGenerators = [
-    tryGenerateDefTs
+    tryGenerateDefTs,
+    tryGenerateIfTs,
 ]
 
 export const tryGenerateCallTs = makeCallTsGenerator(defaultCallTsGenerators)
@@ -21,18 +23,15 @@ export function makeCallTsGenerator(specializations: CodeGeneratorFunc<Call>[]):
 }
 
 export function generateCallTs(call: Call, state: GeneratorState): GeneratedSnippets {
-    const childState = state.makeChild()
-    childState.indentLevel++
-    childState.expressionContext = true
-
-    if (call.func.type === 'block') {
-        return fromComplicated(call, [
-            "(", generateTs(call.func, childState), ")()"
-        ])
-    }
-
-    const functionSnippet = generateTs(call.func, childState)
+    const functionSnippet = generateTs(call.func, state.makeChild({
+        context: contextType.looseExpression,
+        indentLevel: state.indentLevel + 1
+    }))
     const argSnippets = call.args.map((a, i) => {
+        const childState = state.makeChild({
+            context: contextType.isolatedExpression,
+            indentLevel: state.indentLevel + 1
+        })
         if (i === 0) {
             return generateTs(a, childState)
         }

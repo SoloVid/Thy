@@ -3,7 +3,7 @@ import type { Assignment } from "../../tree/assignment";
 import type { TreeNode } from "../../tree/tree-node";
 import { makeGenerator } from "../generate-from-options";
 import { CodeGeneratorFunc, fromTokenRange, GeneratedSnippets } from "../generator";
-import type { GeneratorState } from "../generator-state";
+import { contextType, GeneratorState } from "../generator-state";
 import { generateTs } from "./generate-ts";
 
 export const tryGenerateAssignmentTs = makeTryGenerateAssignmentTs([
@@ -19,7 +19,8 @@ export function makeTryGenerateAssignmentTs(specializations: CodeGeneratorFunc<A
 }
 
 export function generateAssignmentTs(a: Assignment, state: GeneratorState): GeneratedSnippets {
-    const callTs = generateTs(a.call, state)
+    const callTs = generateTs(a.call, state.makeChild({ context: contextType.isolatedExpression }))
+
     const variablePart = generateTs(a.variable, state)
     const assignPart = [variablePart, fromTokenRange(a, " = "), callTs]
     if (a.operator.type === tConstDeclAssign) {

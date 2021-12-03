@@ -1,9 +1,9 @@
-import type { Block } from "../../tree/block";
-import type { TreeNode } from "../../tree/tree-node";
-import { generateTs } from "./generate-ts";
-import type { GeneratorState } from "../generator-state";
-import { genIndent, makeIndent } from "../indent-string";
-import { fromComplicated, fromToken, fromTokenRange, GeneratedSnippet, GeneratedSnippets } from "../generator";
+import type { Block } from "../../../tree/block";
+import type { TreeNode } from "../../../tree/tree-node";
+import { generateTs } from "../generate-ts";
+import { contextType, GeneratorState } from "../../generator-state";
+import { genIndent, makeIndent } from "../../indent-string";
+import { fromComplicated, fromToken, fromTokenRange, GeneratedSnippet, GeneratedSnippets } from "../../generator";
 
 export function tryGenerateBlockTs(node: TreeNode, state: GeneratorState): void | GeneratedSnippets {
     if (node.type === "block") {
@@ -42,10 +42,10 @@ function getParameterSpec(node: TreeNode): GeneratedSnippet | null {
     if (node.type !== "assignment") {
         return null
     }
-    if (node.call.func.type !== "atom") {
+    if (node.call.func.type !== "identifier") {
         return null
     }
-    if (node.call.func.token.text !== "given") {
+    if (node.call.func.target.text !== "given") {
         return null
     }
     // TODO: Add type information
@@ -54,10 +54,9 @@ function getParameterSpec(node: TreeNode): GeneratedSnippet | null {
 }
 
 export function generateBlockLinesTs(block: Block, ideas: Block["ideas"], state: GeneratorState): GeneratedSnippets {
-    const childState = state.makeChild()
-    // childState.indentLevel++
-    childState.expressionContext = false
-    childState.returnContext = false
+    const childState = state.makeChild({
+        context: contextType.blockAllowingReturn
+    })
 
     const lines = ideas.map(i => generateTs(i, childState))
     if (childState.localVariables.length > 0) {
