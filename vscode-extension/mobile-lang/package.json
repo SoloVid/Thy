@@ -11,15 +11,15 @@
     ],
     "contributes": {
         "languages": [{
-            "id": "mob",
-            "aliases": ["Mobile Lang", "mob"],
-            "extensions": [".moby"],
+            "id": "thy",
+            "aliases": ["Mobile Lang", "thy"],
+            "extensions": [".thy"],
             "configuration": "./language-configuration.json"
         }],
         "grammars": [{
-            "language": "mob",
-            "scopeName": "source.moby",
-            "path": "./syntaxes/mob.tmLanguage.json"
+            "language": "thy",
+            "scopeName": "source.thy",
+            "path": "./syntaxes/thy.tmLanguage.json"
         }]
     }
 }

@@ -17,17 +17,17 @@
 					"begin": "^(\\s*)([A-Z]{3,}.*)$",
 					"end": "^(\\1)(\\2)$",
 					"beginCaptures": {
-						"2": { "name": "comment.block.mob" }
+						"2": { "name": "comment.block.thy" }
 					},
-					"contentName": "comment.block.mob",
+					"contentName": "comment.block.thy",
 					"endCaptures": {
-						"2": { "name": "comment.block.mob" }
+						"2": { "name": "comment.block.thy" }
 					}
 				},
 				{
 					"match": "^\\s*([A-Z].*)$",
 					"captures": {
-						"1": { "name": "comment.line.mob" }
+						"1": { "name": "comment.line.thy" }
 					}
 				}
 			]
@@ -35,11 +35,11 @@
 		"code-lines": {
 			"patterns": [
 				{
-					"name": "meta.line.mob",
+					"name": "meta.line.thy",
 					"match": "^(\\s*)([a-z].+)$",
 					"captures": {
 						"2": {
-							"name": "meta.line.content.mob",
+							"name": "meta.line.content.thy",
 							"patterns": [
 								{ "include": "#type-definitions" },
 								{ "include": "#constant-assignments" },
@@ -57,13 +57,13 @@
 		"constant-assignments": {
 			"patterns": [
 				{
-					"name": "meta.assignment.mob",
+					"name": "meta.assignment.thy",
 					"match": "(?:(export) +)?(?:(private) +)?([^ ]+) +(is|to)( +.*)?$",
 					"captures": {
-						"1": {"name": "keyword.control.export.mob"},
-						"2": {"name": "storage.modifier.private.mob"},
+						"1": {"name": "keyword.control.export.thy"},
+						"2": {"name": "storage.modifier.private.thy"},
 						"3": {"patterns": [{"include": "#value-identifiers"}]},
-						"4": {"name": "keyword.operator.mob"},
+						"4": {"name": "keyword.operator.thy"},
 						"5": {"patterns": [{"include": "#calls"}]}
 					}
 				}
@@ -72,11 +72,11 @@
 		"assignments": {
 			"patterns": [
 				{
-					"name": "meta.assignment.mob",
+					"name": "meta.assignment.thy",
 					"match": "([^ ]+) +(to) +(.+)$",
 					"captures": {
 						"1": {"patterns": [{"include": "#value-identifiers"}]},
-						"2": {"name": "keyword.operator.mob"},
+						"2": {"name": "keyword.operator.thy"},
 						"3": {"patterns": [{"include": "#calls"}]}
 					}
 				}
@@ -85,15 +85,15 @@
 		"declarations": {
 			"patterns": [
 				{
-					"name": "meta.declaration.mob",
+					"name": "meta.declaration.thy",
 					"match": "(?:(export) +)?(?:(private) +)?([^ ]+) +(be) +(.+)$",
 					"captures": {
-						"1": {"name": "keyword.control.export.mob"},
-						"2": {"name": "keyword.control.private.mob"},
+						"1": {"name": "keyword.control.export.thy"},
+						"2": {"name": "keyword.control.private.thy"},
 						"3": {
 							"patterns": [{"include": "#value-identifiers"}]
 						},
-						"4": {"name": "keyword.operator.mob"},
+						"4": {"name": "keyword.operator.thy"},
 						"5": {
 							"patterns": [{"include": "#type-identifiers"}]
 						}
@@ -106,13 +106,13 @@
 				{
 					"match": "\\b(type)\\b( .*)?",
 					"captures": {
-						"1": {"name":"storage.type.type.mob"},
+						"1": {"name":"storage.type.type.thy"},
 						"2": {
 							"patterns": [
 								{
 									"match": "\\b(given|return)\\b(.*)",
 									"captures": {
-										"1": {"name":"storage.type.mob"},
+										"1": {"name":"storage.type.thy"},
 										"2": {
 											"patterns": [
 												{"include": "#value-identifiers"},
@@ -125,7 +125,7 @@
 									"match": "([^ ]+) +(is) +(.+)$",
 									"captures": {
 										"1": {"patterns": [{"include": "#type-identifiers"}]},
-										"2": {"name": "keyword.operator.assignment.mob"},
+										"2": {"name": "keyword.operator.assignment.thy"},
 										"3": {
 											"patterns": [
 												{"include": "#value-identifiers"},
@@ -144,10 +144,10 @@
 		"yields": {
 			"patterns": [
 				{
-					"name": "meta.yield.mob",
+					"name": "meta.yield.thy",
 					"match": "(yield) (.+)$",
 					"captures": {
-						"1": {"name": "keyword.control.yield.mob"},
+						"1": {"name": "keyword.control.yield.thy"},
 						"2": {
 							"patterns": [{"include": "#calls"}]
 						}
@@ -158,10 +158,10 @@
 		"call-continuations": {
 			"patterns": [
 				{
-					"name": "meta.call.continuation.mob",
+					"name": "meta.call.continuation.thy",
 					"match": "(and)( .*)?$",
 					"captures": {
-						"1": {"name": "keyword.operator.and.mob"},
+						"1": {"name": "keyword.operator.and.thy"},
 						"2": {"patterns": [{"include": "#values"}]}
 					}
 				}
@@ -170,7 +170,7 @@
 		"calls": {
 			"patterns": [
 				{
-					"name": "meta.call.mob",
+					"name": "meta.call.thy",
 					"match": "([^ ]+)( .*)?$",
 					"captures": {
 						"1": {
@@ -183,11 +183,11 @@
 										"2": {
 											"patterns": [
 												{
-													"name": "entity.name.function.mob",
+													"name": "entity.name.function.thy",
 													"match": "\\b[a-z].*\\b"
 												},
 												{
-													"name": "invalid.illegal.mob",
+													"name": "invalid.illegal.thy",
 													"match": "\\b.+\\b"
 												}
 											]
@@ -197,7 +197,7 @@
 							]
 						},
 						"2": {
-							"name": "meta.arguments.mob",
+							"name": "meta.arguments.thy",
 							"patterns": [
 								{"include": "#type-identifiers"},
 								{"include": "#values"}
@@ -216,32 +216,32 @@
 			]
 		},
 		"strings": {
-			"name": "string.quoted.other.mob",
+			"name": "string.quoted.other.thy",
 			"begin": "(?<![a-z])\\.",
 			"end": "\\.(?!\\.)(?![a-zA-Z])",
 			"patterns": [
 				{
-					"name": "constant.character.escape.mob",
+					"name": "constant.character.escape.thy",
 					"match": "\\.\\."
 				}
 			]
 		},
 		"numeric-literals": {
-			"name": "constant.numeric.mob",
+			"name": "constant.numeric.thy",
 			"match": "[0-9]+(\\.[0-9]+)?"
 		},
 		"special-functions": {
 			"patterns": [
 				{
-					"name": "keyword.control.mob",
+					"name": "keyword.control.thy",
 					"match": "(?<!\\.)\\b(await|return|throw)\\b"
 				},
 				{
-					"name": "storage.type.mob",
+					"name": "storage.type.thy",
 					"match": "(?<!\\.)\\b(given|namespace)\\b"
 				},
 				{
-					"name": "support.function.mob",
+					"name": "support.function.thy",
 					"match": "(?<!\\.)\\b(fun|get|if|loop|set|switch|val)\\b"
 				}
 			]
@@ -249,19 +249,19 @@
 		"special-values": {
 			"patterns": [
 				{
-					"name": "variable.language.that.mob",
+					"name": "variable.language.that.thy",
 					"match": "(?<!\\.)\\b(that)\\b"
 				}
 			]
 		},
 		"type-identifiers": {
-			"name": "entity.name.type.mob",
+			"name": "entity.name.type.thy",
 			"match": "\\b[A-Z][a-zA-Z0-9]*\\b"
 		},
 		"value-identifiers": {
-			"name": "variable.other.mob",
+			"name": "variable.other.thy",
 			"match": "\\b[a-z][a-zA-Z0-9]*\\b"
 		}
 	},
-	"scopeName": "source.moby"
+	"scopeName": "source.thy"
 }
