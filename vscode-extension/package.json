@@ -1,7 +1,7 @@
 {
-    "name": "mobile-lang",
-    "displayName": "Mobile Lang",
-    "description": "Syntax highlighting for mobile lang",
+    "name": "thy-lang",
+    "displayName": "Thy Lang",
+    "description": "Syntax highlighting for thy lang",
     "version": "0.0.1",
     "engines": {
         "vscode": "^1.56.0"

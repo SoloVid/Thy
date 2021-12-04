@@ -1,6 +1,6 @@
-# mobile-lang README
+# thy-lang README
 
-This is the README for your extension "mobile-lang". After writing up a brief description, we recommend including the following sections.
+This is the README for your extension "thy-lang". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 

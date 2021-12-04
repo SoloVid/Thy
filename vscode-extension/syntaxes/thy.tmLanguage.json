@@ -1,6 +1,6 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-	"name": "Mobile Lang",
+	"name": "Thy Lang",
 	"patterns": [
 		{"include": "#script-parts"}
 	],
@@ -145,7 +145,7 @@
 			"patterns": [
 				{
 					"name": "meta.yield.thy",
-					"match": "(yield) (.+)$",
+					"match": "(yield|let) (.+)$",
 					"captures": {
 						"1": {"name": "keyword.control.yield.thy"},
 						"2": {
@@ -217,12 +217,12 @@
 		},
 		"strings": {
 			"name": "string.quoted.other.thy",
-			"begin": "(?<![a-z])\\.",
-			"end": "\\.(?!\\.)(?![a-zA-Z])",
+			"begin": "\"",
+			"end": "\"",
 			"patterns": [
 				{
 					"name": "constant.character.escape.thy",
-					"match": "\\.\\."
+					"match": "\\\\."
 				}
 			]
 		},
@@ -241,8 +241,12 @@
 					"match": "(?<!\\.)\\b(given|namespace)\\b"
 				},
 				{
+					"name": "variable.language.that.thy",
+					"match": "(?<!\\.)\\b(that|beforeThat)\\b"
+				},
+				{
 					"name": "support.function.thy",
-					"match": "(?<!\\.)\\b(fun|get|if|loop|set|switch|val)\\b"
+					"match": "(?<!\\.)\\b(fun|get|if|loop|set|switch|thy|val)\\b"
 				}
 			]
 		},
@@ -250,7 +254,7 @@
 			"patterns": [
 				{
 					"name": "variable.language.that.thy",
-					"match": "(?<!\\.)\\b(that)\\b"
+					"match": "(?<!\\.)\\b(that|beforeThat)\\b"
 				}
 			]
 		},
