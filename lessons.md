@@ -3,13 +3,13 @@
 Let's jump right in with our first Thy **program**:
 
 ```thy
-print .Hello there!.
+print "Hello there!"
 ```
 
 This **program** just prints the text `Hello there!` to the screen.
 
 `print` is a **function** (we'll talk about these a lot more later).
-`.Hello there!.` is a **string** **literal**.
+`"Hello there!"` is a **string** **literal**.
 A **string** is a sequence of characters, in this case the 12-character sequence `Hello there!`.
 Most languages denote strings with quotation marks (e.g. `"Hello there!"`), but in Thy we use periods.
 
@@ -17,7 +17,7 @@ Most languages denote strings with quotation marks (e.g. `"Hello there!"`), but 
 Multiple **statements** within a **program** will execute in the order they are written.
 
 ```thy
-print .The sum of 5 and 3.5 is:.
+print "The sum of 5 and 3.5 is:"
 print 8.5
 ```
 
@@ -31,10 +31,10 @@ blank lines and lines starting with a capital letter (i.e. **comments**).
 
 ```thy
 Say hello
-print .Hello there, beautiful!.
+print "Hello there, beautiful!"
 
 Inquire about dinner
-print .Doing anything tonight?.
+print "Doing anything tonight?"
 ```
 
 In this example, lines 1, 3, and 4 do not do anything, but the other two lines print text to the screen.
@@ -51,7 +51,7 @@ You're now a programmer! There's still a lot more to learn, but you're off to a 
 Often, it is useful to store **values** in **variables** to reference later.
 
 ```thy
-message is def .Hello there! I'm a really really really really looooonnnnnnggg message!.
+message is def "Hello there! I'm a really really really really looooonnnnnnggg message!"
 print message
 print message
 ```
@@ -59,7 +59,7 @@ print message
 The `message is` part creates a **variable** called `message` and assigns it the **value** to the right.
 (`is` is our first Thy **keyword**.)
 So after line 1, `message` (a name we made up) holds the **string** `Hello there! (etc)`.
-Instead of using the **string** _literal_ `.Hello there! (etc).` (notice the periods) with `print`,
+Instead of using the **string** _literal_ `"Hello there! (etc)"` (notice the periods) with `print`,
 we are instead using the **variable** `message` (notice no periods) which holds the same **string** **value**.
 
 The **program** prints the message once on line 2 and again on line 3.
@@ -98,11 +98,11 @@ When we **call** the `print` **function**, we are running code written somewhere
 that prints values to the screen.
 
 ```thy
-print .Hello there!.
+print "Hello there!"
 ```
 
 In this simple example, we are **calling** the **function** called `print`,
-and we are **passing** one **argument** `.Hello there!.` as we **call** it.
+and we are **passing** one **argument** `"Hello there!"` as we **call** it.
 
 But there are many functions that do different things and may receive multiple **arguments**.
 For example, the `math.add` **function** takes two **arguments** (`a` and `b` in this example) and adds them together:
@@ -141,8 +141,8 @@ print product
 The **program** above calculates the product of `1` and `2.5`, and it prints the result to the screen.
 
 ```thy
-greeting is def .Heya, .
-name is def .Joe.
+greeting is def "Heya, "
+name is def "Joe"
 message is string.concat greeting name
 Prints "Heya, Joe"
 print message
@@ -164,8 +164,8 @@ b is def 2.5
 math.multiply a b
 print that
 
-greeting is def .Heya, .
-name is def .Joe.
+greeting is def "Heya, "
+name is def "Joe"
 string.concat greeting name
 print that
 ```
@@ -196,7 +196,7 @@ Let's start with a simple one:
 ```thy
 Define our function.
 printHi is def
-  print .Hi!.
+  print "Hi!"
 
 Call our function.
 printHi
@@ -210,11 +210,11 @@ We can put as many lines as we would like inside our **function**:
 
 ```thy
 printStuff is def
-  print .Hi!.
-  print .I'm a computer.
+  print "Hi!"
+  print "I'm a computer"
 
   Blank lines and comments are still fine in here
-  print .Are you?.
+  print "Are you?"
 
 printStuff
 ```
@@ -236,15 +236,15 @@ Let's **define** a **function** which greets someone by name:
 
 ```thy
 greet is def
-  given String name
-  message is string.concat .Hello there, . name
+  name is given String
+  message is string.concat "Hello there, " name
   print message
 
 Call the function. Prints "Hello there, Norm"
-greet .Norm.
+greet "Norm"
 ```
 
-The new line here is `given String name`.
+The new line here is `name is given String`.
 This line says that our **function** has a **parameter** named `name` which will have the **type** `String`.
 Once we have specified a **parameter** like this, we can use it as we would use any other **variable**.
 In this case, we've **passed** `name` as the second **argument** to `string.concat`
@@ -254,14 +254,14 @@ What if we want to receive multiple **parameters**?
 
 ```thy
 greet is def
-  given String name
-  given String extraMessage
-  message is string.concat .Hello there, . name
+  name is given String
+  extraMessage is given String
+  message is string.concat "Hello there, " name
   print message
   print extraMessage
 
 Call the function. Prints "Hello there, Keith" then "Change your name! It's not scary!"
-greet .Keith. .Change your name! It's not scary!.
+greet "Keith" "Change your name! It's not scary!"
 ```
 
 This is the first time we've used **types** (`String` here) explicitly in the code itself.
@@ -288,8 +288,8 @@ of a right triangle using the Pythagorean Theorem.
 
 ```thy
 calcHypotenuse is def
-  given Number a
-  given Number b
+  a is given Number
+  b is given Number
   a2 is math.multiply a a
   b2 is math.multiply b b
   math.add a2 b2
@@ -317,13 +317,13 @@ Take a crack at guessing what this example program does before reading the subse
 ```thy
 This is one of our early example functions.
 printHi is def
-  print .Hi!.
+  print "Hi!"
 
 stammer is def
-  given Function sayMessage
-  print .ummmm.
+  sayMessage is given Function
+  print "ummmm"
   sayMessage
-  print .uhhhh.
+  print "uhhhh"
 
 stammer printHi
 ```
@@ -346,20 +346,20 @@ Here is pretty much the same example **program**, but with multiple **parameters
 ```thy
 This is one of our early example functions.
 printHi is def
-  print .Hi!.
+  print "Hi!"
 printNope is def
-  print .nope.
+  print "nope"
 
 stammer is def
-  given Function sayMessage
-  given Number randomNumber
-  given Function sayMessage2
-  print .ummmm.
+  sayMessage is given Function
+  randomNumber is given Number
+  sayMessage2 is given Function
+  print "ummmm"
   sayMessage
-  print .uhhhh.
+  print "uhhhh"
   print randomNumber
   sayMessage2
-  print .yeah.
+  print "yeah"
 
 stammer printHi 5 printNope
 stammer printNope 1 printNope
@@ -397,17 +397,17 @@ In Thy, we'll typically refer to these as just **blocks**,
 but they are more commonly called **lambdas** or **anonymous functions** in other languages.
 
 Before diving in, note that a **block** is a **literal** **value**
-like a **string** **literal** (e.g. `.Hi there!.`) or a **number** **literal** (e.g. `3.14`).
+like a **string** **literal** (e.g. `"Hi there!"`) or a **number** **literal** (e.g. `3.14`).
 
 ```thy
 stammer is def
-  given Function sayMessage
-  print .ummmm.
+  sayMessage is given Function
+  print "ummmm"
   sayMessage
-  print .uhhhh.
+  print "uhhhh"
 
 stammer
-  print .Hi!.
+  print "Hi!"
 ```
 
 This example is functionally equivalent to the first example in this lesson,
@@ -431,7 +431,7 @@ You could actually **define** `def` (we'll name it `fun` here) like this:
 
 ```thy
 fun is def
-  given Function block
+  block is given Function
   return block
 ```
 
@@ -449,23 +449,23 @@ Reworking our second example from this lesson...
 
 ```thy
 stammer is def
-  given Function sayMessage
-  given Number randomNumber
-  given Function sayMessage2
+  sayMessage is given Function
+  randomNumber is given Number
+  sayMessage2 is given Function
   sayMessage
   print randomNumber
   sayMessage2
 
 Here is the first call.
 stammer
-  print .Hi!.
+  print "Hi!"
 and 5
-  print .nope.
+  print "nope"
 Here is the second call.
 stammer
-  print .nope.
+  print "nope"
 and 1
-  print .nope
+  print "nope"
 ```
 
 This example ends with two **calls** to `stammer`, each with three **arguments**:
@@ -499,7 +499,7 @@ This construct does get us one step closer to a complete **definition** of the `
 ```thy
 def is
   return
-    given Function block
+    block is given Function
     return block
 ```
 
@@ -531,11 +531,11 @@ Can you guess what this **program** does?
 calcHypotenuse 3 4
 compare.equal that 5
 if that
-  print .Hypotenuse was 5 as expected.
+  print "Hypotenuse was 5 as expected"
 and else
-  print .Hypotenuse was not 5???.
+  print "Hypotenuse was not 5???"
 
-print .Done.
+print "Done"
 ```
 
 #### Explanation
@@ -576,7 +576,7 @@ calcHypotenuse 3 4
 compare.equal that 5
 check.not that
 if that
-  print .Hypotenuse was not 5???.
+  print "Hypotenuse was not 5???"
 ```
 
 In this shorter form, nothing happens in what would be the `else` case of the previous example.
@@ -608,7 +608,7 @@ We could address this with a simple `if`:
 
 ```thy
 def doCalc
-  given Number a
+  a is given Number
   Maybe have some other parameters here...
   compare.equal a 0
   if that
@@ -630,7 +630,7 @@ Before you get lost with more description, let's look at our previous example mo
 
 ```thy
 def doCalc
-  given Number a
+  a is given Number
   compare.equal a 0
   yield if that
     return 0
@@ -682,12 +682,12 @@ There's only one more thing we need in Thy to make this happen: the `loop` **fun
 loop
   Assume getUserInput is already defined and returns string provided by user.
   input is getUserInput
-  compare.equal input .exit.
+  compare.equal input "exit"
   yield if that
     return
-  print .AAAANNNDD we're still going!.
+  print "AAAANNNDD we're still going!"
   print input
-print .exited.
+print "exited"
 ```
 
 This program...
