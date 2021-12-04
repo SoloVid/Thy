@@ -10,16 +10,39 @@
         "Programming Languages"
     ],
     "contributes": {
-        "languages": [{
-            "id": "thy",
-            "aliases": ["Mobile Lang", "thy"],
-            "extensions": [".thy"],
-            "configuration": "./language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "thy",
-            "scopeName": "source.thy",
-            "path": "./syntaxes/thy.tmLanguage.json"
-        }]
+        "languages": [
+            {
+                "id": "thy",
+                "aliases": [
+                    "Thy Lang",
+                    "thy"
+                ],
+                "extensions": [
+                    ".thy"
+                ],
+                "configuration": "./language-configuration.json"
+            },
+            {
+                "id": "thy-injection"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "thy",
+                "scopeName": "source.thy",
+                "path": "./syntaxes/thy.tmLanguage.json"
+            },
+            {
+                "language": "thy-injection",
+                "scopeName": "markdown.thy.codeblock",
+                "path": "./syntaxes/thy-codeblock.tmLanguage.json",
+                "injectTo": [
+                    "text.html.markdown"
+                ],
+                "embeddedLanguages": {
+                    "meta.embedded.block.thy": "thy"
+                }
+            }
+        ]
     }
 }
