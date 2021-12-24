@@ -79,7 +79,7 @@ Because binary operations are so common, `beforeThat` is provided to go one more
 - No inheritance
 - Targeted loop interfaces (e.g. no while/do-while, no awkward for(...;...;...) loop)
 - Switch cases don't fall through
-- `break` is replaced by more uniform interface (yield/return)
+- `break` is replaced by more uniform interface (let/return)
 
 ## Reserved Words
 
@@ -94,7 +94,7 @@ These keywords need to be recognized by the lexer since they are part of the lan
 - private - modifier for declarations
 - to - denotes preceding identifier as not a function call
 - type - type-related operations just start breaking the standard language stuff
-- yield - unlike standard function calls, this can (and must) precede another function call on the same line
+- let - unlike standard function calls, this can (and must) precede another function call on the same line
 
 ### Language Feature Functions
 
@@ -191,7 +191,7 @@ Types can be used in three places:
 
 ## Return values
 
-### Early Returns (yield)
+### Early Returns (let)
 I really want to make `if` a function in this language.
 It takes a condition, a function, and additional else-related stuff.
 One common paradigm this makes difficult is early returns:
@@ -203,10 +203,10 @@ One common paradigm this makes difficult is early returns:
     ... // continue on
 ```
 
-So I have this idea to have a `yield` keyword:
+So I have this idea to have a `let` keyword:
 
 ```thy
-yield if condition
+let if condition
     return earlyValue
 ... Continue on
 ```
@@ -220,20 +220,20 @@ splitPath is def
     type MyNullableType is Null MyType
     type SplitPathReturn is Void MyNullableType
     type return SplitPathReturn
-    yield if condition
+    let if condition
         return null
     doSomethingCool
     There is an implicit void return here that translates to TS `return` or `return undefined`.
 ```
 
-But variables cannot hold a value of type Void. `yield` is the only part of the language with access to it.
+But variables cannot hold a value of type Void. `let` is the only part of the language with access to it.
 ```thy
 type A is def
     type return VoidableNullableType
 given A a
 
 Execute the function and either return NullableType or continue (if void was returned).
-yield a
+let a
 
 Assigning the return value of the function call to a variable is undefined behavior.
 In the future, I would want to make this a type error.
@@ -245,11 +245,11 @@ I also really want classes and object literals to follow the same rules as other
 This has led me to the following set of rules:
 - Every indentation level of the program has the same rules.
 - Every block (and these rules only require evaluating at the single indentation level) has some return value/type.
-    - If a block uses `return` or `yield`, it will only return the types of the returned/yielded functions (plus Void if the last statement of the block is not a `return` statement).
+    - If a block uses `return` or `let`, it will only return the types of the returned/leted functions (plus Void if the last statement of the block is not a `return` statement).
     - If a block uses `export` (on a function or variable), it will return an object containing members of all exported declarations.
     - If a block meets neither of the above criteria, it will return an object with all declarations exported.
         - `private` provides a black-listing alternative to `export`.
-    - (It is an error to use `export` in the same block with `return`/`yield`.)
+    - (It is an error to use `export` in the same block with `return`/`let`.)
 
 #### Consequence #1: Object Literals
 ```thy

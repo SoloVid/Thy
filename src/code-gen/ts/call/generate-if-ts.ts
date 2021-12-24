@@ -34,10 +34,8 @@ export function tryGenerateIfTs(node: Call, state: GeneratorState): void | Gener
         }
     }
 
-    if (node.args.length > 4) {
-        for (const arg of node.args.slice(4)) {
-            state.addError(nodeError(arg, `if cannot take this many arguments`))
-        }
+    for (const arg of node.args.slice(4)) {
+        state.addError(nodeError(arg, `if cannot take more than 4 arguments`))
     }
 
     // TODO: Check type parameters etc.

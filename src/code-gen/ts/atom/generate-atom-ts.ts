@@ -12,5 +12,5 @@ export function makeAtomTsGenerator(specializations: CodeGeneratorFunc<Atom>[]):
         if (node.type === "atom") {
             return node
         }
-    }, atom => fromToken(atom.token), specializations)
+    }, atom => [fromToken(atom.token, `${atom.token.text} as const`)], specializations)
 }

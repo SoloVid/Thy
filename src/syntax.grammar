@@ -18,7 +18,7 @@ Definition {
 }
 
 FunctionCallStatement {
-  kw<"yield">? FunctionCall
+  kw<"let">? FunctionCall
 }
 
 FunctionCall {

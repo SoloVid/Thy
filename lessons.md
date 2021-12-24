@@ -596,13 +596,13 @@ and else
 In this example, `moneyInCard` will be set to `50` if `iLikeYou` is `true`,
 but otherwise it will be set to `1`.
 
-### Yield
+### Let
 
 Sometimes it is useful to **return** early from a **function**.
 For example, division by zero is problematic, so we may want to avoid
 executing certain calculations if some **variable** is zero.
 
-#### Without Yield
+#### Without Let
 
 We could address this with a simple `if`:
 
@@ -620,54 +620,54 @@ def doCalc
 
 This approach is fine, but the indentation could start to get out of hand with additional factors.
 
-#### With Yield
+#### With Let
 
-Thy provides the **keyword** (not a **function**) `yield` to solve this problem.
-`yield` can be placed before a **function** **call** **statement**
+Thy provides the **keyword** (not a **function**) `let` to solve this problem.
+`let` can be placed before a **function** **call** **statement**
 to indicate that this **block** _might_ **return** at this line.
 
-Before you get lost with more description, let's look at our previous example modified to use `yield`:
+Before you get lost with more description, let's look at our previous example modified to use `let`:
 
 ```thy
 def doCalc
   a is given Number
   compare.equal a 0
-  yield if that
+  let if that
     return 0
   math.divide 123 a
   return that
 ```
 
-Notice that the `if` line now starts with `yield`
+Notice that the `if` line now starts with `let`
 and that the `else` line and corresponding indentation have been removed.
 
-`yield` here means, "If the `if` call returns a value, return that value."
+`let` here means, "If the `if` call returns a value, return that value."
 
 So if the condition `that` is true...
 1. The `if` **function** calls our **block**.
 2. Our block **returns** `0`.
 3. The `if` **function** **returns** that `0`.
-4. `yield` receives the **value** `0`.
-5. `yield` promptly **returns** (from `doCalc`).
+4. `let` receives the **value** `0`.
+5. `let` promptly **returns** (from `doCalc`).
 
 On the other hand, if the condition `that` is not true...
 1. The `if` **function** doesn't call our **block**.
 2. The `if` **function** does not **return** a **value**.
-3. `yield` receives no **value**.
-4. `yield` does not **return** (from `doCalc`).
+3. `let` receives no **value**.
+4. `let` does not **return** (from `doCalc`).
 5. (**Program** execution would continue on with line 6.)
 
 #### Note on Other Languages
 
-`yield` is not a standard **keyword** across programming languages.
-I am not aware of another language that uses the `yield` **keyword**
+`let` is not a standard **keyword** across programming languages.
+I am not aware of another language that uses the `let` **keyword**
 to mean the same thing it means in Thy.
 
-Ruby has a `yield` **keyword** which is the most similar idea to `yield` in Thy,
+Ruby has a `let` **keyword** which is the most similar idea to `let` in Thy,
 but it is still pretty different.
 In Ruby, it **calls** the one **block** parameter passed to the **function**.
 
-Python and JavaScript have a `yield` **keyword**,
+Python and JavaScript have a `let` **keyword**,
 but it is a completely different concept related to generator **functions**.
 
 ### Looping Code
@@ -683,7 +683,7 @@ loop
   Assume getUserInput is already defined and returns string provided by user.
   input is getUserInput
   compare.equal input "exit"
-  yield if that
+  let if that
     return
   print "AAAANNNDD we're still going!"
   print input

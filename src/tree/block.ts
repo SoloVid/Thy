@@ -5,7 +5,7 @@ import { SymbolTable } from "./symbol-table";
 import type { TokenRange } from "./token-range";
 import { TypeAssignment } from "./type-assignment";
 import { TypeCall } from "./type-call";
-import { YieldCall } from "./yield-call";
+import { LetCall } from "./let-call";
 
 export const returnStyle = {
     implicitExport: "implicitExport",
@@ -24,7 +24,7 @@ export const returnStylePrecedence = [
 export interface Block extends TokenRange {
     type: "block"
     symbolTable: SymbolTable
-    ideas: (Assignment | BlankLine | Call | NonCode | TypeAssignment | TypeCall | YieldCall)[]
+    ideas: (Assignment | BlankLine | Call | NonCode | TypeAssignment | TypeCall | LetCall)[]
     returnStyle: ReturnStyle
 }
 

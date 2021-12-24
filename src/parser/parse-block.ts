@@ -1,13 +1,13 @@
 import assert from "assert";
 import { tokenError } from "../compile-error";
 import type { Token } from "../tokenizer/token";
-import { tComment, tConstDeclAssign, tEndBlock, tExport, tNoDeclAssign, tPrivate, tStartBlock, tStatementTerminator, tType, tVarDeclAssign, tYield } from "../tokenizer/token-type";
+import { tComment, tConstDeclAssign, tEndBlock, tExport, tNoDeclAssign, tPrivate, tStartBlock, tStatementTerminator, tType, tVarDeclAssign, tLet } from "../tokenizer/token-type";
 import { Block, ReturnStyle, returnStyle } from "../tree/block";
 import { parseAssignment } from "./parse-assignment";
 import { parseCall } from "./parse-call";
 import { parseTypeAssignment } from "./parse-type-assignment";
 import { parseTypeCall } from "./parse-type-call";
-import { parseYieldCall } from "./parse-yield-call";
+import { parseLetCall } from "./parse-let-call";
 import { ParserContext, ParserState, thatAlreadyUsed, thatNotFound } from "./parser-state";
 
 export const returnKeyword = "return"
@@ -74,7 +74,7 @@ export function parseBlock(state: ParserState): Block {
             const idea = parseLine(state, nextToken)
 
             // Figure return style from most recent line.
-            // TODO: Handle all cases of return style. yield/let is one not covered.
+            // TODO: Handle all cases of return style. let/let is one not covered.
             // TODO: Do we really care about the return style here?
             if (idea.type === "call" && idea.func.type === "atom") {
                 if (idea.func.token.text === awaitKeyword) {
@@ -177,8 +177,8 @@ function parseLine(state: ParserState, nextToken: Token): Block['ideas'][number]
         } else {
             return parseTypeCall(state)
         }
-    } else if (nextToken.type === tYield) {
-        return parseYieldCall(state)
+    } else if (nextToken.type === tLet) {
+        return parseLetCall(state)
     } else {
         const afterToken = state.buffer.peekToken(1)
         if ([tConstDeclAssign, tVarDeclAssign, tNoDeclAssign].includes(afterToken.type)) {

@@ -1,6 +1,7 @@
 import type { Token } from "../tokenizer/token";
 
 export interface ReadSymbolTable {
+    readonly localSymbols: Readonly<Map<string, SymbolInfo>>
     getSymbolInfo(name: string): SymbolInfo | null
 }
 
@@ -18,14 +19,15 @@ export interface SymbolInfo {
 }
 
 export function makeSymbolTable(parent?: SymbolTable): SymbolTable {
-    const localSymbols: Record<string, SymbolInfo> = {}
+    const localSymbols = new Map<string, SymbolInfo>()
 
     const childTables: SymbolTable[] = []
 
     const me: SymbolTable = {
+        localSymbols,
         getSymbolInfo(name) {
-            if (name in localSymbols) {
-                return localSymbols[name]
+            if (localSymbols.has(name)) {
+                return localSymbols.get(name)!
             }
             if (parent !== undefined) {
                 return parent.getSymbolInfo(name)
@@ -44,7 +46,7 @@ export function makeSymbolTable(parent?: SymbolTable): SymbolTable {
             return false
         },
         addSymbol(token, isConstant) {
-            localSymbols[token.text] = { token, isConstant }
+            localSymbols.set(token.text, { token, isConstant })
         },
         makeChild() {
             const child = makeSymbolTable(me)

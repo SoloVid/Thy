@@ -4,14 +4,14 @@ import { DefiniteCodeGeneratorFunc, fromToken, fromTokenRange, GeneratedSnippet,
 import { makeGeneratorState } from '../generator-state'
 import { tryGenerateAtomTs } from './atom/generate-atom-ts'
 import { tryGenerateCallTs } from './call/generate-call-ts'
-import { tryGenerateAssignmentTs } from './generate-assignment-ts'
+import { tryGenerateAssignmentTs } from './assignment/generate-assignment-ts'
 import { tryGenerateBlankLineTs } from './generate-blank-line-ts'
 import { tryGenerateBlockTs } from './block/generate-block-ts'
 import { tryGenerateCommentTs } from './generate-comment-ts'
 import { tryGenerateIdentifierTs } from './generate-identifier-ts'
 import { tryGenerateTypeAssignmentTs } from './generate-type-assignment-ts'
 import { tryGenerateTypeCallTs } from './generate-type-call-ts'
-import { tryGenerateYieldCallTs } from './yield/generate-yield-call-ts'
+import { tryGenerateLetCallTs } from './let/generate-let-call-ts'
 
 export function tsGenerator(node: TreeNode): GeneratorResult {
     const state = makeGeneratorState()
@@ -41,6 +41,6 @@ export const generateTs = makeGenerator(
         tryGenerateIdentifierTs,
         tryGenerateTypeAssignmentTs,
         tryGenerateTypeCallTs,
-        tryGenerateYieldCallTs,
+        tryGenerateLetCallTs,
     ]
 ) as DefiniteCodeGeneratorFunc<TreeNode>

@@ -2,7 +2,7 @@ import { CompileError, tokenError } from "../compile-error";
 import { commentTokenizer, multilineCommentTokenizer } from "./comment-tokenizer";
 import { memberAccessOperatorTokenizer, typeIdentifierTokenizer, valueIdentifierTokenizer } from "./identifier-tokenizer";
 import { makeIndentTokenizers } from "./indent-tokenizer";
-import { andTokenizer, beTokenizer, exportTokenizer, isTokenizer, privateTokenizer, toTokenizer, typeTokenizer, yieldTokenizer } from "./keyword-tokenizers";
+import { andTokenizer, beTokenizer, exportTokenizer, isTokenizer, privateTokenizer, toTokenizer, typeTokenizer, letTokenizer } from "./keyword-tokenizers";
 import { numberTokenizer } from "./number-tokenizer";
 import type { SingleTokenizer } from "./single-tokenizer";
 import { stringLiteralTokenizer } from "./string-tokenizer";
@@ -43,7 +43,7 @@ export function makeTokenizer(source: string, errors: CompileError[]): Tokenizer
         exportTokenizer,
         privateTokenizer,
         typeTokenizer,
-        yieldTokenizer,
+        letTokenizer,
 
         // Variable expressions
         numberTokenizer,

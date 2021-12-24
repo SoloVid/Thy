@@ -7,6 +7,7 @@ export async function compileAndVerifyOutput(libDir: string, inputFile: string, 
     const thySource = await readFile(libDir, inputFile)
     const tsSource = await readFile(libDir, expectedOutputFile)
     const compileResult = await compileSource(thySource)
+    console.log(compileResult.output);
     expect(compileResult.output).toBe(tsSource)
     expect(compileResult.errors).toEqual([])
 }

@@ -34,6 +34,7 @@ type ContextType = (typeof contextType)[keyof typeof contextType]
 interface GeneratorStatePublicAttributes {
     context: ContextType
     indentLevel: number
+    isTypeContext: boolean
 }
 
 export interface GeneratorState extends GeneratorStatePublicAttributes {
@@ -42,6 +43,7 @@ export interface GeneratorState extends GeneratorStatePublicAttributes {
     localVariables: LocalVariable[]
     parent: GeneratorState | null
     addError(error: CompileError): void
+    getUniqueVariableName(): string
     isExpressionContext(): boolean
     makeChild(overrides?: Partial<GeneratorStatePublicAttributes>): GeneratorState
 }
@@ -53,9 +55,14 @@ export interface LocalVariable {
 }
 
 export function makeGeneratorState(parent?: GeneratorState): GeneratorState {
+    let nextVar = 1
     const me = {
         errors: [] as CompileError[],
         indentLevel: 0,
+        isTypeContext: false,
+        getUniqueVariableName() {
+            return `_${nextVar++}`
+        },
         ...parent,
         context: contextType.isolatedExpression as ContextType,
         localVariables: [],

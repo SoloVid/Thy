@@ -8,9 +8,9 @@ import type { Identifier } from './identifier'
 import type { NonCode } from './non-code'
 import type { TypeAssignment } from './type-assignment'
 import type { TypeCall } from './type-call'
-import type { YieldCall } from './yield-call'
+import type { LetCall } from './let-call'
 
-export type TreeNode = Assignment | Atom | BlankLine | Block | Call | Identifier | NonCode | TypeAssignment | TypeCall | YieldCall
+export type TreeNode = Assignment | Atom | BlankLine | Block | Call | Identifier | NonCode | TypeAssignment | TypeCall | LetCall
 
 type ErrorableTreeNode = Exclude<TreeNode, BlankLine | NonCode>
 

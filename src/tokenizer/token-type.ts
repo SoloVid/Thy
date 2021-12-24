@@ -16,7 +16,7 @@ export const tNoDeclAssign = "NoDeclAssign"
 export const tExport = "Export"
 export const tPrivate = "Private"
 export const tType = "Type"
-export const tYield = "Yield"
+export const tLet = "Let"
 
 export const tMemberAccessOperator = "MemberAccessOperator"
 

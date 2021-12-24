@@ -30,11 +30,16 @@ export function generateBlockTs(block: Block, state: GeneratorState): GeneratedS
         }
     }
 
-    return fromComplicated(block, [
+    const definition = fromComplicated(block, [
         "(", parameterSpecs, ") => {\n",
         generateBlockLinesTs(block, imperativeIdeas, state),
         makeIndent(state.indentLevel - 1), "}"
     ])
+
+    if (state.context === contextType.looseExpression) {
+        return fromComplicated(block, ["(", definition, ")"])
+    }
+    return definition
 }
 
 function getParameterSpec(node: TreeNode): GeneratedSnippet | null {
@@ -59,6 +64,7 @@ export function generateBlockLinesTs(block: Block, ideas: Block["ideas"], state:
     })
 
     const lines = ideas.map(i => generateTs(i, childState))
+    // TODO: Get local variables stuff working again (probably from tree symbol table?)
     if (childState.localVariables.length > 0) {
         const impliedReturn = childState.localVariables.map(v => {
             const ind = genIndent(childState.indentLevel + 1)

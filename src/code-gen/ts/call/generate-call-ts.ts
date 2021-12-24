@@ -1,15 +1,17 @@
 import type { Call } from "../../../tree/call";
 import type { TreeNode } from "../../../tree/tree-node";
-import { tryGenerateDefTs } from "./generate-def-ts";
 import { makeGenerator } from "../../generate-from-options";
-import { generateTs } from "../generate-ts";
 import { CodeGeneratorFunc, fromComplicated, fromTokenRange, GeneratedSnippets } from "../../generator";
 import { contextType, GeneratorState } from "../../generator-state";
+import { generateTs } from "../generate-ts";
+import { makeControlFlowCallTsGenerator } from "./generate-control-flow-call-ts";
 import { tryGenerateIfTs } from "./generate-if-ts";
 
 export const defaultCallTsGenerators = [
-    tryGenerateDefTs,
     tryGenerateIfTs,
+    makeControlFlowCallTsGenerator("await"),
+    makeControlFlowCallTsGenerator("return"),
+    makeControlFlowCallTsGenerator("throw"),
 ]
 
 export const tryGenerateCallTs = makeCallTsGenerator(defaultCallTsGenerators)
