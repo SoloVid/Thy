@@ -24,23 +24,24 @@ thy.scope "blahBlah.blah"
     and else
       doOtherThing
 
-  for.times 10
+  loop 10
     i is given
     e is get arr i
     doBlah
 
-  for.elements arr
+  arr.forEach
     element is given
     print element
 
   loop
     doWork yo
     condition is def true
-    Keyword 'yield' allows a return from the called function to result in return from this function.
-    yield if condition
-      return
+    Keyword 'let' allows a return from the called function to result in return from this function.
     let if condition
-      return
+      return true
+    let someOtherCall
+    let thirdLambdaCall
+      return here
 
   switch myVal
     case 1 doFirst
@@ -65,7 +66,8 @@ thy.scope "blahBlah.blah"
     type return ReturnType
     asyncAdd pA pB
     await that
-    return pA plus pB
+    math.add pA pB
+    return that
 
   export generalizedFun is def
     type U is Given Unknown
@@ -89,16 +91,17 @@ thy.scope "blahBlah.blah"
 
   TypeScript: interface MyInterface1 { field1: number; field2: string; }
   type MyInterface1 is
-    field1 be Number
-    field2 be String
+    field1 be def Number
+    field2 be def String
 
   TypeScript: interface MyType<T> { field1: number; field2: T[]; }
   More strictly something like: type MyType<T> = typeof (() => { return { field1: null as number, field2: [null as T] } })()
   type MyType is def
     type T is Given Unknown
     type Result is
-      field1 be Number
-      field2 be Array T
+      field1 be def Number
+      type ArrayT is Array T
+      field2 be def ArrayT
     type return Result
 
   TS type Interfaces<X extends number, Y extends X[] = boolean[]> = MyType<X> & YOtherType<Y>
@@ -124,11 +127,11 @@ thy.scope "blahBlah.blah"
     type return ReturnType
 
     Class members.
-    w be String ""
+    w be def String ""
 
     Constructor body.
-    private q is qq
-    w to we
+    private q is def qq
+    w to def we
 
     field1 is getter
       return 5
