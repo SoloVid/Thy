@@ -42,10 +42,8 @@
 							"name": "meta.line.content.thy",
 							"patterns": [
 								{ "include": "#type-definitions" },
-								{ "include": "#constant-assignments" },
 								{ "include": "#assignments" },
-								{ "include": "#declarations" },
-								{ "include": "#yields" },
+								{ "include": "#lets" },
 								{ "include": "#call-continuations" },
 								{ "include": "#calls" }
 							]
@@ -54,49 +52,17 @@
 				}
 			]
 		},
-		"constant-assignments": {
+		"assignments": {
 			"patterns": [
 				{
 					"name": "meta.assignment.thy",
-					"match": "(?:(export) +)?(?:(private) +)?([^ ]+) +(is|to)( +.*)?$",
+					"match": "(?:(export) +)?(?:(private) +)?([^ ]+) +(be|is|to)( +.*)?$",
 					"captures": {
 						"1": {"name": "keyword.control.export.thy"},
 						"2": {"name": "storage.modifier.private.thy"},
 						"3": {"patterns": [{"include": "#value-identifiers"}]},
 						"4": {"name": "keyword.operator.thy"},
 						"5": {"patterns": [{"include": "#calls"}]}
-					}
-				}
-			]
-		},
-		"assignments": {
-			"patterns": [
-				{
-					"name": "meta.assignment.thy",
-					"match": "([^ ]+) +(to) +(.+)$",
-					"captures": {
-						"1": {"patterns": [{"include": "#value-identifiers"}]},
-						"2": {"name": "keyword.operator.thy"},
-						"3": {"patterns": [{"include": "#calls"}]}
-					}
-				}
-			]
-		},
-		"declarations": {
-			"patterns": [
-				{
-					"name": "meta.declaration.thy",
-					"match": "(?:(export) +)?(?:(private) +)?([^ ]+) +(be) +(.+)$",
-					"captures": {
-						"1": {"name": "keyword.control.export.thy"},
-						"2": {"name": "keyword.control.private.thy"},
-						"3": {
-							"patterns": [{"include": "#value-identifiers"}]
-						},
-						"4": {"name": "keyword.operator.thy"},
-						"5": {
-							"patterns": [{"include": "#type-identifiers"}]
-						}
 					}
 				}
 			]
@@ -110,7 +76,7 @@
 						"2": {
 							"patterns": [
 								{
-									"match": "\\b(given|return)\\b(.*)",
+									"match": "\\b(return)\\b(.*)",
 									"captures": {
 										"1": {"name":"storage.type.thy"},
 										"2": {
@@ -141,13 +107,13 @@
 				}
 			]
 		},
-		"yields": {
+		"lets": {
 			"patterns": [
 				{
-					"name": "meta.yield.thy",
-					"match": "(yield|let) (.+)$",
+					"name": "meta.let.thy",
+					"match": "(let|let) (.+)$",
 					"captures": {
-						"1": {"name": "keyword.control.yield.thy"},
+						"1": {"name": "keyword.control.let.thy"},
 						"2": {
 							"patterns": [{"include": "#calls"}]
 						}
@@ -228,25 +194,13 @@
 		},
 		"numeric-literals": {
 			"name": "constant.numeric.thy",
-			"match": "[0-9]+(\\.[0-9]+)?"
+			"match": "-?(0|[1-9]\\d*)(\\.\\d+)?([eE][+-]?\\d+)?"
 		},
 		"special-functions": {
 			"patterns": [
 				{
 					"name": "keyword.control.thy",
 					"match": "(?<!\\.)\\b(await|return|throw)\\b"
-				},
-				{
-					"name": "storage.type.thy",
-					"match": "(?<!\\.)\\b(given|namespace)\\b"
-				},
-				{
-					"name": "variable.language.that.thy",
-					"match": "(?<!\\.)\\b(that|beforeThat)\\b"
-				},
-				{
-					"name": "support.function.thy",
-					"match": "(?<!\\.)\\b(fun|get|if|loop|set|switch|thy|val)\\b"
 				}
 			]
 		},
