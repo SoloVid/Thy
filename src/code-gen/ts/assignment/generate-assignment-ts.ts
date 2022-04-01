@@ -5,10 +5,12 @@ import { makeGenerator } from "../../generate-from-options";
 import { CodeGeneratorFunc, fromTokenRange, GeneratedSnippets } from "../../generator";
 import { contextType, GeneratorState } from "../../generator-state";
 import { generateTs } from "../generate-ts";
+import { standardLibraryGenerators } from "../standard-library";
 import { tryGenerateDefTs } from "./generate-def-ts";
 
 export const tryGenerateAssignmentTs = makeTryGenerateAssignmentTs([
-    tryGenerateDefTs
+    tryGenerateDefTs,
+    standardLibraryGenerators.assignmentGenerator,
 ])
 
 export function makeTryGenerateAssignmentTs(specializations: CodeGeneratorFunc<Assignment>[]): CodeGeneratorFunc<TreeNode> {

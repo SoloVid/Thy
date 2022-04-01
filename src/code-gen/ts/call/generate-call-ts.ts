@@ -4,6 +4,7 @@ import { makeGenerator } from "../../generate-from-options";
 import { CodeGeneratorFunc, fromComplicated, fromTokenRange, GeneratedSnippets } from "../../generator";
 import { contextType, GeneratorState } from "../../generator-state";
 import { generateTs } from "../generate-ts";
+import { standardLibraryGenerators } from "../standard-library";
 import { makeControlFlowCallTsGenerator } from "./generate-control-flow-call-ts";
 import { tryGenerateIfTs } from "./generate-if-ts";
 
@@ -12,6 +13,7 @@ export const defaultCallTsGenerators = [
     makeControlFlowCallTsGenerator("await"),
     makeControlFlowCallTsGenerator("return"),
     makeControlFlowCallTsGenerator("throw"),
+    standardLibraryGenerators.callGenerator,
 ]
 
 export const tryGenerateCallTs = makeCallTsGenerator(defaultCallTsGenerators)

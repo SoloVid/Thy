@@ -7,9 +7,11 @@ import { contextType, GeneratorState } from "../../generator-state";
 import type { Call } from "../../../tree/call";
 import { tryGenerateIfTs } from "../call/generate-if-ts";
 import { makeIndent } from "../../indent-string";
+import { standardLibraryGenerators } from "../standard-library";
 
 export const tryGenerateLetCallTs = makeLetTsGenerator([
     trustedCallGenerator(tryGenerateIfTs),
+    standardLibraryGenerators.letCallGenerator,
 ])
 
 export function makeLetTsGenerator(specializations: CodeGeneratorFunc<LetCall>[]): CodeGeneratorFunc<TreeNode> {
