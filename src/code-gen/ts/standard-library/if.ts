@@ -4,7 +4,7 @@ import { nodeError } from "../../../tree/tree-node";
 import { fromComplicated, fromToken, GeneratedSnippets, GeneratorFixture } from "../../generator";
 import type { GeneratorForGlobalSpec, SimpleCall } from "../../generator-for-global";
 import { ContextType, contextType, GeneratorState } from "../../generator-state";
-import { makeIndent } from "../../indent-string";
+import { genIndent, makeIndent } from "../../indent-string";
 import { generateBlockLinesTs } from "../block/generate-block-ts";
 import { autoTightS } from "./helpers/auto-tight";
 
@@ -83,9 +83,9 @@ function tryGenerateIfTs(node: SimpleCall, state: GeneratorState, fixture: Gener
         const baseTernary = fromComplicated(node, [
             generateCondition(contextType.looseExpression),
             " ? ",
-            generateTrueCase(),
+            generateTrueCase(true),
             " : ",
-            generateFalseCase()
+            generateFalseCase(true)
         ])
 
         if (state.context === contextType.looseExpression) {
@@ -97,14 +97,14 @@ function tryGenerateIfTs(node: SimpleCall, state: GeneratorState, fixture: Gener
     function buildIfStatement() {
         const ifFirstHalf = fromComplicated(node, [
             ifSnippet, " (", generateCondition(contextType.isolatedExpression), ") {\n",
-            generateTrueCase(),
+            generateTrueCase(false),
             makeIndent(state.indentLevel), "}"
         ])
         if (node.args.length >= 3) {
             return fromComplicated(node, [
                 ifFirstHalf,
                 " else {\n",
-                generateFalseCase(),
+                generateFalseCase(false),
                 makeIndent(state.indentLevel), "}"
             ])
         }
@@ -124,7 +124,7 @@ function tryGenerateIfTs(node: SimpleCall, state: GeneratorState, fixture: Gener
         }))
     }
 
-    function generateTrueCase() {
+    function generateTrueCase(allowNoWhitespace: boolean) {
         if (node.args.length < 2) {
             return ""
         }
@@ -134,14 +134,16 @@ function tryGenerateIfTs(node: SimpleCall, state: GeneratorState, fixture: Gener
                 indentLevel: state.indentLevel + 1
             }), fixture)
         } else {
-            return fromComplicated(node, [
+            const basicParts = [
                 fixture.generate(trueCaseNode, state.makeChild({ context: contextType.isolatedExpression })),
                 "()"
-            ])
+            ]
+            const allParts = allowNoWhitespace ? basicParts : [genIndent(state.indentLevel + 1), ...basicParts, "\n"]
+            return fromComplicated(node, allParts)
         }
     }
 
-    function generateFalseCase() {
+    function generateFalseCase(allowNoWhitespace: boolean) {
         if (node.args.length < 4) {
             return ""
         }
@@ -151,10 +153,12 @@ function tryGenerateIfTs(node: SimpleCall, state: GeneratorState, fixture: Gener
                 indentLevel: state.indentLevel + 1
             }), fixture)
         } else {
-            return fromComplicated(node, [
+            const basicParts = [
                 fixture.generate(elseCaseNode, state.makeChild({ context: contextType.isolatedExpression })),
                 "()"
-            ])
+            ]
+            const allParts = allowNoWhitespace ? basicParts : [genIndent(state.indentLevel + 1), ...basicParts, "\n"]
+            return fromComplicated(node, allParts)
         }
     }
 

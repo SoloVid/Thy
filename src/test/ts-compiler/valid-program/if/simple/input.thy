@@ -7,18 +7,19 @@ if condition
 and else
   console.log "no"
 
-callback is
+callback is def
   console.log "yay"
 
 Iff both callbacks are inline
-if condition callback1 else callback2
+if condition callback else callback
+captured is if condition callback else callback
 
-if condition callback1 else
+if condition callback else
   console.log "no"
 
 if condition
   console.log "yes"
-and else callback2
+and else callback
 
 The following cases are errors.
 

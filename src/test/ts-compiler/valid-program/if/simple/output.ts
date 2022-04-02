@@ -9,12 +9,17 @@ if (condition) {
   console.log("no" as const)
 }
 
-function callback() {
+const callback = () => {
   console.log("yay" as const)
 }
 
 // Iff both callbacks are inline
-condition ? callback() : callback()
+if (condition) {
+  callback()
+} else {
+  callback()
+}
+const captured = condition ? callback() : callback()
 
 if (condition) {
   callback()
@@ -30,13 +35,16 @@ if (condition) {
 
 // The following cases are errors.
 
-if (false) {}
+if (false) {
+}
 
-if (condition) {}
+if (condition) {
+}
 
 if (condition) {
   console.log("yes" as const)
-} else {}
+} else {
+}
 
 if (condition) {
   console.log("yes" as const)
