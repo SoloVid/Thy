@@ -11,7 +11,7 @@ export function tryGenerateBlockTs(node: TreeNode, state: GeneratorState, fixtur
 }
 
 export function generateBlockTs(block: Block, state: GeneratorState, fixture: GeneratorFixture): GeneratedSnippets {
-    if (state.indentLevel === 0) {
+    if (state.indentLevel === 0 && state.context === contextType.blockAllowingReturn) {
         return generateBlockLinesTs(block, block.ideas, state, fixture)
     }
     
@@ -29,10 +29,11 @@ export function generateBlockTs(block: Block, state: GeneratorState, fixture: Ge
         }
     }
 
+    const blockBodyState = state.makeChild({ indentLevel: state.indentLevel + 1 })
     const definition = fromComplicated(block, [
         "(", parameterSpecs, ") => {\n",
-        generateBlockLinesTs(block, imperativeIdeas, state, fixture),
-        makeIndent(state.indentLevel - 1), "}"
+        generateBlockLinesTs(block, imperativeIdeas, blockBodyState, fixture),
+        makeIndent(state.indentLevel), "}"
     ])
 
     if (state.context === contextType.looseExpression) {
@@ -62,7 +63,10 @@ export function generateBlockLinesTs(block: Block, ideas: Block["ideas"], state:
         context: contextType.blockAllowingReturn
     })
 
-    const lines = ideas.map(i => fixture.generate(i, childState))
+    const implementationLines = ideas.map(i => i.type === "blank-line" ? { text: "\n" } : [
+        genIndent(state.indentLevel), fixture.generate(i, childState), { text: "\n" }
+    ])
+    const impliedLines: GeneratedSnippets = []
     // TODO: Get local variables stuff working again (probably from tree symbol table?)
     if (childState.localVariables.length > 0) {
         const impliedReturn = childState.localVariables.map(v => {
@@ -76,14 +80,12 @@ export function generateBlockLinesTs(block: Block, ideas: Block["ideas"], state:
                 ind, "set ", genT, "(__) { ", genT, " = __ }",
             ])
         })
-        lines.push(fromComplicated(block, [
-            "return {\n",
-            impliedReturn,
-            "\n",
-            genIndent(state.indentLevel),
-            "}",
+        impliedLines.push(fromComplicated(block, [
+            genIndent(state.indentLevel), "return {\n",
+            impliedReturn, "\n",
+            genIndent(state.indentLevel), "}\n",
         ]))
     }
 
-    return lines.map(l => [genIndent(state.indentLevel), l, { text: "\n" }])
+    return [implementationLines, impliedLines]
 }

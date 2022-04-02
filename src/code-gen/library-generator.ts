@@ -123,7 +123,7 @@ export function makeLibraryGenerators(
             if (node.call.func.type !== "identifier") {
                 return
             }
-            const lookup = lookupByName(callSpecMap, node.call.func)
+            const lookup = lookupByName(assignmentSpecMap, node.call.func)
             if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateAssignment === undefined) {
                 return
             }
@@ -133,7 +133,7 @@ export function makeLibraryGenerators(
             if (node.call.func.type !== "identifier") {
                 return
             }
-            const lookup = lookupByName(callSpecMap, node.call.func)
+            const lookup = lookupByName(letCallSpecMap, node.call.func)
             if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateLetCall === undefined) {
                 return
             }

@@ -15,7 +15,7 @@ export async function compileAndVerifyOutput(libDir: string, inputFile: string, 
 async function readFile(libDir: string, relativePath: string): Promise<string> {
     const srcPath = pathInSrc(path.join(libDir, relativePath))
     const contentsBuffer = await fs.readFile(srcPath)
-    return contentsBuffer.toString().replace("\r\n", "\n")
+    return contentsBuffer.toString().replace(/\r\n/g, "\n")
 }
 
 function pathInSrc(libPath: string): string {

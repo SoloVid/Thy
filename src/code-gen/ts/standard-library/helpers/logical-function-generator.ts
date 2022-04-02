@@ -20,7 +20,7 @@ export function makeLogicalFunctionGenerator(name: string, jsOperator: string, d
             for (const arg of node.args.slice(4)) {
                 state.addError(nodeError(arg, `${name} only supports up to 4 arguments`));
             }
-            const childState = state.makeChild({ context: contextType.isolatedExpression });
+            const childState = state.makeChild({ context: contextType.looseExpression });
             const generatedChildren = node.args.map(a => fixture.generate(a, childState))
             const separatedChildren = generatedChildren.map((c, i) => {
                 if (i === 0) {
@@ -53,16 +53,15 @@ export function makeSequencedLogicalFunctionGenerator(name: string, jsOperator: 
             for (const arg of node.args.slice(4)) {
                 state.addError(nodeError(arg, `${name} only supports up to 4 arguments`));
             }
-            const childState = state.makeChild({ context: contextType.isolatedExpression });
+            const childState = state.makeChild({ context: contextType.looseExpression });
             const pairedOff = node.args.slice(1).map((b, i) => {
                 const a = node.args[i]
-                return fromComplicated(node, [
-                    '(',
+                const innerParts = [
                     fixture.generate(a, childState),
                     ` ${jsOperator} `,
                     fixture.generate(b, childState),
-                    ')'
-                ])
+                ]
+                return fromComplicated(node, node.args.length > 2 ? ['(', ...innerParts, ')'] : innerParts)
             })
             const separatedPairs = pairedOff.map((p, i) => {
                 if (i === 0) {

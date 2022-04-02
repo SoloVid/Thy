@@ -15,7 +15,7 @@ export function makeBinaryGenericFunctionGenerator(name: string, jsOperator: str
                 state.addError(tokenError(node.func.target, `${name} requires two arguments`));
                 return fromComplicated(node, ["false"]);
             }
-            const childState = state.makeChild({ context: contextType.isolatedExpression });
+            const childState = state.makeChild({ context: contextType.looseExpression });
             return fromComplicated(node, autoTight(state, [
                 fixture.generate(node.args[0], childState),
                 ` ${jsOperator} `,

@@ -1,16 +1,16 @@
 const condition = true
 if (condition) {
-  console.log("yay")
+  console.log("yay" as const)
 }
 
 if (condition) {
-  console.log("yes")
+  console.log("yes" as const)
 } else {
-  console.log("no")
+  console.log("no" as const)
 }
 
 function callback() {
-  console.log("yay")
+  console.log("yay" as const)
 }
 
 // Iff both callbacks are inline
@@ -19,11 +19,11 @@ condition ? callback() : callback()
 if (condition) {
   callback()
 } else {
-  console.log("no")
+  console.log("no" as const)
 }
 
 if (condition) {
-  console.log("yes")
+  console.log("yes" as const)
 } else {
   callback()
 }
@@ -35,11 +35,11 @@ if (false) {}
 if (condition) {}
 
 if (condition) {
-  console.log("yes")
+  console.log("yes" as const)
 } else {}
 
 if (condition) {
-  console.log("yes")
+  console.log("yes" as const)
 } else {
-  console.log("no")
+  console.log("no" as const)
 }

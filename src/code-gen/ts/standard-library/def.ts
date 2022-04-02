@@ -24,8 +24,6 @@ export const defGenerator: GeneratorForGlobalSpec = {
         }
     
         const childState = state.makeChild()
-        childState.indentLevel++
-    
         const expressionTs = fixture.generate(node.call.args[0], childState)
         return generateAssignmentTs2(node, state, fixture, expressionTs, node.call.typeArgs.length === 1 ? fixture.generate(node.call.typeArgs[0], childState) : undefined)
     }

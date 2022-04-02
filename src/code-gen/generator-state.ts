@@ -29,7 +29,7 @@ export const contextType = {
     blockAllowingReturn: "blockAllowingReturn",
 } as const
 
-type ContextType = (typeof contextType)[keyof typeof contextType]
+export type ContextType = (typeof contextType)[keyof typeof contextType]
 
 interface GeneratorStatePublicAttributes {
     context: ContextType

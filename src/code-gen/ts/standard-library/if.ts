@@ -2,8 +2,8 @@ import { tokenError } from "../../../compile-error";
 import type { Call } from "../../../tree/call";
 import { nodeError } from "../../../tree/tree-node";
 import { fromComplicated, fromToken, GeneratedSnippets, GeneratorFixture } from "../../generator";
-import type { GeneratorForGlobalSpec } from "../../generator-for-global";
-import { contextType, GeneratorState } from "../../generator-state";
+import type { GeneratorForGlobalSpec, SimpleCall } from "../../generator-for-global";
+import { ContextType, contextType, GeneratorState } from "../../generator-state";
 import { makeIndent } from "../../indent-string";
 import { generateBlockLinesTs } from "../block/generate-block-ts";
 import { autoTightS } from "./helpers/auto-tight";
@@ -30,15 +30,7 @@ ${space}}`)
     }
 }
 
-function tryGenerateIfTs(node: Call, state: GeneratorState, fixture: GeneratorFixture): void | GeneratedSnippets {
-    // TODO: We're now wrapping stuff in identifiers, so this and some other stuff is broke.
-    if (node.func.type !== "identifier") {
-        return
-    }
-    // TODO: Handle scopes for if?
-    if (node.func.target.text !== "if") {
-        return
-    }
+function tryGenerateIfTs(node: SimpleCall, state: GeneratorState, fixture: GeneratorFixture): void | GeneratedSnippets {
     const ifSnippet = fromToken(node.func.target, "if")
 
     if (node.args.length < 2) {
@@ -89,7 +81,7 @@ function tryGenerateIfTs(node: Call, state: GeneratorState, fixture: GeneratorFi
 
     function buildTernary() {
         const baseTernary = fromComplicated(node, [
-            generateCondition(),
+            generateCondition(contextType.looseExpression),
             " ? ",
             generateTrueCase(),
             " : ",
@@ -104,7 +96,7 @@ function tryGenerateIfTs(node: Call, state: GeneratorState, fixture: GeneratorFi
 
     function buildIfStatement() {
         const ifFirstHalf = fromComplicated(node, [
-            ifSnippet, " (", generateCondition(), ") {\n",
+            ifSnippet, " (", generateCondition(contextType.isolatedExpression), ") {\n",
             generateTrueCase(),
             makeIndent(state.indentLevel), "}"
         ])
@@ -123,12 +115,12 @@ function tryGenerateIfTs(node: Call, state: GeneratorState, fixture: GeneratorFi
         return fromComplicated(node, ["(() => {", buildIfStatement(), "})()"])
     }
 
-    function generateCondition() {
+    function generateCondition(context: ContextType) {
         if (node.args.length === 0) {
             return "false"
         }
         return fixture.generate(node.args[0], state.makeChild({
-            context: contextType.looseExpression
+            context: context
         }))
     }
 

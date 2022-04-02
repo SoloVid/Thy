@@ -4,6 +4,7 @@ import { makeGenerator } from "../../generate-from-options";
 import { CodeGeneratorFunc, fromComplicated, fromTokenRange, GeneratedSnippets, GeneratorFixture } from "../../generator";
 import { contextType, GeneratorState } from "../../generator-state";
 import { LibraryGeneratorCollection } from "../../library-generator";
+import { awaitKeyword, returnKeyword, throwKeyword } from "../block/block-return";
 import { makeControlFlowCallTsGenerator } from "./generate-control-flow-call-ts";
 
 export function callGeneratorTs(standardLibrary: LibraryGeneratorCollection) {
@@ -14,9 +15,9 @@ export function callGeneratorTs(standardLibrary: LibraryGeneratorCollection) {
 }
 
 export const defaultCallTsGenerators = [
-    makeControlFlowCallTsGenerator("await"),
-    makeControlFlowCallTsGenerator("return"),
-    makeControlFlowCallTsGenerator("throw"),
+    makeControlFlowCallTsGenerator(awaitKeyword),
+    makeControlFlowCallTsGenerator(returnKeyword),
+    makeControlFlowCallTsGenerator(throwKeyword),
 ]
 
 export function makeCallTsGenerator(specializations: CodeGeneratorFunc<Call>[]): CodeGeneratorFunc<TreeNode> {
@@ -28,15 +29,9 @@ export function makeCallTsGenerator(specializations: CodeGeneratorFunc<Call>[]):
 }
 
 export function generateCallTs(call: Call, state: GeneratorState, fixture: GeneratorFixture): GeneratedSnippets {
-    const functionSnippet = fixture.generate(call.func, state.makeChild({
-        context: contextType.looseExpression,
-        indentLevel: state.indentLevel + 1
-    }))
+    const functionSnippet = fixture.generate(call.func, state.makeChild({ context: contextType.looseExpression }))
     const argSnippets = call.args.map((a, i) => {
-        const childState = state.makeChild({
-            context: contextType.isolatedExpression,
-            indentLevel: state.indentLevel + 1
-        })
+        const childState = state.makeChild({ context: contextType.isolatedExpression })
         if (i === 0) {
             return fixture.generate(a, childState)
         }

@@ -1,7 +1,7 @@
 import { nodeError, TreeNode } from '../../tree/tree-node'
 import { makeGenerator } from '../generate-from-options'
 import { DefiniteCodeGeneratorFuncNoFixture, fromToken, fromTokenRange, GeneratedSnippet, GeneratedSnippets, GeneratorResult } from '../generator'
-import { makeGeneratorState } from '../generator-state'
+import { contextType, makeGeneratorState } from '../generator-state'
 import { assignmentGeneratorTs } from './assignment/generate-assignment-ts'
 import { tryGenerateAtomTs } from './atom/generate-atom-ts'
 import { tryGenerateBlockTs } from './block/generate-block-ts'
@@ -16,6 +16,7 @@ import { standardLibraryGenerators } from './standard-library'
 
 export function tsGenerator(node: TreeNode): GeneratorResult {
     const state = makeGeneratorState()
+    state.context = contextType.blockAllowingReturn
     const output: GeneratedSnippet[] = [generateTs2(node, state)].flat(Infinity)
     return {
         output: output.map(s => s.text).join(""),

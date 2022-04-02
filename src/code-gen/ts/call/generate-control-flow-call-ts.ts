@@ -30,7 +30,8 @@ export function makeControlFlowCallTsGenerator(keyword: string): CodeGeneratorFu
             state.addError(nodeError(arg, `${keyword} only takes 1 argument`))
         }
 
-        const valueSnippet = node.args.length >= 1 ? fixture.generate(node.args[0], state.makeChild({context: contextType.isolatedExpression})) : fromToken(node.func.target, 'undefined')
+        const childState = state.makeChild({context: contextType.isolatedExpression})
+        const valueSnippet = node.args.length >= 1 ? fixture.generate(node.args[0], childState) : fromToken(node.func.target, 'undefined')
 
         return fromComplicated(node, [keywordSnippet, " ", valueSnippet])
     }
