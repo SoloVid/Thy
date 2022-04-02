@@ -1,1 +1,1 @@
-console.log(true, "B", 3)
+console.log(true, "B" as const, 3 as const)

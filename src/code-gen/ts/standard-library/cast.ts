@@ -2,7 +2,6 @@ import { tokenError } from "../../../compile-error";
 import { nodeError } from "../../../tree/tree-node";
 import { fromComplicated, fromTokenRange } from "../../generator";
 import { GeneratorForGlobalSpec } from "../../generator-for-global";
-import { generateTs } from "../generate-ts";
 import { autoTight, autoTightS } from "./helpers/auto-tight";
 
 export const castGenerator: GeneratorForGlobalSpec = {
@@ -10,7 +9,7 @@ export const castGenerator: GeneratorForGlobalSpec = {
     generateValue(state) {
         return autoTightS(state, '<_T>(_value: unknown) => (_value as _T)')
     },
-    generateCall(node, state) {
+    generateCall(node, state, fixture) {
         if (node.typeArgs.length < 1) {
             state.addError(tokenError(node.func.target, `cast requires 1 type argument`));
         }
@@ -25,6 +24,10 @@ export const castGenerator: GeneratorForGlobalSpec = {
             state.addError(nodeError(arg, `cast cannot take more than 1 argument`))
         }
         const childState = state.makeChild()
-        return fromComplicated(node, autoTight(state, [generateTs(node.args[0], childState), "as unknown as ", generateTs(node.typeArgs[0], childState)]))
+        return fromComplicated(node, autoTight(state, [
+            fixture.generate(node.args[0], childState),
+            "as unknown as ",
+            fixture.generate(node.typeArgs[0], childState)
+        ]))
     }
 }

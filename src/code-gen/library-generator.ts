@@ -109,7 +109,7 @@ export function makeLibraryGenerators(
                 return partGeneratedNow
             }
         },
-        callGenerator(node, state) {
+        callGenerator(node, state, fixture) {
             if (node.func.type !== "identifier") {
                 return
             }
@@ -117,9 +117,9 @@ export function makeLibraryGenerators(
             if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateCall === undefined) {
                 return
             }
-            return lookup.spec.generateCall(node as any, state)
+            return lookup.spec.generateCall(node as any, state, fixture)
         },
-        assignmentGenerator(node, state) {
+        assignmentGenerator(node, state, fixture) {
             if (node.call.func.type !== "identifier") {
                 return
             }
@@ -127,9 +127,9 @@ export function makeLibraryGenerators(
             if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateAssignment === undefined) {
                 return
             }
-            return lookup.spec.generateAssignment(node as any, state)
+            return lookup.spec.generateAssignment(node as any, state, fixture)
         },
-        letCallGenerator(node, state) {
+        letCallGenerator(node, state, fixture) {
             if (node.call.func.type !== "identifier") {
                 return
             }
@@ -137,7 +137,7 @@ export function makeLibraryGenerators(
             if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateLetCall === undefined) {
                 return
             }
-            return lookup.spec.generateLetCall(node as any, state)
+            return lookup.spec.generateLetCall(node as any, state, fixture)
         }
     }
 }

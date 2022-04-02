@@ -3,7 +3,7 @@ import type { Assignment } from "../tree/assignment"
 import type { Call } from "../tree/call"
 import type { Identifier } from "../tree/identifier"
 import { LetCall } from "../tree/let-call"
-import type { GeneratedSnippets } from "./generator"
+import type { CodeGeneratorFunc, GeneratedSnippets } from "./generator"
 import type { GeneratorState } from "./generator-state"
 
 export interface SimpleCall extends Call {
@@ -13,9 +13,9 @@ export interface SimpleCall extends Call {
 export interface GeneratorForGlobalSpec {
     name: string
     generateValue: (state: GeneratorState) => string
-    generateCall?: (node: SimpleCall, state: GeneratorState) => void | GeneratedSnippets
-    generateAssignment?: (node: Assignment & {call: SimpleCall}, state: GeneratorState) => void | GeneratedSnippets
-    generateLetCall?: (node: LetCall & {call: SimpleCall}, state: GeneratorState) => void | GeneratedSnippets
+    generateCall?: CodeGeneratorFunc<SimpleCall>
+    generateAssignment?: CodeGeneratorFunc<Assignment & {call: SimpleCall}>
+    generateLetCall?: CodeGeneratorFunc<LetCall & {call: SimpleCall}>
 }
 
 export interface GeneratorForGlobalParentSpec {

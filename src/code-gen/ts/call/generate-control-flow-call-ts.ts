@@ -1,12 +1,11 @@
 import { tokenError } from "../../../compile-error";
 import type { Call } from "../../../tree/call";
 import { nodeError } from "../../../tree/tree-node";
-import { CodeGeneratorFunc, fromComplicated, fromToken, GeneratedSnippets } from "../../generator";
+import { CodeGeneratorFunc, fromComplicated, fromToken, GeneratedSnippets, GeneratorFixture } from "../../generator";
 import { contextType, GeneratorState } from "../../generator-state";
-import { generateTs } from "../generate-ts";
 
 export function makeControlFlowCallTsGenerator(keyword: string): CodeGeneratorFunc<Call> {
-    return (node: Call, state: GeneratorState): void | GeneratedSnippets => {
+    return (node: Call, state: GeneratorState, fixture: GeneratorFixture): void | GeneratedSnippets => {
         if (node.func.type !== "identifier") {
             return
         }
@@ -31,7 +30,7 @@ export function makeControlFlowCallTsGenerator(keyword: string): CodeGeneratorFu
             state.addError(nodeError(arg, `${keyword} only takes 1 argument`))
         }
 
-        const valueSnippet = node.args.length >= 1 ? generateTs(node.args[0], state.makeChild({context: contextType.isolatedExpression})) : fromToken(node.func.target, 'undefined')
+        const valueSnippet = node.args.length >= 1 ? fixture.generate(node.args[0], state.makeChild({context: contextType.isolatedExpression})) : fromToken(node.func.target, 'undefined')
 
         return fromComplicated(node, [keywordSnippet, " ", valueSnippet])
     }

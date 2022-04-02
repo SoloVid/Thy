@@ -6,19 +6,19 @@ export function makeGenerator<InType extends TreeNode, SpecializedType>(
     generateDefault: DefiniteCodeGeneratorFunc<SpecializedType>,
     specializations: CodeGeneratorFunc<SpecializedType>[],
 ): CodeGeneratorFunc<InType> {
-    return (node, state) => {
+    return (node, state, fixture) => {
         const specializedNode = transformNode(node)
         if (!specializedNode) {
             return
         }
 
         for (const generator of specializations) {
-            const outputCode = generator(specializedNode, state)
+            const outputCode = generator(specializedNode, state, fixture)
             if (outputCode !== undefined) {
                 return outputCode
             }
         }
 
-        return generateDefault(specializedNode, state)
+        return generateDefault(specializedNode, state, fixture)
     }
 }

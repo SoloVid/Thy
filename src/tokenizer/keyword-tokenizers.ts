@@ -1,7 +1,7 @@
 import { makeSingleRegexTokenizer } from "./single-regex-tokenizer";
 import { tStatementContinuation, tVarDeclAssign, tExport, tConstDeclAssign, tPrivate, tNoDeclAssign, tType, tLet } from "./token-type";
 
-export const andTokenizer = makeSingleRegexTokenizer(tStatementContinuation, /\r?\n *and\b/)
+export const statementContinuationTokenizer = makeSingleRegexTokenizer(tStatementContinuation, /\r?\n *and\b/)
 export const isTokenizer = makeSingleRegexTokenizer(tConstDeclAssign, /\bis\b/)
 export const beTokenizer = makeSingleRegexTokenizer(tVarDeclAssign, /\bbe\b/)
 export const toTokenizer = makeSingleRegexTokenizer(tNoDeclAssign, /\bto\b/)

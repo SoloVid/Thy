@@ -3,7 +3,6 @@ import { nodeError } from "../../../../tree/tree-node";
 import { fromComplicated, fromToken, GeneratedSnippets } from "../../../generator";
 import { GeneratorForGlobalSpec } from "../../../generator-for-global";
 import { contextType } from "../../../generator-state";
-import { generateTs } from "../../generate-ts";
 import { autoTight, autoTightS } from "./auto-tight";
 
 export function makeLogicalFunctionGenerator(name: string, jsOperator: string, defaultValue: string): GeneratorForGlobalSpec {
@@ -13,7 +12,7 @@ export function makeLogicalFunctionGenerator(name: string, jsOperator: string, d
             const expression = ['_a', ...['_b', '_c', '_d'].map(e => `(${e} ?? ${defaultValue})`)].join(` ${jsOperator} `);
             return autoTightS(state, `(_a: boolean, _b?: boolean, _c?: boolean, _d?: boolean) => ${expression}`);
         },
-        generateCall(node, state) {
+        generateCall(node, state, fixture) {
             if (node.args.length < 1) {
                 state.addError(tokenError(node.func.target, `${name} requires at least 1 argument`));
                 return fromComplicated(node, ["false"]);
@@ -22,7 +21,7 @@ export function makeLogicalFunctionGenerator(name: string, jsOperator: string, d
                 state.addError(nodeError(arg, `${name} only supports up to 4 arguments`));
             }
             const childState = state.makeChild({ context: contextType.isolatedExpression });
-            const generatedChildren = node.args.map(a => generateTs(a, childState))
+            const generatedChildren = node.args.map(a => fixture.generate(a, childState))
             const separatedChildren = generatedChildren.map((c, i) => {
                 if (i === 0) {
                     return c
@@ -46,7 +45,7 @@ export function makeSequencedLogicalFunctionGenerator(name: string, jsOperator: 
             const expression = pairedOff.filter(a => a.length > 0).map(a => a.join("")).join(" && ")
             return autoTightS(state, `<_T extends ${constraint}>(_a: _T, _b: _T, _c: _T = _b${fillIn}, _d: _T = _c${fillIn}) => ${expression}`);
         },
-        generateCall(node, state) {
+        generateCall(node, state, fixture) {
             if (node.args.length < 2) {
                 state.addError(tokenError(node.func.target, `${name} requires at least 2 arguments`));
                 return fromComplicated(node, ["false"]);
@@ -59,9 +58,9 @@ export function makeSequencedLogicalFunctionGenerator(name: string, jsOperator: 
                 const a = node.args[i]
                 return fromComplicated(node, [
                     '(',
-                    generateTs(a, childState),
+                    fixture.generate(a, childState),
                     ` ${jsOperator} `,
-                    generateTs(b, childState),
+                    fixture.generate(b, childState),
                     ')'
                 ])
             })

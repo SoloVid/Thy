@@ -5,11 +5,13 @@ import type { TreeNode } from "../../tree/tree-node";
 import { makeGenerator } from "../generate-from-options";
 import { CodeGeneratorFunc, fromToken, GeneratedSnippets } from "../generator";
 import type { GeneratorState } from "../generator-state";
-import { standardLibraryGenerators } from "./standard-library";
+import { LibraryGeneratorCollection } from "../library-generator";
 
-export const tryGenerateIdentifierTs = makeIdentifierTsGenerator([
-    standardLibraryGenerators.valueGenerator,
-])
+export function identifierGeneratorTs(standardLibrary: LibraryGeneratorCollection) {
+    return makeIdentifierTsGenerator([
+        standardLibrary.valueGenerator,
+    ])
+}
 
 export function makeIdentifierTsGenerator(specializations: CodeGeneratorFunc<Identifier>[]): CodeGeneratorFunc<TreeNode> {
     return makeGenerator((node) => {

@@ -2,7 +2,6 @@ import { tokenError } from "../../../compile-error";
 import { fromComplicated } from "../../generator";
 import type { GeneratorForGlobalParentSpec, GeneratorForGlobalSpec } from "../../generator-for-global";
 import { contextType } from "../../generator-state";
-import { generateTs } from "../generate-ts";
 import { autoTight, autoTightS } from "./helpers/auto-tight";
 import { makeLogicalFunctionGenerator, makeSequencedLogicalFunctionGenerator } from "./helpers/logical-function-generator";
 
@@ -15,13 +14,13 @@ const not: GeneratorForGlobalSpec = {
     generateValue(state) {
         return autoTightS(state, `(_a: boolean) => !_a`);
     },
-    generateCall(node, state) {
+    generateCall(node, state, fixture) {
         if (node.args.length !== 1) {
             state.addError(tokenError(node.func.target, `not takes exactly 1 argument`));
             return fromComplicated(node, ["false"]);
         }
         const childState = state.makeChild({ context: contextType.isolatedExpression });
-        return fromComplicated(node, autoTight(state, ["!", generateTs(node.args[0], childState)]));
+        return fromComplicated(node, autoTight(state, ["!", fixture.generate(node.args[0], childState)]));
     }
 }
 const some = makeLogicalFunctionGenerator('some', '||', 'false')

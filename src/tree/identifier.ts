@@ -9,7 +9,9 @@ type TypeOrValue = typeof tTypeIdentifier | typeof tValueIdentifier
 
 export interface Identifier<T extends TypeOrValue = TypeOrValue> extends TokenRange {
     type: "identifier"
+    /** Left-to-right qualifiers in the identifier. */
     scopes: (Atom<typeof tValueIdentifier> | Block | Call)[]
+    /** The right-most name in the identifier. */
     target: Token<T>
     rawTokens: Token[]
 }

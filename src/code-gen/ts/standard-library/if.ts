@@ -1,13 +1,36 @@
 import { tokenError } from "../../../compile-error";
 import type { Call } from "../../../tree/call";
 import { nodeError } from "../../../tree/tree-node";
-import { fromComplicated, fromToken, GeneratedSnippets } from "../../generator";
+import { fromComplicated, fromToken, GeneratedSnippets, GeneratorFixture } from "../../generator";
+import type { GeneratorForGlobalSpec } from "../../generator-for-global";
 import { contextType, GeneratorState } from "../../generator-state";
 import { makeIndent } from "../../indent-string";
 import { generateBlockLinesTs } from "../block/generate-block-ts";
-import { generateTs } from "../generate-ts";
+import { autoTightS } from "./helpers/auto-tight";
 
-export function tryGenerateIfTs(node: Call, state: GeneratorState): void | GeneratedSnippets {
+export const ifGenerator: GeneratorForGlobalSpec = {
+    name: "if",
+    generateValue(state) {
+        const space = makeIndent(state.indentLevel)
+        const space2 = makeIndent(state.indentLevel + 1)
+        const space3 = makeIndent(state.indentLevel + 2)
+        return autoTightS(state, `<_T>(condition: boolean, trueCallback: () => _T, elseLiteral?: \"else\", falseCallback?: () => _T) => {
+${space2}if (condition) {
+${space3}trueCallback()
+${space2}} else if (falseCallback) {
+${space3}falseCallback()
+${space2}}
+${space}}`)
+    },
+    generateCall(node, state, fixture) {
+        return tryGenerateIfTs(node, state, fixture)
+    },
+    generateLetCall(node, state, fixture) {
+        return tryGenerateIfTs(node.call, state.makeChild({ context: contextType.blockAllowingReturn }), fixture)
+    }
+}
+
+function tryGenerateIfTs(node: Call, state: GeneratorState, fixture: GeneratorFixture): void | GeneratedSnippets {
     // TODO: We're now wrapping stuff in identifiers, so this and some other stuff is broke.
     if (node.func.type !== "identifier") {
         return
@@ -104,7 +127,7 @@ export function tryGenerateIfTs(node: Call, state: GeneratorState): void | Gener
         if (node.args.length === 0) {
             return "false"
         }
-        return generateTs(node.args[0], state.makeChild({
+        return fixture.generate(node.args[0], state.makeChild({
             context: contextType.looseExpression
         }))
     }
@@ -117,10 +140,10 @@ export function tryGenerateIfTs(node: Call, state: GeneratorState): void | Gener
         if (trueCaseNode.type === "block") {
             return generateBlockLinesTs(trueCaseNode, trueCaseNode.ideas, state.makeChild({
                 indentLevel: state.indentLevel + 1
-            }))
+            }), fixture)
         } else {
             return fromComplicated(node, [
-                generateTs(trueCaseNode, state.makeChild({ context: contextType.isolatedExpression })),
+                fixture.generate(trueCaseNode, state.makeChild({ context: contextType.isolatedExpression })),
                 "()"
             ])
         }
@@ -134,10 +157,10 @@ export function tryGenerateIfTs(node: Call, state: GeneratorState): void | Gener
         if (elseCaseNode.type === "block") {
             return generateBlockLinesTs(elseCaseNode, elseCaseNode.ideas, state.makeChild({
                 indentLevel: state.indentLevel + 1
-            }))
+            }), fixture)
         } else {
             return fromComplicated(node, [
-                generateTs(elseCaseNode, state.makeChild({ context: contextType.isolatedExpression })),
+                fixture.generate(elseCaseNode, state.makeChild({ context: contextType.isolatedExpression })),
                 "()"
             ])
         }

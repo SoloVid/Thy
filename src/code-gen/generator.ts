@@ -16,8 +16,13 @@ export interface CodeGenResult {
     readonly mightReturn: boolean
 }
 
-export type CodeGeneratorFunc<T> = (node: T, state: GeneratorState) => void | GeneratedSnippets
-export type DefiniteCodeGeneratorFunc<T> = (node: T, state: GeneratorState) => GeneratedSnippets
+export interface GeneratorFixture {
+    generate: DefiniteCodeGeneratorFuncNoFixture<TreeNode>
+}
+
+export type CodeGeneratorFunc<T> = (node: T, state: GeneratorState, fixture: GeneratorFixture) => void | GeneratedSnippets
+export type DefiniteCodeGeneratorFunc<T> = (node: T, state: GeneratorState, fixture: GeneratorFixture) => GeneratedSnippets
+export type DefiniteCodeGeneratorFuncNoFixture<T> = (node: T, state: GeneratorState) => GeneratedSnippets
 
 export function fromToken(token: Token, text?: string): MappedGeneratedSnippet {
     return {

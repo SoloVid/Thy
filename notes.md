@@ -146,13 +146,15 @@ but you couldn't actually implement them in thy.
 
 ### Other Provided Stuff
 
+- boolean - runtime cast to boolean
+- cast - compile-time cast
 - check
     - all - logical AND
-    - some - logical OR
-- compare
     - asc - less than
     - desc - greater than
     - equal
+    - not - logical NOT
+    - some - logical OR
 - def - shorthand function that returns the value of the first argument
 - for - container for for-loop functions
     - elements
@@ -162,6 +164,7 @@ but you couldn't actually implement them in thy.
     - subtract
     - multiply
     - divide
+- string - runtime cast to string
 
 ## Building Blocks
 
