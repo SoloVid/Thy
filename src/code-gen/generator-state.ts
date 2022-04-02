@@ -54,16 +54,15 @@ export interface LocalVariable {
     isConstant: boolean
 }
 
-export function makeGeneratorState(parent?: GeneratorState): GeneratorState {
+export function makeGeneratorState(parent?: GeneratorState, overrides: Partial<GeneratorStatePublicAttributes> = {}): GeneratorState {
     let nextVar = 1
     const me = {
-        errors: [] as CompileError[],
-        indentLevel: 0,
-        isTypeContext: false,
-        getUniqueVariableName() {
+        errors: parent?.errors ?? [] as CompileError[],
+        indentLevel: parent?.indentLevel ?? 0,
+        isTypeContext: parent?.isTypeContext ?? false,
+        getUniqueVariableName: parent?.getUniqueVariableName ?? (() => {
             return `_${nextVar++}`
-        },
-        ...parent,
+        }),
         context: contextType.isolatedExpression as ContextType,
         localVariables: [],
         parent: parent ?? null,
@@ -74,8 +73,9 @@ export function makeGeneratorState(parent?: GeneratorState): GeneratorState {
             return this.context === contextType.looseExpression || this.context === contextType.isolatedExpression
         },
         makeChild(overrides: Partial<GeneratorStatePublicAttributes> = {}) {
-            return { ...makeGeneratorState(me), ...overrides }
-        }
+            return makeGeneratorState(me, overrides)
+        },
+        ...overrides
     }
     return me
 }
