@@ -3,24 +3,13 @@
 
 - Names for built-in functions?
     - Arrays
-        - new array - `newArray`? `array`? `arr`? `a`?
         - array access - `get myArr 3`?
         - array element set - `set myArr 3 myVal`?
-    - Comparators - may just want these all to be `compare.xxx`
-        - equivalence - `compare.equal`?
-        - less than / greater than - `compare.asc`/`compare.desc`?
-    - Logic
-        - and / or - `all` / `some`?
-        - not - `not`
-    - Math - may just want these all to be `math.xxx`
-        - add / subtract
-        - multiply / divide / mod
-        - exponent?
 
 ## Overview of Language Strategy
 
 - No special characters
-- Naturalness (compared to mainstream programming)
+- Naturalness (e.g. not foreign to mainstream programming)
 - Strong static types
 - Simple compiler
 - Simple rules
