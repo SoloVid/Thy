@@ -1,7 +1,7 @@
 import type { CodeGenerator } from "./code-gen/generator";
 import type { CompileError } from "./compile-error";
 import { parse } from "./parser/parser";
-import type { TokenizerFactory } from "./tokenizer/tokenizer";
+import { makeTokenizer, TokenizerFactory } from "./tokenizer/tokenizer";
 import type { Block } from "./tree/block";
 
 export interface CompileResult {
@@ -18,11 +18,11 @@ export interface Compiler {
     compile(source: string): CompileResult
 }
 
-export function makeCompiler(tokenizerFactory: TokenizerFactory, codeGenerator: CodeGenerator): Compiler {
+export function makeCompiler(codeGenerator: CodeGenerator): Compiler {
     return {
         compile(source: string) {
             const tokenizerErrors: CompileError[] = []
-            const tokenizer = tokenizerFactory(source, tokenizerErrors)
+            const tokenizer = makeTokenizer(source, tokenizerErrors)
             const parserOutput = parse(tokenizer)
             const generatorOutput = codeGenerator(parserOutput.top)
             return {
