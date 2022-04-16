@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import yargs from 'yargs/yargs';
 import { compile } from './compile';
+import chalk from 'chalk';
 
 const argv = yargs(process.argv.slice(2)).options({
   target: { alias: 't', choices: ["ts-namespace"] as const, demandOption: true, description: "Target format of compiled output" },
@@ -16,7 +17,7 @@ async function run() {
         for (const e of f.errors) {
             errorCount++
             // console.error(e)
-            console.error(`${f.filePath}:${e.start.line + 1}:${e.start.column + 1} - error THY1234: ${e.message}`)
+            console.error(`${chalk.cyan(f.filePath)}:${chalk.yellow(e.start.line + 1)}:${chalk.yellow(e.start.column + 1)} - ${chalk.red("error")} ${chalk.gray("THY1234")}: ${e.message}`)
             console.error()
             console.error(e.contextualizedErrorMessage)
             console.error()

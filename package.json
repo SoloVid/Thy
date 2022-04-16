@@ -13,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "@babel/code-frame": "^7.16.7",
+    "chalk": "^4.1.2",
     "glob": "^8.0.1",
     "lezer": "^0.13.0",
     "yargs": "^17.4.1"
