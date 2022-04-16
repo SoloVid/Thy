@@ -5,6 +5,7 @@ const mathAddGenerator = makeBinaryNumberFunctionGenerator('add', '+')
 const mathSubtractGenerator = makeBinaryNumberFunctionGenerator('subtract', '-')
 const mathMultiplyGenerator = makeBinaryNumberFunctionGenerator('multiply', '*')
 const mathDivideGenerator = makeBinaryNumberFunctionGenerator('divide', '/')
+const mathModGenerator = makeBinaryNumberFunctionGenerator('mod', '%')
 
 export const mathGenerator: GeneratorForGlobalParentSpec = {
     name: "math",
@@ -13,6 +14,7 @@ export const mathGenerator: GeneratorForGlobalParentSpec = {
         mathSubtractGenerator,
         mathMultiplyGenerator,
         mathDivideGenerator,
+        mathModGenerator,
     ],
 }
 
