@@ -5,6 +5,7 @@ import type { CompileOptions } from "./compile-options";
 import type { CompileResults, FileCompileResults } from "./compile-results";
 import fs from "fs/promises"
 import path from "path"
+import { convertFromInternalError } from "./compile-error";
 
 export async function compile(options: CompileOptions): Promise<CompileResults> {
     const compiler = pickCompiler(options)
@@ -40,9 +41,13 @@ function pickCompiler(options: CompileOptions): Compiler {
 async function handleOneFile(compiler: Compiler, srcPath: string, outPath: string): Promise<FileCompileResults> {
     const input = await fs.readFile(srcPath, 'utf-8')
     const rawResult = compiler.compile(input)
-    console.log(`Would write to ${outPath}:\n${rawResult.output}`)
-    // await fs.writeFile(outPath, rawResult.output)
+    // console.log(`Would write to ${outPath}:\n${rawResult.output}`)
+    await fs.mkdir(path.dirname(outPath), { recursive: true })
+    await fs.writeFile(outPath, rawResult.output)
+    console.log('format results for ' + srcPath)
     return {
-        errors: rawResult.getAllErrors()
+        fileName: path.basename(srcPath),
+        filePath: srcPath,
+        errors: rawResult.getAllErrors().map(e => convertFromInternalError(e, input))
     }
 }

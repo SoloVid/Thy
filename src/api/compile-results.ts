@@ -5,5 +5,7 @@ export interface CompileResults {
 }
 
 export interface FileCompileResults {
+    fileName: string
+    filePath: string
     errors: readonly CompileError[]
 }

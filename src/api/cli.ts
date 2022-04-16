@@ -10,7 +10,21 @@ const argv = yargs(process.argv.slice(2)).options({
 
 async function run() {
     const args = await argv
-    await compile(args)
+    const results = await compile(args)
+    let errorCount = 0
+    for (const f of results.files) {
+        for (const e of f.errors) {
+            errorCount++
+            // console.error(e)
+            console.error(`${f.filePath}:${e.start.line + 1}:${e.start.column + 1} - error THY1234: ${e.message}`)
+            console.error()
+            console.error(e.contextualizedErrorMessage)
+            console.error()
+        }
+    }
+    console.error()
+    console.error(`Found ${errorCount} ${errorCount > 0 ? "errors" : "error"}.`)
+    console.error()
 }
 
 run().then(() => {
