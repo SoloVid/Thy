@@ -11,7 +11,7 @@ export function tryGenerateBlockTs(node: TreeNode, state: GeneratorState, fixtur
 }
 
 export function generateBlockTs(block: Block, state: GeneratorState, fixture: GeneratorFixture): GeneratedSnippets {
-    if (state.indentLevel === 0 && state.context === contextType.blockAllowingReturn) {
+    if (state.indentLevel === 0 && state.context === contextType.blockAllowingExport) {
         return generateBlockLinesTs(block, block.ideas, state, fixture)
     }
     
@@ -29,7 +29,7 @@ export function generateBlockTs(block: Block, state: GeneratorState, fixture: Ge
         }
     }
 
-    const blockBodyState = state.makeChild({ indentLevel: state.indentLevel + 1 })
+    const blockBodyState = state.makeChild({ context: contextType.blockAllowingReturn, indentLevel: state.indentLevel + 1 })
     const definition = fromComplicated(block, [
         "(", parameterSpecs, ") => {\n",
         generateBlockLinesTs(block, imperativeIdeas, blockBodyState, fixture),
@@ -59,18 +59,14 @@ function getParameterSpec(node: TreeNode): GeneratedSnippet | null {
 }
 
 export function generateBlockLinesTs(block: Block, ideas: Block["ideas"], state: GeneratorState, fixture: GeneratorFixture): GeneratedSnippets {
-    const childState = state.makeChild({
-        context: contextType.blockAllowingReturn
-    })
-
     const implementationLines = ideas.map(i => i.type === "blank-line" ? { text: "\n" } : [
-        genIndent(state.indentLevel), fixture.generate(i, childState), { text: "\n" }
+        genIndent(state.indentLevel), fixture.generate(i, state), { text: "\n" }
     ])
     const impliedLines: GeneratedSnippets = []
     // TODO: Get local variables stuff working again (probably from tree symbol table?)
-    if (childState.localVariables.length > 0) {
-        const impliedReturn = childState.localVariables.map(v => {
-            const ind = genIndent(childState.indentLevel + 1)
+    if (state.localVariables.length > 0) {
+        const impliedReturn = state.localVariables.map(v => {
+            const ind = genIndent(state.indentLevel + 1)
             const genT = fromToken(v.token, v.name)
             if (v.isConstant) {
                 return [ind, genT]

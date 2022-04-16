@@ -1,9 +1,9 @@
-import { tokenError } from "../../../compile-error";
-import { fromComplicated } from "../../generator";
-import type { GeneratorForGlobalParentSpec, GeneratorForGlobalSpec } from "../../generator-for-global";
-import { contextType } from "../../generator-state";
-import { autoTight, autoTightS } from "./helpers/auto-tight";
-import { makeLogicalFunctionGenerator, makeSequencedLogicalFunctionGenerator } from "./helpers/logical-function-generator";
+import { tokenError } from "../../../../compile-error";
+import { fromComplicated } from "../../../generator";
+import type { GeneratorForGlobalParentSpec, GeneratorForGlobalSpec } from "../../../generator-for-global";
+import { contextType } from "../../../generator-state";
+import { autoTight, autoTightS } from "../helpers/auto-tight";
+import { makeLogicalFunctionGenerator, makeSequencedLogicalFunctionGenerator } from "../helpers/logical-function-generator";
 
 const all = makeLogicalFunctionGenerator('all', '&&', 'true')
 const asc = makeSequencedLogicalFunctionGenerator('asc', '<', 'number', ' + 1')

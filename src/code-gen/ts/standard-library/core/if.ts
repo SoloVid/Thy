@@ -1,12 +1,12 @@
-import { tokenError } from "../../../compile-error";
-import type { Call } from "../../../tree/call";
-import { nodeError } from "../../../tree/tree-node";
-import { fromComplicated, fromToken, GeneratedSnippets, GeneratorFixture } from "../../generator";
-import type { GeneratorForGlobalSpec, SimpleCall } from "../../generator-for-global";
-import { ContextType, contextType, GeneratorState } from "../../generator-state";
-import { genIndent, makeIndent } from "../../indent-string";
-import { generateBlockLinesTs } from "../block/generate-block-ts";
-import { autoTightS } from "./helpers/auto-tight";
+import { tokenError } from "../../../../compile-error";
+import type { Call } from "../../../../tree/call";
+import { nodeError } from "../../../../tree/tree-node";
+import { fromComplicated, fromToken, GeneratedSnippets, GeneratorFixture } from "../../../generator";
+import type { GeneratorForGlobalSpec, SimpleCall } from "../../../generator-for-global";
+import { ContextType, contextType, GeneratorState } from "../../../generator-state";
+import { genIndent, makeIndent } from "../../../indent-string";
+import { generateBlockLinesTs } from "../../block/generate-block-ts";
+import { autoTightS } from "../helpers/auto-tight";
 
 export const ifGenerator: GeneratorForGlobalSpec = {
     name: "if",
@@ -71,7 +71,7 @@ function tryGenerateIfTs(node: SimpleCall, state: GeneratorState, fixture: Gener
                 return buildTernary()
             }
         } else {
-            if (state.context === contextType.blockAllowingReturn || !mightReturn) {
+            if (state.context === contextType.blockAllowingReturn || state.context === contextType.blockAllowingExport || !mightReturn) {
                 return buildIfStatement()
             }
         }
@@ -131,6 +131,7 @@ function tryGenerateIfTs(node: SimpleCall, state: GeneratorState, fixture: Gener
         const trueCaseNode = node.args[1]
         if (trueCaseNode.type === "block") {
             return generateBlockLinesTs(trueCaseNode, trueCaseNode.ideas, state.makeChild({
+                context: contextType.blockAllowingReturn,
                 indentLevel: state.indentLevel + 1
             }), fixture)
         } else {
@@ -150,6 +151,7 @@ function tryGenerateIfTs(node: SimpleCall, state: GeneratorState, fixture: Gener
         const elseCaseNode = node.args[3]
         if (elseCaseNode.type === "block") {
             return generateBlockLinesTs(elseCaseNode, elseCaseNode.ideas, state.makeChild({
+                context: contextType.blockAllowingReturn,
                 indentLevel: state.indentLevel + 1
             }), fixture)
         } else {

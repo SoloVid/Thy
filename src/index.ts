@@ -1,4 +1,5 @@
 import { tsGenerator } from "./code-gen/ts/generate-ts"
+import { standardLibraryCore } from "./code-gen/ts/standard-library/core"
 import { parse } from "./parser/parser"
 import { readProgram } from "./read-program"
 import { makeTokenizer } from "./tokenizer/tokenizer"
@@ -22,7 +23,7 @@ async function run() {
         const tree = parserOutput.top
         console.log(tree)
 
-        console.log(tsGenerator(tree))
+        console.log(tsGenerator(standardLibraryCore)(tree))
     } catch (e: unknown) {
         console.error(e)
     }

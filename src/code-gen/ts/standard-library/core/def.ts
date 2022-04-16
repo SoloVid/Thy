@@ -1,9 +1,9 @@
-import { tokenError } from "../../../compile-error";
-import { nodeError } from "../../../tree/tree-node";
-import { fromTokenRange } from "../../generator";
-import type { GeneratorForGlobalSpec } from "../../generator-for-global";
-import { generateAssignmentTs2 } from "../assignment/generate-assignment-ts";
-import { autoTightS } from "./helpers/auto-tight";
+import { tokenError } from "../../../../compile-error";
+import { nodeError } from "../../../../tree/tree-node";
+import { fromTokenRange } from "../../../generator";
+import type { GeneratorForGlobalSpec } from "../../../generator-for-global";
+import { generateAssignmentTs2 } from "../../assignment/generate-assignment-ts";
+import { autoTightS } from "../helpers/auto-tight";
 
 export const defGenerator: GeneratorForGlobalSpec = {
     name: "def",

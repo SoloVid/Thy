@@ -23,6 +23,10 @@ export interface GeneratorForGlobalParentSpec {
     children: readonly (GeneratorForGlobalSpec | GeneratorForGlobalParentSpec)[]
 }
 
+export function isLeaf(spec: GeneratorForGlobalSpec | GeneratorForGlobalParentSpec): spec is GeneratorForGlobalSpec {
+    return "generateValue" in spec
+}
+
 export function isParent(spec: GeneratorForGlobalSpec | GeneratorForGlobalParentSpec): spec is GeneratorForGlobalParentSpec {
     return "children" in spec
 }

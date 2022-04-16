@@ -6,7 +6,7 @@ import { Call } from "../tree/call";
 import { Identifier } from "../tree/identifier";
 import { LetCall } from "../tree/let-call";
 import { CodeGeneratorFunc, fromTokenRange, GeneratedSnippets } from "./generator";
-import { GeneratorForGlobalParentSpec, GeneratorForGlobalSpec, isParent } from "./generator-for-global";
+import { GeneratorForGlobalParentSpec, GeneratorForGlobalSpec, isLeaf, isParent } from "./generator-for-global";
 import { GeneratorState } from "./generator-state";
 
 export interface LibraryGeneratorCollection {
@@ -23,7 +23,8 @@ function makeSpecMap(specs: readonly (GeneratorForGlobalSpec | GeneratorForGloba
     for (const spec of specs) {
         if (isParent(spec)) {
             specMap.set(spec.name, makeSpecMap(spec.children, requiredMethod))
-        } else if (requiredMethod in spec) {
+        }
+        if (isLeaf(spec) && requiredMethod in spec) {
             specMap.set(spec.name, spec)
         }
     }
@@ -75,6 +76,43 @@ type GenerateObject = (hierarchy: SpecMap, state: GeneratorState) => string
 interface Options {
     fillOutIdentifierExpression: FillOutIdentifierExpression,
     generateObject: GenerateObject
+}
+
+export function aggregateLibrary(libraries: readonly LibraryGeneratorCollection[]): LibraryGeneratorCollection {
+    return {
+        valueGenerator(node, state, fixture) {
+            for (const lib of libraries) {
+                const output = lib.valueGenerator(node, state, fixture)
+                if (output) {
+                    return output
+                }
+            }
+        },
+        callGenerator(node, state, fixture) {
+            for (const lib of libraries) {
+                const output = lib.callGenerator(node, state, fixture)
+                if (output) {
+                    return output
+                }
+            }
+        },
+        assignmentGenerator(node, state, fixture) {
+            for (const lib of libraries) {
+                const output = lib.assignmentGenerator(node, state, fixture)
+                if (output) {
+                    return output
+                }
+            }
+        },
+        letCallGenerator(node, state, fixture) {
+            for (const lib of libraries) {
+                const output = lib.letCallGenerator(node, state, fixture)
+                if (output) {
+                    return output
+                }
+            }
+        },
+    }
 }
 
 export function makeLibraryGenerators(

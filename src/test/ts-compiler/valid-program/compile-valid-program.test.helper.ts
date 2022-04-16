@@ -1,12 +1,12 @@
 import fs from "fs/promises"
 import path from "path"
-import { tsCompiler } from "../../../code-gen/ts-compiler"
 import type { CompileError } from "../../../compile-error"
+import type { Compiler } from "../../../compiler"
 
-export async function compileAndVerifyOutput(libDir: string, inputFile: string, expectedOutputFile: string) {
+export async function compileAndVerifyOutput(compiler: Compiler, libDir: string, inputFile: string, expectedOutputFile: string) {
     const thySource = await readFile(libDir, inputFile)
     const tsSource = await readFile(libDir, expectedOutputFile)
-    const compileResult = await compileSource(thySource)
+    const compileResult = await compileSource(compiler, thySource)
     // console.log(compileResult.output);
     expect(compileResult.output).toBe(tsSource)
     expect(compileResult.errors).toEqual([])
@@ -31,8 +31,8 @@ export interface CompileResult {
     errors: readonly CompileError[]
 }
 
-async function compileSource(thySource: string): Promise<CompileResult> {
-    const compilerResult = tsCompiler.compile(thySource)
+async function compileSource(compiler: Compiler, thySource: string): Promise<CompileResult> {
+    const compilerResult = compiler.compile(thySource)
     return {
         output: compilerResult.output,
         errors: compilerResult.getAllErrors()

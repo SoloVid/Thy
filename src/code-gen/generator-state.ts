@@ -27,6 +27,10 @@ export const contextType = {
      * (including await and return) instead of just expressions.
      */
     blockAllowingReturn: "blockAllowingReturn",
+    /**
+     * Is it valid to export at this level?
+     */
+    blockAllowingExport: "blockAllowingExport",
 } as const
 
 export type ContextType = (typeof contextType)[keyof typeof contextType]

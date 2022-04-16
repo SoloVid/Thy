@@ -1,4 +1,3 @@
-import { tsCompiler } from "../code-gen/ts-compiler";
 import { Compiler } from "../compiler";
 import { asyncGlob } from "../utils/async-glob";
 import type { CompileOptions } from "./compile-options";
@@ -6,6 +5,7 @@ import type { CompileResults, FileCompileResults } from "./compile-results";
 import fs from "fs/promises"
 import path from "path"
 import { convertFromInternalError } from "./compile-error";
+import { tsNamespaceCompiler } from "../code-gen/ts-compiler";
 
 export async function compile(options: CompileOptions): Promise<CompileResults> {
     const compiler = pickCompiler(options)
@@ -32,7 +32,7 @@ export async function compile(options: CompileOptions): Promise<CompileResults> 
 function pickCompiler(options: CompileOptions): Compiler {
     switch (options.target) {
         case "ts-namespace":
-            return tsCompiler
+            return tsNamespaceCompiler
         default:
             throw new Error(`Unsupported target: ${options.target}`)
     }
