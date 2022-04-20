@@ -32,6 +32,7 @@ export function matchMultilineComment(state: TokenizerState): string | null {
     fullCommentRegex.lastIndex = state.offset
     const result = fullCommentRegex.exec(state.text)
     if (result === null) {
+        // TODO: May want to consume the rest of the input here and emit error about unclosed multiline comment.
         return null
     }
 

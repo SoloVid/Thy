@@ -14,7 +14,7 @@
 		"comments": {
 			"patterns": [
 				{
-					"begin": "^(\\s*)([A-Z]{3,}.*)$",
+					"begin": "^(\\s*)([A-Z]{3,})$",
 					"end": "^(\\1)(\\2)$",
 					"beginCaptures": {
 						"2": { "name": "comment.block.thy" }
