@@ -1,14 +1,11 @@
 import assert from "assert";
 import { tStartBlock, tTypeIdentifier, tValueIdentifier } from "../tokenizer/token-type";
-import type { Atom } from "../tree/atom";
-import type { Block } from "../tree/block";
-import type { Call } from "../tree/call";
-import type { Identifier } from "../tree/identifier";
+import type { Expression } from "../tree/expression";
 import { parseBlock } from "./parse-block";
-import { parseOstensibleIdentifier } from "./parse-identifier";
+import { parseNamedExpression } from "./parse-named-expression";
 import type { ParserState } from "./parser-state";
 
-export function parseArguable(state: ParserState): Atom | Block | Call | Identifier {
+export function parseArguable(state: ParserState): Expression {
     const nextToken = state.buffer.peekToken()
     assert(nextToken !== null)
     if (nextToken.type === tStartBlock) {
@@ -16,7 +13,7 @@ export function parseArguable(state: ParserState): Atom | Block | Call | Identif
     }
 
     if (nextToken.type === tTypeIdentifier || nextToken.type === tValueIdentifier) {
-        return parseOstensibleIdentifier(state)
+        return parseNamedExpression(state)
     }
 
     return {

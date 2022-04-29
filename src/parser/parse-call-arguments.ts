@@ -23,7 +23,9 @@ export function parseCallArgs(state: ParserState): Args {
     while (moreArguments) {
         const arg = parseArguable(state)
 
-        if (!typeArgumentsEnded && arg.type === 'identifier' && arg.target.type === tTypeIdentifier) {
+        const argLastToken = arg.type === 'atom' ? arg.token : arg.lastToken
+
+        if (!typeArgumentsEnded && (arg.type === 'atom' || arg.type === 'property-access') && argLastToken.type === tTypeIdentifier) {
             typeArgs.push(arg)
         } else {
             typeArgumentsEnded = true

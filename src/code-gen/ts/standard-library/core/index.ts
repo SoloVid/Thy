@@ -1,5 +1,5 @@
 import { makeLibraryGenerators } from "../../../library-generator";
-import { generateTsFromIdentifierRawTokens } from "../../generate-identifier-ts";
+import { generateTsFromIdentifierRawTokens } from "../../generate-property-access-ts";
 import { castGenerator } from "./cast";
 import { checkGenerator } from "./check";
 import { defGenerator } from "./def";

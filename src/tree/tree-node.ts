@@ -4,13 +4,13 @@ import type { Assignment } from './assignment'
 import type { Atom } from './atom'
 import type { BlankLine, Block } from './block'
 import type { Call } from './call'
-import type { Identifier } from './identifier'
 import type { NonCode } from './non-code'
 import type { TypeAssignment } from './type-assignment'
 import type { TypeCall } from './type-call'
 import type { LetCall } from './let-call'
+import type { PropertyAccess } from './property-access'
 
-export type TreeNode = Assignment | Atom | BlankLine | Block | Call | Identifier | NonCode | TypeAssignment | TypeCall | LetCall
+export type TreeNode = Assignment | Atom | BlankLine | Block | Call | NonCode | PropertyAccess | TypeAssignment | TypeCall | LetCall
 
 type ErrorableTreeNode = Exclude<TreeNode, BlankLine | NonCode>
 

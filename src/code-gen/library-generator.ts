@@ -1,16 +1,18 @@
 import assert from "assert";
-import { tValueIdentifier } from "../tokenizer/token-type";
-import { Assignment } from "../tree/assignment";
-import { Atom } from "../tree/atom";
-import { Call } from "../tree/call";
-import { Identifier } from "../tree/identifier";
-import { LetCall } from "../tree/let-call";
+import { Token } from "../tokenizer/token";
+import { tMemberAccessOperator, tValueIdentifier } from "../tokenizer/token-type";
+import type { PropertyAccess } from "../tree";
+import type { Assignment } from "../tree/assignment";
+import type { Atom } from "../tree/atom";
+import type { Call } from "../tree/call";
+import type { LetCall } from "../tree/let-call";
 import { CodeGeneratorFunc, fromTokenRange, GeneratedSnippets } from "./generator";
 import { GeneratorForGlobalParentSpec, GeneratorForGlobalSpec, isLeaf, isParent } from "./generator-for-global";
-import { GeneratorState } from "./generator-state";
+import type { GeneratorState } from "./generator-state";
 
 export interface LibraryGeneratorCollection {
-    valueGenerator: CodeGeneratorFunc<Identifier>
+    atomGenerator: CodeGeneratorFunc<Atom>
+    propertyAccessGenerator: CodeGeneratorFunc<PropertyAccess>
     callGenerator: CodeGeneratorFunc<Call>
     assignmentGenerator: CodeGeneratorFunc<Assignment>
     letCallGenerator: CodeGeneratorFunc<LetCall>
@@ -36,7 +38,8 @@ interface LookupResult {
     identifierPartsUsed: number
 }
 
-function lookupByName(specMap: SpecMap, identifier: Identifier<typeof tValueIdentifier>): null | LookupResult {
+function lookupByName(specMap: SpecMap, identifier: UnwrappedPropertyAccess): null | LookupResult {
+    const names = [identifier[0], ...(identifier.slice(1) as readonly PropertyPair[]).map(p => p[1].text)]
     let currentMap = specMap
     let scopesUsed = 0
     for (const scope of identifier.scopes) {
@@ -70,19 +73,27 @@ function lookupByName(specMap: SpecMap, identifier: Identifier<typeof tValueIden
     return null
 }
 
-type FillOutIdentifierExpression = (identifier: Identifier<typeof tValueIdentifier>, generated: GeneratedSnippets, partsUsed: number) => GeneratedSnippets
+type FillOutPropertyAccessExpression = (trailingTokens: Token[]) => GeneratedSnippets
 type GenerateObject = (hierarchy: SpecMap, state: GeneratorState) => string
 
 interface Options {
-    fillOutIdentifierExpression: FillOutIdentifierExpression,
+    fillOutPropertyAccessExpression: FillOutPropertyAccessExpression,
     generateObject: GenerateObject
 }
 
 export function aggregateLibrary(libraries: readonly LibraryGeneratorCollection[]): LibraryGeneratorCollection {
     return {
-        valueGenerator(node, state, fixture) {
+        atomGenerator(node, state, fixture) {
             for (const lib of libraries) {
-                const output = lib.valueGenerator(node, state, fixture)
+                const output = lib.atomGenerator(node, state, fixture)
+                if (output) {
+                    return output
+                }
+            }
+        },
+        propertyAccessGenerator(node, state, fixture) {
+            for (const lib of libraries) {
+                const output = lib.propertyAccessGenerator(node, state, fixture)
                 if (output) {
                     return output
                 }
@@ -117,7 +128,7 @@ export function aggregateLibrary(libraries: readonly LibraryGeneratorCollection[
 
 export function makeLibraryGenerators(
     specs: (GeneratorForGlobalSpec | GeneratorForGlobalParentSpec)[],
-    { fillOutIdentifierExpression, generateObject }: Options,
+    { fillOutPropertyAccessExpression, generateObject }: Options,
 ): LibraryGeneratorCollection {
     const valueSpecMap = makeSpecMap(specs, "generateValue")
     const callSpecMap = makeSpecMap(specs, "generateCall")
@@ -178,4 +189,24 @@ export function makeLibraryGenerators(
             return lookup.spec.generateLetCall(node as any, state, fixture)
         }
     }
+}
+
+type PropertyPair = readonly [Token<typeof tMemberAccessOperator>, Token]
+type UnwrappedPropertyAccess = readonly [Token, ...PropertyPair[]]
+
+function unwrapPropertyAccess(propertyAccess: PropertyAccess): UnwrappedPropertyAccess | undefined {
+    if (propertyAccess.base.type === "call") {
+        return
+    }
+    if (propertyAccess.base.type === "property-access") {
+        const baseUnwrapped = unwrapPropertyAccess(propertyAccess.base)
+        if (baseUnwrapped === undefined) {
+            return
+        }
+        return [
+            ...baseUnwrapped,
+            [propertyAccess.memberAccessOperatorToken, propertyAccess.property] as const
+        ] as const
+    }
+    return [propertyAccess.base.token, [propertyAccess.memberAccessOperatorToken, propertyAccess.property]]
 }

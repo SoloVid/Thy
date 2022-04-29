@@ -3,10 +3,13 @@ import type { TreeNode } from "../../../tree/tree-node";
 import { makeGenerator } from "../../generate-from-options";
 import { CodeGeneratorFunc, fromToken } from "../../generator";
 import { contextType } from "../../generator-state";
+import type { LibraryGeneratorCollection } from "../../library-generator";
 
-export const tryGenerateAtomTs = makeAtomTsGenerator([
-
-])
+export function atomGeneratorTs(standardLibrary: LibraryGeneratorCollection) {
+    return makeAtomTsGenerator([
+        standardLibrary.atomGenerator,
+    ])
+}
 
 export function makeAtomTsGenerator(specializations: CodeGeneratorFunc<Atom>[]): CodeGeneratorFunc<TreeNode> {
     return makeGenerator(node => {

@@ -4,12 +4,12 @@ import { fromToken, fromTokenRange, GeneratedSnippet, GeneratedSnippets, Generat
 import { contextType, GeneratorState, makeGeneratorState } from '../generator-state'
 import type { LibraryGeneratorCollection } from '../library-generator'
 import { assignmentGeneratorTs } from './assignment/generate-assignment-ts'
-import { tryGenerateAtomTs } from './atom/generate-atom-ts'
+import { atomGeneratorTs } from './atom/generate-atom-ts'
 import { tryGenerateBlockTs } from './block/generate-block-ts'
 import { callGeneratorTs } from './call/generate-call-ts'
 import { tryGenerateBlankLineTs } from './generate-blank-line-ts'
 import { tryGenerateCommentTs } from './generate-comment-ts'
-import { identifierGeneratorTs } from './generate-identifier-ts'
+import { propertyAccessGeneratorTs } from './generate-property-access-ts'
 import { tryGenerateTypeAssignmentTs } from './generate-type-assignment-ts'
 import { tryGenerateTypeCallTs } from './generate-type-call-ts'
 import { letCallGeneratorTs } from './let/generate-let-call-ts'
@@ -37,12 +37,12 @@ export const tsGenerator = (standardLibrary: LibraryGeneratorCollection) => (nod
             return { text: JSON.stringify(node) }
         }, [
             assignmentGeneratorTs(standardLibrary),
-            tryGenerateAtomTs,
+            atomGeneratorTs(standardLibrary),
             tryGenerateBlankLineTs,
             tryGenerateBlockTs,
             callGeneratorTs(standardLibrary),
             tryGenerateCommentTs,
-            identifierGeneratorTs(standardLibrary),
+            propertyAccessGeneratorTs(standardLibrary),
             tryGenerateTypeAssignmentTs,
             tryGenerateTypeCallTs,
             letCallGeneratorTs(standardLibrary),
