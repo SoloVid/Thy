@@ -1,4 +1,3 @@
-import { tokenError } from "../../../../compile-error";
 import { nodeError } from "../../../../tree/tree-node";
 import { fromComplicated, fromTokenRange } from "../../../generator";
 import { GeneratorForGlobalSpec } from "../../../generator-for-global";
@@ -11,13 +10,13 @@ export const castGenerator: GeneratorForGlobalSpec = {
     },
     generateCall(node, state, fixture) {
         if (node.typeArgs.length < 1) {
-            state.addError(tokenError(node.func.target, `cast requires 1 type argument`));
+            state.addError(nodeError(node.func, `cast requires 1 type argument`));
         }
         for (const arg of node.typeArgs.slice(1)) {
             state.addError(nodeError(arg, `cast cannot take more than 1 type argument`))
         }
         if (node.args.length < 1) {
-            state.addError(tokenError(node.func.target, `cast requires 1 argument`));
+            state.addError(nodeError(node.func, `cast requires 1 argument`));
             return fromTokenRange(node, 'null');
         }
         for (const arg of node.args.slice(1)) {

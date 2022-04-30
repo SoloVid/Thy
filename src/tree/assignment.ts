@@ -8,7 +8,7 @@ import type { TokenRange } from "./token-range";
 export interface Assignment extends TokenRange {
     type: "assignment"
     modifier: Token<typeof tExport | typeof tPrivate> | null
-    variable: Atom | PropertyAccess<typeof tValueIdentifier>
+    variable: Atom | PropertyAccess<Call, typeof tValueIdentifier>
     operator: Token<typeof tConstDeclAssign | typeof tVarDeclAssign | typeof tNoDeclAssign>
     call: Call
 }

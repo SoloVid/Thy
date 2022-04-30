@@ -39,6 +39,16 @@ export function fromTokenRange(range: TokenRange, text: string): MappedGenerated
     }
 }
 
+export function fromNode(node: TreeNode, text: string): MappedGeneratedSnippet | UnmappedGeneratedWhitespace {
+    if (node.type === "blank-line") {
+        return { text }
+    }
+    if (node.type === "atom" || node.type === 'non-code') {
+        return fromToken(node.token, text)
+    }
+    return fromTokenRange(node, text)
+}
+
 export function fromComplicated(range: TokenRange, parts: (GeneratedSnippets | string)[]): GeneratedSnippets {
     return parts.map(p => typeof p === "string" ? fromTokenRange(range, p) : p)
 }

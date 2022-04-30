@@ -1,9 +1,9 @@
 import { makeLibraryGenerators } from "../../../library-generator";
-import { generateTsFromIdentifierRawTokens } from "../../generate-property-access-ts";
+import { fillOutPropertyAccessExpression } from "../../generate-property-access-ts";
+import { generateObjectFromHierarchy } from "../helpers/generate-object";
 import { castGenerator } from "./cast";
 import { checkGenerator } from "./check";
 import { defGenerator } from "./def";
-import { generateObjectFromHierarchy } from "../helpers/generate-object";
 import { ifGenerator } from "./if";
 import { mathGenerator } from "./math";
 
@@ -17,10 +17,7 @@ export const standardLibraryCore = makeLibraryGenerators([
     ifGenerator,
     mathGenerator,
 ], {
-    fillOutIdentifierExpression(identifier, generated, partsUsed) {
-        const remainingRawTokens = identifier.rawTokens.slice(partsUsed * 2)
-        return [generated, generateTsFromIdentifierRawTokens(remainingRawTokens)]
-    },
+    fillOutPropertyAccessExpression: fillOutPropertyAccessExpression,
     generateObject: generateObjectFromHierarchy
 }
 )

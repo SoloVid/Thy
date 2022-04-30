@@ -1,4 +1,4 @@
-import { tokenError } from "../../../../compile-error";
+import { nodeError } from "../../../../tree";
 import { fromComplicated } from "../../../generator";
 import { GeneratorForGlobalSpec } from "../../../generator-for-global";
 import { contextType } from "../../../generator-state";
@@ -12,7 +12,7 @@ export function makeBinaryGenericFunctionGenerator(name: string, jsOperator: str
         },
         generateCall(node, state, fixture) {
             if (node.args.length < 2) {
-                state.addError(tokenError(node.func.target, `${name} requires two arguments`));
+                state.addError(nodeError(node.func, `${name} requires two arguments`));
                 return fromComplicated(node, ["false"]);
             }
             const childState = state.makeChild({ context: contextType.looseExpression });

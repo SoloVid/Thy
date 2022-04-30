@@ -1,6 +1,5 @@
-import { tokenError } from "../../../../compile-error";
 import { nodeError } from "../../../../tree/tree-node";
-import { fromComplicated, fromToken, GeneratedSnippets } from "../../../generator";
+import { fromComplicated, fromNode } from "../../../generator";
 import { GeneratorForGlobalSpec } from "../../../generator-for-global";
 import { contextType } from "../../../generator-state";
 import { autoTight, autoTightS } from "./auto-tight";
@@ -14,7 +13,7 @@ export function makeLogicalFunctionGenerator(name: string, jsOperator: string, d
         },
         generateCall(node, state, fixture) {
             if (node.args.length < 1) {
-                state.addError(tokenError(node.func.target, `${name} requires at least 1 argument`));
+                state.addError(nodeError(node.func, `${name} requires at least 1 argument`));
                 return fromComplicated(node, ["false"]);
             }
             for (const arg of node.args.slice(4)) {
@@ -26,7 +25,7 @@ export function makeLogicalFunctionGenerator(name: string, jsOperator: string, d
                 if (i === 0) {
                     return c
                 }
-                return [fromToken(node.func.target, ` ${jsOperator} `), c]
+                return [fromNode(node.func, ` ${jsOperator} `), c]
             })
             return fromComplicated(node, autoTight(state, separatedChildren));
         }
@@ -47,7 +46,7 @@ export function makeSequencedLogicalFunctionGenerator(name: string, jsOperator: 
         },
         generateCall(node, state, fixture) {
             if (node.args.length < 2) {
-                state.addError(tokenError(node.func.target, `${name} requires at least 2 arguments`));
+                state.addError(nodeError(node.func, `${name} requires at least 2 arguments`));
                 return fromComplicated(node, ["false"]);
             }
             for (const arg of node.args.slice(4)) {
@@ -67,7 +66,7 @@ export function makeSequencedLogicalFunctionGenerator(name: string, jsOperator: 
                 if (i === 0) {
                     return p
                 }
-                return [fromToken(node.func.target, ` && `), p]
+                return [fromNode(node.func, ` && `), p]
             })
             return fromComplicated(node, autoTight(state, separatedPairs));
         }

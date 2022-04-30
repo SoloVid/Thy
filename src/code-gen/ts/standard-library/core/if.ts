@@ -1,11 +1,10 @@
-import { tokenError } from "../../../../compile-error";
-import type { Call } from "../../../../tree/call";
 import { nodeError } from "../../../../tree/tree-node";
-import { fromComplicated, fromToken, GeneratedSnippets, GeneratorFixture } from "../../../generator";
+import { fromComplicated, GeneratedSnippets, GeneratorFixture } from "../../../generator";
 import type { GeneratorForGlobalSpec, SimpleCall } from "../../../generator-for-global";
 import { ContextType, contextType, GeneratorState } from "../../../generator-state";
 import { genIndent, makeIndent } from "../../../indent-string";
 import { generateBlockLinesTs } from "../../block/generate-block-ts";
+import { generateSimpleNamedExpressionTs } from "../../generate-simple-named-expression";
 import { autoTightS } from "../helpers/auto-tight";
 
 export const ifGenerator: GeneratorForGlobalSpec = {
@@ -31,16 +30,16 @@ ${space}}`)
 }
 
 function tryGenerateIfTs(node: SimpleCall, state: GeneratorState, fixture: GeneratorFixture): void | GeneratedSnippets {
-    const ifSnippet = fromToken(node.func.target, "if")
+    const ifSnippet = generateSimpleNamedExpressionTs(node.func, state, fixture)
 
     if (node.args.length < 2) {
-        state.addError(tokenError(node.func.target, "if requires at least two arguments: 1) condition and 2) callback"))
+        state.addError(nodeError(node.func, "if requires at least two arguments: 1) condition and 2) callback"))
     }
 
     const elseLiteral = node.args.length > 2 ? node.args[2] : null
 
     if (elseLiteral !== null) {
-        if (elseLiteral.type !== "identifier" || elseLiteral.scopes.length !== 0 || elseLiteral.target.text !== "else") {
+        if (elseLiteral.type !== "atom" || elseLiteral.token.text !== "else") {
             state.addError(nodeError(elseLiteral, `Expected "else"`))
         }
 

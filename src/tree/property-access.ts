@@ -7,9 +7,9 @@ import type { TokenRange } from "./token-range";
 
 type TypeOrValue = typeof tTypeIdentifier | typeof tValueIdentifier
 
-export interface PropertyAccess<T extends TypeOrValue = TypeOrValue> extends TokenRange {
+export interface PropertyAccess<CallPossibleAsBaseOrNever extends Call = Call, T extends TypeOrValue = TypeOrValue> extends TokenRange {
     type: "property-access"
-    base: Atom | Call | PropertyAccess<typeof tValueIdentifier>
+    base: Atom | Call | PropertyAccess<CallPossibleAsBaseOrNever, typeof tValueIdentifier>
     memberAccessOperatorToken: Token<typeof tMemberAccessOperator>
     property: Token<T>
 }

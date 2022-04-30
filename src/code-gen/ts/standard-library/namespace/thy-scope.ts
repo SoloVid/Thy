@@ -1,7 +1,7 @@
 import { tokenError } from "../../../../compile-error";
 import type { Call } from "../../../../tree/call";
 import { nodeError } from "../../../../tree/tree-node";
-import { fromComplicated, fromToken, fromTokenRange, GeneratedSnippets, GeneratorFixture } from "../../../generator";
+import { fromComplicated, fromNode, fromToken, fromTokenRange, GeneratedSnippets, GeneratorFixture } from "../../../generator";
 import type { GeneratorForGlobalSpec, SimpleCall } from "../../../generator-for-global";
 import { ContextType, contextType, GeneratorState } from "../../../generator-state";
 import { genIndent, makeIndent } from "../../../indent-string";
@@ -20,12 +20,12 @@ ${space}}`)
     },
     generateCall(node, state, fixture) {
         if (state.isExpressionContext()) {
-            state.addError(tokenError(node.func.target, "thy.scope must be called as an independent statement"))
-            return fromTokenRange(node.func, "undefined")
+            state.addError(nodeError(node.func, "thy.scope must be called as an independent statement"))
+            return fromNode(node.func, "undefined")
         }
 
         if (node.args.length < 2) {
-            state.addError(tokenError(node.func.target, "thy.scope requires 2 arguments"))
+            state.addError(nodeError(node.func, "thy.scope requires 2 arguments"))
             return fromComplicated(node, ["// bad scope"])
         }
 

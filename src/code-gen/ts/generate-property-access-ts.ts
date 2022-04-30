@@ -21,13 +21,13 @@ export function makePropertyAccessTsGenerator(specializations: CodeGeneratorFunc
     }, generatePropertyAccessTs, specializations)
 }
 
-function generatePropertyAccessTs(node: PropertyAccess, state: GeneratorState, fixture: GeneratorFixture): GeneratedSnippets {
+export function generatePropertyAccessTs(node: PropertyAccess, state: GeneratorState, fixture: GeneratorFixture): GeneratedSnippets {
     const baseGenerated = fixture.generate(node.base, state)
     const tailGenerated = fillOutPropertyAccessExpression([node.memberAccessOperatorToken, node.property])
     return [baseGenerated, tailGenerated]
 }
 
-export function fillOutPropertyAccessExpression(trailingTokens: Token[]): GeneratedSnippets {
+export function fillOutPropertyAccessExpression(trailingTokens: readonly Token[]): GeneratedSnippets {
     return trailingTokens.map(t => {
         if (t.type === tMemberAccessOperator) {
             return fromToken(t, ".")

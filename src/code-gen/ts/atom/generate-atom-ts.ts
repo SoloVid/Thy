@@ -1,8 +1,8 @@
 import type { Atom } from "../../../tree/atom";
 import type { TreeNode } from "../../../tree/tree-node";
 import { makeGenerator } from "../../generate-from-options";
-import { CodeGeneratorFunc, fromToken } from "../../generator";
-import { contextType } from "../../generator-state";
+import { CodeGeneratorFunc, fromToken, GeneratedSnippets } from "../../generator";
+import { contextType, GeneratorState } from "../../generator-state";
 import type { LibraryGeneratorCollection } from "../../library-generator";
 
 export function atomGeneratorTs(standardLibrary: LibraryGeneratorCollection) {
@@ -16,10 +16,12 @@ export function makeAtomTsGenerator(specializations: CodeGeneratorFunc<Atom>[]):
         if (node.type === "atom") {
             return node
         }
-    }, (atom, state) => {
-        if (state.context === contextType.looseExpression) {
-            return fromToken(atom.token, atom.token.text)
-        }
-        return fromToken(atom.token, `${atom.token.text} as const`)
-    }, specializations)
+    }, generateAtomTs, specializations)
+}
+
+export function generateAtomTs(atom: Atom, state: GeneratorState): GeneratedSnippets {
+    if (state.context === contextType.looseExpression) {
+        return fromToken(atom.token, atom.token.text)
+    }
+    return fromToken(atom.token, `${atom.token.text} as const`)
 }

@@ -1,7 +1,7 @@
 import assert from "assert";
 import { Token } from "../tokenizer/token";
 import { tMemberAccessOperator, tValueIdentifier } from "../tokenizer/token-type";
-import type { PropertyAccess } from "../tree";
+import type { PropertyAccess, TreeNode } from "../tree";
 import type { Assignment } from "../tree/assignment";
 import type { Atom } from "../tree/atom";
 import type { Call } from "../tree/call";
@@ -12,7 +12,7 @@ import type { GeneratorState } from "./generator-state";
 
 export interface LibraryGeneratorCollection {
     atomGenerator: CodeGeneratorFunc<Atom>
-    propertyAccessGenerator: CodeGeneratorFunc<PropertyAccess>
+    propertyAccessGenerator: CodeGeneratorFunc<PropertyAccess<never>>
     callGenerator: CodeGeneratorFunc<Call>
     assignmentGenerator: CodeGeneratorFunc<Assignment>
     letCallGenerator: CodeGeneratorFunc<LetCall>
@@ -35,45 +35,33 @@ function makeSpecMap(specs: readonly (GeneratorForGlobalSpec | GeneratorForGloba
 
 interface LookupResult {
     spec: GeneratorForGlobalSpec | SpecMap
-    identifierPartsUsed: number
+    unusedPropertyAccessTokens: readonly Token[]
 }
 
 function lookupByName(specMap: SpecMap, identifier: UnwrappedPropertyAccess): null | LookupResult {
-    const names = [identifier[0], ...(identifier.slice(1) as readonly PropertyPair[]).map(p => p[1].text)]
+    const names = [identifier[0].text, ...(identifier.slice(1) as readonly PropertyPair[]).map(p => p[1].text)]
     let currentMap = specMap
-    let scopesUsed = 0
-    for (const scope of identifier.scopes) {
-        scopesUsed++
-        if (scope.type !== 'atom') {
+    for (let i = 0; i < names.length; i++) {
+        const name = names[i]
+        // TODO: Is there a scenario here for just returning the `.something` on this group?
+        if (!currentMap.has(name)) {
             return null
         }
-        if (currentMap.has(scope.token.text)) {
-            const inward = currentMap.get(scope.token.text)
-            assert(inward)
-            if (inward instanceof Map) {
-                currentMap = inward
-            } else {
-                return {
-                    spec: inward,
-                    identifierPartsUsed: scopesUsed
-                }
-            }
+        const inward = currentMap.get(name)
+        assert(inward)
+        if (inward instanceof Map) {
+            currentMap = inward
         } else {
-            return null
-        }
-    }
-    if (currentMap.has(identifier.target.text)) {
-        const found = currentMap.get(identifier.target.text)
-        assert(found)
-        return {
-            spec: found,
-            identifierPartsUsed: scopesUsed + 1
+            return {
+                spec: inward,
+                unusedPropertyAccessTokens: identifier.slice(i + 1).flat()
+            }
         }
     }
     return null
 }
 
-type FillOutPropertyAccessExpression = (trailingTokens: Token[]) => GeneratedSnippets
+type FillOutPropertyAccessExpression = (trailingTokens: readonly Token[]) => GeneratedSnippets
 type GenerateObject = (hierarchy: SpecMap, state: GeneratorState) => string
 
 interface Options {
@@ -135,60 +123,71 @@ export function makeLibraryGenerators(
     const assignmentSpecMap = makeSpecMap(specs, "generateAssignment")
     const letCallSpecMap = makeSpecMap(specs, "generateLetCall")
 
+    function valueGenerator(node: Atom | PropertyAccess, state: GeneratorState) {
+        const lookup = tryLookupNamedNode(valueSpecMap, node)
+        if (lookup === null) {
+            return
+        }
+        const range = {
+            firstToken: node.type === 'atom' ? node.token : node.firstToken,
+            lastToken: node.type == 'atom' ? node.token : node.lastToken
+        }
+        let partGeneratedNow: GeneratedSnippets
+        if (lookup.spec instanceof Map) {
+            partGeneratedNow = fromTokenRange(range, generateObject(lookup.spec, state))
+        } else {
+            partGeneratedNow = fromTokenRange(range, lookup.spec.generateValue(state))
+        }
+        
+        if (lookup.unusedPropertyAccessTokens.length > 0) {
+            return fillOutPropertyAccessExpression(lookup.unusedPropertyAccessTokens)
+        } else {
+            return partGeneratedNow
+        }
+    }
+
     return {
-        valueGenerator(node, state) {
-            if (node.target.type !== tValueIdentifier) {
-                return
-            }
-            const valueIdentifier = node as Identifier<typeof tValueIdentifier>
-            const lookup = lookupByName(valueSpecMap, valueIdentifier)
-            if (lookup === null) {
-                return
-            }
-            let partGeneratedNow: GeneratedSnippets
-            if (lookup.spec instanceof Map) {
-                partGeneratedNow = fromTokenRange(node, generateObject(lookup.spec, state))
-            } else {
-                partGeneratedNow = fromTokenRange(node, lookup.spec.generateValue(state))
-            }
-            
-            if (lookup.identifierPartsUsed < node.scopes.length + 1) {
-                return fillOutIdentifierExpression(valueIdentifier, partGeneratedNow, lookup.identifierPartsUsed)
-            } else {
-                return partGeneratedNow
-            }
+        atomGenerator(node, state, fixture) {
+            return valueGenerator(node, state)
+        },
+        propertyAccessGenerator(node, state, fixture) {
+            return valueGenerator(node, state)
         },
         callGenerator(node, state, fixture) {
-            if (node.func.type !== "identifier") {
-                return
-            }
-            const lookup = lookupByName(callSpecMap, node.func)
+            const lookup = tryLookupNamedNode(callSpecMap, node)
             if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateCall === undefined) {
                 return
             }
             return lookup.spec.generateCall(node as any, state, fixture)
         },
         assignmentGenerator(node, state, fixture) {
-            if (node.call.func.type !== "identifier") {
-                return
-            }
-            const lookup = lookupByName(assignmentSpecMap, node.call.func)
+            const lookup = tryLookupNamedNode(assignmentSpecMap, node)
             if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateAssignment === undefined) {
                 return
             }
             return lookup.spec.generateAssignment(node as any, state, fixture)
         },
         letCallGenerator(node, state, fixture) {
-            if (node.call.func.type !== "identifier") {
-                return
-            }
-            const lookup = lookupByName(letCallSpecMap, node.call.func)
+            const lookup = tryLookupNamedNode(letCallSpecMap, node)
             if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateLetCall === undefined) {
                 return
             }
             return lookup.spec.generateLetCall(node as any, state, fixture)
         }
     }
+}
+
+function tryLookupNamedNode(specMap: SpecMap, node: TreeNode) {
+    if (node.type === "atom") {
+        return lookupByName(specMap, [node.token])
+    }
+    if (node.type === "property-access") {
+        const unwrapped = unwrapPropertyAccess(node)
+        if (unwrapped !== undefined) {
+            return lookupByName(specMap, unwrapped)
+        }
+    }
+    return null
 }
 
 type PropertyPair = readonly [Token<typeof tMemberAccessOperator>, Token]

@@ -6,20 +6,17 @@ import { contextType, GeneratorState } from "../../generator-state";
 
 export function makeControlFlowCallTsGenerator(keyword: string): CodeGeneratorFunc<Call> {
     return (node: Call, state: GeneratorState, fixture: GeneratorFixture): void | GeneratedSnippets => {
-        if (node.func.type !== "identifier") {
+        if (node.func.type !== "atom") {
             return
         }
-        if (node.func.target.text !== keyword) {
+        if (node.func.token.text !== keyword) {
             return
-        }
-        for (const scope of node.func.scopes) {
-            state.addError(nodeError(scope, `${keyword} cannot be scoped`))
         }
 
-        const keywordSnippet = fromToken(node.func.target, keyword)
+        const keywordSnippet = fromToken(node.func.token, keyword)
 
         if (node.args.length < 1) {
-            state.addError(tokenError(node.func.target, `${keyword} requires 1 argument`))
+            state.addError(tokenError(node.func.token, `${keyword} requires 1 argument`))
         }
 
         for (const arg of node.typeArgs) {
@@ -31,7 +28,7 @@ export function makeControlFlowCallTsGenerator(keyword: string): CodeGeneratorFu
         }
 
         const childState = state.makeChild({context: contextType.isolatedExpression})
-        const valueSnippet = node.args.length >= 1 ? fixture.generate(node.args[0], childState) : fromToken(node.func.target, 'undefined')
+        const valueSnippet = node.args.length >= 1 ? fixture.generate(node.args[0], childState) : fromToken(node.func.token, 'undefined')
 
         return fromComplicated(node, [keywordSnippet, " ", valueSnippet])
     }

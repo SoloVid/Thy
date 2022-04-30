@@ -22,7 +22,7 @@ ${space}}`)
         const variablePart = fixture.generate(node.variable, state)
 
         if (node.call.args.length === 0) {
-            state.addError(tokenError(node.call.func.target, "thy requires 1 argument"))
+            state.addError(nodeError(node.call.func, "thy requires 1 argument"))
             return fromComplicated(node, ["// import ", variablePart])
         }
 

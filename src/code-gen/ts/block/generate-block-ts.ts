@@ -44,18 +44,22 @@ export function generateBlockTs(block: Block, state: GeneratorState, fixture: Ge
 
 function getParameterSpec(node: TreeNode): GeneratedSnippet | null {
     // TODO: Also support `given` call without assignment (ignored parameter)
+    // TODO: Decide and implement support for non-constant assignments
     if (node.type !== "assignment") {
         return null
     }
-    if (node.call.func.type !== "identifier") {
+    if (node.call.func.type !== "atom") {
         return null
     }
-    if (node.call.func.target.text !== "given") {
+    if (node.call.func.token.text !== "given") {
+        return null
+    }
+    // TODO: Support property access here
+    if (node.variable.type !== "atom") {
         return null
     }
     // TODO: Add type information
-    // TODO: Validate unscoped
-    return fromToken(node.variable.target)
+    return fromToken(node.variable.token)
 }
 
 export function generateBlockLinesTs(block: Block, ideas: Block["ideas"], state: GeneratorState, fixture: GeneratorFixture): GeneratedSnippets {

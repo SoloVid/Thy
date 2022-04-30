@@ -1,4 +1,3 @@
-import { tokenError } from "../../../../compile-error";
 import { nodeError } from "../../../../tree/tree-node";
 import { fromTokenRange } from "../../../generator";
 import type { GeneratorForGlobalSpec } from "../../../generator-for-global";
@@ -12,7 +11,7 @@ export const defGenerator: GeneratorForGlobalSpec = {
     },
     generateAssignment(node, state, fixture) {
         if (node.call.args.length === 0) {
-            state.addError(tokenError(node.call.func.target, "def requires 1 argument"))
+            state.addError(nodeError(node.call.func, "def requires 1 argument"))
             return fromTokenRange(node, "undefined")
         }
     

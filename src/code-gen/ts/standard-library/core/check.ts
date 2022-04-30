@@ -1,4 +1,5 @@
 import { tokenError } from "../../../../compile-error";
+import { nodeError } from "../../../../tree";
 import { fromComplicated } from "../../../generator";
 import type { GeneratorForGlobalParentSpec, GeneratorForGlobalSpec } from "../../../generator-for-global";
 import { contextType } from "../../../generator-state";
@@ -16,7 +17,7 @@ const not: GeneratorForGlobalSpec = {
     },
     generateCall(node, state, fixture) {
         if (node.args.length !== 1) {
-            state.addError(tokenError(node.func.target, `not takes exactly 1 argument`));
+            state.addError(nodeError(node.func, `not takes exactly 1 argument`));
             return fromComplicated(node, ["false"]);
         }
         const childState = state.makeChild({ context: contextType.isolatedExpression });
