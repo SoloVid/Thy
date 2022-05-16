@@ -20,7 +20,8 @@ export function makeAtomTsGenerator(specializations: CodeGeneratorFunc<Atom>[]):
 }
 
 export function generateAtomTs(atom: Atom, state: GeneratorState): GeneratedSnippets {
-    if (state.context === contextType.looseExpression) {
+    const isLiteral = !/^[A-Za-z]/.test(atom.token.text)
+    if (state.context === contextType.looseExpression || !isLiteral) {
         return fromToken(atom.token, atom.token.text)
     }
     return fromToken(atom.token, `${atom.token.text} as const`)
