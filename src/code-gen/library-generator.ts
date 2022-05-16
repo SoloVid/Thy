@@ -154,21 +154,21 @@ export function makeLibraryGenerators(
             return valueGenerator(node, state)
         },
         callGenerator(node, state, fixture) {
-            const lookup = tryLookupNamedNode(callSpecMap, node)
+            const lookup = tryLookupNamedNode(callSpecMap, node.func)
             if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateCall === undefined) {
                 return
             }
             return lookup.spec.generateCall(node as any, state, fixture)
         },
         assignmentGenerator(node, state, fixture) {
-            const lookup = tryLookupNamedNode(assignmentSpecMap, node)
+            const lookup = tryLookupNamedNode(assignmentSpecMap, node.call.func)
             if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateAssignment === undefined) {
                 return
             }
             return lookup.spec.generateAssignment(node as any, state, fixture)
         },
         letCallGenerator(node, state, fixture) {
-            const lookup = tryLookupNamedNode(letCallSpecMap, node)
+            const lookup = tryLookupNamedNode(letCallSpecMap, node.call.func)
             if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateLetCall === undefined) {
                 return
             }
