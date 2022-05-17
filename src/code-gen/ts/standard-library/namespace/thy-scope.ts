@@ -48,7 +48,7 @@ ${space}}`)
 
         const shouldBeBlock = node.args[1]
         let generatedBody: GeneratedSnippets
-        const childState = state.makeChild({ indentLevel: state.indentLevel + 1, context: contextType.blockAllowingExport })
+        const childState = state.makeChild({ increaseIndent: true, context: contextType.blockAllowingExport })
         if (shouldBeBlock.type !== "block") {
             state.addError(nodeError(shouldBeBlock, `Scope body must be a block literal`))
             if (shouldBeBlock.type === "atom") {

@@ -1,3 +1,4 @@
+import assert from "assert"
 import type { CompileError } from "../compile-error"
 import type { Token } from "../tokenizer/token"
 
@@ -35,21 +36,32 @@ export const contextType = {
 
 export type ContextType = (typeof contextType)[keyof typeof contextType]
 
-interface GeneratorStatePublicAttributes {
-    context: ContextType
-    indentLevel: number
-    isTypeContext: boolean
+interface GeneratorStateOptions {
+    readonly context?: ContextType
+    readonly increaseIndent?: boolean
+    readonly isTypeContext?: boolean
+    readonly newImplicitArguments?: boolean
 }
 
-export interface GeneratorState extends GeneratorStatePublicAttributes {
+export interface ImplicitArgumentsState {
+    readonly variableName: string
+    readonly used: boolean
+    markImplicitArgumentUsed(): void
+}
+
+export interface GeneratorState {
+    readonly context: ContextType
+    readonly indentLevel: number
+    readonly isTypeContext: boolean
     /** Singleton(ish) array of errors encountered. */
-    errors: CompileError[]
-    localVariables: LocalVariable[]
-    parent: GeneratorState | null
+    readonly errors: CompileError[]
+    readonly localVariables: LocalVariable[]
+    readonly parent: GeneratorState | null
+    readonly implicitArguments: ImplicitArgumentsState | null
     addError(error: CompileError): void
     getUniqueVariableName(): string
     isExpressionContext(): boolean
-    makeChild(overrides?: Partial<GeneratorStatePublicAttributes>): GeneratorState
+    makeChild(options?: GeneratorStateOptions): GeneratorState
 }
 
 export interface LocalVariable {
@@ -58,28 +70,36 @@ export interface LocalVariable {
     isConstant: boolean
 }
 
-export function makeGeneratorState(parent?: GeneratorState, overrides: Partial<GeneratorStatePublicAttributes> = {}): GeneratorState {
+export function makeGeneratorState(parent?: GeneratorState, options: GeneratorStateOptions = {}): GeneratorState {
     let nextVar = 1
+    const getUniqueVariableName = parent?.getUniqueVariableName ?? (() => {
+        return `_${nextVar++}`
+    })
     const me = {
         errors: parent?.errors ?? [] as CompileError[],
-        indentLevel: parent?.indentLevel ?? 0,
-        isTypeContext: parent?.isTypeContext ?? false,
-        getUniqueVariableName: parent?.getUniqueVariableName ?? (() => {
-            return `_${nextVar++}`
-        }),
-        context: contextType.isolatedExpression as ContextType,
+        indentLevel: (options.increaseIndent && parent) ? parent.indentLevel + 1 : parent?.indentLevel ?? 0,
+        isTypeContext: options.isTypeContext !== undefined ? options.isTypeContext : parent?.isTypeContext ?? false,
+        getUniqueVariableName,
+        context: options.context !== undefined ? options.context : contextType.isolatedExpression as ContextType,
         localVariables: [],
         parent: parent ?? null,
+        implicitArguments: options.newImplicitArguments ? {
+            variableName: getUniqueVariableName(),
+            used: false,
+            markImplicitArgumentUsed() {
+                this.used = true
+                parent?.implicitArguments?.markImplicitArgumentUsed()
+            }
+        } : parent?.implicitArguments ?? null,
         addError(error: CompileError) {
             this.errors.push(error)
         },
         isExpressionContext() {
             return this.context === contextType.looseExpression || this.context === contextType.isolatedExpression
         },
-        makeChild(overrides: Partial<GeneratorStatePublicAttributes> = {}) {
-            return makeGeneratorState(me, overrides)
-        },
-        ...overrides
+        makeChild(options: GeneratorStateOptions = {}) {
+            return makeGeneratorState(me, options)
+        }
     }
     return me
 }

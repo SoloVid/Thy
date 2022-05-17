@@ -152,8 +152,10 @@ function parseLine(state: ParserState, nextToken: Token): Block['ideas'][number]
             symbolTable: state.context.symbolTable,
             token: state.buffer.consumeToken(),
         } as const
-        const separator = state.buffer.consumeToken()
-        assert(separator.type === tStatementTerminator)
+        const nextToken2 = state.buffer.peekToken()
+        if (nextToken2.type === tStatementTerminator) {
+            state.buffer.consumeToken()
+        }
         return idea
     } else if (nextToken.type === tStatementTerminator) {
         state.buffer.consumeToken()

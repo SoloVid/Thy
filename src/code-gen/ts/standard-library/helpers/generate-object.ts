@@ -6,7 +6,7 @@ type SpecMap = Map<string, GeneratorForGlobalSpec | SpecMap>
 
 export function generateObjectFromHierarchy(hierarchy: SpecMap, state: GeneratorState): string {
     const space = makeIndent(state.indentLevel)
-    const childState = state.makeChild({ indentLevel: state.indentLevel + 1 })
+    const childState = state.makeChild({ increaseIndent: true })
     const lines: string[] = []
     for (const [key, value] of hierarchy.entries()) {
         const valueLiteral = value instanceof Map ? generateObjectFromHierarchy(value, childState) : value.generateValue(state)

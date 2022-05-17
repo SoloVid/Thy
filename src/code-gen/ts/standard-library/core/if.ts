@@ -131,7 +131,7 @@ function tryGenerateIfTs(node: SimpleCall, state: GeneratorState, fixture: Gener
         if (trueCaseNode.type === "block") {
             return generateBlockLinesTs(trueCaseNode, trueCaseNode.ideas, state.makeChild({
                 context: contextType.blockAllowingReturn,
-                indentLevel: state.indentLevel + 1
+                increaseIndent: true
             }), fixture)
         } else {
             const basicParts = [
@@ -151,7 +151,7 @@ function tryGenerateIfTs(node: SimpleCall, state: GeneratorState, fixture: Gener
         if (elseCaseNode.type === "block") {
             return generateBlockLinesTs(elseCaseNode, elseCaseNode.ideas, state.makeChild({
                 context: contextType.blockAllowingReturn,
-                indentLevel: state.indentLevel + 1
+                increaseIndent: true
             }), fixture)
         } else {
             const basicParts = [

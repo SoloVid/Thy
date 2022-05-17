@@ -15,8 +15,7 @@ import { tryGenerateTypeCallTs } from './generate-type-call-ts'
 import { letCallGeneratorTs } from './let/generate-let-call-ts'
 
 export const tsGenerator = (standardLibrary: LibraryGeneratorCollection) => (node: TreeNode): GeneratorResult => {
-    const state = makeGeneratorState()
-    state.context = contextType.blockAllowingExport
+    const state = makeGeneratorState(undefined, { context: contextType.blockAllowingExport })
 
     function generateTs2(node: TreeNode, state: GeneratorState) {
         const fixture = {

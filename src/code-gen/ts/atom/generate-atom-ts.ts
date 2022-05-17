@@ -1,5 +1,5 @@
 import type { Atom } from "../../../tree/atom";
-import type { TreeNode } from "../../../tree/tree-node";
+import { nodeError, TreeNode } from "../../../tree/tree-node";
 import { makeGenerator } from "../../generate-from-options";
 import { CodeGeneratorFunc, fromToken, GeneratedSnippets } from "../../generator";
 import { contextType, GeneratorState } from "../../generator-state";
@@ -20,8 +20,19 @@ export function makeAtomTsGenerator(specializations: CodeGeneratorFunc<Atom>[]):
 }
 
 export function generateAtomTs(atom: Atom, state: GeneratorState): GeneratedSnippets {
-    const isLiteral = !/^[A-Za-z]/.test(atom.token.text)
-    if (state.context === contextType.looseExpression || !isLiteral) {
+    const isIdentifier = /^[A-Za-z]/.test(atom.token.text)
+    if (isIdentifier) {
+        if (atom.symbolTable.getSymbolInfo(atom.token.text) === null) {
+            if (!state.implicitArguments) {
+                state.addError(nodeError(atom, `${atom.token.text} is not defined locally and there is no target for implicit arguments in this scope`))
+            } else {
+                state.implicitArguments.markImplicitArgumentUsed()
+                return fromToken(atom.token, `${state.implicitArguments.variableName}.${atom.token.text}`)
+            }
+        }
+        return fromToken(atom.token, atom.token.text)
+    }
+    if (state.context === contextType.looseExpression) {
         return fromToken(atom.token, atom.token.text)
     }
     return fromToken(atom.token, `${atom.token.text} as const`)

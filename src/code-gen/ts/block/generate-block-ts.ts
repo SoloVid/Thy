@@ -29,10 +29,21 @@ export function generateBlockTs(block: Block, state: GeneratorState, fixture: Ge
         }
     }
 
-    const blockBodyState = state.makeChild({ context: contextType.blockAllowingReturn, indentLevel: state.indentLevel + 1 })
+    const blockBodyState = state.makeChild({ context: contextType.blockAllowingReturn, increaseIndent: true, newImplicitArguments: parameterSpecs.length === 0 })
+    let linesTs = generateBlockLinesTs(block, imperativeIdeas, blockBodyState, fixture)
+
+    if (parameterSpecs.length === 0 && blockBodyState.implicitArguments?.used) {
+        const n = blockBodyState.implicitArguments.variableName
+        const localName = n + "L"
+        parameterSpecs.push(fromTokenRange(block, localName))
+        const space = makeIndent(blockBodyState.indentLevel)
+        const parentObj = state.implicitArguments?.variableName ?? "{}"
+        linesTs = [fromTokenRange(block, `${space}const ${n} = {...${localName}, ...${parentObj}} as const\n`), linesTs]
+    }
+
     const definition = fromComplicated(block, [
         "(", parameterSpecs, ") => {\n",
-        generateBlockLinesTs(block, imperativeIdeas, blockBodyState, fixture),
+        linesTs,
         makeIndent(state.indentLevel), "}"
     ])
 
