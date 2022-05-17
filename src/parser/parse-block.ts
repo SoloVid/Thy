@@ -149,7 +149,8 @@ function parseLine(state: ParserState, nextToken: Token): Block['ideas'][number]
     if (nextToken.type === tComment) {
         const idea = {
             type: "non-code",
-            token: state.buffer.consumeToken()
+            symbolTable: state.context.symbolTable,
+            token: state.buffer.consumeToken(),
         } as const
         const separator = state.buffer.consumeToken()
         assert(separator.type === tStatementTerminator)
@@ -157,7 +158,8 @@ function parseLine(state: ParserState, nextToken: Token): Block['ideas'][number]
     } else if (nextToken.type === tStatementTerminator) {
         state.buffer.consumeToken()
         return {
-            type: "blank-line"
+            type: "blank-line",
+            symbolTable: state.context.symbolTable,
         }
     } else if ([tExport, tPrivate].includes(nextToken.type)) {
         const afterToken = state.buffer.peekToken(1)

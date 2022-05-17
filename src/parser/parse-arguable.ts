@@ -18,6 +18,7 @@ export function parseArguable(state: ParserState): Expression {
 
     return {
         type: "atom",
+        symbolTable: state.context.symbolTable,
         token: state.buffer.consumeToken()
     }
 }

@@ -10,6 +10,7 @@ export function parseLetCall(state: ParserState): LetCall {
     const call = parseCall(state)
     return {
         type: "let-call",
+        symbolTable: state.context.symbolTable,
         letToken: letToken,
         call,
         firstToken: letToken,

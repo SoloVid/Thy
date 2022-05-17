@@ -9,6 +9,7 @@ export function parseTypeCall(state: ParserState): TypeCall {
     const vanillaCall = parseCall(state)
     return {
         type: "type-call" as const,
+        symbolTable: state.context.symbolTable,
         func: vanillaCall.func,
         args: [...vanillaCall.typeArgs, ...vanillaCall.args],
         firstToken: vanillaCall.firstToken,

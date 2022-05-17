@@ -53,7 +53,7 @@ function parseNamedExpressionVanilla(state: ParserState): NamedExpression {
     }
 
     return {
-        atoms: significantTokens.map(t => ({ type: "atom", token: t })),
+        atoms: significantTokens.map(t => ({ type: "atom", symbolTable: state.context.symbolTable, token: t })),
         memberAccessOperatorTokens: memberAccessOperatorTokens,
         rawTokens: rawTokens,
         firstToken: firstToken,
@@ -74,10 +74,10 @@ function translateThat(state: ParserState, node: NamedExpression): PossibleRetur
         const thatCall = state.context.takeThat(thatToken)
         if (thatCall === thatNotFound) {
             state.addError(tokenError(thatToken, `No preceding call is eligible to satisfy that`))
-            return { type: 'atom', token: thatToken }
+            return { type: 'atom', symbolTable: state.context.symbolTable, token: thatToken }
         } else if (thatCall === thatAlreadyUsed) {
             state.addError(tokenError(thatToken, `that already used`))
-            return { type: 'atom', token: thatToken }
+            return { type: 'atom', symbolTable: state.context.symbolTable, token: thatToken }
         } else {
             return thatCall
         }
@@ -87,10 +87,10 @@ function translateThat(state: ParserState, node: NamedExpression): PossibleRetur
         const beforeThatCall = state.context.takeBeforeThat(beforeThatToken)
         if (beforeThatCall === thatNotFound) {
             state.addError(tokenError(beforeThatToken, `No preceding call is eligible to satisfy beforeThat`))
-            return { type: 'atom', token: beforeThatToken }
+            return { type: 'atom', symbolTable: state.context.symbolTable, token: beforeThatToken }
         } else if (beforeThatCall === thatAlreadyUsed) {
             state.addError(tokenError(beforeThatToken, `beforeThat already used`))
-            return { type: 'atom', token: beforeThatToken }
+            return { type: 'atom', symbolTable: state.context.symbolTable, token: beforeThatToken }
         } else {
             return beforeThatCall
         }
@@ -118,6 +118,7 @@ function translateThat(state: ParserState, node: NamedExpression): PossibleRetur
     return justTrailingAtoms.reduce((output, part, i) => {
         const propertyAccess: PropertyAccess = {
             type: "property-access",
+            symbolTable: state.context.symbolTable,
             base: output,
             memberAccessOperatorToken: part[0],
             property: part[1].token,
