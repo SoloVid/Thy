@@ -159,10 +159,7 @@ function parseLine(state: ParserState, nextToken: Token): Block['ideas'][number]
         return idea
     } else if (nextToken.type === tStatementTerminator) {
         state.buffer.consumeToken()
-        return {
-            type: "blank-line",
-            symbolTable: state.context.symbolTable,
-        }
+        return { type: "blank-line" }
     } else if ([tExport, tPrivate].includes(nextToken.type)) {
         const afterToken = state.buffer.peekToken(1)
         if (afterToken.type === tType) {

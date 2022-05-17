@@ -118,7 +118,6 @@ function translateThat(state: ParserState, node: NamedExpression): PossibleRetur
     return justTrailingAtoms.reduce((output, part, i) => {
         const propertyAccess: PropertyAccess = {
             type: "property-access",
-            symbolTable: state.context.symbolTable,
             base: output,
             memberAccessOperatorToken: part[0],
             property: part[1].token,

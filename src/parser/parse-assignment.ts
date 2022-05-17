@@ -47,7 +47,6 @@ export function parseAssignment(state: ParserState): Assignment {
     const call = parseCall(state)
     return {
         type: "assignment",
-        symbolTable: state.context.symbolTable,
         modifier,
         variable,
         operator,

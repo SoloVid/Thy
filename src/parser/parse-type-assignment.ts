@@ -28,7 +28,6 @@ export function parseTypeAssignment(state: ParserState): TypeAssignment {
     const isTypeCall = accessToken === null ? false : accessToken.type === tTypeIdentifier
     const call = !isTypeCall ? vanillaCall : {
         type: "type-call" as const,
-        symbolTable: state.context.symbolTable,
         func: vanillaCall.func,
         args: [...vanillaCall.typeArgs, ...vanillaCall.args],
         firstToken: vanillaCall.firstToken,
@@ -37,7 +36,6 @@ export function parseTypeAssignment(state: ParserState): TypeAssignment {
 
     return {
         type: "type-assignment",
-        symbolTable: state.context.symbolTable,
         modifier,
         typeToken,
         variable,

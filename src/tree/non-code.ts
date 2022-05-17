@@ -1,7 +1,6 @@
 import type { Token } from "../tokenizer/token";
-import type { BaseTreeNode } from "./base-tree-node";
 
-export interface NonCode extends BaseTreeNode {
+export interface NonCode {
     type: "non-code"
     token: Token
 }

@@ -34,7 +34,6 @@ export function parseCall(state: ParserState): Call {
 
     return {
         type: "call",
-        symbolTable: state.context.symbolTable,
         func,
         typeArgs: args.typeArgs,
         args: args.args,
