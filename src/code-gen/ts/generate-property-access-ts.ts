@@ -1,4 +1,4 @@
-import { Token } from "../../tokenizer/token";
+import type { Token } from "../../tokenizer/token";
 import { tMemberAccessOperator } from "../../tokenizer/token-type";
 import type { PropertyAccess } from "../../tree";
 import type { TreeNode } from "../../tree/tree-node";

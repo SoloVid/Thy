@@ -1,4 +1,4 @@
-import { tValueIdentifier } from "../tokenizer/token-type"
+import type { tValueIdentifier } from "../tokenizer/token-type"
 import type { Atom, PropertyAccess } from "../tree"
 import type { Assignment } from "../tree/assignment"
 import type { Call } from "../tree/call"

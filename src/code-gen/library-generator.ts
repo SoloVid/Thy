@@ -1,6 +1,6 @@
 import assert from "assert";
-import { Token } from "../tokenizer/token";
-import { tMemberAccessOperator, tValueIdentifier } from "../tokenizer/token-type";
+import type { Token } from "../tokenizer/token";
+import type { tMemberAccessOperator, tValueIdentifier } from "../tokenizer/token-type";
 import type { PropertyAccess, TreeNode } from "../tree";
 import type { Assignment } from "../tree/assignment";
 import type { Atom } from "../tree/atom";

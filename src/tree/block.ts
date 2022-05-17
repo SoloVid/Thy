@@ -1,11 +1,11 @@
 import type { Assignment } from "./assignment";
 import type { Call } from "./call";
 import type { NonCode } from "./non-code";
-import { SymbolTable } from "./symbol-table";
+import type { SymbolTable } from "./symbol-table";
 import type { TokenRange } from "./token-range";
-import { TypeAssignment } from "./type-assignment";
-import { TypeCall } from "./type-call";
-import { LetCall } from "./let-call";
+import type { TypeAssignment } from "./type-assignment";
+import type { TypeCall } from "./type-call";
+import type { LetCall } from "./let-call";
 
 export const returnStyle = {
     implicitExport: "implicitExport",

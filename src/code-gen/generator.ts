@@ -1,6 +1,6 @@
-import { CompileError } from "../compile-error";
-import { Token } from "../tokenizer/token";
-import { TokenRange } from "../tree/token-range";
+import type { CompileError } from "../compile-error";
+import type { Token } from "../tokenizer/token";
+import type { TokenRange } from "../tree/token-range";
 import type { TreeNode } from "../tree/tree-node";
 import type { GeneratorState } from "./generator-state";
 

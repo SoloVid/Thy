@@ -1,6 +1,6 @@
 import { nodeError } from "../../../../tree/tree-node";
 import { fromComplicated, fromNode } from "../../../generator";
-import { GeneratorForGlobalSpec } from "../../../generator-for-global";
+import type { GeneratorForGlobalSpec } from "../../../generator-for-global";
 import { contextType } from "../../../generator-state";
 import { autoTight, autoTightS } from "./auto-tight";
 

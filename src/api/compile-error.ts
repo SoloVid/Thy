@@ -1,5 +1,5 @@
-import { SourcePosition } from "../tokenizer/token"
-import { CompileError as InternalError } from "../compile-error"
+import type { SourcePosition } from "../tokenizer/token"
+import type { CompileError as InternalError } from "../compile-error"
 import { codeFrameColumns, SourceLocation as CodeFrameSourceLocation } from "@babel/code-frame"
 
 export interface CompileError {

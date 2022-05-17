@@ -4,7 +4,7 @@ import { makeGenerator } from "../../generate-from-options";
 import { CodeGeneratorFunc, fromComplicated, GeneratedSnippets, GeneratorFixture } from "../../generator";
 import { contextType, GeneratorState } from "../../generator-state";
 import { makeIndent } from "../../indent-string";
-import { LibraryGeneratorCollection } from "../../library-generator";
+import type { LibraryGeneratorCollection } from "../../library-generator";
 
 export function letCallGeneratorTs(standardLibrary: LibraryGeneratorCollection) {
     return makeLetTsGenerator([

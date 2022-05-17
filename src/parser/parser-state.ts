@@ -1,5 +1,5 @@
 import type { CompileError } from "../compile-error";
-import { Token } from "../tokenizer/token";
+import type { Token } from "../tokenizer/token";
 import type { Call } from "../tree/call";
 import type { SymbolTable } from "../tree/symbol-table";
 import type { TokenBuffer } from "./token-buffer";

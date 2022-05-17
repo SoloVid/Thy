@@ -1,6 +1,6 @@
 import assert from "assert";
 import { tComment } from "../../tokenizer/token-type";
-import { NonCode } from "../../tree/non-code";
+import type { NonCode } from "../../tree/non-code";
 import type { TreeNode } from "../../tree/tree-node";
 import { fromToken, fromTokenRange, GeneratedSnippets } from "../generator";
 import type { GeneratorState } from "../generator-state";

@@ -1,4 +1,4 @@
-import { UnmappedGeneratedWhitespace } from "./generator"
+import type { UnmappedGeneratedWhitespace } from "./generator"
 
 const indentSize = 2
 
