@@ -140,7 +140,7 @@ export function makeLibraryGenerators(
         }
         
         if (lookup.unusedPropertyAccessTokens.length > 0) {
-            return fillOutPropertyAccessExpression(lookup.unusedPropertyAccessTokens)
+            return [partGeneratedNow, fillOutPropertyAccessExpression(lookup.unusedPropertyAccessTokens)]
         } else {
             return partGeneratedNow
         }
