@@ -4,6 +4,7 @@ import { generateObjectFromHierarchy } from "../helpers/generate-object";
 import { castGenerator } from "./cast";
 import { checkGenerator } from "./check";
 import { defGenerator } from "./def";
+import { catchGenerator, consoleGenerator, elseGenerator, falseGenerator, finallyGenerator, nullGenerator, trueGenerator } from "./globals";
 import { ifGenerator } from "./if";
 import { mathGenerator } from "./math";
 
@@ -16,6 +17,15 @@ export const standardLibraryCore = makeLibraryGenerators([
     defGenerator,
     ifGenerator,
     mathGenerator,
+
+    consoleGenerator,
+    falseGenerator,
+    nullGenerator,
+    trueGenerator,
+
+    catchGenerator,
+    elseGenerator,
+    finallyGenerator,
 ], {
     fillOutPropertyAccessExpression: fillOutPropertyAccessExpression,
     generateObject: generateObjectFromHierarchy
