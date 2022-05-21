@@ -1,10 +1,9 @@
 import { nodeError } from "../../../../tree/tree-node";
-import { fromComplicated, GeneratedSnippets, GeneratorFixture } from "../../../generator";
+import { fromComplicated, fromNode, GeneratedSnippets, GeneratorFixture } from "../../../generator";
 import type { GeneratorForGlobalSpec, SimpleCall } from "../../../generator-for-global";
 import { ContextType, contextType, GeneratorState } from "../../../generator-state";
 import { genIndent, makeIndent } from "../../../indent-string";
 import { generateBlockLinesTs } from "../../block/generate-block-ts";
-import { generateSimpleNamedExpressionTs } from "../../generate-simple-named-expression";
 import { autoTightS } from "../helpers/auto-tight";
 
 export const ifGenerator: GeneratorForGlobalSpec = {
@@ -30,7 +29,7 @@ ${space}}`)
 }
 
 function tryGenerateIfTs(node: SimpleCall, state: GeneratorState, fixture: GeneratorFixture): void | GeneratedSnippets {
-    const ifSnippet = generateSimpleNamedExpressionTs(node.func, state, fixture)
+    const ifSnippet = fromNode(node.func, "if")
 
     if (node.args.length < 2) {
         state.addError(nodeError(node.func, "if requires at least two arguments: 1) condition and 2) callback"))
