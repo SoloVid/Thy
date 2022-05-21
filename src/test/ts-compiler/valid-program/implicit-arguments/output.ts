@@ -2,32 +2,32 @@ const foo = (exercise: (args: { bar: (msg: string) => void }) => void) => {
   exercise({ bar: console.log })
 }
 
-foo((_1) => {
-  const _2 = {..._1} as const
-  foo((_3) => {
-    const _4 = {..._3, ..._2} as const
+foo((_2L) => {
+  const _2 = {..._2L, ...{}} as const
+  foo((_3L) => {
+    const _3 = {..._3L, ..._2} as const
     if (true) {
-      foo((_5) => {
-        const _6 = {..._5, ..._4} as const
-        foo((_7) => {
-          const _8 = {..._7, ..._6} as const
-          _8.bar("himom")
+      foo((_4L) => {
+        const _4 = {..._4L, ..._3} as const
+        foo((_5L) => {
+          const _5 = {..._5L, ..._4} as const
+          _5.bar("himom" as const)
         })
       })
       foo(() => {
-        console.log("himom")
+        console.log("himom" as const)
       })
     }
   })
 })
 
-foo((_9) => {
-  const _10 = {..._9} as const
-  foo((_11) => {
-    const _12 = {..._11, ..._10} as const
-    _12.bar("himom")
+foo((_7L) => {
+  const _7 = {..._7L, ...{}} as const
+  foo((_8L) => {
+    const _8 = {..._8L, ..._7} as const
+    _8.bar("himom" as const)
     foo(() => {
-      console.log("himom")
+      console.log("himom" as const)
     })
   })
 })
