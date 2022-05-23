@@ -41,7 +41,8 @@
 						"2": {
 							"name": "meta.line.content.thy",
 							"patterns": [
-								{ "include": "#type-definitions" },
+								{ "include": "#type-assignments" },
+								{ "include": "#type-call-statements" },
 								{ "include": "#assignments" },
 								{ "include": "#lets" },
 								{ "include": "#call-continuations" },
@@ -67,42 +68,30 @@
 				}
 			]
 		},
-		"type-definitions": {
+		"type-assignments": {
 			"patterns": [
 				{
-					"match": "\\b(type)\\b( .*)?",
+					"name": "meta.type-assignment.thy",
+					"match": "\\b(?:(export) +)?(?:(private) +)?(?:(type) +)([A-Z][^ ]*) +(is)( +.*)?$",
+					"captures": {
+						"1": {"name": "keyword.control.export.thy"},
+						"2": {"name": "storage.modifier.private.thy"},
+						"3": {"name":"storage.type.type.thy"},
+						"4": {"patterns": [{"include": "#type-identifiers"}]},
+						"5": {"name": "keyword.operator.thy"},
+						"6": {"patterns": [{"include": "#type-calls"}]}
+					}
+				}
+			]
+		},
+		"type-call-statements": {
+			"patterns": [
+				{
+					"name": "meta.type-call-statement.thy",
+					"match": "\\b(type)\\b( +.*)?",
 					"captures": {
 						"1": {"name":"storage.type.type.thy"},
-						"2": {
-							"patterns": [
-								{
-									"match": "\\b(return)\\b(.*)",
-									"captures": {
-										"1": {"name":"storage.type.thy"},
-										"2": {
-											"patterns": [
-												{"include": "#value-identifiers"},
-												{"include": "#type-identifiers"}
-											]
-										}
-									}
-								},
-								{
-									"match": "([^ ]+) +(is) +(.+)$",
-									"captures": {
-										"1": {"patterns": [{"include": "#type-identifiers"}]},
-										"2": {"name": "keyword.operator.assignment.thy"},
-										"3": {
-											"patterns": [
-												{"include": "#value-identifiers"},
-												{"include": "#type-identifiers"}
-											]
-										}
-									}
-								},
-								{"include": "#type-identifiers"}
-							]
-						}
+						"2": {"patterns": [{"include": "#type-calls"}]}
 					}
 				}
 			]
@@ -111,7 +100,7 @@
 			"patterns": [
 				{
 					"name": "meta.let.thy",
-					"match": "(let|let) (.+)$",
+					"match": "(let) (.+)$",
 					"captures": {
 						"1": {"name": "keyword.control.let.thy"},
 						"2": {
@@ -151,6 +140,46 @@
 												{
 													"name": "entity.name.function.thy",
 													"match": "\\b[a-z].*\\b"
+												},
+												{
+													"name": "invalid.illegal.thy",
+													"match": "\\b.+\\b"
+												}
+											]
+										}
+									}
+								}
+							]
+						},
+						"2": {
+							"name": "meta.arguments.thy",
+							"patterns": [
+								{"include": "#type-identifiers"},
+								{"include": "#values"}
+							]
+						}
+					}
+				}
+			]
+		},
+		"type-calls": {
+			"patterns": [
+				{
+					"name": "meta.type-call.thy",
+					"match": "([^ ]+)( .*)?$",
+					"captures": {
+						"1": {
+							"patterns": [
+								{"include": "#special-functions"},
+								{
+									"match": "(?:(.+?)\\.)?(\\b[^. ]+\\b(?!\\.))?",
+									"captures": {
+										"1": {"patterns": [{"include": "#values"}]},
+										"2": {
+											"patterns": [
+												{
+													"name": "entity.name.function.thy",
+													"match": "\\b[a-zA-Z].*\\b"
 												},
 												{
 													"name": "invalid.illegal.thy",
