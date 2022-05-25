@@ -6,4 +6,4 @@ import type { PropertyAccess } from "./property-access";
 
 export type Expression = Atom | Block | Call | PropertyAccess<Call, typeof tValueIdentifier>;
 
-export type TypeExpression = Atom | Block | Call | PropertyAccess<Call, typeof tTypeIdentifier>;
+export type TypeExpression = Atom<typeof tTypeIdentifier> | PropertyAccess<Call, typeof tTypeIdentifier>;

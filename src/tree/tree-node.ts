@@ -12,7 +12,7 @@ import type { PropertyAccess } from './property-access'
 
 export type TreeNode = Assignment | Atom | BlankLine | Block | Call | NonCode | PropertyAccess | TypeAssignment | TypeCall | LetCall
 
-type ErrorableTreeNode = Exclude<TreeNode, BlankLine | NonCode>
+export type ErrorableTreeNode = Exclude<TreeNode, BlankLine | NonCode>
 
 export function nodeError(node: ErrorableTreeNode, message: string): CompileError {
     if (node.type === "atom") {

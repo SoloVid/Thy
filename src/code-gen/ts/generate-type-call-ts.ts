@@ -1,4 +1,4 @@
-import type { TreeNode } from "../../tree/tree-node";
+import { nodeError, TreeNode } from "../../tree/tree-node";
 import type { TypeCall } from "../../tree/type-call";
 import { fromTokenRange, GeneratedSnippets } from "../generator";
 import type { GeneratorState } from "../generator-state";
@@ -10,6 +10,6 @@ export function tryGenerateTypeCallTs(node: TreeNode, state: GeneratorState): vo
 }
 
 export function generateTypeCallTs(tc: TypeCall, state: GeneratorState): GeneratedSnippets {
-    // TODO: Generate legit type call.
-    return fromTokenRange(tc, "<type call>")
+    state.addError(nodeError(tc, "Unrecognized type call"))
+    return fromTokenRange(tc, "void \"invalid type call\"")
 }

@@ -19,7 +19,8 @@ export const tsGenerator = (standardLibrary: LibraryGeneratorCollection) => (nod
 
     function generateTs2(node: TreeNode, state: GeneratorState) {
         const fixture = {
-            generate: generateTs2
+            generate: generateTs2,
+            standardLibrary: standardLibrary,
         }
         return generateTs(node, state, fixture) as GeneratedSnippets
     }

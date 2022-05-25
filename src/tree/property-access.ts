@@ -2,6 +2,7 @@ import type { Token } from "../tokenizer/token";
 import type { tMemberAccessOperator, tTypeIdentifier, tValueIdentifier } from "../tokenizer/token-type";
 import type { Atom } from "./atom";
 import type { Call } from "./call";
+import type { Expression } from "./expression";
 import type { TokenRange } from "./token-range";
 
 type TypeOrValue = typeof tTypeIdentifier | typeof tValueIdentifier
@@ -30,4 +31,14 @@ export function getEndOfPropertyAccess(propertyAccess: Atom | Call | PropertyAcc
         return propertyAccess.property
     }
     return propertyAccess.token
+}
+
+export function getEndOfPropertyAccess2(expression: Expression): Token | null {
+    if (expression.type === 'property-access') {
+        return expression.property
+    }
+    if (expression.type === 'atom') {
+        return expression.token
+    }
+    return null
 }

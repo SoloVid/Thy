@@ -1,6 +1,6 @@
 import { tokenError } from "../compile-error";
 import { tConstDeclAssign, tExport, tPrivate, tTypeIdentifier } from "../tokenizer/token-type";
-import { getEndOfPropertyAccess } from "../tree/property-access";
+import { getEndOfPropertyAccess2 } from "../tree/property-access";
 import type { TypeAssignment } from "../tree/type-assignment";
 import { parseCall } from "./parse-call";
 import type { ParserState } from "./parser-state";
@@ -24,7 +24,7 @@ export function parseTypeAssignment(state: ParserState): TypeAssignment {
     // TODO: This is a bit of abusing parseCall().
     // I think sharing the code is a good idea, but I think we have some wrong semantics going on.
     const vanillaCall = parseCall(state)
-    const accessToken = getEndOfPropertyAccess(vanillaCall)
+    const accessToken = getEndOfPropertyAccess2(vanillaCall.func)
     const isTypeCall = accessToken === null ? false : accessToken.type === tTypeIdentifier
     const call = !isTypeCall ? vanillaCall : {
         type: "type-call" as const,

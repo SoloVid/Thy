@@ -3,6 +3,7 @@ import type { Token } from "../tokenizer/token";
 import type { TokenRange } from "../tree/token-range";
 import type { TreeNode } from "../tree/tree-node";
 import type { GeneratorState } from "./generator-state";
+import type { LibraryGeneratorCollection } from "./library-generator";
 
 export interface GeneratorResult {
     readonly output: string
@@ -18,6 +19,7 @@ export interface CodeGenResult {
 
 export interface GeneratorFixture {
     generate: DefiniteCodeGeneratorFuncNoFixture<TreeNode>
+    readonly standardLibrary: LibraryGeneratorCollection
 }
 
 export type CodeGeneratorFunc<T> = (node: T, state: GeneratorState, fixture: GeneratorFixture) => void | GeneratedSnippets
@@ -49,8 +51,8 @@ export function fromNode(node: TreeNode, text: string): MappedGeneratedSnippet |
     return fromTokenRange(node, text)
 }
 
-export function fromComplicated(range: TokenRange, parts: (GeneratedSnippets | string)[]): GeneratedSnippets {
-    return parts.map(p => typeof p === "string" ? fromTokenRange(range, p) : p)
+export function fromComplicated(node: TreeNode, parts: (GeneratedSnippets | string)[]): GeneratedSnippets {
+    return parts.map(p => typeof p === "string" ? fromNode(node, p) : p)
 }
 
 export type GeneratedSnippets = GeneratedSnippet | DeepArray<GeneratedSnippet>
