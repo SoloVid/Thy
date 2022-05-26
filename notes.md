@@ -125,7 +125,7 @@ but you couldn't actually implement them in thy.
 
 - Array (1 type parameter)
 - ArrayMutable (1 type parameter)
-- Bool
+- Boolean
 - If (4 type parameters)
 - Null (0 or 1 type parameters)
 - Number

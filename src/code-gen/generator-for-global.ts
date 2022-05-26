@@ -3,7 +3,7 @@ import type { Atom, PropertyAccess } from "../tree"
 import type { Assignment } from "../tree/assignment"
 import type { Call } from "../tree/call"
 import type { LetCall } from "../tree/let-call"
-import type { CodeGeneratorFunc, GeneratedSnippets } from "./generator"
+import type { CodeGeneratorFunc } from "./generator"
 import type { GeneratorState } from "./generator-state"
 
 export interface SimpleCall extends Call {
@@ -13,6 +13,7 @@ export interface SimpleCall extends Call {
 export interface GeneratorForGlobalSpec {
     name: string
     generateValue: (state: GeneratorState) => string
+    generateTypeInstance?: (state: GeneratorState) => string
     generateCall?: CodeGeneratorFunc<SimpleCall>
     generateAssignment?: CodeGeneratorFunc<Assignment & {call: SimpleCall}>
     generateLetCall?: CodeGeneratorFunc<LetCall & {call: SimpleCall}>

@@ -1,18 +1,19 @@
 import assert from "assert";
 import type { Token } from "../tokenizer/token";
 import type { tMemberAccessOperator, tValueIdentifier } from "../tokenizer/token-type";
-import type { PropertyAccess, TreeNode } from "../tree";
+import type { PropertyAccess, TreeNode, TypeCall } from "../tree";
 import type { Assignment } from "../tree/assignment";
 import type { Atom } from "../tree/atom";
 import type { Call } from "../tree/call";
 import type { LetCall } from "../tree/let-call";
-import { CodeGeneratorFunc, fromTokenRange, GeneratedSnippets } from "./generator";
+import { CodeGeneratorFunc, fromNode, fromTokenRange, GeneratedSnippets } from "./generator";
 import { GeneratorForGlobalParentSpec, GeneratorForGlobalSpec, isLeaf, isParent } from "./generator-for-global";
 import type { GeneratorState } from "./generator-state";
 
 export interface LibraryGeneratorCollection {
     atomGenerator: CodeGeneratorFunc<Atom>
     propertyAccessGenerator: CodeGeneratorFunc<PropertyAccess<never>>
+    typeInstanceGenerator: CodeGeneratorFunc<Atom | PropertyAccess<never>>
     callGenerator: CodeGeneratorFunc<Call>
     assignmentGenerator: CodeGeneratorFunc<Assignment>
     letCallGenerator: CodeGeneratorFunc<LetCall>
@@ -87,6 +88,14 @@ export function aggregateLibrary(libraries: readonly LibraryGeneratorCollection[
                 }
             }
         },
+        typeInstanceGenerator(node, state, fixture) {
+            for (const lib of libraries) {
+                const output = lib.typeInstanceGenerator(node, state, fixture)
+                if (output) {
+                    return output
+                }
+            }
+        },
         callGenerator(node, state, fixture) {
             for (const lib of libraries) {
                 const output = lib.callGenerator(node, state, fixture)
@@ -128,15 +137,11 @@ export function makeLibraryGenerators(
         if (lookup === null) {
             return
         }
-        const range = {
-            firstToken: node.type === 'atom' ? node.token : node.firstToken,
-            lastToken: node.type == 'atom' ? node.token : node.lastToken
-        }
         let partGeneratedNow: GeneratedSnippets
         if (lookup.spec instanceof Map) {
-            partGeneratedNow = fromTokenRange(range, generateObject(lookup.spec, state))
+            partGeneratedNow = fromNode(node, generateObject(lookup.spec, state))
         } else {
-            partGeneratedNow = fromTokenRange(range, lookup.spec.generateValue(state))
+            partGeneratedNow = fromNode(node, lookup.spec.generateValue(state))
         }
         
         if (lookup.unusedPropertyAccessTokens.length > 0) {
@@ -146,12 +151,28 @@ export function makeLibraryGenerators(
         }
     }
 
+    function typeInstanceGenerator(node: Atom | PropertyAccess, state: GeneratorState) {
+        const lookup = tryLookupNamedNode(valueSpecMap, node)
+        if (lookup === null) {
+            return
+        }
+        assert(!(lookup.spec instanceof Map), "We should never lookup a standard library type name and get a parent.")
+        assert(lookup.unusedPropertyAccessTokens.length === 0, "We should never have leftover trailing property access tokens on standard library type.")
+        if (lookup.spec.generateTypeInstance === undefined) {
+            return
+        }
+        return fromNode(node, lookup.spec.generateTypeInstance(state))
+    }
+
     return {
         atomGenerator(node, state, fixture) {
             return valueGenerator(node, state)
         },
         propertyAccessGenerator(node, state, fixture) {
             return valueGenerator(node, state)
+        },
+        typeInstanceGenerator(node, state, fixture) {
+            return typeInstanceGenerator(node, state)
         },
         callGenerator(node, state, fixture) {
             const lookup = tryLookupNamedNode(callSpecMap, node.func)
