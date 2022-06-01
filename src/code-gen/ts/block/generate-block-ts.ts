@@ -2,7 +2,7 @@ import type { Block } from "../../../tree/block";
 import { nodeError, TreeNode } from "../../../tree/tree-node";
 import { contextType, GeneratorState } from "../../generator-state";
 import { genIndent, makeIndent } from "../../indent-string";
-import { fromComplicated, fromToken, fromTokenRange, GeneratedSnippet, GeneratedSnippets, GeneratorFixture } from "../../generator";
+import { fromComplicated, fromToken, fromTokenRange, GeneratedSnippet, GeneratedSnippets, GeneratorFixture, IndependentCodeGeneratorFunc } from "../../generator";
 import { checkAndGenerateTypeInstanceTs, generateTypeInstanceTs } from "../generate-type-instance-ts";
 import assert from "assert";
 
@@ -176,10 +176,27 @@ function getReturnTypeSpec(
     return fromComplicated(node, [": ", checkAndGenerateTypeInstanceTs(node.args[0], state, fixture)])
 }
 
+function resolvePreStatementGenerator(generator: IndependentCodeGeneratorFunc, state: GeneratorState, fixture: GeneratorFixture): readonly GeneratedSnippets[] {
+    const lineState = state.makeChild({ newPreStatementsArray: true })
+    const directSnippet = generator(lineState, fixture)
+    if (lineState.preStatementGenerators.length === 0) {
+        return [directSnippet]
+    }
+    const resolvedPreStatements = lineState.preStatementGenerators.map(g => resolvePreStatementGenerator(g, state, fixture))
+    return [...resolvedPreStatements.flat(1), directSnippet]
+}
+
 export function generateBlockLinesTs(block: Block, ideas: Block["ideas"], state: GeneratorState, fixture: GeneratorFixture): GeneratedSnippets {
-    const implementationLines = ideas.map(i => i.type === "blank-line" ? { text: "\n" } : [
-        genIndent(state.indentLevel), fixture.generate(i, state), { text: "\n" }
-    ])
+    const implementationLines = ideas.map(i => {
+        if (i.type === "blank-line") {
+            return { text: "\n" }
+        }
+        const lineState = state.makeChild({ newPreStatementsArray: true })
+        const primaryGeneratedLine = fixture.generate(i, lineState)
+        const preGeneratedLines = lineState.preStatementGenerators.map(g => resolvePreStatementGenerator(g, state, fixture))
+        const allGeneratedLines = [...preGeneratedLines.flat(1), primaryGeneratedLine]
+        return allGeneratedLines.map(l => [genIndent(state.indentLevel), l, { text: "\n" }])
+    })
     const impliedLines: GeneratedSnippets = []
     // TODO: Get local variables stuff working again (probably from tree symbol table?)
     if (state.localVariables.length > 0) {

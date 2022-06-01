@@ -25,6 +25,7 @@ export interface GeneratorFixture {
 export type CodeGeneratorFunc<T> = (node: T, state: GeneratorState, fixture: GeneratorFixture) => void | GeneratedSnippets
 export type DefiniteCodeGeneratorFunc<T> = (node: T, state: GeneratorState, fixture: GeneratorFixture) => GeneratedSnippets
 export type DefiniteCodeGeneratorFuncNoFixture<T> = (node: T, state: GeneratorState) => GeneratedSnippets
+export type IndependentCodeGeneratorFunc = (state: GeneratorState, fixture: GeneratorFixture) => GeneratedSnippets
 
 export function fromToken(token: Token, text?: string): MappedGeneratedSnippet {
     return {

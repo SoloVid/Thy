@@ -1,6 +1,7 @@
-import assert from "assert"
 import type { CompileError } from "../compile-error"
 import type { Token } from "../tokenizer/token"
+import type { TreeNode } from "../tree"
+import type { CodeGeneratorFunc, IndependentCodeGeneratorFunc } from "./generator"
 
 // These context types are listed in order from most restrictive to most permissive.
 export const contextType = {
@@ -41,6 +42,7 @@ interface GeneratorStateOptions {
     readonly increaseIndent?: boolean
     readonly isTypeContext?: boolean
     readonly newImplicitArguments?: boolean
+    readonly newPreStatementsArray?: boolean
 }
 
 export interface ImplicitArgumentsState {
@@ -55,10 +57,13 @@ export interface GeneratorState {
     readonly isTypeContext: boolean
     /** Singleton(ish) array of errors encountered. */
     readonly errors: CompileError[]
+    readonly preStatementGenerators: IndependentCodeGeneratorFunc[]
     readonly localVariables: LocalVariable[]
     readonly parent: GeneratorState | null
     readonly implicitArguments: ImplicitArgumentsState | null
     addError(error: CompileError): void
+    /** Queue up a generator that needs to be run in a dedicated statement context prior to the current expression context. */
+    addPreStatementGenerator(generator: IndependentCodeGeneratorFunc): void
     getUniqueVariableName(): string
     isExpressionContext(): boolean
     makeChild(options?: GeneratorStateOptions): GeneratorState
@@ -77,6 +82,7 @@ export function makeGeneratorState(parent?: GeneratorState, options: GeneratorSt
     })
     const me = {
         errors: parent?.errors ?? [] as CompileError[],
+        preStatementGenerators: options.newPreStatementsArray ? [] : parent?.preStatementGenerators ?? [],
         indentLevel: (options.increaseIndent && parent) ? parent.indentLevel + 1 : parent?.indentLevel ?? 0,
         isTypeContext: options.isTypeContext !== undefined ? options.isTypeContext : parent?.isTypeContext ?? false,
         getUniqueVariableName,
@@ -93,6 +99,9 @@ export function makeGeneratorState(parent?: GeneratorState, options: GeneratorSt
         } : parent?.implicitArguments ?? null,
         addError(error: CompileError) {
             this.errors.push(error)
+        },
+        addPreStatementGenerator(generator: IndependentCodeGeneratorFunc) {
+            this.preStatementGenerators.push(generator)
         },
         isExpressionContext() {
             return this.context === contextType.looseExpression || this.context === contextType.isolatedExpression
