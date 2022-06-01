@@ -5,6 +5,7 @@ import { CodeGeneratorFunc, fromComplicated, fromTokenRange, GeneratedSnippets, 
 import { contextType, GeneratorState } from "../../generator-state";
 import type { LibraryGeneratorCollection } from "../../library-generator";
 import { awaitKeyword, returnKeyword, throwKeyword } from "../block/block-return";
+import { generateTypeInstanceTs } from "../generate-type-instance-ts";
 import { makeControlFlowCallTsGenerator } from "./generate-control-flow-call-ts";
 
 export function callGeneratorTs(standardLibrary: LibraryGeneratorCollection) {
@@ -30,6 +31,13 @@ export function makeCallTsGenerator(specializations: CodeGeneratorFunc<Call>[]):
 
 export function generateCallTs(call: Call, state: GeneratorState, fixture: GeneratorFixture): GeneratedSnippets {
     const functionSnippet = fixture.generate(call.func, state.makeChild({ context: contextType.looseExpression }))
+    const typeArgSnippets = call.typeArgs.map((a, i) => {
+        const childState = state.makeChild({ context: contextType.isolatedExpression, isTypeContext: true })
+        if (i === 0) {
+            return generateTypeInstanceTs(a, childState, fixture)
+        }
+        return [fromTokenRange(call, ", "), generateTypeInstanceTs(a, childState, fixture)]
+    })
     const argSnippets = call.args.map((a, i) => {
         const childState = state.makeChild({ context: contextType.isolatedExpression })
         if (i === 0) {
@@ -38,6 +46,8 @@ export function generateCallTs(call: Call, state: GeneratorState, fixture: Gener
         return [fromTokenRange(call, ", "), fixture.generate(a, childState)]
     })
     return fromComplicated(call, [
-        functionSnippet, "(", argSnippets, ")"
+        functionSnippet,
+        ...(typeArgSnippets.length === 0 ? [] : ["<", typeArgSnippets, ">"]),
+        "(", argSnippets, ")"
     ])
 }
