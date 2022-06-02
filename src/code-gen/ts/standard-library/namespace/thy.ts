@@ -1,6 +1,6 @@
 import { tokenError } from "../../../../compile-error"
 import { nodeError } from "../../../../tree/tree-node"
-import { fromComplicated } from "../../../generator"
+import { fromComplicated, GeneratedSnippet } from "../../../generator"
 import type { GeneratorForGlobalParentSpec, GeneratorForGlobalSpec } from "../../../generator-for-global"
 import { contextType } from "../../../generator-state"
 import { makeIndent } from "../../../indent-string"
@@ -41,7 +41,9 @@ ${space}}`)
         }
 
         const importSeq = ["import ", variablePart, " = ", referencedName]
-        if ([variablePart].flat(Infinity).map(s => s.text).join("") !== referencedName) {
+        // There's an open issue in TS 4.7 about typing this correctly. https://github.com/microsoft/TypeScript/issues/49280
+        const flattenedVariablePart = [variablePart].flat(Infinity as 1) as GeneratedSnippet[]
+        if (flattenedVariablePart.map(s => s.text).join("") !== referencedName) {
             return fromComplicated(node, importSeq)
         }
         return fromComplicated(node, ["// ", ...importSeq])

@@ -49,7 +49,8 @@ export const tsGenerator = (standardLibrary: LibraryGeneratorCollection) => (nod
         ]
     )
 
-    const output: GeneratedSnippet[] = [generateTs2(node, state)].flat(Infinity)
+    // There's an open issue in TS 4.7 about typing this correctly. https://github.com/microsoft/TypeScript/issues/49280
+    const output: GeneratedSnippet[] = [generateTs2(node, state)].flat(Infinity as 1) as GeneratedSnippet[]
     return {
         output: output.map(s => s.text).join(""),
         errors: state.errors
