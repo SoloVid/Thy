@@ -17,6 +17,7 @@ export interface LibraryGeneratorCollection {
     callGenerator: CodeGeneratorFunc<Call>
     assignmentGenerator: CodeGeneratorFunc<Assignment>
     letCallGenerator: CodeGeneratorFunc<LetCall>
+    typeCallGenerator: CodeGeneratorFunc<TypeCall>
 }
 
 type SpecMap = Map<string, GeneratorForGlobalSpec | SpecMap>
@@ -120,6 +121,14 @@ export function aggregateLibrary(libraries: readonly LibraryGeneratorCollection[
                 }
             }
         },
+        typeCallGenerator(node, state, fixture) {
+            for (const lib of libraries) {
+                const output = lib.typeCallGenerator(node, state, fixture)
+                if (output) {
+                    return output
+                }
+            }
+        },
     }
 }
 
@@ -194,7 +203,14 @@ export function makeLibraryGenerators(
                 return
             }
             return lookup.spec.generateLetCall(node as any, state, fixture)
-        }
+        },
+        typeCallGenerator(node, state, fixture) {
+            const lookup = tryLookupNamedNode(callSpecMap, node.func)
+            if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateTypeCall === undefined) {
+                return
+            }
+            return lookup.spec.generateTypeCall(node as any, state, fixture)
+        },
     }
 }
 

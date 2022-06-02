@@ -1,5 +1,5 @@
-import type { tValueIdentifier } from "../tokenizer/token-type"
-import type { Atom, PropertyAccess } from "../tree"
+import type { tTypeIdentifier, tValueIdentifier } from "../tokenizer/token-type"
+import type { Atom, PropertyAccess, TypeCall } from "../tree"
 import type { Assignment } from "../tree/assignment"
 import type { Call } from "../tree/call"
 import type { LetCall } from "../tree/let-call"
@@ -10,11 +10,16 @@ export interface SimpleCall extends Call {
     func: Atom | PropertyAccess<never, typeof tValueIdentifier>
 }
 
+export interface SimpleTypeCall extends TypeCall {
+    func: Atom | PropertyAccess<never, typeof tTypeIdentifier>
+}
+
 export interface GeneratorForGlobalSpec {
     name: string
     generateValue: (state: GeneratorState) => string
     generateTypeInstance?: (state: GeneratorState) => string
     generateCall?: CodeGeneratorFunc<SimpleCall>
+    generateTypeCall?: CodeGeneratorFunc<SimpleTypeCall>
     generateAssignment?: CodeGeneratorFunc<Assignment & {call: SimpleCall}>
     generateLetCall?: CodeGeneratorFunc<LetCall & {call: SimpleCall}>
 }

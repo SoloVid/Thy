@@ -11,7 +11,7 @@ import { tryGenerateBlankLineTs } from './generate-blank-line-ts'
 import { tryGenerateCommentTs } from './generate-comment-ts'
 import { propertyAccessGeneratorTs } from './generate-property-access-ts'
 import { tryGenerateTypeAssignmentTs } from './generate-type-assignment-ts'
-import { tryGenerateTypeCallTs } from './generate-type-call-ts'
+import { tryGenerateDanglingTypeCallTs } from './generate-type-call-ts'
 import { letCallGeneratorTs } from './let/generate-let-call-ts'
 
 export const tsGenerator = (standardLibrary: LibraryGeneratorCollection) => (node: TreeNode): GeneratorResult => {
@@ -44,7 +44,7 @@ export const tsGenerator = (standardLibrary: LibraryGeneratorCollection) => (nod
             tryGenerateCommentTs,
             propertyAccessGeneratorTs(standardLibrary),
             tryGenerateTypeAssignmentTs,
-            tryGenerateTypeCallTs,
+            tryGenerateDanglingTypeCallTs,
             letCallGeneratorTs(standardLibrary),
         ]
     )

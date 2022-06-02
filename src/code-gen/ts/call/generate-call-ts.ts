@@ -29,7 +29,28 @@ export function makeCallTsGenerator(specializations: CodeGeneratorFunc<Call>[]):
     }, generateCallTs, specializations)
 }
 
-export function generateCallTs(call: Call, state: GeneratorState, fixture: GeneratorFixture): GeneratedSnippets {
+export function generateCallTs(
+    call: Call,
+    state: GeneratorState,
+    fixture: GeneratorFixture,
+    callName?: string,
+): GeneratedSnippets {
+    if (state.isTypeContext) {
+        callName = callName ? `_${callName}` : state.getUniqueVariableName()
+        const callValueSnippet = fixture.generate(call.func, state.makeChild({ context: contextType.isolatedExpression }))
+        const argsAsUnknown = call.args.map(a => `${state.getUniqueVariableName()}: unknown, `).join('')
+        // TODO: Don't duplicate this logic from later down.
+        const argSnippets = call.args.map((a, i) => {
+            const childState = state.makeChild({ context: contextType.isolatedExpression })
+            return [fixture.generate(a, childState), fromTokenRange(call, ", ")]
+        })
+        state.addPreStatementGenerator((s, f) =>
+            fromComplicated(call, [`function ${callName}_WrappedValue() { return `, callValueSnippet, ` }`]))
+        state.addPreStatementGenerator((s, f) =>
+            fromComplicated(call, [`type ${callName}_RestParams = (ReturnType<typeof ${callName}_WrappedValue>) extends (${argsAsUnknown}...rest: infer U) => unknown ? U : []`]))
+        return fromComplicated(call, [`${callName}_WrappedValue()(`, argSnippets, `...([] as unknown[] as ${callName}_RestParams))`])
+    }
+
     const functionSnippet = fixture.generate(call.func, state.makeChild({ context: contextType.looseExpression }))
     const typeArgSnippets = call.typeArgs.map((a, i) => {
         const childState = state.makeChild({ context: contextType.isolatedExpression, isTypeContext: true })
