@@ -8,6 +8,7 @@ import { catchGenerator, consoleGenerator, elseGenerator, falseGenerator, finall
 import { ifGenerator } from "./if";
 import { mathGenerator } from "./math";
 import { booleanTypeGenerator, numberTypeGenerator, stringTypeGenerator, unknownTypeGenerator, voidTypeGenerator } from "./primitive-types";
+import { unionGenerator } from "./transform-types";
 
 /**
  * Standard library for core language functionality (e.g. control flow and math).
@@ -29,6 +30,8 @@ export const standardLibraryCore = makeLibraryGenerators([
     stringTypeGenerator,
     unknownTypeGenerator,
     voidTypeGenerator,
+
+    unionGenerator,
 
     catchGenerator,
     elseGenerator,

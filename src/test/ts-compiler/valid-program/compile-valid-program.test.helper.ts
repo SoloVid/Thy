@@ -19,11 +19,13 @@ async function readFile(libDir: string, relativePath: string): Promise<string> {
 }
 
 function pathInSrc(libPath: string): string {
-    const absLibPath = path.resolve(libPath)
     const searchFor = "lib"
     const replaceWith = "src"
-    const libIndex = absLibPath.lastIndexOf(searchFor)
-    return absLibPath.substr(0, libIndex) + replaceWith + absLibPath.substr(libIndex + searchFor.length)
+    const libRootPath = path.resolve(path.join(__dirname, "..", "..", ".."))
+    const libIndex = libRootPath.lastIndexOf(searchFor)
+    const srcRootPath = libRootPath.substring(0, libIndex) + replaceWith + libRootPath.substring(libIndex + searchFor.length)
+    const absLibPath = path.resolve(libPath)
+    return absLibPath.replace(libRootPath, srcRootPath)
 }
 
 export interface CompileResult {
