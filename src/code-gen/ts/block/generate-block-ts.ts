@@ -177,7 +177,7 @@ function getReturnTypeSpec(
 }
 
 function resolvePreStatementGenerator(generator: IndependentCodeGeneratorFunc, state: GeneratorState, fixture: GeneratorFixture): readonly GeneratedSnippets[] {
-    const lineState = state.makeChild({ newPreStatementsArray: true })
+    const lineState = state.makeChild({ context: contextType.blockNoReturn, newPreStatementsArray: true })
     const directSnippet = generator(lineState, fixture)
     if (lineState.preStatementGenerators.length === 0) {
         return [directSnippet]
@@ -191,7 +191,7 @@ export function generateBlockLinesTs(block: Block, ideas: Block["ideas"], state:
         if (i.type === "blank-line") {
             return { text: "\n" }
         }
-        const lineState = state.makeChild({ newPreStatementsArray: true })
+        const lineState = state.makeChild({ context: contextType.blockAllowingReturn, newPreStatementsArray: true })
         const primaryGeneratedLine = fixture.generate(i, lineState)
         const preGeneratedLines = lineState.preStatementGenerators.map(g => resolvePreStatementGenerator(g, state, fixture))
         const allGeneratedLines = [...preGeneratedLines.flat(1), primaryGeneratedLine]
