@@ -10,3 +10,6 @@ voidFunc is def
   p is given Void
 
 type BasicUnion is Union String Number
+type UnionWithValue is Union String unknownFunc
+type NonTrivialUnion is Union String
+  return "himom"

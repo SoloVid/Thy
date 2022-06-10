@@ -1,5 +1,5 @@
+import type { Expression, PropertyAccess } from "../../tree";
 import type { Atom } from "../../tree/atom";
-import type { PropertyAccess } from "../../tree";
 import type { GeneratedSnippets, GeneratorFixture } from "../generator";
 import type { GeneratorState } from "../generator-state";
 import { generateAtomTs } from "./atom/generate-atom-ts";
@@ -10,4 +10,12 @@ export function generateSimpleNamedExpressionTs(node: Atom | PropertyAccess<neve
         return generateAtomTs(node, state)
     }
     return generatePropertyAccessTs(node, state, fixture)
+}
+
+export function isSimpleNamed(expression: Expression): expression is Atom | PropertyAccess<never> {
+    if (expression.type !== "atom" && expression.type !== "property-access") {
+        return false
+    }
+    // TODO: Check property access more thoroughly.
+    return true
 }

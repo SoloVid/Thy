@@ -1,12 +1,12 @@
 import assert from "assert";
 import type { Token } from "../tokenizer/token";
-import type { tMemberAccessOperator, tValueIdentifier } from "../tokenizer/token-type";
+import type { tMemberAccessOperator } from "../tokenizer/token-type";
 import type { PropertyAccess, TreeNode, TypeCall } from "../tree";
 import type { Assignment } from "../tree/assignment";
 import type { Atom } from "../tree/atom";
 import type { Call } from "../tree/call";
 import type { LetCall } from "../tree/let-call";
-import { CodeGeneratorFunc, fromNode, fromTokenRange, GeneratedSnippets } from "./generator";
+import { CodeGeneratorFunc, fromNode, GeneratedSnippets } from "./generator";
 import { GeneratorForGlobalParentSpec, GeneratorForGlobalSpec, isLeaf, isParent } from "./generator-for-global";
 import type { GeneratorState } from "./generator-state";
 
@@ -18,6 +18,7 @@ export interface LibraryGeneratorCollection {
     assignmentGenerator: CodeGeneratorFunc<Assignment>
     letCallGenerator: CodeGeneratorFunc<LetCall>
     typeCallGenerator: CodeGeneratorFunc<TypeCall>
+    simpleTypeCallGenerator: CodeGeneratorFunc<TypeCall>
 }
 
 type SpecMap = Map<string, GeneratorForGlobalSpec | SpecMap>
@@ -129,6 +130,14 @@ export function aggregateLibrary(libraries: readonly LibraryGeneratorCollection[
                 }
             }
         },
+        simpleTypeCallGenerator(node, state, fixture) {
+            for (const lib of libraries) {
+                const output = lib.simpleTypeCallGenerator(node, state, fixture)
+                if (output) {
+                    return output
+                }
+            }
+        },
     }
 }
 
@@ -140,6 +149,8 @@ export function makeLibraryGenerators(
     const callSpecMap = makeSpecMap(specs, "generateCall")
     const assignmentSpecMap = makeSpecMap(specs, "generateAssignment")
     const letCallSpecMap = makeSpecMap(specs, "generateLetCall")
+    const typeCallSpecMap = makeSpecMap(specs, "generateTypeCall")
+    const simpleTypeCallSpecMap = makeSpecMap(specs, "generateSimpleTypeCall")
 
     function valueGenerator(node: Atom | PropertyAccess, state: GeneratorState) {
         const lookup = tryLookupNamedNode(valueSpecMap, node)
@@ -205,11 +216,18 @@ export function makeLibraryGenerators(
             return lookup.spec.generateLetCall(node as any, state, fixture)
         },
         typeCallGenerator(node, state, fixture) {
-            const lookup = tryLookupNamedNode(callSpecMap, node.func)
+            const lookup = tryLookupNamedNode(typeCallSpecMap, node.func)
             if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateTypeCall === undefined) {
                 return
             }
             return lookup.spec.generateTypeCall(node as any, state, fixture)
+        },
+        simpleTypeCallGenerator(node, state, fixture) {
+            const lookup = tryLookupNamedNode(simpleTypeCallSpecMap, node.func)
+            if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateSimpleTypeCall === undefined) {
+                return
+            }
+            return lookup.spec.generateSimpleTypeCall(node as any, state, fixture)
         },
     }
 }
