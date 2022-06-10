@@ -17,10 +17,11 @@ export function generateBlockTs(block: Block, state: GeneratorState, fixture: Ge
         return generateBlockLinesTs(block, block.ideas, state, fixture)
     }
     
+    let preludeTypeSnippetsDone = false
     const typeParameterSpecs: GeneratedSnippets = []
     const parameterSpecs: GeneratedSnippets = []
     let returnTypeSpec: GeneratedSnippets | null = null
-    const blockStartLineSnippets: GeneratedSnippets = []
+    const preludeTypeSnippets: GeneratedSnippets = []
     const imperativeIdeas: Block["ideas"] = []
     for (const idea of block.ideas) {
         const tps = getTypeParameterSpec(idea, state, fixture);
@@ -29,9 +30,15 @@ export function generateBlockTs(block: Block, state: GeneratorState, fixture: Ge
                 typeParameterSpecs.push(fromTokenRange(block, ", "))
             }
             typeParameterSpecs.push(tps.inlineParamSnippet)
-            blockStartLineSnippets.push(tps.blockSnippet)
+            preludeTypeSnippets.push(tps.blockSnippet)
             continue
         }
+        if (!preludeTypeSnippetsDone && idea.type === "type-assignment") {
+            const gen = fixture.generate(idea, state)
+            preludeTypeSnippets.push(gen)
+            continue
+        }
+        preludeTypeSnippetsDone = true
 
         const ps = getParameterSpec(idea, state, fixture)
         if (ps !== null) {
@@ -71,7 +78,7 @@ export function generateBlockTs(block: Block, state: GeneratorState, fixture: Ge
     const definition = fromComplicated(block, [
         ...(typeParameterSpecs.length === 0 ? [] : ["<", typeParameterSpecs, ">"]),
         "(", parameterSpecs, ")", returnTypeSpec ?? [], " => {\n",
-        ...blockStartLineSnippets.map(s => [makeIndent(state.indentLevel + 1), s, "\n"]).flat(),
+        ...preludeTypeSnippets.map(s => [makeIndent(state.indentLevel + 1), s, "\n"]).flat(),
         linesTs,
         makeIndent(state.indentLevel), "}"
     ])
