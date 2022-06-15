@@ -56,7 +56,7 @@ export function parseAssignment(state: ParserState): Assignment {
     }
 }
 
-function applyToSymbolTable(state: ParserState, variable: Token<string>, isConstant: boolean): void {
+export function applyToSymbolTable(state: ParserState, variable: Token<string>, isConstant: boolean): void {
     if (state.context.symbolTable.getSymbolInfo(variable.text) !== null) {
         state.addError(tokenError(variable, `"${variable.text}" is already declared in this scope and cannot be re-declared`))
     } else if (state.context.symbolTable.isSymbolNameTakenHereOrInChild(variable.text)) {

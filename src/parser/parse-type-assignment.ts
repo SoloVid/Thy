@@ -2,6 +2,7 @@ import { tokenError } from "../compile-error";
 import { tConstDeclAssign, tExport, tPrivate, tTypeIdentifier } from "../tokenizer/token-type";
 import { getEndOfPropertyAccess2 } from "../tree/property-access";
 import type { TypeAssignment } from "../tree/type-assignment";
+import { applyToSymbolTable } from "./parse-assignment";
 import { parseCall } from "./parse-call";
 import type { ParserState } from "./parser-state";
 
@@ -12,6 +13,7 @@ export function parseTypeAssignment(state: ParserState): TypeAssignment {
     const firstToken = state.buffer.peekToken()
     const modifier = [tExport, tPrivate].includes(firstToken.type) ? state.buffer.consumeToken() : null
     const variable = state.buffer.consumeToken()
+    applyToSymbolTable(state, variable, true)
     // TODO: Validate some token types etc.
 
     const operator = state.buffer.consumeToken()
