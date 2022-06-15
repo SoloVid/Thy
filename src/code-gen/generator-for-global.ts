@@ -1,5 +1,5 @@
 import type { tTypeIdentifier, tValueIdentifier } from "../tokenizer/token-type"
-import type { Atom, PropertyAccess, TypeCall } from "../tree"
+import type { Atom, PropertyAccess, TypeAssignment, TypeCall } from "../tree"
 import type { Assignment } from "../tree/assignment"
 import type { Call } from "../tree/call"
 import type { LetCall } from "../tree/let-call"
@@ -35,6 +35,7 @@ export interface GeneratorForGlobalSpec {
     /** Given a really simple type call (like `Union String Number`), generate a _**type**_. */
     generateSimpleTypeCall?: CodeGeneratorFunc<ReallySimpleTypeCall>
     generateAssignment?: CodeGeneratorFunc<Assignment & {call: SimpleCall}>
+    generateTypeAssignment?: CodeGeneratorFunc<TypeAssignment & {call: SimpleCall | SimpleTypeCall}>
     generateLetCall?: CodeGeneratorFunc<LetCall & {call: SimpleCall}>
 }
 

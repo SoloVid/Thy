@@ -14,6 +14,11 @@ export function tryGenerateTypeAssignmentTs(node: TreeNode, state: GeneratorStat
 }
 
 export function generateTypeAssignmentTs(ta: TypeAssignment, state: GeneratorState, fixture: GeneratorFixture): GeneratedSnippets {
+    const stdLibGenerated = fixture.standardLibrary.typeAssignmentGenerator(ta, state, fixture)
+    if (stdLibGenerated) {
+        return stdLibGenerated
+    }
+
     const name = ta.variable.text
     const childState = state.makeChild({ context: contextType.isolatedExpression, isTypeContext: true })
     const typePart = generateTypePart(ta.call, childState, fixture, name)
@@ -40,7 +45,6 @@ function handleSimpleTypeCall(call: Call | TypeCall, state: GeneratorState, fixt
     if (call.type === "call") {
         return
     }
-    console.log("type call")
     const funcIsSimple = isSimpleNamed(call.func)
     const argsAreSimple = call.args.reduce((allSimple, a) => {
         return allSimple && isSimpleNamed(a)

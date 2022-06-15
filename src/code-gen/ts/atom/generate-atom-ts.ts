@@ -20,8 +20,7 @@ export function makeAtomTsGenerator(specializations: CodeGeneratorFunc<Atom>[]):
 }
 
 export function generateAtomTs(atom: Atom, state: GeneratorState): GeneratedSnippets {
-    const isIdentifier = /^[A-Za-z]/.test(atom.token.text)
-    if (isIdentifier) {
+    if (isAtomIdentifier(atom)) {
         if (atom.symbolTable.getSymbolInfo(atom.token.text) === null) {
             if (!state.implicitArguments) {
                 state.addError(nodeError(atom, `${atom.token.text} is not defined locally and there is no target for implicit arguments in this scope`))
@@ -36,4 +35,8 @@ export function generateAtomTs(atom: Atom, state: GeneratorState): GeneratedSnip
         return fromToken(atom.token, atom.token.text)
     }
     return fromToken(atom.token, `${atom.token.text} as const`)
+}
+
+export function isAtomIdentifier(atom: Atom): boolean {
+    return /^[A-Za-z]/.test(atom.token.text)
 }

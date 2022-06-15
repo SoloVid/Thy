@@ -1,7 +1,7 @@
 import assert from "assert";
 import type { Token } from "../tokenizer/token";
 import type { tMemberAccessOperator } from "../tokenizer/token-type";
-import type { PropertyAccess, TreeNode, TypeCall } from "../tree";
+import type { PropertyAccess, TreeNode, TypeAssignment, TypeCall } from "../tree";
 import type { Assignment } from "../tree/assignment";
 import type { Atom } from "../tree/atom";
 import type { Call } from "../tree/call";
@@ -19,6 +19,7 @@ export interface LibraryGeneratorCollection {
     letCallGenerator: CodeGeneratorFunc<LetCall>
     typeCallGenerator: CodeGeneratorFunc<TypeCall>
     simpleTypeCallGenerator: CodeGeneratorFunc<TypeCall>
+    typeAssignmentGenerator: CodeGeneratorFunc<TypeAssignment>
 }
 
 type SpecMap = Map<string, GeneratorForGlobalSpec | SpecMap>
@@ -138,6 +139,14 @@ export function aggregateLibrary(libraries: readonly LibraryGeneratorCollection[
                 }
             }
         },
+        typeAssignmentGenerator(node, state, fixture) {
+            for (const lib of libraries) {
+                const output = lib.typeAssignmentGenerator(node, state, fixture)
+                if (output) {
+                    return output
+                }
+            }
+        },
     }
 }
 
@@ -151,6 +160,7 @@ export function makeLibraryGenerators(
     const letCallSpecMap = makeSpecMap(specs, "generateLetCall")
     const typeCallSpecMap = makeSpecMap(specs, "generateTypeCall")
     const simpleTypeCallSpecMap = makeSpecMap(specs, "generateSimpleTypeCall")
+    const typeAssignmentSpecMap = makeSpecMap(specs, "generateTypeAssignment")
 
     function valueGenerator(node: Atom | PropertyAccess, state: GeneratorState) {
         const lookup = tryLookupNamedNode(valueSpecMap, node)
@@ -228,6 +238,13 @@ export function makeLibraryGenerators(
                 return
             }
             return lookup.spec.generateSimpleTypeCall(node as any, state, fixture)
+        },
+        typeAssignmentGenerator(node, state, fixture) {
+            const lookup = tryLookupNamedNode(typeAssignmentSpecMap, node.call.func)
+            if (lookup === null || lookup.spec instanceof Map || lookup.spec.generateTypeAssignment === undefined) {
+                return
+            }
+            return lookup.spec.generateTypeAssignment(node as any, state, fixture)
         },
     }
 }
