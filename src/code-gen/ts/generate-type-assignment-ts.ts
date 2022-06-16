@@ -3,6 +3,7 @@ import type { TreeNode } from "../../tree/tree-node";
 import type { TypeAssignment } from "../../tree/type-assignment";
 import { fromComplicated, GeneratedSnippets, GeneratorFixture } from "../generator";
 import { contextType, GeneratorState } from "../generator-state";
+import { maybeGenerateExport } from "./assignment/generate-assignment-ts";
 import { generateCallTs } from "./call/generate-call-ts";
 import { isSimpleNamed } from "./generate-simple-named-expression";
 import { generateTypeCallTs } from "./generate-type-call-ts";
@@ -19,11 +20,11 @@ export function generateTypeAssignmentTs(ta: TypeAssignment, state: GeneratorSta
         return stdLibGenerated
     }
 
-    const name = ta.variable.text
+    const name = ta.variable.token.text
     const childState = state.makeChild({ context: contextType.isolatedExpression, isTypeContext: true })
     const typePart = generateTypePart(ta.call, childState, fixture, name)
     return fromComplicated(ta, [
-        `const ${name} = undefined as unknown as `, typePart,
+        maybeGenerateExport(ta, state), `const ${name} = undefined as unknown as `, typePart,
     ])
 }
 

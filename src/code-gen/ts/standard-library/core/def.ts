@@ -3,7 +3,7 @@ import type { Expression, TypeExpression } from "../../../../tree/expression";
 import { nodeError } from "../../../../tree/tree-node";
 import { fromComplicated, fromNode, fromToken, fromTokenRange, GeneratedSnippets } from "../../../generator";
 import type { GeneratorForGlobalSpec } from "../../../generator-for-global";
-import { generateAssignmentTs2 } from "../../assignment/generate-assignment-ts";
+import { generateAssignmentTs2, maybeGenerateExport } from "../../assignment/generate-assignment-ts";
 import { isAtomIdentifier } from "../../atom/generate-atom-ts";
 import { isSimpleNamed } from "../../generate-simple-named-expression";
 import { generateTypeInstanceTs } from "../../generate-type-instance-ts";
@@ -63,7 +63,7 @@ export const defGenerator: GeneratorForGlobalSpec = {
 
         function generateSimple(arg: Atom | PropertyAccess<never>, typeSnippet?: GeneratedSnippets) {
             return fromComplicated(node, [
-                `const `, node.variable.text, ` = undefined as unknown as `,
+                maybeGenerateExport(node, state), `const `, node.variable.token.text, ` = undefined as unknown as `,
                 typeSnippet ?? generateTypeInstanceTs(arg, state, fixture)
             ])
         }

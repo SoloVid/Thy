@@ -1,11 +1,12 @@
 import type { Block } from "../../../tree/block";
 import { nodeError, TreeNode } from "../../../tree/tree-node";
-import { contextType, GeneratorState } from "../../generator-state";
+import { ContextType, contextType, GeneratorState } from "../../generator-state";
 import { genIndent, makeIndent } from "../../indent-string";
 import { fromComplicated, fromNode, fromToken, fromTokenRange, GeneratedSnippet, GeneratedSnippets, GeneratorFixture, IndependentCodeGeneratorFunc } from "../../generator";
 import { checkAndGenerateTypeInstanceTs, generateTypeInstanceTs } from "../generate-type-instance-ts";
 import assert from "assert";
 import type { Call, TypeCall } from "../../../tree";
+import { maybeGenerateExport } from "../assignment/generate-assignment-ts";
 
 export function tryGenerateBlockTs(node: TreeNode, state: GeneratorState, fixture: GeneratorFixture): void | GeneratedSnippets {
     if (node.type === "block") {
@@ -14,7 +15,8 @@ export function tryGenerateBlockTs(node: TreeNode, state: GeneratorState, fixtur
 }
 
 export function generateBlockTs(block: Block, state: GeneratorState, fixture: GeneratorFixture): GeneratedSnippets {
-    if (state.indentLevel === 0 && state.context === contextType.blockAllowingExport) {
+    const topLevelContextTypes: ContextType[] = [contextType.blockAllowingExport, contextType.blockNoReturn]
+    if (state.indentLevel === 0 && topLevelContextTypes.includes(state.context)) {
         return generateBlockLinesTs(block, block.ideas, state, fixture)
     }
     
@@ -169,30 +171,11 @@ function getTypeParameterSpec(
         state.addError(nodeError(arg, `Given cannot take more than 2 arguments`))
     }
 
-    const paramName = `_${node.variable.text}_Param`
-    const inlineParamSnippet: GeneratedSnippets[] = [fromToken(node.variable, paramName)]
+    const paramName = `_${node.variable.token.text}_Param`
+    const inlineParamSnippet: GeneratedSnippets[] = [fromToken(node.variable.token, paramName)]
     if (node.call.args.length > 0) {
-        // const intermediateName = `_${node.variable.text}_SuperPackage`
-        // const intermediateTypeParams = generateTypeParams(node, preludeTypeInfo)
-        // const extendedTypeSnippet = checkAndGenerateTypeInstanceTs(node.call.args[0], state, fixture)
-
-        // state.addPreStatementGenerator((s, f) => {
-        //     const indent = makeIndent(s.indentLevel)
-        //     const indent2 = makeIndent(s.indentLevel + 1)
-        //     return fromComplicated(node, [
-        //         `class ${intermediateName}`, intermediateTypeParams.params, ` { f() {\n`,
-        //         preludeTypeInfo.typeSnippets.map(snippet => fromComplicated(node, [indent2, snippet, "\n"])),
-        //         indent2, `return undefined as unknown as `, extendedTypeSnippet, "\n",
-        //         indent, `} }`
-        //     ])
-        // })
-
-        // inlineParamSnippet.push(fromComplicated(node.call.args[0], [
-        //     ' extends ReturnType<', intermediateName, intermediateTypeParams.args, `["f"]>`
-        // ]))
-
         inlineParamSnippet.push(fromComplicated(node.call.args[0], [
-            ' extends ', generatePreStatementAndTypeForParam(node.call, state, fixture, preludeTypeInfo, node.variable.text)
+            ' extends ', generatePreStatementAndTypeForParam(node.call, state, fixture, preludeTypeInfo, node.variable.token.text)
         ]))
 
         if (node.call.args.length > 1) {
@@ -204,7 +187,9 @@ function getTypeParameterSpec(
     return {
         paramName: paramName,
         inlineParamSnippet: inlineParamSnippet,
-        blockSnippet: fromComplicated(node, ['const ', node.variable.text, ' = undefined as unknown as ', paramName])
+        blockSnippet: fromComplicated(node, [
+            maybeGenerateExport(node, state), 'const ', node.variable.token.text, ' = undefined as unknown as ', paramName
+        ])
     }
 }
 
@@ -292,7 +277,7 @@ export function generateBlockLinesTs(block: Block, ideas: Block["ideas"], state:
         if (i.type === "blank-line") {
             return { text: "\n" }
         }
-        const lineState = state.makeChild({ context: contextType.blockAllowingReturn, newPreStatementsArray: true })
+        const lineState = state.makeChild({ block: block, context: state.context, newPreStatementsArray: true })
         const primaryGeneratedLine = fixture.generate(i, lineState)
         const preGeneratedLines = lineState.preStatementGenerators.map(g => resolvePreStatementGenerator(g, state, fixture))
         const allGeneratedLines = [...preGeneratedLines.flat(1), primaryGeneratedLine]

@@ -40,7 +40,7 @@ export function parseTypeAssignment(state: ParserState): TypeAssignment {
         type: "type-assignment",
         modifier,
         typeToken,
-        variable,
+        variable: { type: "atom", token: variable, symbolTable: state.context.symbolTable },
         operator,
         call,
         firstToken: variable,

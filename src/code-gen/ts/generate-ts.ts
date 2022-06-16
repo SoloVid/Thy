@@ -1,7 +1,7 @@
 import { nodeError, TreeNode } from '../../tree/tree-node'
 import { makeGenerator } from '../generate-from-options'
 import { fromToken, fromTokenRange, GeneratedSnippet, GeneratedSnippets, GeneratorResult } from '../generator'
-import { contextType, GeneratorState, makeGeneratorState } from '../generator-state'
+import { ContextType, contextType, GeneratorState, makeGeneratorState } from '../generator-state'
 import type { LibraryGeneratorCollection } from '../library-generator'
 import { assignmentGeneratorTs } from './assignment/generate-assignment-ts'
 import { atomGeneratorTs } from './atom/generate-atom-ts'
@@ -14,8 +14,8 @@ import { tryGenerateTypeAssignmentTs } from './generate-type-assignment-ts'
 import { tryGenerateDanglingTypeCallTs } from './generate-type-call-ts'
 import { letCallGeneratorTs } from './let/generate-let-call-ts'
 
-export const tsGenerator = (standardLibrary: LibraryGeneratorCollection) => (node: TreeNode): GeneratorResult => {
-    const state = makeGeneratorState(undefined, { context: contextType.blockAllowingExport })
+export const tsGenerator = (standardLibrary: LibraryGeneratorCollection, topLevelContext?: ContextType) => (node: TreeNode): GeneratorResult => {
+    const state = makeGeneratorState(undefined, { context: topLevelContext ?? contextType.blockAllowingExport })
 
     function generateTs2(node: TreeNode, state: GeneratorState) {
         const fixture = {

@@ -1,6 +1,6 @@
 import type { CompileError } from "../compile-error"
 import type { Token } from "../tokenizer/token"
-import type { TreeNode } from "../tree"
+import type { Block, TreeNode } from "../tree"
 import type { CodeGeneratorFunc, IndependentCodeGeneratorFunc } from "./generator"
 
 // These context types are listed in order from most restrictive to most permissive.
@@ -38,6 +38,7 @@ export const contextType = {
 export type ContextType = (typeof contextType)[keyof typeof contextType]
 
 interface GeneratorStateOptions {
+    readonly block?: Block
     readonly context?: ContextType
     readonly increaseIndent?: boolean
     readonly isTypeContext?: boolean
@@ -52,6 +53,7 @@ export interface ImplicitArgumentsState {
 }
 
 export interface GeneratorState {
+    readonly block: Block | null
     readonly context: ContextType
     readonly indentLevel: number
     readonly isTypeContext: boolean
@@ -86,6 +88,7 @@ export function makeGeneratorState(parent?: GeneratorState, options: GeneratorSt
         indentLevel: (options.increaseIndent && parent) ? parent.indentLevel + 1 : parent?.indentLevel ?? 0,
         isTypeContext: options.isTypeContext !== undefined ? options.isTypeContext : parent?.isTypeContext ?? false,
         getUniqueVariableName,
+        block: options.block ?? parent?.block ?? null,
         context: options.context !== undefined ? options.context : contextType.isolatedExpression as ContextType,
         localVariables: [],
         parent: parent ?? null,
