@@ -1,5 +1,6 @@
 import fs from "fs/promises"
 import path from "path"
+import { expect } from "expect"
 import type { CompileError } from "../../../compile-error"
 import type { Compiler } from "../../../compiler"
 
@@ -23,7 +24,10 @@ function pathInSrc(libPath: string): string {
     const replaceWith = "src"
     const libRootPath = path.resolve(path.join(__dirname, "..", "..", ".."))
     const libIndex = libRootPath.lastIndexOf(searchFor)
-    const srcRootPath = libRootPath.substring(0, libIndex) + replaceWith + libRootPath.substring(libIndex + searchFor.length)
+    let srcRootPath = libRootPath
+    if (libIndex >= 0) {
+        srcRootPath = libRootPath.substring(0, libIndex) + replaceWith + libRootPath.substring(libIndex + searchFor.length)
+    }
     const absLibPath = path.resolve(libPath)
     return absLibPath.replace(libRootPath, srcRootPath)
 }

@@ -5,9 +5,16 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=lib/index.js",
+    "check-types": "tsc --noEmit",
+    "clean": "node -p \"require('fs').rmSync('lib',{force:true,recursive:true})\"",
+    "generate-declarations": "tsc --emitDeclarationOnly",
+    "preprepublish": "npm run clean",
+    "prepublish": "run-p --aggregate-output build test generate-declarations",
     "start": "node lib/index.js",
-    "test": "jest"
+    "test": "run-p --aggregate-output check-types test:uts",
+    "test:uts": "uts -r esbuild-register src",
+    "test:watch": "watchlist --eager src -- npm run test:uts"
   },
   "author": "Grant Dennison",
   "license": "MIT",
@@ -19,16 +26,18 @@
     "yargs": "^17.4.1"
   },
   "devDependencies": {
-    "@tsconfig/node14": "^1.0.1",
+    "@tsconfig/node16": "^1",
     "@types/babel__code-frame": "^7.0.3",
     "@types/glob": "^7.2.0",
     "@types/jest": "^27.0.2",
-    "@types/node": "15.12.1",
+    "@types/node": "^16",
     "@types/yargs": "^17.0.10",
-    "jest": "^27.3.1",
-    "typescript": "~4.7"
-  },
-  "jest": {
-    "testRegex": "\\.test\\.js$"
+    "esbuild": "^0.15.5",
+    "esbuild-register": "^3.3.3",
+    "expect": "^28.1.3",
+    "npm-run-all": "^4.1.5",
+    "typescript": "~4.7",
+    "under-the-sun": "^1.0.0",
+    "watchlist": "^0.3.1"
   }
 }
