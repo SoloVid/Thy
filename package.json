@@ -9,6 +9,7 @@
     "check-types": "tsc --noEmit",
     "clean": "node -p \"require('fs').rmSync('lib',{force:true,recursive:true})\"",
     "generate-declarations": "tsc --emitDeclarationOnly",
+    "interpret": "node -r esbuild-register src/interpreter/cli.ts",
     "preprepublish": "npm run clean",
     "prepublish": "run-p --aggregate-output build test generate-declarations",
     "start": "node lib/index.js",
