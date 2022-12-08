@@ -13,6 +13,8 @@
     "prepublish": "run-p --aggregate-output build test generate-declarations",
     "start": "node lib/index.js",
     "test": "run-p --aggregate-output check-types test:uts",
+    "test:uts:interpreter": "uts -r esbuild-register src/interpreter",
+    "test:uts:interpreter:watch": "watchlist --eager src/interpreter -- npm run test:uts:interpreter",
     "test:uts": "uts -r esbuild-register src",
     "test:watch": "watchlist --eager src -- npm run test:uts"
   },
