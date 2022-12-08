@@ -5,7 +5,7 @@ import type { Atom, ThyBlockContext } from "./types"
 
 export function interpretThyExpression(context: ThyBlockContext, thyExpression: Atom): unknown {
   if (Array.isArray(thyExpression)) {
-    return interpretThyBlockLines(thyExpression)
+    return interpretThyBlockLines(thyExpression, { ...context.variablesInBlock, ...context.implicitArguments, ...context.closure })
   }
   assert(typeof thyExpression === "string", "Array case should have been filtered")
 
@@ -38,7 +38,14 @@ function getVariableFromContext(context: ThyBlockContext, variable: string) {
   assert.match(variable, identifierRegex, `Invalid identifier: ${variable}`)
 
   if (context.implicitArguments && variable in context.implicitArguments) {
+    assert(!context.givenUsed, `Implicit arguments cannot be used (referenced ${variable}) after \`given\``)
+    if (context.implicitArgumentFirstUsed === null) {
+      context.implicitArgumentFirstUsed = variable
+    }
     return context.implicitArguments[variable]
+  }
+  if (variable in context.closure) {
+    return context.closure[variable]
   }
   if (variable in context.variablesInBlock) {
     return context.variablesInBlock[variable]

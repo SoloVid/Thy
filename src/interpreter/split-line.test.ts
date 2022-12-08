@@ -13,3 +13,7 @@ test("splitLineParts() should split line into parts of complex formats", async (
 test("splitLineParts() should not split a string with spaces", async () => {
   assert.deepStrictEqual(splitLineParts(`f "hi mom"`), [`f`, `"hi mom"`])
 })
+
+test("splitLineParts() should discard types", async () => {
+  assert.deepStrictEqual(splitLineParts(`foo A String MyType a b c`), [`foo`, `a`, `b`, `c`])
+})

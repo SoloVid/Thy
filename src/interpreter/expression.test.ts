@@ -28,6 +28,40 @@ test("interpretThyExpression() can pull value from implicit arguments", async ()
   assert.strictEqual(interpretThyExpression(context, `x`), 5)
 })
 
+test("interpretThyExpression() can pull value from closure", async () => {
+  const context = makeSimpleContext({
+    closure: { x: 5 }
+  })
+  assert.strictEqual(interpretThyExpression(context, `x`), 5)
+})
+
+test("interpretThyExpression() should set implicitArgumentFirstUsed when an implicit argument is used", async () => {
+  const context = makeSimpleContext({
+    implicitArguments: { x: 5 },
+    implicitArgumentFirstUsed: null,
+  })
+  interpretThyExpression(context, `x`)
+  assert.strictEqual(context.implicitArgumentFirstUsed, "x")
+})
+
+test("interpretThyExpression() should not overwrite implicitArgumentFirstUsed", async () => {
+  const context = makeSimpleContext({
+    implicitArguments: { x: 5, y: 6 },
+    implicitArgumentFirstUsed: null,
+  })
+  interpretThyExpression(context, `x`)
+  interpretThyExpression(context, `y`)
+  assert.strictEqual(context.implicitArgumentFirstUsed, "x")
+})
+
+test("interpretThyExpression() barfs if implicit argument used after given", async () => {
+  const context = makeSimpleContext({
+    givenUsed: true,
+    implicitArguments: { x: 5 }
+  })
+  assert.throws(() => interpretThyExpression(context, `x`), /Implicit arguments cannot be used \(referenced x\) after `given`/)
+})
+
 test("interpretThyExpression() can do member access", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { x: { y: { z: 6 } } }
@@ -62,6 +96,33 @@ test("interpretThyExpression() barfs if member access is attempted on falsey val
 test("interpretThyExpression() interprets array as block", async () => {
   const context = makeSimpleContext()
   const f = interpretThyExpression(context, ["return 5"])
+  assert(typeof f === "function", "Expression should be a function")
+  assert.strictEqual(f(), 5)
+})
+
+test("interpretThyExpression() allows block to access variables from this scope's closure", async () => {
+  const context = makeSimpleContext({
+    closure: { x: 5 },
+  })
+  const f = interpretThyExpression(context, ["return x"])
+  assert(typeof f === "function", "Expression should be a function")
+  assert.strictEqual(f(), 5)
+})
+
+test("interpretThyExpression() allows block to access variables from this scope's implicit arguments", async () => {
+  const context = makeSimpleContext({
+    implicitArguments: { x: 5 },
+  })
+  const f = interpretThyExpression(context, ["return x"])
+  assert(typeof f === "function", "Expression should be a function")
+  assert.strictEqual(f(), 5)
+})
+
+test("interpretThyExpression() allows block to access variables from this scope's local block variables", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { x: 5 },
+  })
+  const f = interpretThyExpression(context, ["return x"])
   assert(typeof f === "function", "Expression should be a function")
   assert.strictEqual(f(), 5)
 })

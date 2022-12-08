@@ -12,4 +12,5 @@ export function splitLineParts(line: string): readonly string[] {
     })
     .split(" ")
     .map(p => p in substitutions ? substitutions[p] : p)
+    .filter(p => !/^[A-Z]/.test(p))
 }

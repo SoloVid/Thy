@@ -6,6 +6,10 @@ export function interpretThyCall(context: ThyBlockContext, parts: readonly Atom[
   const [functionExpression, ...callArgExpressions] = parts
 
   if (functionExpression === "given") {
+    if (context.implicitArgumentFirstUsed !== null) {
+      throw new Error(`\`given\` cannot be used after implicit arguments are used. (${context.implicitArgumentFirstUsed} referenced implicit argument.)`)
+    }
+    context.givenUsed = true
     assert(callArgExpressions.length <= 1, "given may only take one argument")
     if (callArgExpressions.length === 1) {
       const defaultValue = interpretThyExpression(context, callArgExpressions[0])

@@ -64,6 +64,14 @@ test("interpretThyStatement() should reject second attempt to redefine mutable v
   assert.throws(() => interpretThyStatement(context, [`a`, `is`, `f`]), /a is already defined/)
 })
 
+test("interpretThyStatement() should reject attempt to shadow variable from closure", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: () => 5 },
+    closure: { a: 1 },
+  })
+  assert.throws(() => interpretThyStatement(context, [`a`, `be`, `f`]), /a cannot be shadowed/)
+})
+
 test("interpretThyStatement() should reject invalid variable identifier", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },

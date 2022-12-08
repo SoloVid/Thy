@@ -13,15 +13,12 @@ export function splitThyStatements(thySourceLines: readonly string[]): readonly 
 
   return thySourceLines.reduce((soFar, line) => {
     const lineLevelIndent = extractIndent(line)
-    // if (soFar.blockLines !== null) {
-    //   assert(lineLevelIndent.length >= ourLevelIndent.length, "Indent should not go further back out than our level")
-    //   if ()
-    // }
     if (lineLevelIndent.length === ourLevelIndent.length) {
+      const parts = /^[A-Z]/.test(line.trimStart()) ? [] : splitLineParts(line)
       return {
         ...soFar,
         blockLines: null,
-        statements: [...soFar.statements, splitLineParts(line)],
+        statements: [...soFar.statements, parts],
       }
     }
     if (lineLevelIndent.length > ourLevelIndent.length) {

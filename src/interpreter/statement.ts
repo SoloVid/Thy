@@ -8,6 +8,9 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
 
   if (typeof variableName === "string" && typeof assignKeyword === "string" && ["is", "be", "to"].includes(assignKeyword)) {
     assert.match(variableName, identifierRegex, `${variableName} is not a valid identifier. Variable names should begin with a lower-case letter and only contain letters and numbers.`)
+    if (variableName in context.closure) {
+      throw new Error(`${variableName} cannot be shadowed. Since it is declared in an upper scope, it cannot be redefined.`)
+    }
     if (context.variableIsImmutable[variableName]) {
       throw new Error(`${variableName} is immutable and cannot be reassigned. Did you mean to use \`be\` instead of \`is\` at its definition?`)
     }

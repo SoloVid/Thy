@@ -46,3 +46,30 @@ test("interpretThyBlock() should return a function that can call a function pass
   interpreted({ f })
   assert.deepStrictEqual(calledWithArgs, [2, "two"])
 })
+
+test("interpretThyBlock() should return a function that can early return a called function's value via `let`", async () => {
+  const interpreted = interpretThyBlock(`let f\nreturn 1`)
+  const f = () => 5
+  assert.strictEqual(interpreted({ f }), 5)
+})
+
+test("interpretThyBlock() should return a function that can forgo early return via `let`", async () => {
+  const interpreted = interpretThyBlock(`let f\nreturn 1`)
+  const f = () => undefined
+  assert.strictEqual(interpreted({ f }), 1)
+})
+
+test("interpretThyBlock() should return a function that rejects `return` with no argument", async () => {
+  const interpreted = interpretThyBlock(`return`)
+  assert.throws(() => interpreted(), /`return` takes exactly one parameter/)
+})
+
+test("interpretThyBlock() should return a function that rejects `return` with too many arguments", async () => {
+  const interpreted = interpretThyBlock(`return 1 2`)
+  assert.throws(() => interpreted(), /`return` takes exactly one parameter/)
+})
+
+test("interpretThyBlock() should return a function that rejects `let` with no call", async () => {
+  const interpreted = interpretThyBlock(`let\nreturn 1`)
+  assert.throws(() => interpreted(), /`let` requires a function call/)
+})

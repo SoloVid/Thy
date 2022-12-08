@@ -33,7 +33,6 @@ test("splitThyStatements() should return unaltered array for flat block of calls
   ])
 })
 
-
 test("splitThyStatements() should collapse nested block into parent statement parts", async () => {
   const inputLines = [
     "a",
@@ -108,4 +107,33 @@ test("splitThyStatements() should fail on bad outdent", async () => {
     "  b",
   ]
   assert.throws(() => splitThyStatements(inputLines), /does not match any preceding indentation level/)
+})
+
+test("splitThyStatements() should discard comment lines (single line)", async () => {
+  const inputLines = [
+    "This is a comment",
+    "a",
+    "Another",
+    "Third",
+    "b",
+  ]
+  assert.deepStrictEqual(splitThyStatements(inputLines), [
+    [],
+    ["a"],
+    [],
+    [],
+    ["b"],
+  ])
+})
+
+test("splitThyStatements() should detect empty block from comment", async () => {
+  const inputLines = [
+    "a",
+    "  Empty block",
+  ]
+  assert.deepStrictEqual(splitThyStatements(inputLines), [
+    ["a", [
+      "  Empty block",
+    ]]
+  ])
 })
