@@ -15,6 +15,7 @@ export function interpretThyBlockLines(thySourceLines: readonly string[]): (...a
       argsToUse: [...args],
       implicitArguments: args.length > 0 && typeof args[0] === "object" && !!args[0] ? args[0] as Record<string, unknown> : null,
       variablesInBlock: {},
+      variableIsImmutable: {},
     }
     const statements = splitThyStatements(thySourceLines)
     for (const statement of statements) {

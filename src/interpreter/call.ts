@@ -1,12 +1,19 @@
 import assert from "node:assert"
 import { interpretThyExpression } from "./expression"
-import type { ThyBlockContext } from "./types"
+import type { Atom, ThyBlockContext } from "./types"
 
-export function interpretThyCall(context: ThyBlockContext, parts: readonly string[]): unknown {
+export function interpretThyCall(context: ThyBlockContext, parts: readonly Atom[]): unknown {
   const [functionExpression, ...callArgExpressions] = parts
 
   if (functionExpression === "given") {
     assert(callArgExpressions.length <= 1, "given may only take one argument")
+    if (callArgExpressions.length === 1) {
+      const defaultValue = interpretThyExpression(context, callArgExpressions[0])
+      if (context.argsToUse.length === 0) {
+        return defaultValue
+      }
+    }
+    assert(context.argsToUse.length > 0, `No argument or default available for given`)
     return context.argsToUse.shift()
   }
 

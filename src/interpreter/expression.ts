@@ -1,6 +1,6 @@
 import assert from "node:assert"
 import { interpretThyBlockLines } from "./block"
-import { numberRegex, stringRegex } from "./patterns"
+import { identifierRegex, numberRegex, stringRegex } from "./patterns"
 import type { Atom, ThyBlockContext } from "./types"
 
 export function interpretThyExpression(context: ThyBlockContext, thyExpression: Atom): unknown {
@@ -16,11 +16,32 @@ export function interpretThyExpression(context: ThyBlockContext, thyExpression: 
   if (stringMatch !== null) {
     return stringMatch[1]
   }
-  if (context.implicitArguments && thyExpression in context.implicitArguments) {
-    return context.implicitArguments[thyExpression]
+  return resolveNamedAccess(context, thyExpression)
+}
+
+function resolveNamedAccess(context: ThyBlockContext, thyExpression: string) {
+  const parts = thyExpression.split(".")
+  const [base, ...memberAccesses] = parts
+  const baseValue = getVariableFromContext(context, base)
+  let priorAccess = base
+  let finalValue = baseValue
+  for (const access of memberAccesses) {
+    assert.match(access, identifierRegex, `Invalid (member) identifier: ${access}`)
+    assert(!!finalValue, `Cannot access ${access} on ${priorAccess} because ${priorAccess} has no value`)
+    finalValue = (finalValue as Record<string, unknown>)[access]
+    priorAccess = access
   }
-  if (thyExpression in context.variablesInBlock) {
-    return context.variablesInBlock[thyExpression]
+  return finalValue
+}
+
+function getVariableFromContext(context: ThyBlockContext, variable: string) {
+  assert.match(variable, identifierRegex, `Invalid identifier: ${variable}`)
+
+  if (context.implicitArguments && variable in context.implicitArguments) {
+    return context.implicitArguments[variable]
   }
-  throw new Error(`Variable ${thyExpression} not found`)
+  if (variable in context.variablesInBlock) {
+    return context.variablesInBlock[variable]
+  }
+  throw new Error(`Variable ${variable} not found`)
 }

@@ -1,14 +1,23 @@
+import assert from "node:assert"
 import { interpretThyCall } from "./call"
+import { identifierRegex } from "./patterns"
 import type { Atom, ThyBlockContext } from "./types"
 
 export function interpretThyStatement(context: ThyBlockContext, parts: readonly Atom[]): void {
-  // if (Array.isArray(thyExpression)) {
-  //   interpretThyBlockLines(thyExpression)()
-  // }
-  // assert(typeof thyExpression === "string", "Array case should have been filtered")
+  const [variableName, assignKeyword, ...callParts] = parts
 
-  if (parts.length > 1 && parts[1] === "is") {
-    context.variablesInBlock[parts[0]] = interpretThyCall(context, parts.slice(2))
+  if (typeof variableName === "string" && typeof assignKeyword === "string" && ["is", "be", "to"].includes(assignKeyword)) {
+    assert.match(variableName, identifierRegex, `${variableName} is not a valid identifier. Variable names should begin with a lower-case letter and only contain letters and numbers.`)
+    if (context.variableIsImmutable[variableName]) {
+      throw new Error(`${variableName} is immutable and cannot be reassigned. Did you mean to use \`be\` instead of \`is\` at its definition?`)
+    }
+    if (variableName in context.variablesInBlock && assignKeyword !== "to") {
+      throw new Error(`${variableName} is already defined. Did you mean to use \`to\` instead of \`${assignKeyword}\`?`)
+    }
+    if (assignKeyword === "is") {
+      context.variableIsImmutable[variableName] = true
+    }
+    context.variablesInBlock[variableName] = interpretThyCall(context, callParts)
     return
   }
 
