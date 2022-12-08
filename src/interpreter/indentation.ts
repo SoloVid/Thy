@@ -12,5 +12,5 @@ export function getFirstIndent(thySourceLines: readonly string[]): string {
       return extractIndent(line)
     }
   }
-  throw new Error(`Cannot detect indentation when there are no non-empty lines`)
+  return ""
 }

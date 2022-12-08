@@ -11,7 +11,7 @@ export function splitThyStatements(thySourceLines: readonly string[]): readonly 
     statements: readonly Statement[]
   }
 
-  return thySourceLines.reduce((soFar, line) => {
+  return thySourceLines.filter(l => l.trim() !== "").reduce((soFar, line) => {
     const lineLevelIndent = extractIndent(line)
     if (lineLevelIndent.length === ourLevelIndent.length) {
       const parts = /^[A-Z]/.test(line.trimStart()) ? [] : splitLineParts(line)

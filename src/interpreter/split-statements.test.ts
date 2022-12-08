@@ -109,6 +109,20 @@ test("splitThyStatements() should fail on bad outdent", async () => {
   assert.throws(() => splitThyStatements(inputLines), /does not match any preceding indentation level/)
 })
 
+test("splitThyStatements() should discard empty lines", async () => {
+  const inputLines = [
+    "  ",
+    "a",
+    "",
+    "    ",
+    "b",
+  ]
+  assert.deepStrictEqual(splitThyStatements(inputLines), [
+    ["a"],
+    ["b"],
+  ])
+})
+
 test("splitThyStatements() should discard comment lines (single line)", async () => {
   const inputLines = [
     "This is a comment",

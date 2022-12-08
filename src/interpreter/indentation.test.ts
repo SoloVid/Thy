@@ -22,9 +22,10 @@ test("getFirstIndent() should skip empty lines", async () => {
   ]), "  ")
 })
 
-test("getFirstIndent() should fail if there are no non-empty lines", async () => {
-  assert.throws(() => getFirstIndent([
+test("getFirstIndent() should return empty string if there are no non-empty lines", async () => {
+  assert.strictEqual(getFirstIndent([
+    `  `,
     ``,
     `    `,
-  ]), /no non-empty lines/)
+  ]), "")
 })
