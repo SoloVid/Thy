@@ -151,3 +151,36 @@ test("splitThyStatements() should detect empty block from comment", async () => 
     ]]
   ])
 })
+
+test("splitThyStatements() should discard multi-line comments", async () => {
+  const inputLines = [
+    "COMMENT",
+    "a",
+    "  b",
+    "COMMENT",
+    "c",
+  ]
+  assert.deepStrictEqual(splitThyStatements(inputLines), [
+    [],
+    [],
+    [],
+    [],
+    ["c"],
+  ])
+})
+
+test("splitThyStatements() should detect empty block from multi-line comment", async () => {
+  const inputLines = [
+    "a",
+    "  XXX",
+    "  b",
+    "  XXX",
+  ]
+  assert.deepStrictEqual(splitThyStatements(inputLines), [
+    ["a", [
+      "  XXX",
+      "  b",
+      "  XXX",
+    ]]
+  ])
+})

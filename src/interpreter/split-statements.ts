@@ -9,11 +9,28 @@ export function splitThyStatements(thySourceLines: readonly string[]): readonly 
   type ReduceState = {
     blockLines: null | readonly string[]
     statements: readonly Statement[]
+    multilineCommentTag: string | null
   }
 
   return thySourceLines.filter(l => l.trim() !== "").reduce((soFar, line) => {
+    if (soFar.multilineCommentTag !== null) {
+      return {
+        ...soFar,
+        statements: [...soFar.statements, []],
+        multilineCommentTag: line === soFar.multilineCommentTag ? null : soFar.multilineCommentTag,
+      }
+    }
     const lineLevelIndent = extractIndent(line)
     if (lineLevelIndent.length === ourLevelIndent.length) {
+      const multilineCommentTagMatch = /^[A-Z]{3,}$/.exec(line.trimStart())
+      if (multilineCommentTagMatch !== null) {
+        return {
+          ...soFar,
+          blockLines: null,
+          statements: [...soFar.statements, []],
+          multilineCommentTag: multilineCommentTagMatch[0],
+        }
+      }
       const parts = /^[A-Z]/.test(line.trimStart()) ? [] : splitLineParts(line)
       return {
         ...soFar,
@@ -42,5 +59,5 @@ export function splitThyStatements(thySourceLines: readonly string[]): readonly 
       }
     }
     throw new Error(`Bad outdent (indent is not the start of a block and does not match any preceding indentation level)`)
-  }, { blockLines: null, statements: [] } as ReduceState).statements
+  }, { blockLines: null, statements: [], multilineCommentTag: null } as ReduceState).statements
 }
