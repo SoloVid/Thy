@@ -72,6 +72,32 @@ test("interpretThyStatement() should reject attempt to shadow variable from clos
   assert.throws(() => interpretThyStatement(context, [`a`, `be`, `f`]), /a cannot be shadowed/)
 })
 
+test("interpretThyStatement() should allow overwriting mutable variable in closure", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: () => 5 },
+    closure: { a: 1 },
+  })
+  interpretThyStatement(context, [`a`, `to`, `f`])
+  assert.strictEqual(context.closure.a, 5)
+})
+
+test("interpretThyStatement() should not allow overwriting immutable variable in closure", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: () => 5 },
+    closure: { a: 1 },
+    closureVariableIsImmutable: { a: true },
+  })
+  assert.throws(() => interpretThyStatement(context, [`a`, `to`, `f`]), /a is immutable/)
+})
+
+test("interpretThyStatement() should not allow overwriting implicit argument", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: () => 5 },
+    implicitArguments: { a: 1 },
+  })
+  assert.throws(() => interpretThyStatement(context, [`a`, `to`, `f`]), /implicit argument/)
+})
+
 test("interpretThyStatement() should reject invalid variable identifier", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },

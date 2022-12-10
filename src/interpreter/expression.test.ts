@@ -109,6 +109,28 @@ test("interpretThyExpression() allows block to access variables from this scope'
   assert.strictEqual(f(), 5)
 })
 
+test("interpretThyExpression() allows block to write mutable variables from this scope's closure", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: () => 6 },
+    closure: { x: 5 },
+  })
+  const f = interpretThyExpression(context, ["x to f"])
+  assert(typeof f === "function", "Expression should be a function")
+  f()
+  assert.strictEqual(context.closure.x, 6)
+})
+
+test("interpretThyExpression() barfs if block attempts to write immutable variables from this scope's closure", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: () => 6 },
+    closure: { x: 5 },
+    closureVariableIsImmutable: { x: true },
+  })
+  const f = interpretThyExpression(context, ["x to f"])
+  assert(typeof f === "function", "Expression should be a function")
+  assert.throws(() => f(), /x is immutable/)
+})
+
 test("interpretThyExpression() allows block to access variables from this scope's implicit arguments", async () => {
   const context = makeSimpleContext({
     implicitArguments: { x: 5 },
@@ -118,6 +140,17 @@ test("interpretThyExpression() allows block to access variables from this scope'
   assert.strictEqual(f(), 5)
 })
 
+test("interpretThyExpression() barfs if block attempts to overwrite this scope's implicit arguments", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: () => 6 },
+    implicitArguments: { x: 5 },
+  })
+  const f = interpretThyExpression(context, ["x to f"])
+  assert(typeof f === "function", "Expression should be a function")
+  // TODO: Should this be made a more explicit error about implicit arguments? Would require tracking more context I think.
+  assert.throws(() => f(), /x is immutable/)
+})
+
 test("interpretThyExpression() allows block to access variables from this scope's local block variables", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { x: 5 },
@@ -125,4 +158,24 @@ test("interpretThyExpression() allows block to access variables from this scope'
   const f = interpretThyExpression(context, ["return x"])
   assert(typeof f === "function", "Expression should be a function")
   assert.strictEqual(f(), 5)
+})
+
+test("interpretThyExpression() allows block to write mutable variables from this scope's local block variables", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: () => 6, x: 5 },
+  })
+  const f = interpretThyExpression(context, ["x to f"])
+  assert(typeof f === "function", "Expression should be a function")
+  f()
+  assert.strictEqual(context.variablesInBlock.x, 6)
+})
+
+test("interpretThyExpression() barfs if block attempts to write immutable variables from this scope's local block variables", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: () => 6, x: 5 },
+    variableIsImmutable: { x: true },
+  })
+  const f = interpretThyExpression(context, ["x to f"])
+  assert(typeof f === "function", "Expression should be a function")
+  assert.throws(() => f(), /x is immutable/)
 })

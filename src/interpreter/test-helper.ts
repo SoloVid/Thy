@@ -3,10 +3,11 @@ import type { ThyBlockContext } from "./types";
 export const makeSimpleContext = (o: Partial<ThyBlockContext> = {}): ThyBlockContext => ({
   argsToUse: [],
   givenUsed: false,
-  implicitArguments: null,
+  implicitArguments: {},
   implicitArgumentFirstUsed: null,
   variablesInBlock: {},
   variableIsImmutable: {},
   closure: {},
+  closureVariableIsImmutable: {},
   ...o,
 })

@@ -5,27 +5,33 @@ import { splitThyStatements } from "./split-statements"
 import { interpretThyStatement } from "./statement"
 import type { ThyBlockContext } from "./types"
 
+type BlockOptions = {
+  closure: ThyBlockContext["closure"]
+  closureVariableIsImmutable: ThyBlockContext["closureVariableIsImmutable"]
+}
+
 export function interpretThyBlock(
   thySource: string,
-  closure: Readonly<Record<string, unknown>> = {}
+  options: BlockOptions = { closure: {}, closureVariableIsImmutable: {} },
 ): (...args: readonly unknown[]) => unknown {
   const lines = thySource.split(/\r\n|\n/)
-  return interpretThyBlockLines(lines, closure)
+  return interpretThyBlockLines(lines, options)
 }
 
 export function interpretThyBlockLines(
   thySourceLines: readonly string[],
-  closure: Readonly<Record<string, unknown>>
+  options: BlockOptions,
 ): (...args: readonly unknown[]) => unknown {
   return (...args: readonly unknown[]) => {
     const context: ThyBlockContext = {
       argsToUse: [...args],
       givenUsed: false,
-      implicitArguments: args.length > 0 && typeof args[0] === "object" && !!args[0] ? args[0] as Record<string, unknown> : null,
+      implicitArguments: args.length > 0 && typeof args[0] === "object" && !!args[0] ? args[0] as Record<string, unknown> : {},
       implicitArgumentFirstUsed: null,
       variablesInBlock: {},
       variableIsImmutable: {},
-      closure: closure,
+      closure: options.closure,
+      closureVariableIsImmutable: options.closureVariableIsImmutable,
     }
     const statements = splitThyStatements(thySourceLines)
     for (const statement of statements) {
