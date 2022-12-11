@@ -7,6 +7,11 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
   const [variableName, assignKeyword, ...callParts] = parts
 
   if (typeof variableName === "string" && typeof assignKeyword === "string" && ["is", "be", "to"].includes(assignKeyword)) {
+    const newValue = interpretThyCall(context, callParts)
+
+    context.thatValue = undefined
+    context.beforeThatValue = undefined
+
     assert.match(variableName, identifierRegex, `${variableName} is not a valid identifier. Variable names should begin with a lower-case letter and only contain letters and numbers.`)
     assert(!(variableName in context.implicitArguments), `${variableName} is an implicit argument and cannot be overwritten`)
     if (variableName in context.closure && ["is", "be"].includes(assignKeyword)) {
@@ -18,7 +23,6 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
     if (variableName in context.variablesInBlock && assignKeyword !== "to") {
       throw new Error(`${variableName} is already defined. Did you mean to use \`to\` instead of \`${assignKeyword}\`?`)
     }
-    const newValue = interpretThyCall(context, callParts)
     if (variableName in context.closure) {
       context.closure[variableName] = newValue
       return
@@ -30,5 +34,7 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
     return
   }
 
-  interpretThyCall(context, parts)
+  const result = interpretThyCall(context, parts)
+  context.beforeThatValue = context.thatValue
+  context.thatValue = result
 }

@@ -179,3 +179,39 @@ test("interpretThyExpression() barfs if block attempts to write immutable variab
   assert(typeof f === "function", "Expression should be a function")
   assert.throws(() => f(), /x is immutable/)
 })
+
+test("interpretThyExpression() replaces `that` with stored value from context", async () => {
+  const context = makeSimpleContext({
+    thatValue: 5,
+  })
+  assert.strictEqual(interpretThyExpression(context, "that"), 5)
+  // Do it again to verify it wasn't removed.
+  assert.strictEqual(interpretThyExpression(context, "that"), 5)
+  // Triple-check it wasn't removed.
+  assert.strictEqual(context.thatValue, 5)
+})
+
+test("interpretThyExpression() barfs on `that` if value is unavailable from context", async () => {
+  const context = makeSimpleContext({
+    thatValue: undefined,
+  })
+  assert.throws(() => interpretThyExpression(context, "that"), /Value is not available for `that`/)
+})
+
+test("interpretThyExpression() replaces `beforeThat` with stored value from context", async () => {
+  const context = makeSimpleContext({
+    beforeThatValue: 5,
+  })
+  assert.strictEqual(interpretThyExpression(context, "beforeThat"), 5)
+  // Do it again to verify it wasn't removed.
+  assert.strictEqual(interpretThyExpression(context, "beforeThat"), 5)
+  // Triple-check it wasn't removed.
+  assert.strictEqual(context.beforeThatValue, 5)
+})
+
+test("interpretThyExpression() barfs on `beforeThat` if value is unavailable from context", async () => {
+  const context = makeSimpleContext({
+    beforeThatValue: undefined,
+  })
+  assert.throws(() => interpretThyExpression(context, "beforeThat"), /Value is not available for `beforeThat`/)
+})

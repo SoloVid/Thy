@@ -10,4 +10,8 @@ export type ThyBlockContext = {
   readonly closureVariableIsImmutable: Readonly<Record<string, boolean>>
   readonly variablesInBlock: Record<string, unknown>
   readonly variableIsImmutable: Record<string, boolean>
+  /** `undefined` is special and indicates that no `that` value is available. */
+  thatValue: unknown
+  /** `undefined` is special and indicates that no `beforeThat` value is available. */
+  beforeThatValue: unknown
 }

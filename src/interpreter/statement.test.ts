@@ -104,3 +104,52 @@ test("interpretThyStatement() should reject invalid variable identifier", async 
   })
   assert.throws(() => interpretThyStatement(context, [`$a`, `is`, `f`]), /\$a is not a valid identifier/)
 })
+
+test("interpretThyStatement() should clear thatValue and beforeThatValue if statement is assignment", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: () => 2 },
+    thatValue: 4,
+    beforeThatValue: 5,
+  })
+  interpretThyStatement(context, [`a`, `is`, `f`])
+  assert.strictEqual(context.thatValue, undefined)
+  assert.strictEqual(context.beforeThatValue, undefined)
+})
+
+test("interpretThyStatement() should use thatValue and beforeThatValue before clear-on-assignment", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: (a: number, b: number) => a + b },
+    thatValue: 4,
+    beforeThatValue: 5,
+  })
+  interpretThyStatement(context, [`a`, `is`, `f`, `that`, `beforeThat`])
+  assert.strictEqual(context.variablesInBlock.a, 9)
+})
+
+test("interpretThyStatement() should store unassigned values into `that` and `beforeThat` on a rotating basis", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: (a: number) => a },
+  })
+
+  interpretThyStatement(context, [`f`, `1`])
+  assert.strictEqual(context.thatValue, 1)
+  assert.strictEqual(context.beforeThatValue, undefined)
+
+  interpretThyStatement(context, [`f`, `2`])
+  assert.strictEqual(context.thatValue, 2)
+  assert.strictEqual(context.beforeThatValue, 1)
+
+  interpretThyStatement(context, [`f`, `3`])
+  assert.strictEqual(context.thatValue, 3)
+  assert.strictEqual(context.beforeThatValue, 2)
+})
+
+test("interpretThyStatement() should use thatValue and beforeThatValue before context is updated", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: (a: number, b: number) => a + b },
+    thatValue: 4,
+    beforeThatValue: 5,
+  })
+  interpretThyStatement(context, [`f`, `that`, `beforeThat`])
+  assert.strictEqual(context.thatValue, 9)
+})

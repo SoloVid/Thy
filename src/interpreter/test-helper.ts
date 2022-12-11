@@ -9,5 +9,7 @@ export const makeSimpleContext = (o: Partial<ThyBlockContext> = {}): ThyBlockCon
   variableIsImmutable: {},
   closure: {},
   closureVariableIsImmutable: {},
+  thatValue: undefined,
+  beforeThatValue: undefined,
   ...o,
 })

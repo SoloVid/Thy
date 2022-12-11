@@ -32,6 +32,8 @@ export function interpretThyBlockLines(
       variableIsImmutable: {},
       closure: options.closure,
       closureVariableIsImmutable: options.closureVariableIsImmutable,
+      thatValue: undefined,
+      beforeThatValue: undefined,
     }
     const statements = splitThyStatements(thySourceLines)
     for (const statement of statements) {

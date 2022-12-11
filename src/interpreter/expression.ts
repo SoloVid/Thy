@@ -5,42 +5,16 @@ import type { Atom, ThyBlockContext } from "./types"
 
 export function interpretThyExpression(context: ThyBlockContext, thyExpression: Atom): unknown {
   if (Array.isArray(thyExpression)) {
-    const childClosure: ThyBlockContext["closure"] = { ...context.implicitArguments }
-    const childClosureVariableIsImmutable: Record<string, boolean> = {}
-    for (const key of Object.keys(context.variablesInBlock)) {
-      Object.defineProperty(childClosure, key, {
-        get() {
-          return context.variablesInBlock[key]
-        },
-        set(value) {
-          assert(!context.variableIsImmutable[key], `${key} is immutable and cannot be reassigned`)
-          context.variablesInBlock[key] = value
-        }
-      })
-      if (key in context.variableIsImmutable) {
-        childClosureVariableIsImmutable[key] = context.variableIsImmutable[key]
-      }
-    }
-    for (const key of Object.keys(context.implicitArguments)) {
-      childClosureVariableIsImmutable[key] = true
-    }
-    for (const key of Object.keys(context.closure)) {
-      Object.defineProperty(childClosure, key, {
-        get() {
-          return context.closure[key]
-        },
-        set(value) {
-          assert(!context.closureVariableIsImmutable[key], `${key} is immutable and cannot be reassigned`)
-          context.closure[key] = value
-        }
-      })
-      if (key in context.closureVariableIsImmutable) {
-        childClosureVariableIsImmutable[key] = context.closureVariableIsImmutable[key]
-      }
-    }
-    return interpretThyBlockLines(thyExpression, { closure: childClosure, closureVariableIsImmutable: childClosureVariableIsImmutable })
+    return resolveBlock(context, thyExpression)
   }
   assert(typeof thyExpression === "string", "Array case should have been filtered")
+
+  if (thyExpression === "that") {
+    return interpretThat(context, "thatValue", "that")
+  }
+  if (thyExpression === "beforeThat") {
+    return interpretThat(context, "beforeThatValue", "beforeThat")
+  }
 
   if (numberRegex.test(thyExpression)) {
     return parseFloat(thyExpression)
@@ -50,6 +24,50 @@ export function interpretThyExpression(context: ThyBlockContext, thyExpression: 
     return stringMatch[1]
   }
   return resolveNamedAccess(context, thyExpression)
+}
+
+function resolveBlock(context: ThyBlockContext, thyLines: readonly string[]) {
+  const childClosure: ThyBlockContext["closure"] = { ...context.implicitArguments }
+  const childClosureVariableIsImmutable: Record<string, boolean> = {}
+  for (const key of Object.keys(context.variablesInBlock)) {
+    Object.defineProperty(childClosure, key, {
+      get() {
+        return context.variablesInBlock[key]
+      },
+      set(value) {
+        assert(!context.variableIsImmutable[key], `${key} is immutable and cannot be reassigned`)
+        context.variablesInBlock[key] = value
+      }
+    })
+    if (key in context.variableIsImmutable) {
+      childClosureVariableIsImmutable[key] = context.variableIsImmutable[key]
+    }
+  }
+  for (const key of Object.keys(context.implicitArguments)) {
+    childClosureVariableIsImmutable[key] = true
+  }
+  for (const key of Object.keys(context.closure)) {
+    Object.defineProperty(childClosure, key, {
+      get() {
+        return context.closure[key]
+      },
+      set(value) {
+        assert(!context.closureVariableIsImmutable[key], `${key} is immutable and cannot be reassigned`)
+        context.closure[key] = value
+      }
+    })
+    if (key in context.closureVariableIsImmutable) {
+      childClosureVariableIsImmutable[key] = context.closureVariableIsImmutable[key]
+    }
+  }
+  return interpretThyBlockLines(thyLines, { closure: childClosure, closureVariableIsImmutable: childClosureVariableIsImmutable })
+}
+
+function interpretThat(context: ThyBlockContext, contextKey: "thatValue" | "beforeThatValue", keyword: "that" | "beforeThat") {
+  if (context[contextKey] === undefined) {
+    throw new Error(`Value is not available for \`${keyword}\``)
+  }
+  return context[contextKey]
 }
 
 function resolveNamedAccess(context: ThyBlockContext, thyExpression: string) {
