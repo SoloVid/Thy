@@ -3,14 +3,14 @@ import { extractIndent, getFirstIndent } from "./indentation"
 import { splitLineParts } from "./split-line"
 import type { Statement } from "./types"
 
+type ReduceState = {
+  blockLines: null | readonly string[]
+  statements: readonly Statement[]
+  multilineCommentTag: string | null
+}
+
 export function splitThyStatements(thySourceLines: readonly string[]): readonly Statement[] {
   const ourLevelIndent = getFirstIndent(thySourceLines)
-
-  type ReduceState = {
-    blockLines: null | readonly string[]
-    statements: readonly Statement[]
-    multilineCommentTag: string | null
-  }
 
   return thySourceLines.filter(l => l.trim() !== "").reduce((soFar, line) => {
     if (soFar.multilineCommentTag !== null) {
@@ -32,6 +32,19 @@ export function splitThyStatements(thySourceLines: readonly string[]): readonly 
         }
       }
       const parts = /^[A-Z]/.test(line.trimStart()) ? [] : splitLineParts(line)
+      const [andPart, ...afterAndParts] = parts
+      if (andPart === "and") {
+        const precedingStatements = [...soFar.statements]
+        const lastStatement = precedingStatements.pop() as Statement
+        assert(lastStatement, "No preceding statement for `and` to match")
+        const precedingParts = [...lastStatement]
+        precedingParts.pop()
+        return {
+          ...soFar,
+          blockLines: null,
+          statements: [...precedingStatements, [...lastStatement, ...afterAndParts]],
+        }
+      }
       return {
         ...soFar,
         blockLines: null,

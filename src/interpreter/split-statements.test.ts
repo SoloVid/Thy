@@ -47,6 +47,46 @@ test("splitThyStatements() should collapse nested block into parent statement pa
   ])
 })
 
+test("splitThyStatements() should reject `and` without a preceding statement", async () => {
+  const inputLines = [
+    "and a",
+  ]
+  assert.throws(() => splitThyStatements(inputLines), /No preceding statement for `and`/)
+})
+
+test("splitThyStatements() should treat `and` arguments as part of preceding statement", async () => {
+  const inputLines = [
+    "a",
+    "  b",
+    "and c d",
+  ]
+  assert.deepStrictEqual(splitThyStatements(inputLines), [
+    ["a", [
+      "  b",
+    ], "c", "d"]
+  ])
+})
+
+test("splitThyStatements() should support `and` with multiple blocks", async () => {
+  const inputLines = [
+    "a",
+    "  b",
+    "and c d",
+    "  e",
+    "and",
+    "  f",
+  ]
+  assert.deepStrictEqual(splitThyStatements(inputLines), [
+    ["a", [
+      "  b",
+    ], "c", "d", [
+      "  e",
+    ], [
+      "  f",
+    ]]
+  ])
+})
+
 test("splitThyStatements() should collapse layers of nested block into parent statement parts", async () => {
   const inputLines = [
     "a",
