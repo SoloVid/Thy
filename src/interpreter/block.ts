@@ -1,4 +1,4 @@
-import assert from "node:assert"
+import assert from "../utils/assert"
 import { interpretThyCall } from "./call"
 import { interpretThyExpression } from "./expression"
 import { splitThyStatements } from "./split-statements"

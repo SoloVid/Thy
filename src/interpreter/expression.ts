@@ -1,4 +1,4 @@
-import assert from "node:assert"
+import assert from "../utils/assert"
 import { interpretThyBlockLines } from "./block"
 import { identifierRegex, numberRegex, stringRegex } from "./patterns"
 import type { Atom, ThyBlockContext } from "./types"
@@ -77,7 +77,7 @@ function resolveNamedAccess(context: ThyBlockContext, thyExpression: string) {
   let priorAccess = base
   let finalValue = baseValue
   for (const access of memberAccesses) {
-    assert.match(access, identifierRegex, `Invalid (member) identifier: ${access}`)
+    assert(identifierRegex.test(access), `Invalid (member) identifier: ${access}`)
     assert(!!finalValue, `Cannot access ${access} on ${priorAccess} because ${priorAccess} has no value`)
     finalValue = (finalValue as Record<string, unknown>)[access]
     priorAccess = access
@@ -86,7 +86,7 @@ function resolveNamedAccess(context: ThyBlockContext, thyExpression: string) {
 }
 
 function getVariableFromContext(context: ThyBlockContext, variable: string) {
-  assert.match(variable, identifierRegex, `Invalid identifier: ${variable}`)
+  assert(identifierRegex.test(variable), `Invalid identifier: ${variable}`)
 
   if (context.implicitArguments && variable in context.implicitArguments) {
     assert(!context.givenUsed, `Implicit arguments cannot be used (referenced ${variable}) after \`given\``)

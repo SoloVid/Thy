@@ -1,4 +1,4 @@
-import assert from "node:assert"
+import assert from "../utils/assert"
 import { extractIndent, getFirstIndent } from "./indentation"
 import { splitLineParts } from "./split-line"
 import type { Statement } from "./types"
@@ -36,7 +36,7 @@ export function splitThyStatements(thySourceLines: readonly string[]): readonly 
       if (andPart === "and") {
         const precedingStatements = [...soFar.statements]
         const lastStatement = precedingStatements.pop() as Statement
-        assert(lastStatement, "No preceding statement for `and` to match")
+        assert(!!lastStatement, "No preceding statement for `and` to match")
         const precedingParts = [...lastStatement]
         precedingParts.pop()
         return {
@@ -54,7 +54,7 @@ export function splitThyStatements(thySourceLines: readonly string[]): readonly 
     if (lineLevelIndent.length > ourLevelIndent.length) {
       const precedingStatements = [...soFar.statements]
       const lastStatement = precedingStatements.pop() as Statement
-      assert(lastStatement, "No last statement")
+      assert(!!lastStatement, "No last statement")
       function updateStatement(): readonly [readonly string[], Statement] {
         if (!soFar.blockLines) {
           return [[line], [...lastStatement, [line]]] as const

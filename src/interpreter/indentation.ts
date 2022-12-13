@@ -1,4 +1,4 @@
-import assert from "assert"
+import assert from "../utils/assert"
 
 export function extractIndent(line: string): string {
   const m = /^( *)/.exec(line)

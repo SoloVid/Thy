@@ -1,4 +1,4 @@
-import assert from "node:assert"
+import assert from "../utils/assert"
 import { interpretThyExpression } from "./expression"
 import type { Atom, ThyBlockContext } from "./types"
 

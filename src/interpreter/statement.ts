@@ -1,4 +1,4 @@
-import assert from "node:assert"
+import assert from "../utils/assert"
 import { interpretThyCall } from "./call"
 import { identifierRegex } from "./patterns"
 import type { Atom, ThyBlockContext } from "./types"
@@ -17,7 +17,7 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
     context.thatValue = undefined
     context.beforeThatValue = undefined
 
-    assert.match(variableName, identifierRegex, `${variableName} is not a valid identifier. Variable names should begin with a lower-case letter and only contain letters and numbers.`)
+    assert(identifierRegex.test(variableName), `${variableName} is not a valid identifier. Variable names should begin with a lower-case letter and only contain letters and numbers.`)
 
     if (assignKeyword !== "to") {
       if (isExport) {
