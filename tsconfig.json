@@ -6,7 +6,9 @@
         "sourceMap": true,
         "rootDir": "src",
         "outDir": "lib",
-        "importsNotUsedAsValues": "error"
+        "importsNotUsedAsValues": "error",
+        "jsx": "react-jsx",
+        "jsxImportSource": "preact"
     },
     "include": ["src/**/*.ts"]
 }
