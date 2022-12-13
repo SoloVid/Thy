@@ -16,6 +16,8 @@
     "test": "run-p --aggregate-output check-types test:uts",
     "test:uts:interpreter": "uts -r esbuild-register src/interpreter",
     "test:uts:interpreter:watch": "watchlist --eager src/interpreter -- npm run test:uts:interpreter",
+    "test:uts:std-lib": "uts -r esbuild-register src/std-lib",
+    "test:uts:std-lib:watch": "watchlist --eager src/std-lib -- npm run test:uts:std-lib",
     "test:uts": "uts -r esbuild-register src",
     "test:watch": "watchlist --eager src -- npm run test:uts"
   },

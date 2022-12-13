@@ -1,7 +1,7 @@
 export const ifBuiltin = <_T>(condition: boolean, trueCallback: () => _T, elseLiteral?: "else", falseCallback?: () => _T) => {
   if (condition) {
-    trueCallback()
+    return trueCallback()
   } else if (falseCallback) {
-    falseCallback()
+    return falseCallback()
   }
 }
