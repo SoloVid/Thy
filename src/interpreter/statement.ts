@@ -4,7 +4,12 @@ import { identifierRegex } from "./patterns"
 import type { Atom, ThyBlockContext } from "./types"
 
 export function interpretThyStatement(context: ThyBlockContext, parts: readonly Atom[]): void {
-  const [variableName, assignKeyword, ...callParts] = parts
+  const mutableParts = [...parts]
+  const firstPart = mutableParts.shift()
+  const isExport = firstPart === "export"
+  const isPrivate = firstPart === "private"
+  const variableName = (isExport || isPrivate) ? mutableParts.shift() : firstPart
+  const [assignKeyword, ...callParts] = mutableParts
 
   if (typeof variableName === "string" && typeof assignKeyword === "string" && ["is", "be", "to"].includes(assignKeyword)) {
     const newValue = interpretThyCall(context, callParts)
@@ -13,6 +18,13 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
     context.beforeThatValue = undefined
 
     assert.match(variableName, identifierRegex, `${variableName} is not a valid identifier. Variable names should begin with a lower-case letter and only contain letters and numbers.`)
+
+    if (isExport) {
+      context.exportedVariables.push(variableName)
+    } else if (!isPrivate) {
+      context.bareVariables.push(variableName)
+    }
+
     assert(!(variableName in context.implicitArguments), `${variableName} is an implicit argument and cannot be overwritten`)
     if (variableName in context.closure && ["is", "be"].includes(assignKeyword)) {
       throw new Error(`${variableName} cannot be shadowed. Since it is declared in an upper scope, it cannot be redefined.`)

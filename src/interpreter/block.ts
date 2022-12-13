@@ -22,6 +22,28 @@ export function interpretThyBlockLines(
   thySourceLines: readonly string[],
   options: BlockOptions,
 ): (...args: readonly unknown[]) => unknown {
+  const statements = splitThyStatements(thySourceLines)
+  let exportUsed = false
+  let letUsed = false
+  for (const statement of statements) {
+    if (statement[0] === "export") {
+      if (letUsed) {
+        throw new Error(`\`export\` cannot be used after \`let\``)
+      }
+      exportUsed = true
+    }
+    if (statement[0] === "let") {
+      if (exportUsed) {
+        throw new Error(`\`let\` cannot be used after \`export\``)
+      }
+      letUsed = true
+    }
+    if (statement[0] === "return") {
+      if (exportUsed) {
+        throw new Error(`\`return\` cannot be used after \`export\``)
+      }
+    }
+  }
   return (...args: readonly unknown[]) => {
     const context: ThyBlockContext = {
       argsToUse: [...args],
@@ -30,12 +52,13 @@ export function interpretThyBlockLines(
       implicitArgumentFirstUsed: null,
       variablesInBlock: {},
       variableIsImmutable: {},
+      bareVariables: [],
+      exportedVariables: [],
       closure: options.closure,
       closureVariableIsImmutable: options.closureVariableIsImmutable,
       thatValue: undefined,
       beforeThatValue: undefined,
     }
-    const statements = splitThyStatements(thySourceLines)
     for (const statement of statements) {
       const parts = statement
       if (parts.length > 0) {
@@ -55,6 +78,25 @@ export function interpretThyBlockLines(
 
         interpretThyStatement(context, parts)
       }
+    }
+    const exportSource = context.exportedVariables.length > 0 ? context.exportedVariables : context.bareVariables
+    if (!letUsed && exportSource.length > 0) {
+      const implicitReturn: Record<string, unknown> = {}
+      for (const variableName of exportSource) {
+        Object.defineProperty(implicitReturn, variableName, {
+          enumerable: true,
+          get() {
+            return context.variablesInBlock[variableName]
+          },
+          set(newValue) {
+            if (context.variableIsImmutable[variableName]) {
+              throw new Error(`${variableName} is immutable and cannot be overwritten`)
+            }
+            context.variablesInBlock[variableName] = newValue
+          },
+        })
+      }
+      return implicitReturn
     }
     return undefined
   }

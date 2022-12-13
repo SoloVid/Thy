@@ -73,3 +73,78 @@ test("interpretThyBlock() should return a function that rejects `let` with no ca
   const interpreted = interpretThyBlock(`let\nreturn 1`)
   assert.throws(() => interpreted(), /`let` requires a function call/)
 })
+
+test("interpretThyBlock() should return a function that can return undefined (when no return)", async () => {
+  const interpreted = interpretThyBlock(`Just a comment`)
+  assert.strictEqual(interpreted(), undefined)
+})
+
+test("interpretThyBlock() should return object of exported variables", async () => {
+  const interpreted = interpretThyBlock(`export a is f\nb is f\nexport c be f`)
+  const f = () => 5
+  assert.deepStrictEqual(interpreted({ f }), { a: 5, c: 5 })
+})
+
+test("interpretThyBlock() should return object of exported variables, appropriately mutable", async () => {
+  const interpreted = interpretThyBlock(`export a be f`)
+  const f = () => 5
+  const result = interpreted({ f })
+  assert(result !== null && typeof result === "object")
+  const record = result as Record<string, unknown>
+  record.a = 6
+  assert.deepStrictEqual(result, { a: 6 })
+})
+
+test("interpretThyBlock() should return object of exported variables, appropriately immutable", async () => {
+  const interpreted = interpretThyBlock(`export a is f`)
+  const f = () => 5
+  const result = interpreted({ f })
+  assert(result !== null && typeof result === "object")
+  const record = result as Record<string, unknown>
+  assert.throws(() => record.a = 6, /a is immutable/)
+  assert.deepStrictEqual(result, { a: 5 })
+})
+
+test("interpretThyBlock() should reject export after let", async () => {
+  assert.throws(() => interpretThyBlock(`let f\nexport a is f`), /`export` cannot be used after `let`/)
+})
+
+test("interpretThyBlock() should reject let after export", async () => {
+  assert.throws(() => interpretThyBlock(`export a is f\nlet f`), /`let` cannot be used after `export`/)
+})
+
+test("interpretThyBlock() should reject return after export", async () => {
+  assert.throws(() => interpretThyBlock(`export a is f\nreturn 5`), /`return` cannot be used after `export`/)
+})
+
+test("interpretThyBlock() should return object of implicitly exported variables", async () => {
+  const interpreted = interpretThyBlock(`a is f\nb is f`)
+  const f = () => 5
+  assert.deepStrictEqual(interpreted({ f }), { a: 5, b: 5 })
+})
+
+test("interpretThyBlock() should return object of implicitly exported variables, appropriately mutable", async () => {
+  const interpreted = interpretThyBlock(`a be f`)
+  const f = () => 5
+  const result = interpreted({ f })
+  assert(result !== null && typeof result === "object")
+  const record = result as Record<string, unknown>
+  record.a = 6
+  assert.deepStrictEqual(result, { a: 6 })
+})
+
+test("interpretThyBlock() should return object of implicitly exported variables, appropriately immutable", async () => {
+  const interpreted = interpretThyBlock(`a is f`)
+  const f = () => 5
+  const result = interpreted({ f })
+  assert(result !== null && typeof result === "object")
+  const record = result as Record<string, unknown>
+  assert.throws(() => record.a = 6, /a is immutable/)
+  assert.deepStrictEqual(result, { a: 5 })
+})
+
+test("interpretThyBlock() should not return object of implicitly exported variables if let was used", async () => {
+  const interpreted = interpretThyBlock(`let f\na is f\nb is f`)
+  const f = () => undefined
+  assert.deepStrictEqual(interpreted({ f }), undefined)
+})

@@ -7,6 +7,8 @@ export const makeSimpleContext = (o: Partial<ThyBlockContext> = {}): ThyBlockCon
   implicitArgumentFirstUsed: null,
   variablesInBlock: {},
   variableIsImmutable: {},
+  bareVariables: [],
+  exportedVariables: [],
   closure: {},
   closureVariableIsImmutable: {},
   thatValue: undefined,
