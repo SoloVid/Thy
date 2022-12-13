@@ -148,3 +148,18 @@ test("interpretThyBlock() should not return object of implicitly exported variab
   const f = () => undefined
   assert.deepStrictEqual(interpreted({ f }), undefined)
 })
+
+test("interpretThyBlock() should share mutable variable state", async () => {
+  const interpreted = interpretThyBlock(`a be def 1\nf is def\n  aBefore is def a\n  a to def 2\n  return aBefore`)
+  const result = interpreted({ def: (a: unknown) => a })
+  assert(result !== null && typeof result === "object")
+  const record = result as Record<string, unknown>
+  assert.strictEqual(record.a, 1)
+  assert(typeof record.f === "function")
+  record.a = 3
+  assert.strictEqual(record.a, 3)
+  // This should return `a` as is and set `a` to 2.
+  const aFromF = record.f()
+  assert.strictEqual(aFromF, 3)
+  assert.strictEqual(record.a, 2)
+})
