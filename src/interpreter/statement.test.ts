@@ -217,3 +217,11 @@ test("interpretThyStatement() should not add private variables to context export
   interpretThyStatement(context, [`private`, `a`, `is`, `f`])
   assert.deepStrictEqual(context.exportedVariables, [])
 })
+
+test("interpretThyStatement() should not add re-assigned variables to context bare array", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: () => 5, a: 1 },
+  })
+  interpretThyStatement(context, [`a`, `to`, `f`])
+  assert.deepStrictEqual(context.bareVariables, [])
+})

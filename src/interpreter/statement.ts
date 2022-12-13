@@ -19,10 +19,12 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
 
     assert.match(variableName, identifierRegex, `${variableName} is not a valid identifier. Variable names should begin with a lower-case letter and only contain letters and numbers.`)
 
-    if (isExport) {
-      context.exportedVariables.push(variableName)
-    } else if (!isPrivate) {
-      context.bareVariables.push(variableName)
+    if (assignKeyword !== "to") {
+      if (isExport) {
+        context.exportedVariables.push(variableName)
+      } else if (!isPrivate) {
+        context.bareVariables.push(variableName)
+      }
     }
 
     assert(!(variableName in context.implicitArguments), `${variableName} is an implicit argument and cannot be overwritten`)
