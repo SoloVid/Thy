@@ -8,7 +8,12 @@
 		"script-parts": {
 			"patterns": [
 				{"include": "#comments"},
-				{"include": "#code-lines"}
+				{"include": "#multiline-strings-plus"},
+				{"include": "#code-lines"},
+				{
+					"name": "invalid.illegal.thy",
+					"match": "."
+				}
 			]
 		},
 		"comments": {
@@ -210,10 +215,33 @@
 				{"include": "#value-identifiers"}
 			]
 		},
+		"multiline-strings-plus": {
+			"name": "meta.multiline-string-plus.thy",
+			"begin": "^((\\s*)[a-z].+)(\"\"\")$",
+			"end": "^(?=\\2\\S)",
+			"beginCaptures": {
+				"3": { "name": "string.quoted.multiline.thy" },
+				"1": {
+					"patterns": [
+						{ "include": "#code-lines" }
+					]
+				}
+			},
+			"contentName": "string.quoted.multiline.thy",
+			"patterns": [
+				{"include": "#inside-strings"}
+			]
+		},
 		"strings": {
-			"name": "string.quoted.other.thy",
+			"name": "string.quoted.inline.thy",
 			"begin": "\"",
 			"end": "\"",
+			"patterns": [
+				{"include": "#inside-strings"}
+			]
+		},
+		"inside-strings": {
+			"name": "meta.inside-string.thy",
 			"patterns": [
 				{
 					"name": "constant.character.escape.thy",

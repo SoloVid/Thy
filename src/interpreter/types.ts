@@ -1,5 +1,8 @@
-export type Atom = string | (readonly string[])
+export type Atom = string | Block | MultilineString
 export type Statement = readonly Atom[]
+
+export type Block = readonly string[]
+export type MultilineString = { type: "multiline-string", indent: string, lines: readonly string[] }
 
 export type ThyBlockContext = {
   readonly argsToUse: unknown[]

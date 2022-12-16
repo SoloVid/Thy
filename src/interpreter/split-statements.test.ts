@@ -224,3 +224,43 @@ test("splitThyStatements() should detect empty block from multi-line comment", a
     ]]
   ])
 })
+
+test("splitThyStatements() should collapse multiline string", async () => {
+  const inputLines = [
+    `f """`,
+    ``,
+    `  Dear so-and-so,`,
+    ``,
+    `  This letter...`,
+    ``,
+    `g`,
+  ]
+  assert.deepStrictEqual(splitThyStatements(inputLines), [
+    ["f", { type: "multiline-string", indent: "", lines: [
+      "",
+      "  Dear so-and-so,",
+      "",
+      "  This letter...",
+      "",
+    ] }],
+    ["g"],
+  ])
+})
+
+test("splitThyStatements() should track indent level", async () => {
+  const inputLines = [
+    `  f """`,
+    ``,
+    `    himom`,
+    ``,
+    `  g`,
+  ]
+  assert.deepStrictEqual(splitThyStatements(inputLines), [
+    ["f", { type: "multiline-string", indent: "  ", lines: [
+      "",
+      "    himom",
+      "",
+    ] }],
+    ["g"],
+  ])
+})

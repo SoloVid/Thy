@@ -1,9 +1,14 @@
 import { stringRegex } from "./patterns"
 
-export function splitLineParts(line: string): readonly string[] {
+export function splitLineParts(line: string): string[] {
   const substitutions: Record<string, string> = {}
   return line
     .trim()
+    .replace(/"""/g, (match) => {
+      const id = generateUID()
+      substitutions[id] = match
+      return id
+    })
     .replace(new RegExp(stringRegex, "g"), (match) => {
       const id = generateUID()
       substitutions[id] = match
