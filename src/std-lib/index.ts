@@ -6,6 +6,7 @@ import { falseBuiltin, nullBuiltin, trueBuiltin } from "./globals";
 import { ifBuiltin } from "./if";
 import { loopElementsBuiltin, loopForeverBuiltin, loopTimesBuiltin } from "./loop";
 import { loopAsyncElementsBuiltin, loopAsyncForeverBuiltin, loopAsyncTimesBuiltin } from "./loop-async";
+import { mutableMapBuiltin } from "./map";
 import { math } from "./math";
 import { printBuiltin } from "./print";
 
@@ -26,6 +27,7 @@ export const core = {
       "elements": loopAsyncElementsBuiltin,
     }
   },
+  "map": mutableMapBuiltin,
   "math": math,
   "print": printBuiltin,
 

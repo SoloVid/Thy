@@ -3,7 +3,7 @@ type InitArgs<T> = {
   push: (e: T) => void
 }
 
-export const arrayBuiltin = <_T>(init: (args: InitArgs<_T>) => void) => {
+export const mutableArrayBuiltin = <_T>(init: (args: InitArgs<_T>) => void) => {
   const arr: _T[] = []
   init({
     a: (e) => arr.push(e),
@@ -12,4 +12,4 @@ export const arrayBuiltin = <_T>(init: (args: InitArgs<_T>) => void) => {
   return arr
 }
 
-export const mutableArrayBuiltin = <_T>(init: (args: InitArgs<_T>) => void): readonly _T[] => arrayBuiltin(init)
+export const arrayBuiltin = <_T>(init: (args: InitArgs<_T>) => void): readonly _T[] => mutableArrayBuiltin(init)
