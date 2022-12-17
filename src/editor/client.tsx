@@ -1,10 +1,12 @@
-import "preact/debug";
+import "preact/debug"
 
-import ace from "ace-builds";
-import { render } from "preact";
-import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { interpretThyBlock } from "../interpreter/block";
-import { core } from "../std-lib";
+import ace from "ace-builds"
+import { render } from "preact"
+import { useEffect, useRef, useState } from "preact/hooks"
+import { interpretThyBlock } from "../interpreter/block"
+import { generateUID } from "../interpreter/split-line"
+import { core } from "../std-lib"
+import { useLocalFiles } from "./local-files"
 
 type Output = {
   readonly error: null | string
@@ -36,7 +38,7 @@ export default function App() {
     return `return "himom"\n`
   })
 
-  function run(sourceCode: string): Output {
+  async function run(sourceCode: string): Promise<Output> {
     let error: null | string = null
     let returnValue: unknown = undefined
     let printedLines: string[] = []
@@ -50,13 +52,14 @@ export default function App() {
         },
         fetch,
       }
-      returnValue = interpreted(playgroundLib)
+      returnValue = await interpreted(playgroundLib)
     } catch (e) {
       console.error(e)
       if (e instanceof Error) {
         error = e.stack ?? e.message
+      } else {
+        error = JSON.stringify(e)
       }
-      error = JSON.stringify(e)
     }
     return {
       error,
@@ -65,19 +68,37 @@ export default function App() {
     }
   }
 
-  const [output, setOutput] = useState<Output>(() => {
-    return run(sourceCode)
+  const [output, setOutput] = useState<Output | string>({
+    error: null,
+    returnValue: undefined,
+    printedLines: [],
   })
+  function runThenSetOutput(code: string) {
+    const uid = generateUID()
+    setOutput(uid)
+    run(sourceCode).then((newOutput) => {
+      setOutput((before) => {
+        if (before === uid) {
+          return newOutput
+        }
+        return before
+      })
+    })
+  }
 
   function onSourceCodeChange(newSource: string) {
     setSourceCode(newSource)
     history.replaceState(null, "", `#b64=${btoa(newSource)}`)
   }
 
-  function submitSourceCode(newSource: string) {
+  async function submitSourceCode(newSource: string) {
     onSourceCodeChange(newSource)
-    setOutput(run(newSource))
+    runThenSetOutput(newSource)
   }
+
+  const [showFileMenu, setShowFileMenu] = useState(false)
+  const fileMan = useLocalFiles()
+  const [fileLoaded, setFileLoaded] = useState("")
 
   const editorRef = useRef<HTMLDivElement>(null)
 
@@ -105,26 +126,71 @@ export default function App() {
       // editor.setTheme("ace/theme/monokai")
       // editor.session.setMode("ace/mode/javascript")
     }
-  }, [editorRef.current])
+  }, [editorRef.current, fileLoaded])
 
   return <div style={`height:100vh;height:${windowHeight}px;`}>
     {/* <div style="padding: 20px;height:100%;"> */}
       {/* <div style="background-color: red;height:100%;"> */}
+        <div>
+          <span onClick={() => setShowFileMenu(before => !before)} className="btn">File</span>
+          {showFileMenu && (
+            <ul>
+              {fileMan.files.length === 0 && <li>No saved files</li>}
+              {fileMan.files.map(f => (
+                <li>
+                  <span className="small-btn" onClick={() => {
+                    fileMan.saveFile(f, sourceCode)
+                    setFileLoaded(f)
+                  }}>Save</span>
+                  <span className="small-btn" onClick={() => {
+                    const contents = fileMan.getFile(f)
+                    if (contents === null) {
+                      return
+                    }
+                    setSourceCode(contents)
+                    setFileLoaded(f)
+                  }}>Load</span>
+                  <span className="small-btn" onClick={() => fileMan.deleteFile(f)}>Delete</span>
+                  <strong>{f}</strong>
+                </li>
+              ))}
+                <li>
+                  <span className="small-btn" onClick={() => {
+                    const newName = fileMan.saveAsNew(sourceCode)
+                    if (!!newName) {
+                      setFileLoaded(newName)
+                    }
+                  }}>Save as New</span>
+                  <span className="small-btn" onClick={() => {
+                    if (!window.confirm("Clear editor?")) {
+                      return
+                    }
+                    setSourceCode("")
+                    setFileLoaded("")
+                  }}>Clear</span>
+                </li>
+            </ul>
+          )}
+        </div>
         <div ref={editorRef} id="editor" style={`position:relative; width: 100%; height: ${editorHeight}px;`}></div>
         <div>
-          <span onClick={() => run(sourceCode)} style="cursor:pointer;padding:15px;background-color:rgb(100,200,220);color:white;font-size:20px;display:block;">Run</span>
-          {output.error !== null && <div>
-            <h3>Error</h3>
-            <pre>{output.error}</pre>
-          </div>}
-          {output.returnValue !== undefined && <div>
-            <h3>Return Value</h3>
-            <pre>{"" + output.returnValue}</pre>
-          </div>}
-          {output.printedLines.length > 0 && <div>
-            <h3>Printed Lines</h3>
-            <pre>{output.printedLines.join("\n")}</pre>
-          </div>}
+          <span onClick={() => runThenSetOutput(sourceCode)} class="btn">Run</span>
+          {typeof output === "string" ? (
+            <h4>Running...</h4>
+          ): (<>
+            {output.error !== null && <div>
+              <h3>Error</h3>
+              <pre>{output.error}</pre>
+            </div>}
+            {output.returnValue !== undefined && <div>
+              <h3>Return Value</h3>
+              <pre>{"" + output.returnValue}</pre>
+            </div>}
+            {output.printedLines.length > 0 && <div>
+              <h3>Printed Lines</h3>
+              <pre>{output.printedLines.join("\n")}</pre>
+            </div>}  
+          </>)}
         </div>
       {/* </div> */}
     {/* </div> */}
