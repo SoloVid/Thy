@@ -20,7 +20,7 @@ export function splitLineParts(line: string): string[] {
 }
 
 // Implementation from https://stackoverflow.com/a/1349426/4639640
-function generateUID(length: number = 16) {
+export function generateUID(length: number = 16) {
   var result = '';
   var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   var charactersLength = characters.length;

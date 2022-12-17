@@ -236,13 +236,7 @@ test("splitThyStatements() should collapse multiline string", async () => {
     `g`,
   ]
   assert.deepStrictEqual(splitThyStatements(inputLines), [
-    ["f", { type: "multiline-string", indent: "", lines: [
-      "",
-      "  Dear so-and-so,",
-      "",
-      "  This letter...",
-      "",
-    ] }],
+    ["f", `"\\nDear so-and-so,\\n\\nThis letter..."`],
     ["g"],
   ])
 })
@@ -256,11 +250,7 @@ test("splitThyStatements() should track indent level", async () => {
     `  g`,
   ]
   assert.deepStrictEqual(splitThyStatements(inputLines), [
-    ["f", { type: "multiline-string", indent: "  ", lines: [
-      "",
-      "    himom",
-      "",
-    ] }],
+    ["f", `"\\nhimom"`],
     ["g"],
   ])
 })

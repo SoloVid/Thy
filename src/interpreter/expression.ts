@@ -1,17 +1,12 @@
 import assert from "../utils/assert"
 import { interpretThyBlockLines } from "./block"
 import { identifierRegex, numberRegex, stringRegex } from "./patterns"
-import { interpolateString, interpretThyMultilineString } from "./string"
-import type { Atom, MultilineString, ThyBlockContext } from "./types"
+import { interpolateString, parseString } from "./string"
+import type { Atom, ThyBlockContext } from "./types"
 
 export function interpretThyExpression(context: ThyBlockContext, thyExpression: Atom): unknown {
   if (Array.isArray(thyExpression)) {
     return resolveBlock(context, thyExpression)
-  }
-  const thyMultilineString = thyExpression as MultilineString
-  if (typeof thyMultilineString === "object" && thyMultilineString.type === "multiline-string") {
-    const rawString = interpretThyMultilineString(thyMultilineString)
-    return interpolateString(context, rawString)
   }
   assert(typeof thyExpression === "string", "Array case should have been filtered")
 
@@ -20,7 +15,7 @@ export function interpretThyExpression(context: ThyBlockContext, thyExpression: 
   }
   const stringMatch = stringRegex.exec(thyExpression)
   if (stringMatch !== null) {
-    const rawString = JSON.parse(stringMatch[0])
+    const rawString = parseString(stringMatch[0])
     return interpolateString(context, rawString)
   }
 

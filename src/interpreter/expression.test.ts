@@ -26,29 +26,9 @@ test("interpretThyExpression() can interpolate string", async () => {
   assert.strictEqual(interpretThyExpression(context, `"check .a."`), "check 12")
 })
 
-test("interpretThyExpression() can return multiline string", async () => {
+test("interpretThyExpression() allows escaping periods in string", async () => {
   const context = makeSimpleContext()
-  assert.strictEqual(interpretThyExpression(context, {
-    type: "multiline-string",
-    indent: "  ",
-    lines: [
-      "",
-      "  yo",
-    ],
-  }), "\nyo")
-})
-
-test("interpretThyExpression() can interpolate multiline string", async () => {
-  const context = makeSimpleContext({
-    variablesInBlock: { a: 13 },
-  })
-  assert.strictEqual(interpretThyExpression(context, {
-    type: "multiline-string",
-    indent: "  ",
-    lines: [
-      "check .a.",
-    ],
-  }), "check 13")
+  assert.strictEqual(interpretThyExpression(context, `"check \\.a\\."`), "check .a.")
 })
 
 test("interpretThyExpression() can pull value from local variables", async () => {

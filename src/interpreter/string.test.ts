@@ -1,12 +1,11 @@
 import assert from "node:assert"
 import { test } from "under-the-sun"
+import { parseString, RawMultilineStringData } from "./string"
 import { interpolateString, interpretThyMultilineString } from "./string"
 import { makeSimpleContext } from "./test-helper"
-import type { MultilineString } from "./types"
 
 test("interpretThyMultilineString() should return string with stripped insignificant whitespace", async () => {
-  const input: MultilineString = {
-    type: "multiline-string",
+  const input: RawMultilineStringData = {
     indent: "    ",
     lines: [
       "",
@@ -21,7 +20,18 @@ test("interpretThyMultilineString() should return string with stripped insignifi
     ]
   }
   const output = interpretThyMultilineString(input)
-  assert.strictEqual(output, `\n\n\n \nsomething\n\n `)
+  assert.strictEqual(output, `"\\n\\n\\n \\nsomething\\n\\n "`)
+})
+
+test("interpretThyMultilineString() should escape quotes", async () => {
+  const input: RawMultilineStringData = {
+    indent: "    ",
+    lines: [
+      `say "hi"!`
+    ]
+  }
+  const output = interpretThyMultilineString(input)
+  assert.strictEqual(output, `"say \\"hi\\"!"`)
 })
 
 test("interpolateString() should interpolate string values", async () => {
@@ -96,4 +106,16 @@ test("interpolateString() should not mess with normal periods", async () => {
 test("interpolateString() should allow escaping periods", async () => {
   const context = makeSimpleContext()
   assert.strictEqual(interpolateString(context, "check \\.a\\."), "check .a.")
+})
+
+test("parseString() should behave similar to JSON.parse()", async () => {
+  assert.strictEqual(parseString(`"a\\"\\n"`), `a"\n`)
+})
+
+test("parseString() should reject bad string literal", async () => {
+  assert.throws(() => parseString(`"unterminated`), /Invalid string literal/)
+})
+
+test("parseString() should leave period escape", async () => {
+  assert.strictEqual(parseString(`". \\. \\\\\\."`), `. \\. \\\\.`)
 })

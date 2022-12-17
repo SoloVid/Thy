@@ -1,34 +1,41 @@
 import assert from "../utils/assert"
 import { extractIndent, getFirstIndent } from "./indentation"
 import { splitLineParts } from "./split-line"
-import type { Atom, MultilineString, Statement } from "./types"
+import { interpretThyMultilineString, RawMultilineStringData } from "./string"
+import type { Atom, Statement } from "./types"
 
 type ReduceState = {
   blockLines: null | readonly string[]
   statements: readonly Statement[]
   multilineCommentTag: string | null
-  inMultilineString: boolean
+  inProgressMultilineString: RawMultilineStringData | null
 }
 
 export function splitThyStatements(thySourceLines: readonly string[]): readonly Statement[] {
   const ourLevelIndent = getFirstIndent(thySourceLines)
 
-  return thySourceLines.reduce((soFar, line) => {
+  return thySourceLines.reduce((soFar0, line) => {
     const lineLevelIndent = extractIndent(line)
-    if (soFar.inMultilineString && (lineLevelIndent.length > ourLevelIndent.length || line.trim() === "")) {
-      const precedingStatements = [...soFar.statements]
-      const lastStatement = precedingStatements.pop() as Statement
-      assert(!!lastStatement, "No preceding statement for multiline string")
-      const precedingParts = [...lastStatement]
-      const multilineString = precedingParts.pop() as MultilineString
-      assert(!!multilineString && typeof multilineString === "object" && multilineString.type === "multiline-string", "Preceding part should be a multiline string")
-      const amendedMultilineString = {
-        ...multilineString,
-        lines: [...multilineString.lines, line],
-      } as const
-      return {
-        ...soFar,
-        statements: [...precedingStatements, [...precedingParts, amendedMultilineString]],
+    let soFar: ReduceState = soFar0
+    if (soFar0.inProgressMultilineString !== null) {
+      if (lineLevelIndent.length > ourLevelIndent.length || line.trim() === "") {
+        return {
+          ...soFar0,
+          inProgressMultilineString: {
+            ...soFar0.inProgressMultilineString,
+            lines: [...soFar0.inProgressMultilineString.lines, line],
+          }
+        }
+      } else {
+        const precedingStatements = [...soFar.statements]
+        const lastStatement = precedingStatements.pop() as Statement
+        assert(!!lastStatement, "No preceding statement for multiline string")
+        const combinedString = interpretThyMultilineString(soFar0.inProgressMultilineString)
+        soFar = {
+          ...soFar0,
+          statements: [...precedingStatements, [...lastStatement, combinedString]],
+          inProgressMultilineString: null,
+        }
       }
     }
     if (line.trim() === "") {
@@ -55,8 +62,8 @@ export function splitThyStatements(thySourceLines: readonly string[]): readonly 
       const opensMultilineString = parts.length > 0 && parts[parts.length - 1] === `"""`
       if (opensMultilineString) {
         parts.pop()
-        parts.push({ type: "multiline-string", indent: lineLevelIndent, lines: [] })
       }
+      const inProgressMultilineString = opensMultilineString ? { indent: lineLevelIndent + "  ", lines: [] } : null
       const [andPart, ...afterAndParts] = parts
       if (andPart === "and") {
         const precedingStatements = [...soFar.statements]
@@ -68,14 +75,14 @@ export function splitThyStatements(thySourceLines: readonly string[]): readonly 
           ...soFar,
           blockLines: null,
           statements: [...precedingStatements, [...lastStatement, ...afterAndParts]],
-          inMultilineString: opensMultilineString,
+          inProgressMultilineString: inProgressMultilineString,
         }
       }
       return {
         ...soFar,
         blockLines: null,
         statements: [...soFar.statements, parts],
-        inMultilineString: opensMultilineString,
+        inProgressMultilineString: inProgressMultilineString,
       }
     }
     if (lineLevelIndent.length > ourLevelIndent.length) {
@@ -103,6 +110,6 @@ export function splitThyStatements(thySourceLines: readonly string[]): readonly 
     blockLines: null,
     statements: [],
     multilineCommentTag: null,
-    inMultilineString: false,
+    inProgressMultilineString: null,
   } as ReduceState).statements
 }
