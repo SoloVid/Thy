@@ -1,4 +1,6 @@
-import type { MultilineString } from "./types"
+import assert from "../utils/assert"
+import { interpretThyIdentifier } from "./expression"
+import type { MultilineString, ThyBlockContext } from "./types"
 
 type InterpretMultilineStringState = {
   readonly newlinesBuiltUp: number
@@ -41,4 +43,12 @@ function makeNewlines(count: number): string {
     output = output + "\n"
   }
   return output
+}
+
+export function interpolateString(context: ThyBlockContext, thyString: string): string {
+  return thyString.replace(/\.([a-z][a-zA-Z0-9]*)\./g, (m, p1) => {
+    const value = interpretThyIdentifier(context, p1)
+    assert(typeof value === "string" || typeof value === "number", `${p1} is not a string or number`)
+    return `${value}`
+  })
 }

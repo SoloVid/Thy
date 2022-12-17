@@ -1,7 +1,7 @@
 import assert from "../utils/assert"
 import { interpretThyBlockLines } from "./block"
 import { identifierRegex, numberRegex, stringRegex } from "./patterns"
-import { interpretThyMultilineString } from "./string"
+import { interpolateString, interpretThyMultilineString } from "./string"
 import type { Atom, MultilineString, ThyBlockContext } from "./types"
 
 export function interpretThyExpression(context: ThyBlockContext, thyExpression: Atom): unknown {
@@ -10,25 +10,21 @@ export function interpretThyExpression(context: ThyBlockContext, thyExpression: 
   }
   const thyMultilineString = thyExpression as MultilineString
   if (typeof thyMultilineString === "object" && thyMultilineString.type === "multiline-string") {
-    return interpretThyMultilineString(thyMultilineString)
+    const rawString = interpretThyMultilineString(thyMultilineString)
+    return interpolateString(context, rawString)
   }
   assert(typeof thyExpression === "string", "Array case should have been filtered")
-
-  if (thyExpression === "that") {
-    return interpretThat(context, "thatValue", "that")
-  }
-  if (thyExpression === "beforeThat") {
-    return interpretThat(context, "beforeThatValue", "beforeThat")
-  }
 
   if (numberRegex.test(thyExpression)) {
     return parseFloat(thyExpression)
   }
   const stringMatch = stringRegex.exec(thyExpression)
   if (stringMatch !== null) {
-    return JSON.parse(stringMatch[0])
+    const rawString = JSON.parse(stringMatch[0])
+    return interpolateString(context, rawString)
   }
-  return resolveNamedAccess(context, thyExpression)
+
+  return interpretThyIdentifier(context, thyExpression)
 }
 
 function resolveBlock(context: ThyBlockContext, thyLines: readonly string[]) {
@@ -66,6 +62,17 @@ function resolveBlock(context: ThyBlockContext, thyLines: readonly string[]) {
     }
   }
   return interpretThyBlockLines(thyLines, { closure: childClosure, closureVariableIsImmutable: childClosureVariableIsImmutable })
+}
+
+export function interpretThyIdentifier(context: ThyBlockContext, thyExpression: string) {
+  if (thyExpression === "that") {
+    return interpretThat(context, "thatValue", "that")
+  }
+  if (thyExpression === "beforeThat") {
+    return interpretThat(context, "beforeThatValue", "beforeThat")
+  }
+
+  return resolveNamedAccess(context, thyExpression)
 }
 
 function interpretThat(context: ThyBlockContext, contextKey: "thatValue" | "beforeThatValue", keyword: "that" | "beforeThat") {

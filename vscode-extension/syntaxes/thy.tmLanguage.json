@@ -246,6 +246,15 @@
 				{
 					"name": "constant.character.escape.thy",
 					"match": "\\\\."
+				},
+				{
+					"name": "meta.string-interpolation.thy",
+					"match": "(\\.)([a-z][a-zA-Z0-9]*)(\\.)",
+					"captures": {
+						"2": { "name": "variable.other.thy" },
+						"1": { "name": "constant.character.escape.thy" },
+						"3": { "name": "constant.character.escape.thy" }
+					}
 				}
 			]
 		},

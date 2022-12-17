@@ -19,6 +19,13 @@ test("interpretThyExpression() respects escape codes in string", async () => {
   assert.strictEqual(interpretThyExpression(context, `"hi mom\\n\\"how'r u\\""`), "hi mom\n\"how'r u\"")
 })
 
+test("interpretThyExpression() can interpolate string", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { a: 12 },
+  })
+  assert.strictEqual(interpretThyExpression(context, `"check .a."`), "check 12")
+})
+
 test("interpretThyExpression() can return multiline string", async () => {
   const context = makeSimpleContext()
   assert.strictEqual(interpretThyExpression(context, {
@@ -29,6 +36,19 @@ test("interpretThyExpression() can return multiline string", async () => {
       "  yo",
     ],
   }), "\nyo")
+})
+
+test("interpretThyExpression() can interpolate multiline string", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { a: 13 },
+  })
+  assert.strictEqual(interpretThyExpression(context, {
+    type: "multiline-string",
+    indent: "  ",
+    lines: [
+      "check .a.",
+    ],
+  }), "check 13")
 })
 
 test("interpretThyExpression() can pull value from local variables", async () => {
