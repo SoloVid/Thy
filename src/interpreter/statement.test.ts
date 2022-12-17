@@ -225,3 +225,97 @@ test("interpretThyStatement() should not add re-assigned variables to context ba
   interpretThyStatement(context, [`a`, `to`, `f`])
   assert.deepStrictEqual(context.bareVariables, [])
 })
+
+test("interpretThyStatement() should not return a promise if not an await call (no assign)", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: (n: number) => n }
+  })
+  const thyResult = interpretThyStatement(context, [`f`, `5`])
+  assert.strictEqual(thyResult, undefined)
+})
+
+test("interpretThyStatement() should not return a promise if not an await call (with assign)", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: (n: number) => n }
+  })
+  const thyResult = interpretThyStatement(context, [`a`, `is`, `f`, `5`])
+  assert.strictEqual(thyResult, undefined)
+})
+
+test("interpretThyStatement() should handle await call (no assign)", async () => {
+  let order = 0
+  let pResolveOrder = -1
+  let thyStatementResolveOrder = -1
+  let resolve = (n: number) => undefined as void
+  const p = new Promise<number>((r) => {
+    resolve = r
+  })
+  p.then(() => {
+    pResolveOrder = order++
+  })
+  const context = makeSimpleContext({
+    variablesInBlock: { p: p }
+  })
+  const thyResult = interpretThyStatement(context, [`await`, `p`])
+  assert(thyResult instanceof Promise)
+  thyResult.then(() => {
+    thyStatementResolveOrder = order++
+  })
+  assert.strictEqual(context.thatValue, undefined)
+  resolve(5)
+  await p
+  await thyResult
+  assert(pResolveOrder >= 0, "p should have resolved")
+  assert(thyStatementResolveOrder >= 0, "thy statement promise should have resolved")
+  assert(pResolveOrder < thyStatementResolveOrder, "thy statement promise should have resolved after p")
+  assert.strictEqual(context.thatValue, 5)
+})
+
+test("interpretThyStatement() should reject await call (no assign) with no arguments", async () => {
+  const context = makeSimpleContext()
+  assert.throws(() => interpretThyStatement(context, [`await`]), /`await` takes 1 argument/)
+})
+
+test("interpretThyStatement() should reject await call (no assign) with too many arguments", async () => {
+  const context = makeSimpleContext()
+  assert.throws(() => interpretThyStatement(context, [`await`, `1`, `1`]), /`await` takes 1 argument/)
+})
+
+test("interpretThyStatement() should handle await call with assignment", async () => {
+  let order = 0
+  let pResolveOrder = -1
+  let thyStatementResolveOrder = -1
+  let resolve = (n: number) => undefined as void
+  const p = new Promise<number>((r) => {
+    resolve = r
+  })
+  p.then(() => {
+    pResolveOrder = order++
+  })
+  const context = makeSimpleContext({
+    variablesInBlock: { p: p }
+  })
+  const thyResult = interpretThyStatement(context, [`a`, `is`, `await`, `p`])
+  assert(thyResult instanceof Promise)
+  thyResult.then(() => {
+    thyStatementResolveOrder = order++
+  })
+  assert(!("a" in context.variablesInBlock))
+  resolve(5)
+  await p
+  await thyResult
+  assert(pResolveOrder >= 0, "p should have resolved")
+  assert(thyStatementResolveOrder >= 0, "thy statement promise should have resolved")
+  assert(pResolveOrder < thyStatementResolveOrder, "thy statement promise should have resolved after p")
+  assert.strictEqual(context.variablesInBlock.a, 5)
+})
+
+test("interpretThyStatement() should reject await call (with assign) with no arguments", async () => {
+  const context = makeSimpleContext()
+  assert.throws(() => interpretThyStatement(context, [`a`, `is`, `await`]), /`await` takes 1 argument/)
+})
+
+test("interpretThyStatement() should reject await call (with assign) with too many arguments", async () => {
+  const context = makeSimpleContext()
+  assert.throws(() => interpretThyStatement(context, [`a`, `is`, `await`, `1`, `1`]), /`await` takes 1 argument/)
+})
