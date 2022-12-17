@@ -1,6 +1,6 @@
 import assert from "../utils/assert"
 import { interpretThyBlockLines } from "./block"
-import { identifierRegex, numberRegex, stringRegex } from "./patterns"
+import { exactNumberRegex, exactStringRegex, identifierRegex } from "./patterns"
 import { interpolateString, parseString } from "./string"
 import type { Atom, ThyBlockContext } from "./types"
 
@@ -10,10 +10,10 @@ export function interpretThyExpression(context: ThyBlockContext, thyExpression: 
   }
   assert(typeof thyExpression === "string", "Array case should have been filtered")
 
-  if (numberRegex.test(thyExpression)) {
+  if (exactNumberRegex.test(thyExpression)) {
     return parseFloat(thyExpression)
   }
-  const stringMatch = stringRegex.exec(thyExpression)
+  const stringMatch = exactStringRegex.exec(thyExpression)
   if (stringMatch !== null) {
     const rawString = parseString(stringMatch[0])
     return interpolateString(context, rawString)

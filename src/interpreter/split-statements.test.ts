@@ -254,3 +254,18 @@ test("splitThyStatements() should track indent level", async () => {
     ["g"],
   ])
 })
+
+test("splitThyStatements() should allow multiple multiline strings", async () => {
+  const inputLines = [
+    `f """`,
+    `  one`,
+    `f """`,
+    `  two`,
+    `and """`,
+    `  three`,
+  ]
+  assert.deepStrictEqual(splitThyStatements(inputLines), [
+    ["f", `"one"`],
+    ["f", `"two"`, `"three"`],
+  ])
+})

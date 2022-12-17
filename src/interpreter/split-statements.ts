@@ -14,7 +14,22 @@ type ReduceState = {
 export function splitThyStatements(thySourceLines: readonly string[]): readonly Statement[] {
   const ourLevelIndent = getFirstIndent(thySourceLines)
 
-  return thySourceLines.reduce((soFar0, line) => {
+  function submitMultilineString(soFar: ReduceState): ReduceState {
+    if (soFar.inProgressMultilineString === null) {
+      return soFar
+    }
+    const precedingStatements = [...soFar.statements]
+    const lastStatement = precedingStatements.pop() as Statement
+    assert(!!lastStatement, "No preceding statement for multiline string")
+    const combinedString = interpretThyMultilineString(soFar.inProgressMultilineString)
+    return {
+      ...soFar,
+      statements: [...precedingStatements, [...lastStatement, combinedString]],
+      inProgressMultilineString: null,
+    }
+  }
+
+  const finalState = thySourceLines.reduce((soFar0, line) => {
     const lineLevelIndent = extractIndent(line)
     let soFar: ReduceState = soFar0
     if (soFar0.inProgressMultilineString !== null) {
@@ -27,15 +42,7 @@ export function splitThyStatements(thySourceLines: readonly string[]): readonly 
           }
         }
       } else {
-        const precedingStatements = [...soFar.statements]
-        const lastStatement = precedingStatements.pop() as Statement
-        assert(!!lastStatement, "No preceding statement for multiline string")
-        const combinedString = interpretThyMultilineString(soFar0.inProgressMultilineString)
-        soFar = {
-          ...soFar0,
-          statements: [...precedingStatements, [...lastStatement, combinedString]],
-          inProgressMultilineString: null,
-        }
+        soFar = submitMultilineString(soFar0)
       }
     }
     if (line.trim() === "") {
@@ -111,5 +118,6 @@ export function splitThyStatements(thySourceLines: readonly string[]): readonly 
     statements: [],
     multilineCommentTag: null,
     inProgressMultilineString: null,
-  } as ReduceState).statements
+  } as ReduceState)
+  return submitMultilineString(finalState).statements
 }

@@ -14,6 +14,16 @@ test("interpretThyExpression() can return string", async () => {
   assert.strictEqual(interpretThyExpression(context, `"himom"`), "himom")
 })
 
+test("interpretThyExpression() can return string with numbers", async () => {
+  const context = makeSimpleContext()
+  assert.strictEqual(interpretThyExpression(context, `"1"`), "1")
+})
+
+test("interpretThyExpression() can return multiline string", async () => {
+  const context = makeSimpleContext()
+  assert.strictEqual(interpretThyExpression(context, `"one\\ntwo"`), "one\ntwo")
+})
+
 test("interpretThyExpression() respects escape codes in string", async () => {
   const context = makeSimpleContext()
   assert.strictEqual(interpretThyExpression(context, `"hi mom\\n\\"how'r u\\""`), "hi mom\n\"how'r u\"")
