@@ -1,6 +1,6 @@
 import "preact/debug"
 
-import ace from "ace-builds"
+import ace, { Ace } from "ace-builds"
 import { render } from "preact"
 import { useEffect, useRef, useState } from "preact/hooks"
 import { interpretThyBlock } from "../interpreter/block"
@@ -18,6 +18,8 @@ type Output = {
 window.onbeforeunload = function() {
   return true
 }
+
+let lastAcePoint: Ace.Point | null = null
 
 export default function App() {
 
@@ -112,15 +114,46 @@ export default function App() {
 
   useEffect(() => {
     if (editorRef.current !== null) {
+      // console.log("new editor", fileLoaded)
       const editor = ace.edit(editorRef.current, {
         scrollPastEnd: true,
       })
+      // editor.setShowFoldWidgets(true)
+      // editor.setFadeFoldWidgets(true)
       editor.on("change", () => {
         onSourceCodeChange(editor.getValue())
       })
       editor.setValue(sourceCodeState)
+      if (lastAcePoint !== null) {
+        editor.moveCursorToPosition(lastAcePoint)
+      }
       editor.focus()
       editor.clearSelection()
+      editor.on("paste", (e) => {
+        // console.log(e)
+        const pasteLines = e.text.split("\n")
+        // if (pasteLines.length === 1 || (pasteLines.length === 2 && pasteLines[1].trim() === "")) {
+        //   return
+        // }
+        // console.log("paste", pasteLines)
+        const currentPosition = editor.getCursorPosition()
+        const currentLine = editor.getValue().split("\n")[currentPosition.row]
+        const currentLineIndent = /^ */.exec(currentLine)![0]
+        const isIntoLineContent = currentPosition.column > currentLineIndent.length
+        const indentToRemove = (pasteLines.length === 1 || !isIntoLineContent) ? /^ */.exec(pasteLines[0])![0] : /^ */.exec(pasteLines[1])![0]
+        // console.log("indentToRemove", indentToRemove, indentToRemove.length)
+        e.text = pasteLines.map((l, i) => {
+          if (i === 0 && (currentLine.trim() === "" || isIntoLineContent)) {
+            return l.trimStart()
+          }
+          if (i === pasteLines.length - 1 && l.trim() === "") {
+            return currentLineIndent
+          }
+          return l.replace(new RegExp(`^${indentToRemove}`), currentLineIndent)
+        }).join("\n")
+        // console.log(currentPosition.column, currentLine)
+        // e.text = "no"
+      })
       editor.commands.addCommand({
         name: 'run',
         bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
@@ -132,9 +165,16 @@ export default function App() {
         // multiSelectAction: "forEach", optional way to control behavior with multiple cursors
         // scrollIntoView: "cursor", control how cursor is scrolled into view after the command
       })
+      editor.session.setNewLineMode("unix")
+      editor.session.setTabSize(2)
+      editor.session.setUseSoftTabs(true)
       editor.session.setUseWrapMode(true)
       // editor.setTheme("ace/theme/monokai")
       // editor.session.setMode("ace/mode/javascript")
+      return () => {
+        lastAcePoint = editor.getCursorPosition()
+        editor.destroy()
+      }
     }
   }, [editorRef.current, fileLoaded])
 
