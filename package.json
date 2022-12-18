@@ -6,7 +6,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "esbuild src/index.ts --bundle --platform=node --outfile=lib/index.js",
-    "build:editor-client": "esbuild src/editor/client.tsx --bundle --platform=browser --jsx=automatic --outfile=lib/editor-client.js --sourcemap",
+    "build:editor-client": "esbuild src/editor/client.tsx --bundle --platform=browser --jsx=automatic --outfile=playground/editor-client.js --sourcemap",
     "check-types": "tsc --noEmit",
     "clean": "node -p \"require('fs').rmSync('lib',{force:true,recursive:true})\"",
     "generate-declarations": "tsc --emitDeclarationOnly",

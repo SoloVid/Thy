@@ -14,11 +14,12 @@ const server = createServer(async (req, res) => {
     switch (req.url) {
       case "/":
       case "/playground":
-      case "/playground.html":
-        await serve("playground.html")
+      case "/playground/index.html":
+        await serve("playground/index.html")
         return
-      case "/lib/editor-client.js":
-        await serve("lib/editor-client.js")
+      case "/editor-client.js":
+      case "/playground/editor-client.js":
+        await serve("playground/editor-client.js")
         return
       default:
         res.writeHead(404)
