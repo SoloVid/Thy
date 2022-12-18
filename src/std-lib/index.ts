@@ -4,6 +4,7 @@ import { check } from "./check";
 import { defBuiltin } from "./def";
 import { falseBuiltin, nullBuiltin, trueBuiltin } from "./globals";
 import { ifBuiltin } from "./if";
+import { json } from "./json";
 import { loopElementsBuiltin, loopForeverBuiltin, loopTimesBuiltin } from "./loop";
 import { loopAsyncElementsBuiltin, loopAsyncForeverBuiltin, loopAsyncTimesBuiltin } from "./loop-async";
 import { mutableMapBuiltin } from "./map";
@@ -17,6 +18,7 @@ export const core = {
   "check": check,
   "def": defBuiltin,
   "if": ifBuiltin,
+  "json": json,
   "loop": {
     "forever": loopForeverBuiltin,
     "times": loopTimesBuiltin,

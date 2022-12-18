@@ -3,11 +3,7 @@ import { useState } from "preact/hooks"
 const storageFilesListKey = "files"
 const storageFileKeyPrefix = "file:"
 
-export function useLocalFiles() {
-  // This is only here to allow forcing re-render.
-  const [version, setVersion] = useState(0)
-  const bumpVersion = () => setVersion(before => before + 1)
-
+export function makeFileManager() {
   function getFilesList() {
     const filesJson = localStorage.getItem(storageFilesListKey) ?? "[]"
     return JSON.parse(filesJson) as string[]
@@ -15,7 +11,6 @@ export function useLocalFiles() {
   function updateFilesList(newFilesList: readonly string[]) {
     localStorage.setItem(storageFilesListKey, JSON.stringify(newFilesList))
   }
-  const files = getFilesList().sort()
 
   function getStorageKey(name: string) {
     return `${storageFileKeyPrefix}${name}`
@@ -25,21 +20,46 @@ export function useLocalFiles() {
     return localStorage.getItem(getStorageKey(name))
   }
 
-  function saveAsNew(sourceCode: string) {
-    const name = window.prompt("File name?")
-    if (!!name) {
-      saveFile(name, sourceCode)
-    }
-    bumpVersion()
-    return name
-  }
-
   function saveFile(name: string, sourceCode: string) {
     localStorage.setItem(getStorageKey(name), sourceCode)
     const before = getFilesList()
     if (!before.includes(name)) {
       updateFilesList([...before, name])
     }
+  }
+
+  function deleteFile(name: string) {
+    localStorage.removeItem(getStorageKey(name))
+    const before = getFilesList()
+    updateFilesList(before.filter(f => f !== name))
+  }
+
+  return {
+    getFilesList,
+    getFile,
+    saveFile,
+    deleteFile,
+  }
+}
+
+export function useLocalFiles(implementation: FileManager) {
+  // This is only here to allow forcing re-render.
+  const [version, setVersion] = useState(0)
+  const bumpVersion = () => setVersion(before => before + 1)
+
+  const files = implementation.getFilesList().sort()
+
+  function saveAsNew(sourceCode: string) {
+    const name = window.prompt("File name?")
+    if (!!name) {
+      implementation.saveFile(name, sourceCode)
+    }
+    bumpVersion()
+    return name
+  }
+
+  function saveFile(name: string, sourceCode: string) {
+    implementation.saveFile(name, sourceCode)
     bumpVersion()
   }
 
@@ -47,17 +67,17 @@ export function useLocalFiles() {
     if (!window.confirm(`Delete ${name}?`)) {
       return
     }
-    localStorage.removeItem(getStorageKey(name))
-    const before = getFilesList()
-    updateFilesList(before.filter(f => f !== name))
+    implementation.deleteFile(name)
     bumpVersion()
   }
 
   return {
     files: files as readonly string[],
-    getFile,
+    getFile: implementation.getFile,
     saveAsNew,
     saveFile,
     deleteFile,
   }
 }
+
+export type FileManager = ReturnType<typeof makeFileManager>
