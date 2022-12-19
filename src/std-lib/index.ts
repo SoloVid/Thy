@@ -10,6 +10,7 @@ import { loopAsyncElementsBuiltin, loopAsyncForeverBuiltin, loopAsyncTimesBuilti
 import { mutableMapBuiltin } from "./map";
 import { math } from "./math";
 import { printBuiltin } from "./print";
+import { regexBuiltin } from "./regex";
 
 export const core = {
   "array": arrayBuiltin,
@@ -32,6 +33,7 @@ export const core = {
   "map": mutableMapBuiltin,
   "math": math,
   "print": printBuiltin,
+  "regex": regexBuiltin,
 
   "true": trueBuiltin,
   "false": falseBuiltin,
