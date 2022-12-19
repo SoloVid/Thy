@@ -69,27 +69,9 @@ function resolveBlock(context: ThyBlockContext, thyLines: readonly string[]) {
 }
 
 export function interpretThyIdentifier(context: ThyBlockContext, thyExpression: string): InterpretedExpression {
-  if (thyExpression === "that") {
-    return ie(interpretThat(context, "thatValue", "that"))
-  }
-  if (thyExpression === "beforeThat") {
-    return ie(interpretThat(context, "beforeThatValue", "beforeThat"))
-  }
-
-  return resolveNamedAccess(context, thyExpression)
-}
-
-function interpretThat(context: ThyBlockContext, contextKey: "thatValue" | "beforeThatValue", keyword: "that" | "beforeThat") {
-  if (context[contextKey] === undefined) {
-    throw new Error(`Value is not available for \`${keyword}\``)
-  }
-  return context[contextKey]
-}
-
-function resolveNamedAccess(context: ThyBlockContext, thyExpression: string): InterpretedExpression {
   const parts = thyExpression.split(".")
   const [base, ...memberAccesses] = parts
-  const baseValue = getVariableFromContext(context, base)
+  const baseValue = interpretThyIdentifierBase(context, base)
   let priorAccess = base
   let thisValue = undefined
   let finalValue = baseValue
@@ -101,6 +83,24 @@ function resolveNamedAccess(context: ThyBlockContext, thyExpression: string): In
     priorAccess = access
   }
   return { target: finalValue, thisValue: thisValue }
+}
+
+function interpretThyIdentifierBase(context: ThyBlockContext, thyExpressionBase: string) {
+  if (thyExpressionBase === "that") {
+    return interpretThat(context, "thatValue", "that")
+  }
+  if (thyExpressionBase === "beforeThat") {
+    return interpretThat(context, "beforeThatValue", "beforeThat")
+  }
+
+  return getVariableFromContext(context, thyExpressionBase)
+}
+
+function interpretThat(context: ThyBlockContext, contextKey: "thatValue" | "beforeThatValue", keyword: "that" | "beforeThat") {
+  if (context[contextKey] === undefined) {
+    throw new Error(`Value is not available for \`${keyword}\``)
+  }
+  return context[contextKey]
 }
 
 function getVariableFromContext(context: ThyBlockContext, variable: string) {

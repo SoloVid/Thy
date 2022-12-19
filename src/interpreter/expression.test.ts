@@ -218,6 +218,13 @@ test("interpretThyExpression() replaces `that` with stored value from context", 
   assert.strictEqual(context.thatValue, 5)
 })
 
+test("interpretThyExpression() replaces `that` with stored value from context when used as base for property access", async () => {
+  const context = makeSimpleContext({
+    thatValue: { a: 5 },
+  })
+  assert.strictEqual(interpretThyExpression(context, "that.a").target, 5)
+})
+
 test("interpretThyExpression() barfs on `that` if value is unavailable from context", async () => {
   const context = makeSimpleContext({
     thatValue: undefined,
