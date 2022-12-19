@@ -75,3 +75,17 @@ test("interpretThyCall() should barf if given is used after implicit argument", 
   })
   assert.throws(() => interpretThyCall(context, [`given`]), /\`given\` cannot be used after implicit arguments are used/)
 })
+
+test("interpretThyCall() should properly pass `this` in function call", async () => {
+  class C {
+    a = 5
+    f() {
+      return this.a
+    }
+  }
+
+  const context = makeSimpleContext({
+    variablesInBlock: { o: new C() },
+  })
+  assert.strictEqual(interpretThyCall(context, [`o.f`]), 5)
+})

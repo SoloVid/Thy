@@ -12,7 +12,7 @@ export function interpretThyCall(context: ThyBlockContext, parts: readonly Atom[
     context.givenUsed = true
     assert(callArgExpressions.length <= 1, "given may only take one argument")
     if (callArgExpressions.length === 1) {
-      const defaultValue = interpretThyExpression(context, callArgExpressions[0])
+      const defaultValue = interpretThyExpression(context, callArgExpressions[0]).target
       if (context.argsToUse.length === 0) {
         return defaultValue
       }
@@ -21,8 +21,12 @@ export function interpretThyCall(context: ThyBlockContext, parts: readonly Atom[
     return context.argsToUse.shift()
   }
 
-  const callArgs = callArgExpressions.map(a => interpretThyExpression(context, a))
-  const f = interpretThyExpression(context, functionExpression) as (...args: readonly unknown[]) => unknown
+  const callArgs = callArgExpressions.map(a => interpretThyExpression(context, a).target)
+  const ie = interpretThyExpression(context, functionExpression)
+  const f = ie.target as (...args: readonly unknown[]) => unknown
   assert(typeof f === "function", `${functionExpression} is not a function: ${JSON.stringify(f)}`)
+  if (ie.thisValue !== undefined) {
+    return f.call(ie.thisValue, ...callArgs)
+  }
   return f(...callArgs)
 }

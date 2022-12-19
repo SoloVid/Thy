@@ -52,7 +52,7 @@ function makeNewlines(count: number): string {
 export function interpolateString(context: ThyBlockContext, thyString: string): string {
   const uid = generateUID()
   return thyString.replace(/\\\./g, uid).replace(/\.([a-z][a-zA-Z0-9]*)\./g, (m, p1) => {
-    const value = interpretThyIdentifier(context, p1)
+    const value = interpretThyIdentifier(context, p1).target
     assert(typeof value === "string" || typeof value === "number", `${p1} is not a string or number`)
     return `${value}`
   }).replaceAll(uid, ".")

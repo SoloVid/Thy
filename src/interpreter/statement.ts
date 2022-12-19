@@ -15,7 +15,7 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
   if (typeof variableName === "string" && typeof assignKeyword === "string" && ["is", "be", "to"].includes(assignKeyword)) {
     if (callParts[0] === "await") {
       assert(callParts.length === 2, `\`await\` takes 1 argument; got ${callParts.length}`)
-      return Promise.resolve(interpretThyExpression(context, callParts[1])).then(handleReturnedValue)
+      return Promise.resolve(interpretThyExpression(context, callParts[1]).target).then(handleReturnedValue)
     }
   
     handleReturnedValue(interpretThyCall(context, callParts))
@@ -61,7 +61,7 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
 
   if (parts[0] === "await") {
     assert(parts.length === 2, `\`await\` takes 1 argument; got ${parts.length}`)
-    return Promise.resolve(interpretThyExpression(context, parts[1])).then((result) => {
+    return Promise.resolve(interpretThyExpression(context, parts[1]).target).then((result) => {
       context.beforeThatValue = context.thatValue
       context.thatValue = result
     })

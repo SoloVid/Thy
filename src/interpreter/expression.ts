@@ -4,19 +4,26 @@ import { exactNumberRegex, exactStringRegex, identifierRegex } from "./patterns"
 import { interpolateString, parseString } from "./string"
 import type { Atom, ThyBlockContext } from "./types"
 
-export function interpretThyExpression(context: ThyBlockContext, thyExpression: Atom): unknown {
+type InterpretedExpression = {
+  target: unknown
+  thisValue?: unknown
+}
+
+const ie = (value: unknown): InterpretedExpression => ({ target: value })
+
+export function interpretThyExpression(context: ThyBlockContext, thyExpression: Atom): InterpretedExpression {
   if (Array.isArray(thyExpression)) {
-    return resolveBlock(context, thyExpression)
+    return ie(resolveBlock(context, thyExpression))
   }
   assert(typeof thyExpression === "string", "Array case should have been filtered")
 
   if (exactNumberRegex.test(thyExpression)) {
-    return parseFloat(thyExpression)
+    return ie(parseFloat(thyExpression))
   }
   const stringMatch = exactStringRegex.exec(thyExpression)
   if (stringMatch !== null) {
     const rawString = parseString(stringMatch[0])
-    return interpolateString(context, rawString)
+    return ie(interpolateString(context, rawString))
   }
 
   return interpretThyIdentifier(context, thyExpression)
@@ -59,12 +66,12 @@ function resolveBlock(context: ThyBlockContext, thyLines: readonly string[]) {
   return interpretThyBlockLines(thyLines, { closure: childClosure, closureVariableIsImmutable: childClosureVariableIsImmutable })
 }
 
-export function interpretThyIdentifier(context: ThyBlockContext, thyExpression: string) {
+export function interpretThyIdentifier(context: ThyBlockContext, thyExpression: string): InterpretedExpression {
   if (thyExpression === "that") {
-    return interpretThat(context, "thatValue", "that")
+    return ie(interpretThat(context, "thatValue", "that"))
   }
   if (thyExpression === "beforeThat") {
-    return interpretThat(context, "beforeThatValue", "beforeThat")
+    return ie(interpretThat(context, "beforeThatValue", "beforeThat"))
   }
 
   return resolveNamedAccess(context, thyExpression)
@@ -77,19 +84,21 @@ function interpretThat(context: ThyBlockContext, contextKey: "thatValue" | "befo
   return context[contextKey]
 }
 
-function resolveNamedAccess(context: ThyBlockContext, thyExpression: string) {
+function resolveNamedAccess(context: ThyBlockContext, thyExpression: string): InterpretedExpression {
   const parts = thyExpression.split(".")
   const [base, ...memberAccesses] = parts
   const baseValue = getVariableFromContext(context, base)
   let priorAccess = base
+  let thisValue = undefined
   let finalValue = baseValue
   for (const access of memberAccesses) {
+    thisValue = finalValue
     assert(identifierRegex.test(access), `Invalid (member) identifier: ${access}`)
     assert(!!finalValue, `Cannot access ${access} on ${priorAccess} because ${priorAccess} has no value`)
     finalValue = (finalValue as Record<string, unknown>)[access]
     priorAccess = access
   }
-  return finalValue
+  return { target: finalValue, thisValue: thisValue }
 }
 
 function getVariableFromContext(context: ThyBlockContext, variable: string) {

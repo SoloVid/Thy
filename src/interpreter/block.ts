@@ -67,7 +67,7 @@ export function interpretThyBlockLines(
       if (parts.length > 0) {
         if (parts[0] === "return") {
           assert(parts.length === 2, `\`return\` takes exactly one parameter`)
-          return [true, interpretThyExpression(context, parts[1])]
+          return [true, interpretThyExpression(context, parts[1]).target]
         }
         if (parts[0] === "let") {
           assert(parts.length > 1, `\`let\` requires a function call following it`)
@@ -120,7 +120,7 @@ export function interpretThyBlockLines(
       for (const statement of statements) {
         if (statement[0] === "let" && statement[1] === "await") {
           assert(statement.length === 3, `\`await\` takes 1 argument; got ${statement.length - 1}`)
-          const returnValue = await interpretThyExpression(helper.context, statement[2])
+          const returnValue = await interpretThyExpression(helper.context, statement[2]).target
           if (returnValue !== undefined) {
             return returnValue
           }
