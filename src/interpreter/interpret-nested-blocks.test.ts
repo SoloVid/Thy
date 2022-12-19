@@ -21,3 +21,15 @@ test("interpretThyBlock() can return a function that can pass a multiline string
     "again",
   ])
 })
+
+test("interpretThyBlock() can return a function that can pass context through multiple layers of blocks", async () => {
+  const interpreted = interpretThyBlock(`a is\n  b is\n    c is\n      d is f 1\n      return d\n    return c\n  return b\nreturn a`)
+  let calledWith: unknown = null
+  const f = (arg: number) => {
+    calledWith = arg
+    return arg + 1
+  }
+  const result = interpreted({ f })
+  assert.strictEqual(calledWith, 1)
+  assert.strictEqual(result, 2)
+})
