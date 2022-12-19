@@ -2,7 +2,7 @@ import { arrayBuiltin, mutableArrayBuiltin } from "./array";
 import { castBuiltin } from "./cast";
 import { check } from "./check";
 import { defBuiltin } from "./def";
-import { falseBuiltin, nullBuiltin, trueBuiltin } from "./globals";
+import { elseBuiltin, falseBuiltin, nullBuiltin, trueBuiltin } from "./globals";
 import { ifBuiltin } from "./if";
 import { json } from "./json";
 import { loopElementsBuiltin, loopForeverBuiltin, loopTimesBuiltin } from "./loop";
@@ -38,4 +38,6 @@ export const core = {
   "true": trueBuiltin,
   "false": falseBuiltin,
   "null": nullBuiltin,
+
+  "else": elseBuiltin,
 }
