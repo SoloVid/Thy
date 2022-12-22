@@ -616,6 +616,7 @@ def doCalc
   and else
     math.divide 123 a
     return that
+  return that
 ```
 
 This approach is fine, but the indentation could start to get out of hand with additional factors.
@@ -663,12 +664,9 @@ On the other hand, if the condition `that` is not true...
 I am not aware of another language that uses the `let` **keyword**
 to mean the same thing it means in Thy.
 
-Ruby has a `let` **keyword** which is the most similar idea to `let` in Thy,
-but it is still pretty different.
-In Ruby, it **calls** the one **block** parameter passed to the **function**.
-
-Python and JavaScript have a `let` **keyword**,
-but it is a completely different concept related to generator **functions**.
+JavaScript has a `let` **keyword**,
+but it is related to block-scoped mutable variable declarations,
+which Thy already handles a different way.
 
 ### Looping Code
 
@@ -676,10 +674,10 @@ Next exciting piece of functionality: loops!
 
 It's pretty common to write a program that has some core loop of **statements**
 that run over and over again until some condition is met.
-There's only one more thing we need in Thy to make this happen: the `loop` **function**.
+There's only one more thing we need in Thy to make this happen: the `loop.forever` **function**.
 
 ```thy
-loop
+loop.forever
   Assume getUserInput is already defined and returns string provided by user.
   input is getUserInput
   compare.equal input "exit"

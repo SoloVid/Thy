@@ -8,12 +8,13 @@
 
 ## Overview of Language Strategy
 
-- No special characters
+- No special characters (mobile friendly)
 - Naturalness (e.g. not foreign to mainstream programming)
 - Strong static types
 - Simple compiler
 - Simple rules
 - Encourage good programming practices
+- Conciseness (not extremely verbose)
 
 ### No Special Characters
 
@@ -61,7 +62,7 @@ Because binary operations are so common, `beforeThat` is provided to go one more
 ### Encourage Good Programming Practices
 
 - Immutable by default
-    - Note to self: This includes arrays. I'll probably have an alternative like arrayMutable. May use `as const` at call site?
+    - Note to self: This includes arrays. I'll probably have an alternative like `arrayMutable`. May use `as const` (in generated TypeScript) at call site?
 - No variable name ghosting
     - Note to self: Compiler error for this.
 - No classes
@@ -83,7 +84,7 @@ These keywords need to be recognized by the lexer since they are part of the lan
 - private - modifier for declarations
 - to - denotes preceding identifier as not a function call
 - type - type-related operations just start breaking the standard language stuff
-- let - unlike standard function calls, this can (and must) precede another function call on the same line
+- let - precedes another function call on the same line and potentially effects a return
 
 ### Language Feature Functions
 
@@ -110,7 +111,6 @@ but you couldn't actually implement them in thy.
 - get - array access
 - getter - define as getter
 - if - function
-- loop - function
 - null - value
 - set - array mutate
 - setter - define as setter
@@ -145,7 +145,8 @@ but you couldn't actually implement them in thy.
     - not - logical NOT
     - some - logical OR
 - def - shorthand function that returns the value of the first argument
-- for - container for for-loop functions
+- loop - container for for-loop functions
+    - forever
     - elements
     - times
 - math
@@ -237,7 +238,7 @@ I also really want classes and object literals to follow the same rules as other
 This has led me to the following set of rules:
 - Every indentation level of the program has the same rules.
 - Every block (and these rules only require evaluating at the single indentation level) has some return value/type.
-    - If a block uses `return` or `let`, it will only return the types of the returned/leted functions (plus Void if the last statement of the block is not a `return` statement).
+    - If a block uses `return` or `let`, it will only return the types of the returned/let'ed functions (plus Void if the last statement of the block is not a `return` statement).
     - If a block uses `export` (on a function or variable), it will return an object containing members of all exported declarations.
     - If a block meets neither of the above criteria, it will return an object with all declarations exported.
         - `private` provides a black-listing alternative to `export`.
@@ -262,7 +263,7 @@ const myObj = (() => {
     return { field1, field2 }
 })()
 ```
-But it could be optimized to the more colloquial TypeScript:
+But it could be optimized to the more idiomatic TypeScript:
 ```typescript
 const myObj = {
     field1: 1,
@@ -279,7 +280,7 @@ newThing is def
     given NullableA a
 
     compare.equal a null
-    aa be A if that
+    aa be if A that
         return newA
     and else
         return a
@@ -330,10 +331,6 @@ but this isn't a problem because we aren't allowing the class itself
 to function as both an implementation and a type (as most languages I know do),
 so consumers can't access those extra fields as easily.
 It could be a future optimization to actually remove them so they aren't present at runtime.
-
-I think the name clash should just be disallowed. e.g. `fun newThing Thing` would throw compiler error
-because we don't want to create a class called `Thing` that clashes with the type `Thing`.
-Dynamically picking some alternative name will just either make our lives harder or cause a different collision.
 
 Unfortunately, classes and closures are not equivalent in ECMAScript.
 Namely, functions in the closure case (which is logically what's happening in this language) do not have `this`.

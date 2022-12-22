@@ -33,7 +33,7 @@ thy.scope "blahBlah.blah"
     element is given
     print element
 
-  loop
+  loop.forever
     doWork yo
     condition is def true
     Keyword 'let' allows a return from the called function to result in return from this function.

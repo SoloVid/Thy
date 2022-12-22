@@ -53,7 +53,7 @@ node lib/api/cli.js -t ts-namespace -r src -o dist
 ## Language
 
 The most digestible documentation for Thy is split between the [example program](example-program.thy)
-and the [lessons](lessons.md).
+and the [lessons](lessons.md), and there are some more dense language notes in [notes.md](notes.md).
 (Both of these are best viewed with the VSCode extension enabled.)
 
 Many of the features outlines in these documents have not yet been implemented
