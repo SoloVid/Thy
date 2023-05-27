@@ -30,42 +30,58 @@ export function interpretThyExpression(context: ThyBlockContext, thyExpression: 
 }
 
 function resolveBlock(context: ThyBlockContext, thyLines: readonly string[]) {
-  const childClosure: ThyBlockContext["closure"] = { ...context.implicitArguments }
-  const childClosureVariableIsImmutable: Record<string, boolean> = {}
-  for (const key of Object.keys(context.variablesInBlock)) {
-    Object.defineProperty(childClosure, key, {
-      enumerable: true,
-      get() {
-        return context.variablesInBlock[key]
-      },
-      set(value) {
-        assert(!context.variableIsImmutable[key], `${key} is immutable and cannot be reassigned`)
-        context.variablesInBlock[key] = value
-      },
-    })
-    if (key in context.variableIsImmutable) {
-      childClosureVariableIsImmutable[key] = context.variableIsImmutable[key]
+  function initialize() {
+    const childClosure: ThyBlockContext["closure"] = { ...context.implicitArguments }
+    const childClosureVariableIsImmutable: Record<string, boolean> = {}
+    for (const key of Object.keys(context.variablesInBlock)) {
+      Object.defineProperty(childClosure, key, {
+        enumerable: true,
+        get() {
+          return context.variablesInBlock[key]
+        },
+        set(value) {
+          assert(!context.variableIsImmutable[key], `${key} is immutable and cannot be reassigned`)
+          context.variablesInBlock[key] = value
+        },
+      })
+      if (key in context.variableIsImmutable) {
+        childClosureVariableIsImmutable[key] = context.variableIsImmutable[key]
+      }
     }
-  }
-  for (const key of Object.keys(context.implicitArguments)) {
-    childClosureVariableIsImmutable[key] = true
-  }
-  for (const key of Object.keys(context.closure)) {
-    Object.defineProperty(childClosure, key, {
-      enumerable: true,
-      get() {
-        return context.closure[key]
-      },
-      set(value) {
-        assert(!context.closureVariableIsImmutable[key], `${key} is immutable and cannot be reassigned`)
-        context.closure[key] = value
-      },
-    })
-    if (key in context.closureVariableIsImmutable) {
-      childClosureVariableIsImmutable[key] = context.closureVariableIsImmutable[key]
+    for (const key of Object.keys(context.implicitArguments)) {
+      childClosureVariableIsImmutable[key] = true
     }
+    for (const key of Object.keys(context.closure)) {
+      Object.defineProperty(childClosure, key, {
+        enumerable: true,
+        get() {
+          return context.closure[key]
+        },
+        set(value) {
+          assert(!context.closureVariableIsImmutable[key], `${key} is immutable and cannot be reassigned`)
+          context.closure[key] = value
+        },
+      })
+      if (key in context.closureVariableIsImmutable) {
+        childClosureVariableIsImmutable[key] = context.closureVariableIsImmutable[key]
+      }
+    }
+    return interpretThyBlockLines(thyLines, { closure: childClosure, closureVariableIsImmutable: childClosureVariableIsImmutable })
   }
-  return interpretThyBlockLines(thyLines, { closure: childClosure, closureVariableIsImmutable: childClosureVariableIsImmutable })
+
+  // Rather than immediately construct the function for the block lines,
+  // we defer until first execution.
+  // The primary problem this is intended to resolve is the one where
+  // the full list of variables in childClosure is not known
+  // until the parent block has finished evaluating.
+
+  let cached: null | ((...args: readonly unknown[]) => unknown) = null
+  return (...args: readonly unknown[]): unknown => {
+    if (cached === null) {
+      cached = initialize()
+    }
+    return cached(...args)
+  }
 }
 
 export function interpretThyIdentifier(context: ThyBlockContext, thyExpression: string): InterpretedExpression {

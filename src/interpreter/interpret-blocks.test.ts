@@ -1,5 +1,6 @@
 import assert from "assert"
 import { test } from "under-the-sun"
+import { core } from "../std-lib"
 import { interpretThyBlock } from "./block"
 
 test("interpretThyBlock() should return a function that can return a number", async () => {
@@ -162,4 +163,23 @@ test("interpretThyBlock() should share mutable variable state", async () => {
   const aFromF = record.f()
   assert.strictEqual(aFromF, 3)
   assert.strictEqual(record.a, 2)
+})
+
+test("interpretThyBlock() should support recursion", async () => {
+  const interpreted = interpretThyBlock(`
+factorial is def
+  n is given
+  check.asc n 1
+  let if that
+    return 1
+  and else
+    math.subtract n 1
+    factorial that
+    math.multiply n that
+    return that
+factorial 4
+return that
+`)
+  const result = interpreted(core)
+  assert.strictEqual(result, 24)
 })
