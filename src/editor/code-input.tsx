@@ -71,6 +71,31 @@ export default function CodeInput({
     })
   }
 
+  function scrollDownIfOutOfView() {
+    if ($textarea.current === null) {
+      return
+    }
+    const { scrollTop, scrollHeight, clientHeight } = $textarea.current;
+    const lineHeight = scrollHeight / ($textarea.current.value.split("\n").length)
+
+    // Calculate the number of lines that can be displayed at a time
+    const linesInView = Math.floor(clientHeight / lineHeight);
+
+    // Calculate the number of lines scrolled from the top
+    const linesScrolled = Math.floor(scrollTop / lineHeight);
+
+    const currentIndex = $textarea.current.selectionStart
+    const textUpToHere = $textarea.current.value.substring(0, currentIndex)
+    const linesSoFar = textUpToHere.split("\n").length
+
+    // Check if there are more lines to scroll
+    if (linesScrolled + linesInView < linesSoFar) {
+      // Emulate auto-scrolling by adjusting the scroll position
+      $textarea.current.scrollTop = (linesSoFar - linesInView) * lineHeight;
+      // $textarea.current.scrollTop += (linesSoFar - (linesScrolled + linesInView)) * lineHeight;
+    }
+  }
+
   function onKeyDown(event: KeyboardEvent) {
     if ($textarea.current === null) {
       return
@@ -117,10 +142,11 @@ export default function CodeInput({
       return
     }
 
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && !event.ctrlKey && !event.metaKey) {
       const indentMatch = /^\s*/.exec(currentLineBeforeHere)
       if (indentMatch !== null) {
         submitInstead("\n" + indentMatch[0])
+        scrollDownIfOutOfView()
       }
     }
     if (event.key === " ") {
@@ -178,32 +204,42 @@ export default function CodeInput({
   }
 
   return <div id={id} style={style} class="code-input">
+    <pre
+      class="line-numbers-container language-line-numbers"
+      style={`width:6ch;flex:0 0 6ch;padding:10px;padding-right:1ch;`}
+    >
     <ul
       class="line-numbers"
-      style={`width:6ch;padding:10px;padding-right:1ch;top:-${textAreaScroll.top}px;`}
+      style={`top:-${textAreaScroll.top}px;`}
     >
       {lineNumbers.map(i => <li>{i}</li>)}
-    </ul>
-    <textarea
-      ref={$textarea}
-      spellcheck={false}
-      onInput={(e) => {
-        update((e.target as HTMLTextAreaElement).value)
-        syncScroll()
-      }}
-      onScroll={() => syncScroll()}
-      onKeyDown={onKeyDown}
-      onKeyUp={onKeyUp}
-      onPaste={onPaste}
-      style="width:100%;height:100%;padding:10px;padding-left:6ch;"
-    >{value}</textarea>
-    <pre
-      ref={$pre}
-      style={`min-width:100%;padding:10px;padding-left:6ch;top:-${textAreaScroll.top}px;left:-${textAreaScroll.left}px;border-radius:0;`}
-      aria-hidden="true"
-      // class="line-numbers"
-    >
-    <code dangerouslySetInnerHTML={{__html: highlightedHtml}} class="language-thy"></code>
-    </pre>
+    </ul></pre>
+    <div class="editor">
+      <textarea
+        ref={$textarea}
+        spellcheck={false}
+        onInput={(e) => {
+          update((e.target as HTMLTextAreaElement).value)
+          syncScroll()
+        }}
+        onScroll={() => syncScroll()}
+        onKeyDown={onKeyDown}
+        onKeyUp={onKeyUp}
+        onPaste={onPaste}
+        style="width:100%;height:100%;padding:10px;"
+      >{value}</textarea>
+      <div style={`position:absolute;width:${$textarea.current?.clientWidth ?? 9999}px;height:${$textarea.current?.clientHeight ?? 9999}px;overflow:hidden;`}>
+        {/* <div style={`position:relative;width:100px;height:100px;overflow:hidden;`}> */}
+        <pre
+          ref={$pre}
+          class="highlighted"
+          style={`min-width:100%;min-height:100%;padding:10px;top:-${textAreaScroll.top}px;left:-${textAreaScroll.left}px;border-radius:0;`}
+          aria-hidden="true"
+          // class="line-numbers"
+        >
+        <code dangerouslySetInnerHTML={{__html: highlightedHtml}} class="language-thy"></code>
+        </pre>
+      </div>
+    </div>
   </div>
 }

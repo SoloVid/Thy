@@ -3,39 +3,42 @@
 .code-input {
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: row;
 }
 
-.code-input > textarea, .code-input > pre {
+.code-input .editor {
+  flex: 1;
+  display: flex;
+}
+
+.code-input textarea, .code-input pre.highlighted {
   /* Both elements need the same text and space styling so they are directly on top of each other */
   margin: 0;
   padding: 0;
   border: 0;
   box-shadow: none;
 
-  /* In the same place */
-  position: absolute;
-  top: 0;
-  left: 0;
-
   /* Can be scrolled */
   overflow: auto;
   white-space: nowrap; /* Allows textarea to scroll horizontally */
 }
-.code-input > textarea, .code-input > pre, .code-input > pre > code, .code-input > .line-numbers {
+.code-input textarea, .code-input pre.highlighted, .code-input pre.highlighted > code, .code-input .line-numbers {
   /* Also add text styles to highlighting tokens */
-  font-size: 15pt;
+  font-size: 12pt;
   font-family: monospace;
   line-height: normal;
   tab-size: 9;
 }
 
-.code-input > textarea {
+.code-input textarea {
   /* Move the textarea in front of the result */
   z-index: 1;
 
   /* Make textarea almost completely transparent */
   color: transparent;
   background: transparent;
+  outline: none;
   caret-color: white; /* Or choose your favourite color */
   mix-blend-mode: difference;
 
@@ -43,7 +46,7 @@
   resize: none;
 }
 
-.code-input > textarea::selection {
+.code-input textarea::selection {
   /* Make textarea almost completely transparent */
   color: transparent;
   background-color: rgba(179, 212, 252, 0.3);
@@ -51,12 +54,26 @@
   /* background: rgba(100, 100, 100, 0.5); */
 }
 
-.code-input > pre {
+.code-input pre.highlighted {
   z-index: 0;
+  /* In the same place */
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
-.code-input > .line-numbers {
-  position: absolute;
+.code-input .line-numbers-container {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.code-input .line-numbers {
+  position: relative;
   z-index: 1;
   margin: 0;
   padding: 0;
