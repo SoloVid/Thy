@@ -1,5 +1,7 @@
 import "preact/debug"
 
+// import Prism from "prismjs"
+import "prismjs"
 import ace, { Ace } from "ace-builds"
 import { render } from "preact"
 import { useEffect, useRef, useState } from "preact/hooks"
@@ -8,6 +10,7 @@ import { generateUID } from "../interpreter/split-line"
 import { core } from "../std-lib"
 import { makeThyFilesApi } from "./files-api"
 import { makeFileManager, useLocalFiles } from "./local-files"
+import CodeInput from "./code-input"
 
 type Output = {
   readonly error: null | string
@@ -127,6 +130,7 @@ export default function App() {
       if (lastAcePoint !== null) {
         editor.moveCursorToPosition(lastAcePoint)
       }
+
       editor.focus()
       editor.clearSelection()
       editor.on("paste", (e) => {
@@ -178,9 +182,16 @@ export default function App() {
     }
   }, [editorRef.current, fileLoaded])
 
+  const [codeInputValue, setCodeInputValue] = useState<string>("")
+
   return <div style={`height:100vh;height:${windowHeight}px;`}>
     {/* <div style="padding: 20px;height:100%;"> */}
       {/* <div style="background-color: red;height:100%;"> */}
+        <CodeInput
+          value={codeInputValue}
+          setValue={setCodeInputValue}
+        ></CodeInput>
+        <pre><code class="language-css">{"p { color: red }"}</code></pre>
         <div ref={editorRef} id="editor" style={`position:relative; width: 100%; height: ${editorHeight}px;`}></div>
         <div>
           <div className="btn-panel">
