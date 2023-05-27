@@ -33,6 +33,11 @@ export default function CodeInput({
   const $highlighted = useRef<HTMLElement>(null)
   const isThyPrismLoaded = useThyPrism()
 
+  const [textAreaScroll, setTextAreaScroll] = useState({
+    top: 0,
+    left: 0,
+  })
+
   useEffect(() => {
     requestAnimationFrame(() => {
       if ($textarea.current !== null) {
@@ -47,6 +52,8 @@ export default function CodeInput({
     return Prism.highlight(valueToHighlight, Prism.languages.thy ?? Prism.languages.javascript, "thy")
   }, [isThyPrismLoaded, value])
 
+  const lineNumbers = value.split("\n").map((l, i) => i + 1)
+
   function update(text: string) {
     setValue(text.replace(/\r/g, ""))
     if ($highlighted.current === null || $textarea.current === null) {
@@ -55,33 +62,81 @@ export default function CodeInput({
   }
 
   function syncScroll() {
-    if ($pre.current === null || $textarea.current === null) {
+    if ($textarea.current === null) {
       return
     }
-    /* Scroll result to scroll coords of event - sync with textarea */
-    $pre.current.scrollTop = $textarea.current.scrollTop;
-    $pre.current.scrollLeft = $textarea.current.scrollLeft;
+    setTextAreaScroll({
+      top: $textarea.current.scrollTop,
+      left: $textarea.current.scrollLeft,
+    })
   }
 
-  function checkTab(event: KeyboardEvent) {
+  function onKeyDown(event: KeyboardEvent) {
     if ($textarea.current === null) {
       return
     }
     const element = $textarea.current
+    const currentIndex = element.selectionStart
+    const textUpToHere = value.substring(0, currentIndex)
+    const indexOfLineStart = textUpToHere.lastIndexOf("\n") + 1
+    const currentLineBeforeHere = textUpToHere.substring(indexOfLineStart)
+    const textAfter = value.substring(element.selectionEnd)
+
+    function submitInstead(toAdd: string) {
+      event.preventDefault()
+      element.value = textUpToHere + toAdd + textAfter
+      update(textUpToHere + toAdd + textAfter)
+      element.setSelectionRange(currentIndex + toAdd.length, currentIndex + toAdd.length)
+    }
 
     let code = element.value;
     const tabValue = "  "
-    if (event.key == "Tab") {
-      /* Tab key pressed */
-      event.preventDefault(); // stop normal
-      let before_tab = code.slice(0, element.selectionStart); // text before tab
-      let after_tab = code.slice(element.selectionEnd, element.value.length); // text after tab
-      let cursor_pos = element.selectionStart + tabValue.length; // where cursor moves after tab - moving forward by 1 char to after tab
-      element.value = before_tab + tabValue + after_tab; // add tab char
-      // move cursor
-      element.selectionStart = cursor_pos;
-      element.selectionEnd = cursor_pos;
-      update(element.value); // Update text to include indent
+    if (event.key === "Tab") {
+      if (element.selectionStart === element.selectionEnd && !event.shiftKey) {
+        submitInstead(tabValue)
+      } else {
+        event.preventDefault()
+
+        const endIndex = element.selectionEnd
+        const textAfter = value.substring(endIndex)
+        const nextNewlineRelative = textAfter.indexOf("\n")
+        const nextNewline = nextNewlineRelative < 0 ? value.length : endIndex + nextNewlineRelative
+        const textUpToEnd = value.substring(0, endIndex)
+        const indexOfEndLineStart = textUpToEnd.lastIndexOf("\n") + 1
+        const endLine = value.substring(indexOfEndLineStart, nextNewline)
+        const selectedLines = value.substring(indexOfLineStart, indexOfEndLineStart + endLine.length)
+        const modifiedLines = event.shiftKey ? selectedLines.replace(/^  /gm, "") : selectedLines.replace(/^/gm, "  ")
+        const newValue = value.substring(0, indexOfLineStart) + modifiedLines + value.substring(indexOfLineStart + selectedLines.length)
+        element.value = newValue
+        update(newValue)
+        element.setSelectionRange(indexOfLineStart, indexOfLineStart + modifiedLines.length)
+      }
+    }
+
+    if (element.selectionStart !== element.selectionEnd) {
+      return
+    }
+
+    if (event.key === "Enter") {
+      const indentMatch = /^\s*/.exec(currentLineBeforeHere)
+      if (indentMatch !== null) {
+        submitInstead("\n" + indentMatch[0])
+      }
+    }
+    if (event.key === " ") {
+      if (/^\s*$/.test(currentLineBeforeHere)) {
+        submitInstead(tabValue)
+      }
+    }
+    if (event.key === "Backspace") {
+      const lineUpToHere = currentLineBeforeHere.substring(0, currentIndex - indexOfLineStart)
+      if (/^(  )+$/.test(lineUpToHere)) {
+        event.preventDefault()
+        const newValue = textUpToHere.substring(0, indexOfLineStart) + lineUpToHere.substring(0, lineUpToHere.length - 2) + textAfter
+        element.value = newValue
+        update(newValue)
+        element.setSelectionRange(currentIndex - 2, currentIndex - 2)
+      }
     }
   }
 
@@ -122,22 +177,33 @@ export default function CodeInput({
     }
   }
 
-  return <div id={id} style={style}>
+  return <div id={id} style={style} class="code-input">
+    <ul
+      class="line-numbers"
+      style={`width:6ch;padding:10px;padding-right:1ch;top:-${textAreaScroll.top}px;`}
+    >
+      {lineNumbers.map(i => <li>{i}</li>)}
+    </ul>
     <textarea
       ref={$textarea}
-      id="editing"
       spellcheck={false}
       onInput={(e) => {
         update((e.target as HTMLTextAreaElement).value)
         syncScroll()
       }}
       onScroll={() => syncScroll()}
-      onKeyDown={checkTab}
+      onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
       onPaste={onPaste}
+      style="width:100%;height:100%;padding:10px;padding-left:6ch;"
     >{value}</textarea>
-    <pre ref={$pre} id="highlighting" aria-hidden="true">
-    <code dangerouslySetInnerHTML={{__html: highlightedHtml}} class="language-html" id="highlighting-content"></code>
+    <pre
+      ref={$pre}
+      style={`min-width:100%;padding:10px;padding-left:6ch;top:-${textAreaScroll.top}px;left:-${textAreaScroll.left}px;border-radius:0;`}
+      aria-hidden="true"
+      // class="line-numbers"
+    >
+    <code dangerouslySetInnerHTML={{__html: highlightedHtml}} class="language-thy"></code>
     </pre>
   </div>
 }
