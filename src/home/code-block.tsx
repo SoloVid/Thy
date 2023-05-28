@@ -1,6 +1,7 @@
 import type { JSX } from "preact"
 import { useEffect, useMemo, useRef, useState } from "preact/hooks"
 import Prism from "prismjs"
+import "prismjs/components/prism-typescript"
 import { addThyPrismGrammarAndAwaitAvailable } from "../editor/prism-grammar"
 
 export type CodeBlockProps = {

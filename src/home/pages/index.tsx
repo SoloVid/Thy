@@ -2,20 +2,12 @@ import "preact/debug"
 
 import { render } from "preact"
 import { useEffect, useState } from "preact/hooks"
-import { Background } from "./background"
-import CodeBlock from "./code-block"
-import CodeComparison from "./code-comparison"
-import Button, { TryButton } from "./button"
-// import loadLanguages from "prismjs/components/"
-import "prismjs/components/prism-typescript"
-import { baklavaJs, baklavaThy } from "./example/baklava"
-import { josephusJs, josephusThy } from "./example/josephus"
-import TsThyComparison from "./ts-thy-comparison"
-import { fizzBuzzThy } from "./example/fizz-buzz"
+import { TryButton } from "../button"
+import CodeBlock from "../code-block"
+import { fizzBuzzThy } from "../example/fizz-buzz"
+import { typesThy } from "../example/types"
+import { home, playgroundBaseUrl } from "../links"
 
-// loadLanguages(['typescript']);
-
-const playgroundBaseUrl = "file:///C:/Users/grant/code/maven/thy/playground/index.html"
 
 export default function App() {
   const [windowHeight, setWindowHeight] = useState(window.innerHeight)
@@ -33,7 +25,7 @@ export default function App() {
 
   return <div class="background">
     <div class="column-content-sm">
-      <h1 class="text-center">Thy (lang)</h1>
+      <a href={home}><h1 class="text-center">Thy (lang)</h1></a>
       <h4 class="text-center">
         <em>My language is thy language</em>
       </h4>
@@ -57,6 +49,13 @@ export default function App() {
         <li>Encourage good programming practices</li>
         <li>Concise (not extremely verbose)</li>
       </ul>
+
+      <h4>Where to?</h4>
+      <ul>
+        <li><a href="vs-typescript.html">I know TypeScript. I want to compare.</a></li>
+        <li><a href="from-the-top.html">I want Thy explained to me like I've never programmed before.</a></li>
+        <li><a href="algorithms.html">I need to see some actual algorithms.</a></li>
+      </ul>
     </div>
     <div class="column-content-sm">
       <h4>So what does it look like?</h4>
@@ -79,42 +78,28 @@ export default function App() {
       <TryButton playgroundUrl={playgroundBaseUrl} source={`print "himom"`}></TryButton>
     </div>
     <div class="column-content-sm">
+      <h4>What about <em>types</em>?</h4>
       <p>
-        Here's some text that introduces this second thing that is a comparison.
+        You may feel slighted on the type front for the previous examples.
+        Not to worry, Thy <em>does</em> support strong types (using TypeScript's type-checking).
+        However, this feature is not fully implemented in the tooling at this point in time.
       </p>
-    </div>
-    <div class="column-content-md">
-      <TsThyComparison
-        ts={`console.log("himom")`}
-        thy={`print "himom"`}
-        playground={playgroundBaseUrl}
-      ></TsThyComparison>
     </div>
     <div class="column-content-sm">
-      <p>
-        This is ... <a href="https://sampleprograms.io/projects/josephus-problem/" target="_blank">Josephus</a>.
-      </p>
-    </div>
-    <div class="column-content-md">
-      <TsThyComparison
-        ts={josephusJs}
-        thy={josephusThy}
-        playground={playgroundBaseUrl}
-      ></TsThyComparison>
+      <CodeBlock
+        source={typesThy}
+        language="thy"
+      ></CodeBlock>
+      <TryButton playgroundUrl={playgroundBaseUrl} source={typesThy}></TryButton>
     </div>
     <div class="column-content-sm">
-      <h4>Baklava</h4>
+      <h4>Why should I use Thy?</h4>
+      <p>You shouldn't.</p>
       <p>
-        This example program (called <a href="https://sampleprograms.io/projects/baklava/" target="_blank">Baklava</a>) demonstrates basic looping and printing,
-        as well as using JavaScript functionality (<code>.repeat()</code> in this case).
+        I have a grand vision for building out a fully functional game development ecosystem with Thy as part of it.
+        But until those tools are developed, Thy is only really useful for self-contained small problems
+        like <a href="https://adventofcode.com" target="_blank">Advent of Code</a> or writing out notional code on your phone as a sort of shorthand.
       </p>
-    </div>
-    <div class="column-content-md">
-      <TsThyComparison
-        ts={baklavaJs}
-        thy={baklavaThy}
-        playground={playgroundBaseUrl}
-      ></TsThyComparison>
     </div>
   </div>
 }

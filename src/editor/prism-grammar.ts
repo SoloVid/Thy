@@ -10,6 +10,9 @@ const innerParts: Grammar = {
     /\bthat\b/g,
     /\bbeforeThat\b/g,
   ],
+  'number': [
+    /\b-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?\b/,
+  ],
 }
 export const thyPrismGrammar: Grammar = {
   // 'keyword': /TS/,
@@ -21,13 +24,13 @@ export const thyPrismGrammar: Grammar = {
   'comment': [
     // /^\s*([A-Z].*)/,
     {
+      pattern: /^(\s*)([A-Z]{3,})(?:.|[\n\r])+?^(\1)(\2)$/gm,
+      greedy: true,
+    },
+    {
       pattern: /(^\s*)[A-Z].*$/gm,
       lookbehind: true,
     },
-    {
-      pattern: /^(\s*)([A-Z]{3,})(?:.|[\n\r])+^(\1)(\2)$/gm,
-      greedy: true,
-    }
   ],
   'code-line': {
     pattern: /(^\s*)[a-z].+$/gm,
@@ -38,9 +41,6 @@ export const thyPrismGrammar: Grammar = {
           pattern: /"(\\.|[^"])*"/g,
           greedy: true,
         }
-      ],
-      'number': [
-        /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/,
       ],
       'keyword': [
         /\bexport\b/,
@@ -54,7 +54,7 @@ export const thyPrismGrammar: Grammar = {
         /\bthrow\b/,
       ],
       'let-call': {
-        pattern: /\blet\b.+$/,
+        pattern: /\blet\b.*$/,
         inside: {
           'function': {
             pattern: /(\blet )[a-z][a-zA-Z0-9]*(?=\s|$)/,

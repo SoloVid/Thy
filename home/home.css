@@ -55,6 +55,10 @@ a {
   font-weight: bold;
   text-decoration: none;
   cursor: pointer;
+  color: initial;
+}
+a:hover {
+  text-decoration: underline;
 }
 
 .code-comparison {
