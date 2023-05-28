@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Custom Language Example</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism.css">
+  <style>
+    /* Styles for function name */
+    .token-function {
+      color: #FF9900; /* Set the desired color */
+    }
+
+    /* Styles for variable name */
+    .token-variable {
+      color: #3366CC; /* Set the desired color */
+    }
+
+    /* Styles for numbers */
+    .token-number {
+      color: #008000; /* Set the desired color */
+    }
+  </style>
+</head>
+<body>
+  <!-- Your code snippets will go here -->
+  <pre><code class="language-thy">
+    TS a la `import { heya as hey } from ...`
+    hey is thy "blah.blah.heya"
+    
+    TS a la `namespace blahBlah.blah`
+    thy.scope "blahBlah.blah"
+      Define a function.
+      main is def
+        Assign literal. const a = 5
+        a is def 5
+        Assign value. const b = a
+        b is def a
+        Assign function result. const c = calc(a, b)
+        c is calc a b
+        Just call function
+        print "himom"
+    
+        This is a comment
+        check.all c d
+        compare.equal a b
+        check.some beforeThat that
+        if that
+          doThing a b c
+          e is calc d
+        and else
+          doOtherThing
+    
+      loop 10
+        i is given
+        e is get arr i
+        doBlah
+    
+      arr.forEach
+        element is given
+        print element
+    
+      loop.forever
+        doWork yo
+        condition is def true
+        Keyword 'let' allows a return from the called function to result in return from this function.
+        let if condition
+          return true
+        let someOtherCall
+        let thirdLambdaCall
+          return here
+    
+      switch myVal
+        case 1 doFirst
+        case 2
+          doFirst
+        case 3 doFirst
+        case 4
+          doOther
+        default
+          doFallback
+    
+      TS: type FunctionType = (pA: A) => ReturnType
+      More strictly something like: type FunctionType = typeof makeFunction((pA: A): ReturnType => {})
+      type FunctionType is def
+        pA is given A
+        type return ReturnType
+    
+      private typedFun is def
+        pA is given A
+        pB is given B pBDefault
+        type ReturnType is Promise InnerReturnType
+        type return ReturnType
+        asyncAdd pA pB
+        await that
+        math.add pA pB
+        return that
+    
+      export generalizedFun is def
+        type U is Given Unknown
+        type ATU is AT U
+        pA is given ATU
+        type BTU is BT U
+        pB is given BTU 
+        type ReturnType is RT U
+        type return ReturnType
+    
+      TS: type ConditionalType&lt;T> = T extends A ? AImplication : BImplication
+      type ConditionalType is def
+        type T is Given Unknown
+        type Result is If T A AImplication BImplication
+        type return Result
+    
+      This doesn't have a TS direct representation. Closest thing is: type ConditionalTypeAlias&lt;T> = ConditionalType&lt;T>
+      type ConditionalTypeAlias is TypeFun ConditionalType
+      TS: type ConditionalTypeInst = ConditionalType // no arguments passed
+      type ConditionalTypeInst is ConditionalType
+    
+      TypeScript: interface MyInterface1 { field1: number; field2: string; }
+      type MyInterface1 is
+        field1 be def Number
+        field2 be def String
+    
+      TypeScript: interface MyType&lt;T> { field1: number; field2: T[]; }
+      More strictly something like: type MyType&lt;T> = typeof (() => { return { field1: null as number, field2: [null as T] } })()
+      type MyType is def
+        type T is Given Unknown
+        type Result is
+          field1 be def Number
+          type ArrayT is Array T
+          field2 be def ArrayT
+        type return Result
+    
+      TS type Interfaces&lt;X extends number, Y extends X[] = boolean[]> = MyType&lt;X> & YOtherType&lt;Y>
+      type Interfaces is def
+        type X is Given Number
+        Won't allow non-type statements to separate givens from top of fun, but needed here in type fun.
+        type YParent is Array X
+        type DefaultY is Array Boolean
+        type Y is Given YParent DefaultY
+    
+        type MX is MyType X
+        type OY is YOtherType Y
+        type Result is All MX OY
+        type return Result
+    
+      Class definition. class Thing&lt;T> implements Interfaces&lt;T, Yo>
+      newThing is def
+        type T is Given Unknown
+        Constructor parameters.
+        qq is given Q
+        qe is given String
+        type ReturnType is Interfaces T Yo
+        type return ReturnType
+    
+        Class members.
+        w be def String ""
+    
+        Constructor body.
+        private q is def qq
+        w to def we
+    
+        field1 is getter
+          return 5
+        and setter
+          n is given
+          doSet n
+    
+        method is def
+          x is given
+          y is given
+          type return Void
+          print x
+          print y
+    
+      Array initialization. const arr = []
+      arr is array
+      With values. const arr = [1, 2, 3]
+      arr is array
+        a is given
+        a 1
+        a 2
+        a 3
+      Array index write. arr[5] = "blah"
+      set arr 5 "blah"
+      Array index access. const el = arr[5]
+      el is get arr 5
+    
+      Class instantiation. const obj = new MyClass(a, b)
+      obj is newMyClass a b
+      print obj.q
+    
+      Object literal. const lobj = { pa: a, pb: b, pc: { m: 5 } }
+      lobj is
+        pa is a
+        pb is b
+        pc is
+          m is def 5
+    
+      Multiline comment. Do I want this? Could aid mobile dev significantly bc no comment out hotkey.
+      ZZZ
+      String literal. callMe("hey mom.", a, (a, b, c) => {
+          ...
+      }, x => {
+          ...
+      }, d)
+      ZZZ
+      NMC
+        Other Comment
+      NMC
+      callMe "hey mom." a
+        a is given
+        b is given
+        c is given
+        print a
+      and
+        x is given
+        print x
+      and d
+    
+      try
+        doSomething
+          throw "my error"
+      and catch
+        e is given
+        print e
+      and finally
+        print "*sigh*"
+</code></pre>
+
+  <!-- Include the Prism.js library and your custom language plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+  <script>
+    (function (Prism) {
+      // Define the custom language and its grammar here
+      var innerParts = {
+        'punctuation': [
+          /\./,
+        ],
+        'class-name': /\b[A-Z][a-zA-Z0-9]*\b/g,
+        'important': [
+          /\bthat\b/g,
+          /\bbeforeThat\b/g,
+        ],
+      }
+      var thyLanguage = {
+        // 'keyword': /TS/,
+        'whitespace': [
+          {
+            pattern: /^\s+/,
+          }
+        ],
+        'comment': [
+          // /^\s*([A-Z].*)/,
+          {
+            pattern: /(^\s*)[A-Z].*$/gm,
+            lookbehind: true,
+          },
+          {
+            pattern: /^(\s*)([A-Z]{3,})(?:.|[\n\r])+^(\1)(\2)$/gm,
+            greedy: true,
+          }
+        ],
+        'code-line': {
+          pattern: /(^\s*)[a-z].+$/gm,
+          lookbehind: true,
+          inside: {
+            'string': [
+              {
+                pattern: /"(\\.|[^"])*"/g,
+                greedy: true,
+              }
+            ],
+            'number': [
+              /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/,
+            ],
+            'keyword': [
+              /\bexport\b/,
+              /\bprivate\b/,
+              /\btype\b/,
+              /\blet\b/,
+            ],
+            'builtin': [
+              /\bawait\b/,
+              /\bgiven\b/,
+              /\breturn\b/,
+              /\bthrow\b/,
+            ],
+            'continuation': {
+              pattern: /\band(?=(\s.*)?$)/,
+              inside: {
+                'operator': [
+                  /\band\b/,
+                ]
+              }
+            },
+            'assignment': {
+              pattern: /.+\b(be|is|to)\b.+$/,
+              inside: {
+                'function': [
+                  {
+                    pattern: /(\b(?:is|be|to)\s+([a-z][a-zA-Z0-9]*\.)*)[a-z][a-zA-Z0-9]*/,
+                    lookbehind: true,
+                  },
+                  {
+                    pattern: /(\b(?:is|be|to)\s+([a-zA-Z][a-zA-Z0-9]*\.)*)[A-Z][a-zA-Z0-9]*/,
+                    lookbehind: true,
+                  },
+                ],
+                'operator': [
+                  /\bbe\b/,
+                  /\bis\b/,
+                  /\bto\b/,
+                ],
+                ...innerParts,
+              },
+            },
+            'function': [
+              {
+                pattern: /(^|\.)[a-z][a-zA-Z0-9]*(?=\s|$)/,
+              },
+            ],
+            ...innerParts,
+            // 'function': [
+            //   {
+            //     pattern: /(\b(?:is|be|to)\s+)[a-z][a-zA-Z0-9]*/,
+            //   }
+            // ],
+          }
+        },
+        // 'function-call': {
+        //   pattern: /(\b[a-zA-Z_][a-zA-Z0-9_]*)(?:\s+is\s+)(\b[a-zA-Z_][a-zA-Z0-9_]*)(?:\s+)(\d+)/,
+        //   inside: {
+        //     'function': /\b[a-zA-Z_][a-zA-Z0-9_]*\b/,
+        //     'variable': /\b[a-zA-Z_][a-zA-Z0-9_]*\b/,
+        //     'number': /\d+/
+        //   }
+        // },
+        // 'important': /./,
+        // Define the language token patterns
+        // Example:
+        // 'keyword': /\b(keyword1|keyword2|keyword3)\b/,
+        // 'string': /"(?:\\.|[^\\"])*"/,
+        // ... add more token patterns specific to your language
+      };
+
+      // Add the custom language to Prism
+      Prism.languages.thy = thyLanguage;
+    })(Prism);
+  </script>
+</body>
+</html>
