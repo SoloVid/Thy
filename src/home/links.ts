@@ -1,2 +1,2 @@
-export const playgroundBaseUrl = "file:///C:/Users/grant/code/maven/thy/playground/index.html"
+export const playgroundBaseUrl = "https://play.thylang.com"
 export const home = "/index.html"
