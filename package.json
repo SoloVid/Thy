@@ -10,6 +10,7 @@
     "check-types": "tsc --noEmit",
     "clean": "node -p \"require('fs').rmSync('lib',{force:true,recursive:true})\"",
     "generate-declarations": "tsc --emitDeclarationOnly",
+    "home:dev": "esbuild src/home/index.tsx --bundle --platform=browser --jsx=automatic --outfile=home/index.js --sourcemap --servedir=home",
     "interpret": "node -r esbuild-register src/interpreter/cli.ts",
     "apreprepublish": "npm run clean",
     "aprepublish": "run-p --aggregate-output build test generate-declarations",
@@ -27,6 +28,7 @@
   "license": "MIT",
   "dependencies": {
     "@babel/code-frame": "^7.16.7",
+    "@stitches/react": "^1.2.8",
     "chalk": "^4.1.2",
     "glob": "^8.0.1",
     "lezer": "^0.13.0",

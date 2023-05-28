@@ -46,7 +46,6 @@ export const thyPrismGrammar: Grammar = {
         /\bexport\b/,
         /\bprivate\b/,
         /\btype\b/,
-        /\blet\b/,
       ],
       'builtin': [
         /\bawait\b/,
@@ -54,6 +53,16 @@ export const thyPrismGrammar: Grammar = {
         /\breturn\b/,
         /\bthrow\b/,
       ],
+      'let-call': {
+        pattern: /\blet\b.+$/,
+        inside: {
+          'function': {
+            pattern: /(\blet )[a-z][a-zA-Z0-9]*(?=\s|$)/,
+            lookbehind: true,
+          },
+          'keyword': /\blet\b/,
+        }
+      },
       'continuation': {
         pattern: /\band(?=(\s.*)?$)/,
         inside: {
@@ -89,27 +98,8 @@ export const thyPrismGrammar: Grammar = {
         },
       ],
       ...innerParts,
-      // 'function': [
-      //   {
-      //     pattern: /(\b(?:is|be|to)\s+)[a-z][a-zA-Z0-9]*/,
-      //   }
-      // ],
     }
   },
-  // 'function-call': {
-  //   pattern: /(\b[a-zA-Z_][a-zA-Z0-9_]*)(?:\s+is\s+)(\b[a-zA-Z_][a-zA-Z0-9_]*)(?:\s+)(\d+)/,
-  //   inside: {
-  //     'function': /\b[a-zA-Z_][a-zA-Z0-9_]*\b/,
-  //     'variable': /\b[a-zA-Z_][a-zA-Z0-9_]*\b/,
-  //     'number': /\d+/
-  //   }
-  // },
-  // 'important': /./,
-  // Define the language token patterns
-  // Example:
-  // 'keyword': /\b(keyword1|keyword2|keyword3)\b/,
-  // 'string': /"(?:\\.|[^\\"])*"/,
-  // ... add more token patterns specific to your language
 }
 
 const testInput = "Test me"

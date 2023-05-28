@@ -193,7 +193,11 @@ export default function CodeInput({
       }
       return l.replace(new RegExp(`^${indentToRemove}`), currentLineIndent)
     }).join("\n")
-    update(textUpToHere + alteredPasteText + value.substring(currentIndex))
+    const newValue = textUpToHere + alteredPasteText + value.substring(currentIndex)
+    $textarea.current.value = newValue
+    update(newValue)
+    const newIndex = currentIndex + alteredPasteText.length
+    $textarea.current.setSelectionRange(newIndex, newIndex)
   }
 
   function onKeyUp(e: KeyboardEvent) {
