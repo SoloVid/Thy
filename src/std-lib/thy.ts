@@ -1,24 +1,48 @@
+// type BaseBlockMap = Record<string, (args: { thy: (...keyArgs: ([keyArgsKey: string] | [])) => never }) => unknown>
+// type BaseBlockMap = Record<string, (args: { thy: (...args: any) => any }) => unknown>
+type BaseBlockMap = Record<string, (args: { thy: ThyFunction<any> }) => unknown>
+type BlockMapReturns<BlockMap extends BaseBlockMap> = { [K in keyof BlockMap]: ReturnType<BlockMap[K]> }
+
+type BaseThyFunction = (key: string) => unknown
+// type PartialThyFunction<BlockExports extends Record<string, unknown>, Keys extends (string & keyof BlockExports)> = <
+//   OutputKey extends Keys | void = void
+//   >(
+//     ...[outputKey]: ThyFunctionParameters<BlockExports, OutputKey>
+//   ) => ThyFunctionOutput<BlockExports, OutputKey>
+// type BaseBlock<BlockExports extends Record<string, unknown>, ThyFunction extends BaseThyFunction> = (args: { thy: ThyFunction }) => void | (Record<string, unknown> & Partial<BlockExports>)
+type PartialThyFunction<BlockMap extends BaseBlockMap, Keys extends (string & keyof BlockMap)> = <
+  OutputKey extends Keys | void = void
+  >(
+    ...[outputKey]: ThyFunctionParameters<BlockMap, OutputKey>
+  ) => ThyFunctionOutput<BlockMap, OutputKey>
+export type ThyFunction<BlockMap extends BaseBlockMap> = PartialThyFunction<BlockMap, string & keyof BlockMap>
+// type BaseBlock<BlockMap extends BaseBlockMap, ThyFunction extends BaseThyFunction> = (args: { thy: ThyFunction }) => void | (Record<string, unknown> & Partial<BlockMapReturns<BlockMap>>)
+type BaseBlock<BlockMap extends BaseBlockMap> = BlockMap[keyof BlockMap] | ((args: { thy: PartialThyFunction<BlockMap, string & keyof BlockMap> }) => (undefined | void | Record<string, never>))
 
 export function makeThy<
-  BlocksTuple extends readonly (() => void | Record<string, unknown>)[]
+  // BlockExports extends Record<string, unknown>,
+  BlockMap extends BaseBlockMap,
+// BlocksTuple extends readonly BaseBlock<BlockExports, PartialThyFunction<BlockExports, string & keyof BlockExports>>[],
 >({
   blocks,
 }: {
-  blocks: BlocksTuple
-}) {
-  type ReturnTypes = {
-    [K in keyof BlocksTuple]: ReturnType<BlocksTuple[K]>
-  }[number]
-  type ObjectReturnTypes = Exclude<ReturnTypes, void>
-  type AggregateOutput = AssertRecord<UnionToIntersection<ObjectReturnTypes>>
+  // blocks: readonly BaseBlock<NoInfer<BlockExports>, PartialThyFunction<BlockExports, string & keyof BlockExports>>[]
+  // blocks: readonly BaseBlock<NoInfer<BlockMap>, PartialThyFunction<BlockMap, string & keyof BlockMap>>[]
+  blocks: readonly BaseBlock<NoInfer<BlockMap>>[]
+}): PartialThyFunction<BlockMap, string & keyof BlockMap> {
   const values: Record<string, unknown> = {}
-  return <
-    OutputKey extends (string & keyof AggregateOutput) | void = void
+  const blocksRun: unknown[] = []
+  const thy = <
+    OutputKey extends (string & keyof BlockMap) | void = void
   >(
-    ...[outputKey]: ThyFunctionParameters<AggregateOutput, OutputKey>
-  ): ThyFunctionOutput<AggregateOutput, OutputKey> => {
+    ...[outputKey]: ThyFunctionParameters<BlockMap, OutputKey>
+  ): ThyFunctionOutput<BlockMap, OutputKey> => {
     for (const block of blocks) {
-      const newValues = block()
+      if (blocksRun.includes(block)) {
+        continue
+      }
+      blocksRun.push(block)
+      const newValues = block({ thy })
       if (newValues) {
         for (const [key, value] of Object.entries(newValues)) {
           values[key] = value
@@ -26,20 +50,19 @@ export function makeThy<
       }
     }
     if (outputKey) {
-      return values[outputKey] as ThyFunctionOutput<AggregateOutput, OutputKey>
+      return values[outputKey] as ThyFunctionOutput<BlockMap, OutputKey>
     }
-    return undefined as ThyFunctionOutput<AggregateOutput, OutputKey>
+    return undefined as ThyFunctionOutput<BlockMap, OutputKey>
   }
+  return thy
 }
-// From https://stackoverflow.com/a/50375286/4639640
-type UnionToIntersection<U> = 
-  (U extends any ? (k: U)=>void : never) extends ((k: infer I)=>void) ? I : never
 
-type AssertRecord<T> = T extends Record<string, unknown> ? T : never
+// type ThyFunctionParameters<AggregateOutput extends Record<string, unknown>, OutputKey extends (string & keyof AggregateOutput) | void> = OutputKey extends void ? [] : [key: OutputKey]
+// type ThyFunctionOutput<AggregateOutput extends Record<string, unknown>, OutputKey extends (string & keyof AggregateOutput) | void> = OutputKey extends void ? void : OutputKey extends keyof AggregateOutput ? AggregateOutput[OutputKey] : never
+type ThyFunctionParameters<BlockMap extends BaseBlockMap, OutputKey extends (string & keyof BlockMap) | void> = OutputKey extends void ? [] : [key: OutputKey]
+type ThyFunctionOutput<BlockMap extends BaseBlockMap, OutputKey extends (string & keyof BlockMap) | void> = OutputKey extends void ? void : DefiniteReturnType<BlockMap, Exclude<OutputKey, void>>
 
-type ThyFunctionParameters<AggregateOutput extends Record<string, unknown>, OutputKey extends (string & keyof AggregateOutput) | void> = OutputKey extends void ? [] : [key: OutputKey]
-type ThyFunctionOutput<AggregateOutput extends Record<string, unknown>, OutputKey extends (string & keyof AggregateOutput) | void> = OutputKey extends void ? void : OutputKey extends keyof AggregateOutput ? AggregateOutput[OutputKey] : never
+type DefiniteReturnType<BlockMap extends BaseBlockMap, OutputKey extends (string & keyof BlockMap)> = OutputKey extends keyof ReturnType<BlockMap[OutputKey]> ? ReturnType<BlockMap[OutputKey]>[OutputKey] : never
+// type DefiniteReturnType<BlockMap extends BaseBlockMap, OutputKey extends unknown> = OutputKey extends keyof BlockMap ? OutputKey extends keyof ReturnType<BlockMap[OutputKey]> ? ReturnType<BlockMap[OutputKey]>[OutputKey] : never : never
 
-// From https://gist.github.com/webstrand/b6c8a1bb019f156a3b2b0e553370b18d
-type Expand<T> = T extends string | number | boolean | bigint | null | void | symbol | Function | Date ? T : { [K in keyof T]: T[K] }
-type VoidToEmptyObject<T extends Record<string, unknown> | void> = T extends void ? "aggh" : T
+type NoInfer<T> = [T][T extends T ? 0 : never]
