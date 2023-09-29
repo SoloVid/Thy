@@ -1,15 +1,8 @@
-import type { DebugNever, DefaultNever, Expand, NoInfer } from "../utils/utility-types"
+import type { DebugNever, DefaultNever, NoInfer } from "../utils/utility-types"
 
 type BaseBlock = (args: { thy: ThyFunction<{}> }) => unknown
 type BaseBlockMap = Record<string, BaseBlock>
 type Block<BlockMap extends BaseBlockMap> = BlockMap[keyof BlockMap] | ((args: { thy: PartialThyFunction<BlockMap, (string & keyof BlockMap)> }) => (undefined | void | Record<string, never>))
-
-type AllPropertiesAddingDots<T extends unknown> = AllPropertiesAddingDots1<"", T>
-type AllPropertiesAddingDots1<Prefix extends string, T extends unknown> = T extends Record<string, unknown> ? `${Prefix}${Extract<keyof T, string>}` | AllPropertiesAddingDots2<Prefix, T, Extract<keyof T, string>> : never
-type AllPropertiesAddingDots2<Prefix extends string, T extends Record<string, unknown>, Keys extends Extract<keyof T, string>> = Keys extends unknown ? AllPropertiesAddingDots1<`${Prefix}${Keys}.`, T[Keys]> : never
-
-type AggregateOutput<BlockMap extends BaseBlockMap> = ReturnType<BlockMap[keyof BlockMap]>
-type AllBlockKeys<BlockMap extends BaseBlockMap> = AllPropertiesAddingDots<AggregateOutput<BlockMap>>
 
 type ThyFunctionParameters<BlockMap extends BaseBlockMap, OutputKey extends (string & keyof BlockMap) | void> = OutputKey extends void ? [] : [key: OutputKey]
 type ThyFunctionOutput<BlockMap extends BaseBlockMap, OutputKey extends (string & keyof BlockMap) | void> = DefaultNever<

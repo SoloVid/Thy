@@ -237,13 +237,3 @@ testMakeThy("function should reject overlapping definitions", async () => {
     thy()
   }, /"a" defined multiple times/)
 })
-
-// testMakeThy("function should allow getting object field", async () => {
-//   const provider = () => ({ parent: { child: 1 } })
-//   const thy = makeThy({
-//     blocks: [provider],
-//     blockMap: { parent: provider },
-//   })
-//   const child = thy("parent.child")
-//   assert.strictEqual(child, 1)
-// })
