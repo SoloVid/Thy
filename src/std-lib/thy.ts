@@ -17,42 +17,65 @@ type PartialThyFunction<BlockMap extends BaseBlockMap, Keys extends (string & ke
   ) => ThyFunctionOutput<BlockMap, OutputKey>
 export type ThyFunction<BlockMap extends BaseBlockMap> = PartialThyFunction<BlockMap, string & keyof BlockMap>
 
+type MakeThyOptions<BlockMap extends BaseBlockMap> = {
+  blocks: readonly Block<NoInfer<BlockMap>>[]
+  blockMap: BlockMap
+}
+
 export function makeThy<
   BlockMap extends BaseBlockMap,
 >({
   blocks,
-}: {
-  blocks: readonly Block<NoInfer<BlockMap>>[]
-}): PartialThyFunction<BlockMap, string & keyof BlockMap> {
+  blockMap,
+}: MakeThyOptions<BlockMap>): PartialThyFunction<BlockMap, string & keyof BlockMap> {
   const values: Record<string, unknown> = {}
   const blocksRun: unknown[] = []
+
+  const getValue = (outputKey: string) => {
+    if (!(outputKey in values)) {
+      throw new Error(`"${outputKey}" not found`)
+    }
+    return values[outputKey]
+  }
+
+  const ensureBlockRun = (block: Block<BlockMap> | BaseBlock) => {
+    if (blocksRun.includes(block)) {
+      return
+    }
+    blocksRun.push(block)
+    const newValues = block({ thy })
+    if (newValues && typeof newValues === "object") {
+      for (const [key, value] of Object.entries(newValues)) {
+        if (key in values) {
+          throw new Error(`"a" defined multiple times`)
+        }
+        values[key] = value
+      }
+    }
+  }
+
   const thy = <
     OutputKey extends (string & keyof BlockMap) | void = void
   >(
     ...[outputKey]: ThyFunctionParameters<BlockMap, OutputKey>
   ): ThyFunctionOutput<BlockMap, OutputKey> => {
-    for (const block of blocks) {
-      if (blocksRun.includes(block)) {
-        continue
-      }
-      blocksRun.push(block)
-      const newValues = block({ thy })
-      if (newValues && typeof newValues === "object") {
-        for (const [key, value] of Object.entries(newValues)) {
-          if (key in values) {
-            throw new Error(`"a" defined multiple times`)
-          }
-          values[key] = value
-        }
-      }
-    }
     if (outputKey) {
-      if (!(outputKey in values)) {
+      if (!(outputKey in blockMap)) {
         throw new Error(`"${outputKey}" not found`)
       }
-      return values[outputKey] as ThyFunctionOutput<BlockMap, OutputKey>
+      const block = blockMap[outputKey]
+      ensureBlockRun(block)
+      return getValue(outputKey) as ThyFunctionOutput<BlockMap, OutputKey>
+    }
+
+    for (const block of blocks) {
+      ensureBlockRun(block)
+    }
+    if (outputKey) {
+      return getValue(outputKey) as ThyFunctionOutput<BlockMap, OutputKey>
     }
     return undefined as ThyFunctionOutput<BlockMap, OutputKey>
   }
+
   return thy
 }

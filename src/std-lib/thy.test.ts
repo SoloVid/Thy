@@ -12,7 +12,8 @@ testMakeThy("should not run passed functions on construction", async () => {
   makeThy({
     blocks: [() => {
       flag = true
-    }]
+    }],
+    blockMap: {},
   })
   assert(!flag, "Function should not have been called during construction")
 })
@@ -24,6 +25,7 @@ testMakeThy("function should run all passed functions", async () => {
   })
   const thy = makeThy({
     blocks: functions,
+    blockMap: {},
   })
   thy()
   calledFlags.forEach((f, i) => {
@@ -38,12 +40,36 @@ testMakeThy("function should run all functions once", async () => {
   })
   const thy = makeThy({
     blocks: functions,
+    blockMap: {},
   })
   thy()
   thy()
   calledTimes.forEach((f, i) => {
     assert.strictEqual(f, 1, `Function ${i} should have been called exactly once but was called ${f} times`)
   })
+})
+
+testMakeThy("function should not run non-targeted blocks", async () => {
+  let unintendedCall = false
+  const provider1 = () => {
+    unintendedCall = true
+  }
+  const provider2 = () => ({ a: "A" } as const)
+  const provider3 = () => {
+    unintendedCall = true
+  }
+  const thy = makeThy({
+    blocks: [
+      provider1,
+      provider2,
+      provider3,
+    ],
+    blockMap: {
+      "a": provider2,
+    },
+  })
+  assert.strictEqual(thy("a"), "A")
+  assert(!unintendedCall, "Non-targeted blocks should not be called")
 })
 
 const permutations3 = permute([0, 1, 2])
@@ -62,7 +88,12 @@ for (const perm of permutations3) {
         provider1,
         provider2,
         provider3,
-      ] as const)[i])
+      ] as const)[i]),
+      blockMap: {
+        "a": provider1,
+        "b": provider1,
+        "c": provider2,
+      },
     })
     const noOutput: void = thy()
     assert.strictEqual(noOutput, undefined, `thy() should return undefined (void)`)
@@ -95,7 +126,12 @@ for (const perm of permutations3) {
         provider1,
         provider2,
         provider3,
-      ] as const)[i])
+      ] as const)[i]),
+      blockMap: {
+        "a": provider1,
+        "ab": provider2,
+        "abc": provider3,
+      },
     })
     const noOutput = thy()
     assertType<void>(noOutput)
@@ -122,7 +158,10 @@ testMakeThy("function should error on bad key", async () => {
   const thy = makeThy<ProviderMap>({
     blocks: [
       provider1,
-    ] as const
+    ] as const,
+    blockMap: {
+      "a": provider1,
+    },
   })
   assert.throws(() => {
     // @ts-expect-error thy() should not allow invalid key
@@ -141,7 +180,11 @@ testMakeThy("function should reject bad typing", async () => {
   const thy = makeThy<ProviderMap>({
     blocks: [
       provider1,
-    ] as const
+    ] as const,
+    blockMap: {
+      "a": provider1,
+      "b": provider1,
+    },
   })
   const aOutputImplicit = thy("a")
   assertType<"A">(aOutputImplicit)
@@ -161,7 +204,10 @@ testMakeThy("function should reject bad provider map", async () => {
   const thy = makeThy<ProviderMap>({
     blocks: [
       provider1,
-    ] as const
+    ] as const,
+    blockMap: {
+      "b": provider1,
+    },
   })
   assert.throws(() => {
     const bOutput = thy("b")
@@ -182,9 +228,12 @@ testMakeThy("function should reject overlapping definitions", async () => {
     blocks: [
       provider1,
       provider2,
-    ] as const
+    ] as const,
+    blockMap: {
+      "a": provider1,
+    },
   })
   assert.throws(() => {
-    thy("a")
+    thy()
   }, /"a" defined multiple times/)
 })
