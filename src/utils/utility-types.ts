@@ -5,4 +5,7 @@
  */
 export type NoInfer<T> = [T][T extends T ? 0 : never]
 
-export type DebugNever<Message extends string, T extends unknown> = [never, Message, T]
+export type DebugNever<Message> = [never, Message]
+export type DebugNeverWithData<Message extends string, T extends unknown> = [never, Message, T]
+
+export type DefaultNever<T, Default> = [T] extends [never] ? Default : T
