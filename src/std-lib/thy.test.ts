@@ -1,5 +1,6 @@
 import assert from "assert";
-import { test, defineTestGroup } from "under-the-sun";
+import { defineTestGroup } from "under-the-sun";
+import { assertType } from "../utils/assert";
 import { makeThy, ThyFunction } from "./thy";
 
 const testMakeThy = defineTestGroup("makeThy() ")
@@ -25,6 +26,21 @@ testMakeThy("function should run all passed functions", async () => {
   thy()
   calledFlags.forEach((f, i) => {
     assert(f, `Function ${i} should have been called`)
+  })
+})
+
+testMakeThy("function should run all functions once", async () => {
+  let calledTimes = [0, 0]
+  let functions = calledTimes.map((e, i) => () => {
+    calledTimes[i]++
+  })
+  const thy = makeThy({
+    blocks: functions,
+  })
+  thy()
+  thy()
+  calledTimes.forEach((f, i) => {
+    assert.strictEqual(f, 1, `Function ${i} should have been called exactly once but was called ${f} times`)
   })
 })
 
@@ -54,11 +70,6 @@ testMakeThy("function should allow accessing exported member", async () => {
 })
 
 testMakeThy("function should allow components to access each other", async () => {
-  // type MapToFunc<T extends Record<string, unknown>> = <Key extends keyof T>(key: Key) => T[Key]
-  // type PartialThy<BlockExports extends Record<string, unknown>, Keys extends keyof BlockExports> = MapToFunc<Pick<BlockExports, Keys>>
-
-  // type Thy = PartialThy<ProviderReturnMap, keyof ProviderReturnMap>
-  type Thy = ThyFunction<ProviderMap>
   const provider1 = ({ thy }: { thy: Thy }) => {
     const c = thy("c")
     const a = `${c}A` as const
@@ -70,43 +81,70 @@ testMakeThy("function should allow components to access each other", async () =>
     const c = `${b}C` as const
     return { c }
   }
-  const provider4 = () => {
-    return { d: 5 }
-  }
   type ProviderMap = {
     "a": typeof provider1
     "b": typeof provider2
     "c": typeof provider3
   }
-  // type ProviderReturnMap = {
-  //   "a": ReturnType<typeof provider1>
-  //   "b": ReturnType<typeof provider2>
-  //   "c": ReturnType<typeof provider3>
-  // }
+  type Thy = ThyFunction<ProviderMap>
   const thy = makeThy<ProviderMap>({
     blocks: [
       provider1,
       provider2,
       provider3,
-      // ({ thy }) => {
-      //   const c = thy("c")
-      //   const a = `${c}A`
-      //   return { a }
-      // },
-      // () => ({ b: "B" }),
-      // ({ thy }) => {
-      //   const b = thy("b")
-      //   const c = `${b}C`
-      //   return { c }
-      // },
     ] as const
   })
-  const noOutput: void = thy()
+  const noOutput = thy()
+  assertType<void>(noOutput)
   assert.strictEqual(noOutput, undefined, `thy() should return undefined (void)`)
-  const aOutput: "BCA" = thy("a")
+  const aOutput = thy("a")
+  assertType<"BCA">(aOutput)
   assert.strictEqual(aOutput, "BCA", `thy("a") should be "BCA"`)
-  const bOutput: "B" = thy("b")
+  const bOutput = thy("b")
+  assertType<"B">(bOutput)
   assert.strictEqual(bOutput, "B", `thy("b") should be "B"`)
-  const cOutput: "BC" = thy("c")
+  const cOutput = thy("c")
+  assertType<"BC">(cOutput)
   assert.strictEqual(cOutput, "BC", `thy("c") should be "BC"`)
+})
+
+testMakeThy("function should error on bad key", async () => {
+  const provider1 = () => {
+    return { a: "A" as const }
+  }
+  type ProviderMap = {
+    "a": typeof provider1
+  }
+  const thy = makeThy<ProviderMap>({
+    blocks: [
+      provider1,
+    ] as const
+  })
+  assert.throws(() => {
+    // @ts-expect-error thy() should not allow invalid key
+    thy("b")
+  }, /"b" not found/)
+})
+
+testMakeThy("function should reject bad typing", async () => {
+  const provider1 = () => {
+    return { a: "A", b: "B" } as const
+  }
+  type ProviderMap = {
+    "a": typeof provider1
+    "b": typeof provider1
+  }
+  const thy = makeThy<ProviderMap>({
+    blocks: [
+      provider1,
+    ] as const
+  })
+  const aOutputImplicit = thy("a")
+  assertType<"A">(aOutputImplicit)
+  assertType<"A">(thy("a"))
+  // @ts-expect-error thy() should not allow type mismatch
+  assertType<"no">(thy("a"))
+  // @ts-expect-error thy() should not allow type mismatch, even if good for other dependency
+  assertType<"B">(thy("a"))
+  assertType<"B">(thy("b"))
 })
