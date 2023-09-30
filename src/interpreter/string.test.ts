@@ -1,11 +1,10 @@
 import assert from "node:assert"
 import { test } from "under-the-sun"
-import { parseString, RawMultilineStringData } from "./string"
-import { interpolateString, interpretThyMultilineString } from "./string"
+import { interpolateString, interpretThyMultilineString, parseString } from "./string"
 import { makeSimpleContext } from "./test-helper"
 
 test("interpretThyMultilineString() should return string with stripped insignificant whitespace", async () => {
-  const input: RawMultilineStringData = {
+  const input = {
     indent: "    ",
     lines: [
       "",
@@ -24,7 +23,7 @@ test("interpretThyMultilineString() should return string with stripped insignifi
 })
 
 test("interpretThyMultilineString() should escape quotes", async () => {
-  const input: RawMultilineStringData = {
+  const input = {
     indent: "    ",
     lines: [
       `say "hi"!`

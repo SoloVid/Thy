@@ -2,18 +2,20 @@ import assert from "../utils/assert"
 import { interpretThyCall } from "./call"
 import { interpretThyExpression } from "./expression"
 import { identifierRegex } from "./patterns"
-import type { Atom, ThyBlockContext } from "./types"
+import { Atom, isAtomLiterally, isSimpleAtom, ThyBlockContext } from "./types"
 
 export function interpretThyStatement(context: ThyBlockContext, parts: readonly Atom[]): void | PromiseLike<void> {
   const mutableParts = [...parts]
   const firstPart = mutableParts.shift()
-  const isExport = firstPart === "export"
-  const isPrivate = firstPart === "private"
-  const variableName = (isExport || isPrivate) ? mutableParts.shift() : firstPart
-  const [assignKeyword, ...callParts] = mutableParts
+  const isExport = isAtomLiterally(firstPart, "export")
+  const isPrivate = isAtomLiterally(firstPart, "private")
+  const variableNamePart = (isExport || isPrivate) ? mutableParts.shift() : firstPart
+  const [assignKeywordPart, ...callParts] = mutableParts
 
-  if (typeof variableName === "string" && typeof assignKeyword === "string" && ["is", "be", "to"].includes(assignKeyword)) {
-    if (callParts[0] === "await") {
+  if (isSimpleAtom(variableNamePart) && isSimpleAtom(assignKeywordPart) && ["is", "be", "to"].includes(assignKeywordPart.text)) {
+    const variableName = variableNamePart.text
+    const assignKeyword = assignKeywordPart.text
+    if (isAtomLiterally(callParts[0], "await")) {
       assert(callParts.length === 2, `\`await\` takes 1 argument; got ${callParts.length}`)
       return Promise.resolve(interpretThyExpression(context, callParts[1]).target).then(handleReturnedValue)
     }
@@ -22,8 +24,6 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
     return
 
     function handleReturnedValue(newValue: unknown) {
-      assert(typeof variableName === "string", "variableName should have already been proven a string")
-      assert(typeof assignKeyword === "string", "assignKeyword should have already been proven a string")
       context.thatValue = undefined
       context.beforeThatValue = undefined
 
@@ -59,7 +59,7 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
     }
   }
 
-  if (parts[0] === "await") {
+  if (isAtomLiterally(parts[0], "await")) {
     assert(parts.length === 2, `\`await\` takes 1 argument; got ${parts.length}`)
     return Promise.resolve(interpretThyExpression(context, parts[1]).target).then((result) => {
       context.beforeThatValue = context.thatValue

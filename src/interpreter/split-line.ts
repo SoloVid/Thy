@@ -1,22 +1,33 @@
 import { stringRegex } from "./patterns"
 
-export function splitLineParts(line: string): string[] {
-  const substitutions: Record<string, string> = {}
-  return line
-    .trim()
-    .replace(/"""/g, (match) => {
-      const id = generateUID()
-      substitutions[id] = match
-      return id
-    })
-    .replace(new RegExp(stringRegex, "g"), (match) => {
-      const id = generateUID()
-      substitutions[id] = match
-      return id
-    })
-    .split(" ")
-    .map(p => p in substitutions ? substitutions[p] : p)
-    .filter(p => !/^[A-Z]/.test(p))
+export type LinePart = {
+  text: string
+  index: number
+}
+
+export function splitLineParts(line: string): LinePart[] {
+  const partPattern = /"""|"(?:(?:[^"\\]|\\.)*)"|[^ ]+/y
+  let i = 0
+  partPattern.lastIndex = i
+  const results: LinePart[] = []
+  while (i < line.length) {
+    const m = partPattern.exec(line)
+    if (m) {
+      const part = {
+        text: m[0],
+        index: i,
+      }
+      if (!/^[A-Z]/.test(part.text)) {
+        results.push(part)
+      }
+      i = partPattern.lastIndex > 0 ? partPattern.lastIndex : line.length
+    } else {
+      i++
+      partPattern.lastIndex = i
+    }
+  }
+
+  return results
 }
 
 // Implementation from https://stackoverflow.com/a/1349426/4639640

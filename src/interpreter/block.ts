@@ -1,45 +1,55 @@
 import assert from "../utils/assert"
+import { dissectErrorTraceAtBaseline, getErrorTraceLines, replaceErrorTraceLine, transformErrorTrace } from "../utils/error-helper"
 import { interpretThyCall } from "./call"
 import { interpretThyExpression } from "./expression"
 import { splitThyStatements } from "./split-statements"
 import { interpretThyStatement } from "./statement"
-import type { Statement, ThyBlockContext } from "./types"
+import { isAtomLiterally, Statement, ThyBlockContext } from "./types"
 
 type BlockOptions = {
   closure: ThyBlockContext["closure"]
   closureVariableIsImmutable: ThyBlockContext["closureVariableIsImmutable"]
+  functionName?: string
+  sourceFile: ThyBlockContext["sourceFile"]
+  startingLineIndex: number
 }
 
 export function interpretThyBlock(
   thySource: string,
-  options: BlockOptions = { closure: {}, closureVariableIsImmutable: {} },
+  options: Partial<BlockOptions> = {},
 ): (...args: readonly unknown[]) => unknown {
   const lines = thySource.split(/\r\n|\n/)
-  return interpretThyBlockLines(lines, options)
+  return interpretThyBlockLines(lines, {
+    closure: options.closure ?? {},
+    closureVariableIsImmutable: options.closureVariableIsImmutable ?? {},
+    functionName: options.functionName,
+    sourceFile: options.sourceFile ?? "<inline thy code>",
+    startingLineIndex: options.startingLineIndex ?? 0,
+  })
 }
 
 export function interpretThyBlockLines(
   thySourceLines: readonly string[],
   options: BlockOptions,
 ): (...args: readonly unknown[]) => unknown {
-  const statements = splitThyStatements(thySourceLines)
-  const isAsync = statements.some(s => s.some(a => a === "await"))
+  const statements = splitThyStatements(thySourceLines, options.startingLineIndex)
+  const isAsync = statements.some(s => s.some(a => isAtomLiterally(a, "await")))
   let exportUsed = false
   let letUsed = false
   for (const statement of statements) {
-    if (statement[0] === "export") {
+    if (isAtomLiterally(statement[0], "export")) {
       if (letUsed) {
         throw new Error(`\`export\` cannot be used after \`let\``)
       }
       exportUsed = true
     }
-    if (statement[0] === "let") {
+    if (isAtomLiterally(statement[0], "let")) {
       if (exportUsed) {
         throw new Error(`\`let\` cannot be used after \`export\``)
       }
       letUsed = true
     }
-    if (statement[0] === "return") {
+    if (isAtomLiterally(statement[0], "return")) {
       if (exportUsed) {
         throw new Error(`\`return\` cannot be used after \`export\``)
       }
@@ -60,16 +70,18 @@ export function interpretThyBlockLines(
       closureVariableIsImmutable: options.closureVariableIsImmutable,
       thatValue: undefined,
       beforeThatValue: undefined,
+      errorTraceInfo: null,
+      sourceFile: options.sourceFile,
     }
 
     function evaluateStatement(statement: Statement): [shouldReturn: boolean, value: unknown] {
       const parts = statement
       if (parts.length > 0) {
-        if (parts[0] === "return") {
+        if (isAtomLiterally(parts[0], "return")) {
           assert(parts.length === 2, `\`return\` takes exactly one parameter`)
           return [true, interpretThyExpression(context, parts[1]).target]
         }
-        if (parts[0] === "let") {
+        if (isAtomLiterally(parts[0], "let")) {
           assert(parts.length > 1, `\`let\` requires a function call following it`)
           const [letKeyword, ...theRest] = parts
           const returnValue = interpretThyCall(context, theRest)
@@ -118,7 +130,7 @@ export function interpretThyBlockLines(
     return async (...args: readonly unknown[]) => {
       const helper = makeHelper(args)
       for (const statement of statements) {
-        if (statement[0] === "let" && statement[1] === "await") {
+        if (isAtomLiterally(statement[0], "let") && isAtomLiterally(statement[1], "await")) {
           assert(statement.length === 3, `\`await\` takes 1 argument; got ${statement.length - 1}`)
           const returnValue = await interpretThyExpression(helper.context, statement[2]).target
           if (returnValue !== undefined) {
@@ -140,14 +152,44 @@ export function interpretThyBlockLines(
     }
   }
 
-  return (...args: readonly unknown[]) => {
+  const functionName = options.functionName ?? "<anonymous>"
+  const objWithBlockFunction = { [functionName]: (...args: readonly unknown[]) => {
     const helper = makeHelper(args)
-    for (const statement of statements) {
-      const [shouldReturn, value] = helper.evaluateStatement(statement)
-      if (shouldReturn) {
-        return value
+    try {
+      for (const statement of statements) {
+        const [shouldReturn, value] = helper.evaluateStatement(statement)
+        if (shouldReturn) {
+          return value
+        }
       }
+    } catch (e) {
+      console.log("********catching")
+      if (e instanceof Error && helper.context.errorTraceInfo) {
+        const errorHere = new Error()
+        console.log(errorHere)
+        console.log("------dissecting")
+        const errorDissectedAtCall = dissectErrorTraceAtBaseline(e, helper.context.errorTraceInfo.errorCloseToCall)
+        console.log(errorDissectedAtCall)
+        const errorDissectedHere = dissectErrorTraceAtBaseline(e, errorHere)
+        console.log(errorDissectedHere)
+        const lineHere = getErrorTraceLines(new Error()).split("\n")[0]
+        const errorTraceLocation = helper.context.errorTraceInfo.failingLocation
+
+        throw transformErrorTrace(e, (originalTraceLines) => {
+          return [
+            errorDissectedAtCall.delta,
+            replaceErrorTraceLine(errorDissectedHere.pivot, 0, (file, line, column) => [
+              options.sourceFile,
+              errorTraceLocation.lineIndex + 1,
+              errorTraceLocation.columnIndex + 1,
+            ]),
+            errorDissectedHere.shared,
+          ].join("\n")
+        })
+      }
+      throw e
     }
     return helper.formulateResult()
-  }
+  } }
+  return objWithBlockFunction[functionName]
 }

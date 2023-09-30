@@ -8,9 +8,14 @@ type InterpretMultilineStringState = {
   readonly output: string
 }
 
-export type RawMultilineStringData = { indent: string, lines: readonly string[] }
+export type RawMultilineStringData = {
+  indent: string
+  lines: readonly string[]
+  lineIndex: number
+  columnIndex: number
+}
 
-export function interpretThyMultilineString(input: RawMultilineStringData): string {
+export function interpretThyMultilineString(input: Pick<RawMultilineStringData, "indent" | "lines">): string {
   return `"` + input.lines
     .map(l => {
       if (l.length < input.indent.length) {

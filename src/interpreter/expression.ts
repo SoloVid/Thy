@@ -2,7 +2,7 @@ import assert from "../utils/assert"
 import { interpretThyBlockLines } from "./block"
 import { exactNumberRegex, exactStringRegex, identifierRegex } from "./patterns"
 import { interpolateString, parseString } from "./string"
-import type { Atom, ThyBlockContext } from "./types"
+import type { Atom, ThyBlockContext, UnparsedBlock } from "./types"
 
 type InterpretedExpression = {
   target: unknown
@@ -11,25 +11,26 @@ type InterpretedExpression = {
 
 const ie = (value: unknown): InterpretedExpression => ({ target: value })
 
-export function interpretThyExpression(context: ThyBlockContext, thyExpression: Atom): InterpretedExpression {
-  if (Array.isArray(thyExpression)) {
-    return ie(resolveBlock(context, thyExpression))
+export function interpretThyExpression(context: ThyBlockContext, thyExpressionAtom: Atom): InterpretedExpression {
+  if ("lines" in thyExpressionAtom) {
+    return ie(resolveBlock(context, thyExpressionAtom))
   }
-  assert(typeof thyExpression === "string", "Array case should have been filtered")
+  const thyExpressionString = thyExpressionAtom.text
+  assert(typeof thyExpressionString === "string", "Array case should have been filtered")
 
-  if (exactNumberRegex.test(thyExpression)) {
-    return ie(parseFloat(thyExpression))
+  if (exactNumberRegex.test(thyExpressionString)) {
+    return ie(parseFloat(thyExpressionString))
   }
-  const stringMatch = exactStringRegex.exec(thyExpression)
+  const stringMatch = exactStringRegex.exec(thyExpressionString)
   if (stringMatch !== null) {
     const rawString = parseString(stringMatch[0])
     return ie(interpolateString(context, rawString))
   }
 
-  return interpretThyIdentifier(context, thyExpression)
+  return interpretThyIdentifier(context, thyExpressionString)
 }
 
-function resolveBlock(context: ThyBlockContext, thyLines: readonly string[]) {
+function resolveBlock(context: ThyBlockContext, unparsedBlock: UnparsedBlock) {
   function initialize() {
     const childClosure: ThyBlockContext["closure"] = { ...context.implicitArguments }
     const childClosureVariableIsImmutable: Record<string, boolean> = {}
@@ -66,7 +67,12 @@ function resolveBlock(context: ThyBlockContext, thyLines: readonly string[]) {
         childClosureVariableIsImmutable[key] = context.closureVariableIsImmutable[key]
       }
     }
-    return interpretThyBlockLines(thyLines, { closure: childClosure, closureVariableIsImmutable: childClosureVariableIsImmutable })
+    return interpretThyBlockLines(unparsedBlock.lines, {
+      closure: childClosure,
+      closureVariableIsImmutable: childClosureVariableIsImmutable,
+      sourceFile: context.sourceFile,
+      startingLineIndex: unparsedBlock.lineIndex
+    })
   }
 
   // Rather than immediately construct the function for the block lines,
