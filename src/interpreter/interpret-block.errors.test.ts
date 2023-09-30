@@ -10,9 +10,6 @@ test("interpretThyBlock() should reject given with too many args", async () => {
 })
 
 test("interpretThyBlock() should provide Thy stack trace when error is thrown", () => {
-  // Make sure async stack traces are homogenous.
-  // await delay(10)
-
   const interpreted = interpretThyBlock(`f is given\nf`, {
     functionName: "interpreted",
     sourceFile: "provided-source.thy",
@@ -22,8 +19,6 @@ test("interpretThyBlock() should provide Thy stack trace when error is thrown", 
   }
 
   const errorHere = new Error()
-  const hereLines = getErrorTraceLines(errorHere).split("\n")
-  assert(hereLines.length >= 1, "Trace should be at least three lines for assertions")
 
   let actualError: unknown = null
   try {
@@ -34,23 +29,12 @@ test("interpretThyBlock() should provide Thy stack trace when error is thrown", 
 
   assert.notStrictEqual(actualError, null, "Error should be thrown")
   assert(actualError instanceof Error)
-  // console.log(actualError)
 
   assertErrorTraceLineMatch(actualError, 0, /\bfoo\b/)
   assertErrorTraceLineMatch(actualError, 0, /\binterpret-block.errors.test.ts\b/)
   assertErrorTraceLineMatch(actualError, 1, /\binterpreted\b/)
   assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:2:1\b/)
   assertErrorTraceLinesMatch(actualError, 2, errorHere, 0)
-
-  // const traceLines = getErrorTraceLines(actualError).split("\n")
-  // assert(traceLines.length >= 3, "Trace should be at least three lines for assertions")
-  // assert.match(traceLines[0], /\bfoo\b/)
-  // assert.match(traceLines[0], /\binterpret-block.errors.test.ts\b/)
-  // assert.match(traceLines[1], /\binterpreted\b/)
-  // assert.match(traceLines[1], /\bprovided-source.thy:2:1\b/)
-  // const expectedHereLine = hereLines[0].replace(/:\d+:\d+/, ":XXX:XXX")
-  // const actualHereLine = traceLines[2].replace(/:\d+:\d+/, ":XXX:XXX")
-  // assert.strictEqual(actualHereLine, expectedHereLine)
 })
 
 test("interpretThyBlock() should provide Thy stack trace when error is thrown asynchronously", async () => {
@@ -67,39 +51,22 @@ test("interpretThyBlock() should provide Thy stack trace when error is thrown as
   await delay(10)
 
   const errorHere = new Error()
-  const hereLines = getErrorTraceLines(errorHere).split("\n")
-  assert(hereLines.length >= 1, "Trace should be at least three lines for assertions")
 
   let actualError: unknown = null
   try {
-    console.log("before interpreted")
     await interpreted(foo)
-    // throw new Error("agggh")
   } catch (e) {
-    console.log("catch")
     actualError = e
   }
 
   assert.notStrictEqual(actualError, null, "Error should be thrown")
   assert(actualError instanceof Error)
 
-  // console.log(getErrorTraceLines(actualError))
-
   assertErrorTraceLineMatch(actualError, 0, /\bfoo\b/)
   assertErrorTraceLineMatch(actualError, 0, /\binterpret-block.errors.test.ts\b/)
   assertErrorTraceLineMatch(actualError, 1, /\binterpreted\b/)
   assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:3:1\b/)
   assertErrorTraceLinesMatch(actualError, 2, errorHere, 0)
-
-  // const traceLines = getErrorTraceLines(actualError).split("\n")
-  // assert(traceLines.length >= 3, "Trace should be at least three lines for assertions")
-  // assert.match(traceLines[0], /\bfoo\b/)
-  // assert.match(traceLines[0], /\binterpret-block.errors.test.ts\b/)
-  // assert.match(traceLines[1], /\binterpreted\b/)
-  // assert.match(traceLines[1], /\bprovided-source-value:3:1\b/)
-  // const expectedHereLine = hereLines[0].replace(/:\d+:\d+/, ":XXX:XXX")
-  // const actualHereLine = traceLines[2].replace(/:\d+:\d+/, ":XXX:XXX")
-  // assert.strictEqual(actualHereLine, expectedHereLine)
 })
 
 test("interpretThyBlock() should provide Thy stack trace when error is thrown synchronously from async code", async () => {
@@ -115,27 +82,17 @@ test("interpretThyBlock() should provide Thy stack trace when error is thrown sy
   await delay(10)
 
   const errorHere = new Error()
-  const hereLines = getErrorTraceLines(errorHere).split("\n")
-  assert(hereLines.length >= 1, "Trace should be at least three lines for assertions")
 
   let actualError: unknown = null
   try {
-    console.log("before interpreted")
-    const p = interpreted(foo)
-    await p
-    // throw new Error("agggh")
+    await interpreted(foo)
   } catch (e) {
-    console.log("catch")
     actualError = e
   }
 
   assert.notStrictEqual(actualError, null, "Error should be thrown")
   assert(actualError instanceof Error)
 
-  // console.log(getErrorTraceLines(actualError))
-
-  // const traceLines = getErrorTraceLines(actualError).split("\n")
-  // assert(traceLines.length >= 3, "Trace should be at least three lines for assertions")
   assertErrorTraceLineMatch(actualError, 0, /\bfoo\b/)
   assertErrorTraceLineMatch(actualError, 0, /\binterpret-block.errors.test.ts\b/)
   assertErrorTraceLineMatch(actualError, 1, /\binterpreted\b/)
@@ -156,32 +113,79 @@ test("interpretThyBlock() should provide Thy stack trace when error is thrown sy
   await delay(10)
 
   const errorHere = new Error()
-  const hereLines = getErrorTraceLines(errorHere).split("\n")
-  assert(hereLines.length >= 1, "Trace should be at least three lines for assertions")
 
   let actualError: unknown = null
   try {
-    console.log("before interpreted")
-    const p = interpreted(foo)
-    await p
-    // throw new Error("agggh")
+    await interpreted(foo)
   } catch (e) {
-    console.log("catch")
     actualError = e
   }
 
   assert.notStrictEqual(actualError, null, "Error should be thrown")
   assert(actualError instanceof Error)
 
-  // console.log(getErrorTraceLines(actualError))
-
-  // const traceLines = getErrorTraceLines(actualError).split("\n")
-  // assert(traceLines.length >= 3, "Trace should be at least three lines for assertions")
   assertErrorTraceLineMatch(actualError, 0, /\bfoo\b/)
   assertErrorTraceLineMatch(actualError, 0, /\binterpret-block.errors.test.ts\b/)
   assertErrorTraceLineMatch(actualError, 1, /\binterpreted\b/)
   assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:3:6\b/)
   assertErrorTraceLinesMatch(actualError, 2, errorHere, 0)
+})
+
+test("interpretThyBlock() should properly transform nested Thy Error stack trace", () => {
+  const interpreted = interpretThyBlock(`
+ts1 is given
+ts2 is given
+ts3 is given
+thy1 is def
+  thy2
+thy2 is def
+  ts1 thy3
+thy3 is def
+  ts3
+thy1
+`, {
+    functionName: "interpreted",
+    sourceFile: "provided-source.thy",
+    closure: {
+      def: (thing: unknown) => thing,
+    }
+  })
+  function ts1(toCall: () => void) {
+    ts2(toCall)
+  }
+  function ts2(toCall: () => void) {
+    toCall()
+  }
+  function ts3() {
+    throw new Error("error from ts3")
+  }
+
+  const errorHere = new Error()
+
+  let actualError: unknown = null
+  try {
+    interpreted(ts1, ts2, ts3)
+  } catch (e) {
+    actualError = e
+  }
+
+  assert.notStrictEqual(actualError, null, "Error should be thrown")
+  assert(actualError instanceof Error)
+
+  assert.strictEqual(actualError.message, "error from ts3")
+
+  assertErrorTraceLineMatch(actualError, 0, /\bts3\b/)
+  assertErrorTraceLineMatch(actualError, 0, /\binterpret-block.errors.test.ts\b/)
+  assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:10:3\b/)
+  assertErrorTraceLineMatch(actualError, 2, /\bts2\b/)
+  assertErrorTraceLineMatch(actualError, 2, /\binterpret-block.errors.test.ts\b/)
+  assertErrorTraceLineMatch(actualError, 3, /\bts1\b/)
+  assertErrorTraceLineMatch(actualError, 3, /\binterpret-block.errors.test.ts\b/)
+  assertErrorTraceLineMatch(actualError, 4, /\bprovided-source.thy:8:3\b/)
+  assertErrorTraceLineMatch(actualError, 5, /\bprovided-source.thy:6:3\b/)
+  assertErrorTraceLineMatch(actualError, 6, /\binterpreted\b/)
+  assertErrorTraceLineMatch(actualError, 6, /\bprovided-source.thy:11:1\b/)
+  assertErrorTraceLinesMatch(actualError, 7, errorHere, 0)
 })
 
 function assertErrorTraceLineMatch(error: Error, lineIndex: number, pattern: RegExp) {

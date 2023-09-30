@@ -203,14 +203,15 @@ test("replaceErrorTraceLine() allows swapping trace line file and location (Wind
   const inputLines = `    at null.f (c:\\Users\\User\\some-file.ts:15:11)
     at null.anotherLayer (c:\\Users\\User\\another\\file.ts:31:10)
     at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`
-  const outputLines = replaceErrorTraceLine(inputLines, 1, (file, row, column) => {
+  const outputLines = replaceErrorTraceLine(inputLines, 1, (func, file, row, column) => {
+    assert.strictEqual(func, "anotherLayer")
     assert.strictEqual(file, "c:\\Users\\User\\another\\file.ts")
     assert.strictEqual(row, 31)
     assert.strictEqual(column, 10)
-    return ["test-replace-file", 12, 34]
+    return ["swapped", "test-replace-file", 12, 34]
   })
   assert.strictEqual(outputLines, `    at null.f (c:\\Users\\User\\some-file.ts:15:11)
-    at null.anotherLayer (test-replace-file:12:34)
+    at null.swapped (test-replace-file:12:34)
     at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
 })
 
@@ -218,13 +219,14 @@ test("replaceErrorTraceLine() allows swapping trace line file and location (Fire
   const inputLines = `f@file:///C:/Users/User/code/thy/test.html:4:9
 go@file:///C:/Users/User/code/thy/test.html:8:3
 @file:///C:/Users/User/code/thy/test.html:12:3`
-  const outputLines = replaceErrorTraceLine(inputLines, 1, (file, row, column) => {
+  const outputLines = replaceErrorTraceLine(inputLines, 1, (func, file, row, column) => {
+    assert.strictEqual(func, "go")
     assert.strictEqual(file, "file:///C:/Users/User/code/thy/test.html")
     assert.strictEqual(row, 8)
     assert.strictEqual(column, 3)
-    return ["test-replace-file", 12, 34]
+    return ["nono", "test-replace-file", 12, 34]
   })
   assert.strictEqual(outputLines, `f@file:///C:/Users/User/code/thy/test.html:4:9
-go@test-replace-file:12:34
+nono@test-replace-file:12:34
 @file:///C:/Users/User/code/thy/test.html:12:3`)
 })

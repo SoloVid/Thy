@@ -1,5 +1,5 @@
 import assert from "../utils/assert"
-import { dissectErrorTraceAtBaseline, dissectErrorTraceAtCloserBaseline, getErrorTraceLines, replaceErrorTraceLine, transformErrorTrace } from "../utils/error-helper"
+import { dissectErrorTraceAtCloserBaseline, replaceErrorTraceLine, transformErrorTrace } from "../utils/error-helper"
 import { InterpreterErrorWithContext, interpretThyCall } from "./call"
 import { interpretThyExpression } from "./expression"
 import { splitThyStatements } from "./split-statements"
@@ -12,6 +12,7 @@ type BlockOptions = {
   functionName?: string
   sourceFile: ThyBlockContext["sourceFile"]
   startingLineIndex: number
+  additionalTraceLinesToHide?: number
 }
 
 export function interpretThyBlock(
@@ -25,6 +26,7 @@ export function interpretThyBlock(
     functionName: options.functionName,
     sourceFile: options.sourceFile ?? "<inline thy code>",
     startingLineIndex: options.startingLineIndex ?? 0,
+    additionalTraceLinesToHide: options.additionalTraceLinesToHide ?? 0,
   })
 }
 
@@ -32,6 +34,8 @@ export function interpretThyBlockLines(
   thySourceLines: readonly string[],
   options: BlockOptions,
 ): (...args: readonly unknown[]) => unknown {
+  // I don't fully understand the -1 here, but somehow we want a different number of lines masked in the top-level case vs. thy-internal cases.
+  const additionalTraceLinesToHide = options.additionalTraceLinesToHide ?? -1
   const statements = splitThyStatements(thySourceLines, options.startingLineIndex)
   const isAsync = statements.some(s => s.some(a => isAtomLiterally(a, "await")))
   let exportUsed = false
@@ -70,7 +74,6 @@ export function interpretThyBlockLines(
       closureVariableIsImmutable: options.closureVariableIsImmutable,
       thatValue: undefined,
       beforeThatValue: undefined,
-      errorTraceInfo: null,
       sourceFile: options.sourceFile,
     }
 
@@ -141,7 +144,7 @@ export function interpretThyBlockLines(
           continue
         }
 
-        // console.log("eval time")
+        // For async stack traces, the trace is a bit different before and after a true await.
         const errorHere = new Error()
         try {
           const [shouldReturn, value] = helper.evaluateStatement(statement)
@@ -153,34 +156,7 @@ export function interpretThyBlockLines(
             }
           }
         } catch (e) {
-          // console.log("catch async")
-          // console.log(e)
-          throwTransformedError(e, options.sourceFile, errorHere)
-          // throwTransformedError(e, options.sourceFile)
-          // if (e instanceof Error && helper.context.errorTraceInfo) {
-          //   // const errorHere = new Error()
-          //   // console.log("==trace here==\n", getErrorTraceLines(errorHere))
-          //   // console.log("==trace close==\n", getErrorTraceLines(helper.context.errorTraceInfo.errorCloseToCall))
-          //   // console.log("==trace actual==\n", getErrorTraceLines(e))
-          //   const errorDissectedAtCall = dissectErrorTraceAtBaseline(e, helper.context.errorTraceInfo.errorCloseToCall)
-          //   // console.log(errorDissectedAtCall)
-          //   const errorDissectedHere = dissectErrorTraceAtBaseline(e, errorHere)
-          //   // console.log(errorDissectedHere)
-          //   const errorTraceLocation = helper.context.errorTraceInfo.failingLocation
-    
-          //   throw transformErrorTrace(e, (originalTraceLines) => {
-          //     return [
-          //       errorDissectedAtCall.delta,
-          //       replaceErrorTraceLine(errorDissectedHere.pivot, 0, (file, line, column) => [
-          //         options.sourceFile,
-          //         errorTraceLocation.lineIndex + 1,
-          //         errorTraceLocation.columnIndex + 1,
-          //       ]),
-          //       errorDissectedHere.shared,
-          //     ].join("\n")
-          //   })
-          // }
-          // throw e
+          throwTransformedError(e, functionName, options.sourceFile, additionalTraceLinesToHide, errorHere)
         }
       }
       return helper.formulateResult()
@@ -198,15 +174,20 @@ export function interpretThyBlockLines(
         }
       }
     } catch (e) {
-      // console.log("catch sync")
-      throwTransformedError(e, options.sourceFile)
+      throwTransformedError(e, functionName, options.sourceFile, additionalTraceLinesToHide)
     }
     return helper.formulateResult()
   } }
   return objWithBlockFunction[functionName]
 }
 
-function throwTransformedError(errorCloseToCall: unknown, sourceFile: string, altErrorHere?: Error) {
+function throwTransformedError(
+  errorCloseToCall: unknown,
+  functionName: string,
+  sourceFile: string,
+  additionalTraceLinesToHide: number,
+  altErrorHere?: Error
+) {
   if (errorCloseToCall instanceof InterpreterErrorWithContext) {
     if (!(errorCloseToCall.cause instanceof Error)) {
       throw errorCloseToCall.cause
@@ -214,19 +195,17 @@ function throwTransformedError(errorCloseToCall: unknown, sourceFile: string, al
     const e = errorCloseToCall.cause
 
     const errorHere = new Error()
-    // console.log("==trace actual==\n", getErrorTraceLines(e))
-    // console.log("==trace close==\n", getErrorTraceLines(errorCloseToCall))
-    // const errorDissectedAtCall = dissectErrorTraceAtBaseline(e, errorCloseToCall, errorCloseToCall.additionalDepthToShave)
     const errorDissectedAtCall = dissectErrorTraceAtCloserBaseline(e, errorCloseToCall, errorCloseToCall.additionalDepthToShave, errorCloseToCall.altCloseError, errorCloseToCall.altAdditionalDepthToShave)
     // console.log(errorDissectedAtCall)
-    // console.log("==trace here==\n", getErrorTraceLines(errorHere))
-    const errorDissectedHere = dissectErrorTraceAtCloserBaseline(e, errorHere, 0, altErrorHere, 0)
+    const errorDissectedHere = dissectErrorTraceAtCloserBaseline(e, errorHere, additionalTraceLinesToHide, altErrorHere, additionalTraceLinesToHide)
+    // console.log(errorDissectedHere)
     const errorTraceLocation = errorCloseToCall.sourceLocation
 
     throw transformErrorTrace(e, (originalTraceLines) => {
       return [
         errorDissectedAtCall.delta,
-        replaceErrorTraceLine(errorDissectedHere.pivot, 0, (file, line, column) => [
+        replaceErrorTraceLine(errorDissectedHere.pivot, 0, (func, file, line, column) => [
+          functionName,
           sourceFile,
           errorTraceLocation.lineIndex + 1,
           errorTraceLocation.columnIndex + 1,

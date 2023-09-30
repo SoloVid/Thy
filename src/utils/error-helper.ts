@@ -1,7 +1,7 @@
 import assert from "./assert"
 
-const v8TraceLinePattern = /^(\s+at (.+) \()(.+):(\d+):(\d+)(\))$/
-const firefoxTraceLinePattern = /^((.*)@)(.+):(\d+):(\d+)()$/
+const v8TraceLinePattern = /^(\s+at (?:.+\.)?)(.+)( \()(.+):(\d+):(\d+)(\))$/
+const firefoxTraceLinePattern = /^(\s*(?:.+\.)?)(.*)(@)(.+):(\d+):(\d+)()$/
 
 // TODO: Configure this elsewhere?
 Error.stackTraceLimit = 100
@@ -90,16 +90,16 @@ export function dissectErrorTraceAtCloserBaseline(
   return errorDissectedHere
 }
 
-export function replaceErrorTraceLine(traceLines: string, lineIndex: number, transform: (file: string, line: number, column: number) => [file: string, line: number, column: number]) {
+export function replaceErrorTraceLine(traceLines: string, lineIndex: number, transform: (functionName: string, file: string, line: number, column: number) => [functionName: string, file: string, line: number, column: number]) {
   return traceLines.split("\n").map((l, i) => {
     if (i !== lineIndex) {
       return l
     }
     const pattern = firefoxTraceLinePattern.test(l) ? firefoxTraceLinePattern : v8TraceLinePattern
     if (pattern.test(l)) {
-      return l.replace(pattern, (m, prefix, func, file, line, column, postfix) => {
-        const [newFile, newLine, newColumn] = transform(file, parseInt(line), parseInt(column))
-        return `${prefix}${newFile}:${newLine}:${newColumn}${postfix}`
+      return l.replace(pattern, (m, prefix1, func, prefix2, file, line, column, postfix) => {
+        const [newFunc, newFile, newLine, newColumn] = transform(func, file, parseInt(line), parseInt(column))
+        return `${prefix1}${newFunc}${prefix2}${newFile}:${newLine}:${newColumn}${postfix}`
       })
     }
     return l

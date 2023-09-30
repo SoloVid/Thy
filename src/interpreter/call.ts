@@ -26,31 +26,13 @@ export function interpretThyCall(context: ThyBlockContext, parts: readonly Atom[
   const f = ie.target as (...args: readonly unknown[]) => unknown
   const functionName = isSimpleAtom(functionExpression) ? functionExpression.text : "<anonymous>"
   assert(typeof f === "function", `${functionName} is not a function: ${JSON.stringify(f)}`)
-  // return withErrorAugmented(context, functionExpression, () => {
-  //   console.log("try call f")
-  //   if (ie.thisValue !== undefined) {
-  //     return f.call(ie.thisValue, ...callArgs)
-  //   }
-  //   return f(...callArgs)
-  // })
   try {
-    // console.log("try call f")
     if (ie.thisValue !== undefined) {
       return f.call(ie.thisValue, ...callArgs)
     }
     return f(...callArgs)
   } catch (e) {
     throw new InterpreterErrorWithContext(e, functionExpression)
-    // console.log("catch to add location")
-    // addErrorToContext(context, functionExpression)
-    // // context.errorTraceInfo = {
-    // //   errorCloseToCall: new Error("errorCloseToCall"),
-    // //   failingLocation: {
-    // //     lineIndex: functionExpression.lineIndex,
-    // //     columnIndex: (functionExpression as AtomSingle).columnIndex ?? 0,
-    // //   }
-    // // }
-    // throw e
   }
 }
 
@@ -72,29 +54,3 @@ export class InterpreterErrorWithContext extends Error {
     }
   }
 }
-
-export function addErrorToContext(context: ThyBlockContext, atom: Atom) {
-  context.errorTraceInfo = {
-    errorCloseToCall: new Error("errorCloseToCall"),
-    failingLocation: {
-      lineIndex: atom.lineIndex,
-      columnIndex: (atom as AtomSingle).columnIndex ?? 0,
-    }
-  }
-}
-
-// export function withErrorAugmented<T>(context: ThyBlockContext, atom: Atom, exercise: () => T): T {
-//   try {
-//     return exercise()
-//   } catch (e) {
-//     console.log("catch to add location")
-//     context.errorTraceInfo = {
-//       errorCloseToCall: new Error("errorCloseToCall"),
-//       failingLocation: {
-//         lineIndex: atom.lineIndex,
-//         columnIndex: (atom as AtomSingle).columnIndex ?? 0,
-//       }
-//     }
-//     throw e
-//   }
-// }

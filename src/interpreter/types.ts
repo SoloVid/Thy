@@ -27,10 +27,6 @@ export type ThyBlockContext = {
   thatValue: unknown
   /** `undefined` is special and indicates that no `beforeThat` value is available. */
   beforeThatValue: unknown
-  errorTraceInfo: null | {
-    errorCloseToCall: Error
-    failingLocation: { lineIndex: number, columnIndex: number }
-  }
   sourceFile: string
 }
 
