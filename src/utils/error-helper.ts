@@ -3,6 +3,9 @@ import assert from "./assert"
 const v8TraceLinePattern = /^(\s+at (.+) \()(.+):(\d+):(\d+)(\))$/
 const firefoxTraceLinePattern = /^((.*)@)(.+):(\d+):(\d+)()$/
 
+// TODO: Configure this elsewhere?
+Error.stackTraceLimit = 100
+
 export function getErrorTraceLinesFromStack(stack: string): string {
   return stack.split("\n").filter(l => v8TraceLinePattern.test(l) || firefoxTraceLinePattern.test(l)).join("\n")
 }
@@ -32,15 +35,59 @@ export function transformErrorTrace(error: Error, transform: (originalTraceLines
   return new TransformedError(error, transform)
 }
 
-export function dissectErrorTraceAtBaseline(error: Error, baselineError: Error) {
+export function dissectErrorTraceAtBaseline(error: Error, baselineError: Error, additionalOffsetFromBaseline: number = 0) {
   const traceLines = getErrorTraceLines(error).split("\n")
   const baselineTraceLines = getErrorTraceLines(baselineError).split("\n")
-  const baselineTraceLineCount = baselineTraceLines.length
+  const matchCalculations = baselineTraceLines.reduceRight((soFar, line, i) => {
+    if (soFar.stopped) {
+      return soFar
+    }
+    const compareIndex = traceLines.length - (baselineTraceLines.length - i)
+    if (compareIndex < 0) {
+      return soFar
+    }
+    const compareLine = traceLines[compareIndex]
+    if (compareLine === line) {
+      return {
+        stopped: false,
+        matches: soFar.matches + 1,
+      }
+    }
+    return {
+      stopped: true,
+      matches: soFar.matches,
+    }
+  }, {
+    stopped: false,
+    matches: 0,
+  })
+  const baselineTraceLineCount = matchCalculations.matches + 1 + additionalOffsetFromBaseline
+  // const baselineTraceLineCount = baselineTraceLines.length
   return {
     delta: traceLines.slice(0, -baselineTraceLineCount).join("\n"),
     pivot: traceLines[traceLines.length - baselineTraceLineCount],
     shared: traceLines.slice(-baselineTraceLineCount + 1).join("\n"),
   }
+}
+
+export function dissectErrorTraceAtCloserBaseline(
+  error: Error,
+  baselineError1: Error,
+  additionalOffsetFromBaseline1: number,
+  baselineError2: Error | undefined,
+  additionalOffsetFromBaseline2: number,
+) {
+  const errorDissectedHere = dissectErrorTraceAtBaseline(error, baselineError1, additionalOffsetFromBaseline1)
+  // console.log(errorDissectedHere)
+  if (baselineError2) {
+    // console.log("==trace alt here==\n", getErrorTraceLines(baselineError2))
+    const altErrorDissectedHere = dissectErrorTraceAtBaseline(error, baselineError2, additionalOffsetFromBaseline2)
+    if (altErrorDissectedHere.shared.split("\n").length > errorDissectedHere.shared.split("\n").length) {
+      // console.log("choosing alt error here instead because better match")
+      return altErrorDissectedHere
+    }
+  }
+  return errorDissectedHere
 }
 
 export function replaceErrorTraceLine(traceLines: string, lineIndex: number, transform: (file: string, line: number, column: number) => [file: string, line: number, column: number]) {

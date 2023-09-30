@@ -1,7 +1,5 @@
 import assert from "node:assert"
-import StackTracey from "stacktracey"
 import { test } from "under-the-sun"
-import { delay } from "../utils/delay"
 import { interpretThyCall } from "./call"
 import { makeSimpleContext } from "./test-helper"
 import type { ThyBlockContext } from "./types"
@@ -96,47 +94,3 @@ test("interpretThyCall() should properly pass `this` in function call", async ()
   })
   assert.strictEqual(interpretThyCallBasic(context, [`o.f`]), 5)
 })
-
-// test("interpretThyCall() should provide Thy stack trace when error is thrown", async () => {
-//   const context = makeSimpleContext({
-//     variablesInBlock: {
-//       foo: () => {
-//         throw new Error("himom")
-//       }
-//     },
-//   })
-
-//   // Force into homogenous async stack traces.
-//   await delay(10)
-
-//   const errorHere = new Error("here")
-//   console.log(errorHere.stack)
-//   const errorHereStack = new StackTracey(errorHere)
-//   // console.log(errorHere.stack)
-//   // console.log(errorHereStack.items)
-
-//   let actualError: unknown = null
-//   try {
-//     interpretThyCallBasic(context, [`foo`])
-//   } catch (e) {
-//     actualError = e
-//   }
-//   assert.notStrictEqual(actualError, null, "Error should be thrown")
-//   assert(actualError instanceof Error)
-//   console.log(actualError.stack)
-//   console.log("==")
-//   console.log(actualError.stack.split("\n").slice(errorHere.stack?.split("\n").length).join("\n"))
-//   console.log("==")
-//   const actualErrorStack = new StackTracey(actualError)
-//   // console.log(actualErrorStack.items)
-//   const uniqueStackItems = actualErrorStack.items.slice(0, -errorHereStack.items.length)
-//   // console.log(uniqueStackItems)
-//   assert.deepStrictEqual(uniqueStackItems, ["blah"])
-
-//   // assert.throws(() => interpretThyCall(context, [`foo`]), (e) => {
-//   //   assert(e instanceof Error)
-//   //   console.log(e.stack)
-//   //   assert.strictEqual(e.stack, errorHere.stack)
-//   //   return true
-//   // })
-// })

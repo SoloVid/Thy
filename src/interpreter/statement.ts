@@ -1,8 +1,8 @@
 import assert from "../utils/assert"
-import { interpretThyCall } from "./call"
+import { addErrorToContext, InterpreterErrorWithContext, interpretThyCall } from "./call"
 import { interpretThyExpression } from "./expression"
 import { identifierRegex } from "./patterns"
-import { Atom, isAtomLiterally, isSimpleAtom, ThyBlockContext } from "./types"
+import { Atom, AtomSingle, isAtomLiterally, isSimpleAtom, ThyBlockContext } from "./types"
 
 export function interpretThyStatement(context: ThyBlockContext, parts: readonly Atom[]): void | PromiseLike<void> {
   const mutableParts = [...parts]
@@ -17,7 +17,8 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
     const assignKeyword = assignKeywordPart.text
     if (isAtomLiterally(callParts[0], "await")) {
       assert(callParts.length === 2, `\`await\` takes 1 argument; got ${callParts.length}`)
-      return Promise.resolve(interpretThyExpression(context, callParts[1]).target).then(handleReturnedValue)
+      return doAwaitStuff(callParts[0], callParts[1]).then(handleReturnedValue)
+      // return Promise.resolve(interpretThyExpression(context, callParts[1]).target).then(handleReturnedValue)
     }
   
     handleReturnedValue(interpretThyCall(context, callParts))
@@ -59,12 +60,59 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
     }
   }
 
+  function doAwaitStuff(awaitAtom: Atom, expressionAtom: Atom) {
+    return (async () => {
+      const errorHere = new Error()
+      try {
+        await interpretThyExpression(context, expressionAtom).target
+        context.beforeThatValue = context.thatValue
+        context.thatValue = result
+      } catch (e) {
+        throw new InterpreterErrorWithContext(e, awaitAtom, 0, errorHere, 1)
+      }
+    })()
+  }
+
   if (isAtomLiterally(parts[0], "await")) {
     assert(parts.length === 2, `\`await\` takes 1 argument; got ${parts.length}`)
-    return Promise.resolve(interpretThyExpression(context, parts[1]).target).then((result) => {
+    return doAwaitStuff(parts[0], parts[1]).then((result) => {
       context.beforeThatValue = context.thatValue
       context.thatValue = result
     })
+    return (async () => {
+      // const p = (() => {
+      //   try {
+      //     return interpretThyExpression(context, parts[1]).target
+      //   } catch (e) {
+      //     console.log("adding sync async error context")
+      //     addErrorToContext(context, parts[0])
+      //     throw e
+      //   }  
+      // })()
+      const errorHere = new Error()
+      try {
+        // await p
+        await interpretThyExpression(context, parts[1]).target
+        context.beforeThatValue = context.thatValue
+        context.thatValue = result
+      } catch (e) {
+        throw new InterpreterErrorWithContext(e, parts[0], 0, errorHere, 1)
+        // console.log("adding async error context")
+        // // addErrorToContext(context, parts[0])
+        // context.errorTraceInfo = {
+        //   errorCloseToCall: errorHere,
+        //   failingLocation: {
+        //     lineIndex: parts[0].lineIndex,
+        //     columnIndex: (parts[0] as AtomSingle).columnIndex ?? 0,
+        //   }
+        // }
+        // throw e
+      }
+    })()
+    // return Promise.resolve(interpretThyExpression(context, parts[1]).target).then((result) => {
+    //   context.beforeThatValue = context.thatValue
+    //   context.thatValue = result
+    // })
   }
 
   const result = interpretThyCall(context, parts)

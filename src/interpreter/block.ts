@@ -1,6 +1,6 @@
 import assert from "../utils/assert"
-import { dissectErrorTraceAtBaseline, getErrorTraceLines, replaceErrorTraceLine, transformErrorTrace } from "../utils/error-helper"
-import { interpretThyCall } from "./call"
+import { dissectErrorTraceAtBaseline, dissectErrorTraceAtCloserBaseline, getErrorTraceLines, replaceErrorTraceLine, transformErrorTrace } from "../utils/error-helper"
+import { InterpreterErrorWithContext, interpretThyCall } from "./call"
 import { interpretThyExpression } from "./expression"
 import { splitThyStatements } from "./split-statements"
 import { interpretThyStatement } from "./statement"
@@ -126,8 +126,10 @@ export function interpretThyBlockLines(
     }
   }
 
+  const functionName = options.functionName ?? "<anonymous>"
+
   if (isAsync) {
-    return async (...args: readonly unknown[]) => {
+    const objWithBlockFunction = { [functionName]:  async (...args: readonly unknown[]) => {
       const helper = makeHelper(args)
       for (const statement of statements) {
         if (isAtomLiterally(statement[0], "let") && isAtomLiterally(statement[1], "await")) {
@@ -139,20 +141,53 @@ export function interpretThyBlockLines(
           continue
         }
 
-        const [shouldReturn, value] = helper.evaluateStatement(statement)
-        if (shouldReturn) {
-          return value
-        } else {
-          if (value instanceof Promise) {
-            await value
+        // console.log("eval time")
+        const errorHere = new Error()
+        try {
+          const [shouldReturn, value] = helper.evaluateStatement(statement)
+          if (shouldReturn) {
+            return value
+          } else {
+            if (value instanceof Promise) {
+              await value
+            }
           }
+        } catch (e) {
+          // console.log("catch async")
+          // console.log(e)
+          throwTransformedError(e, options.sourceFile, errorHere)
+          // throwTransformedError(e, options.sourceFile)
+          // if (e instanceof Error && helper.context.errorTraceInfo) {
+          //   // const errorHere = new Error()
+          //   // console.log("==trace here==\n", getErrorTraceLines(errorHere))
+          //   // console.log("==trace close==\n", getErrorTraceLines(helper.context.errorTraceInfo.errorCloseToCall))
+          //   // console.log("==trace actual==\n", getErrorTraceLines(e))
+          //   const errorDissectedAtCall = dissectErrorTraceAtBaseline(e, helper.context.errorTraceInfo.errorCloseToCall)
+          //   // console.log(errorDissectedAtCall)
+          //   const errorDissectedHere = dissectErrorTraceAtBaseline(e, errorHere)
+          //   // console.log(errorDissectedHere)
+          //   const errorTraceLocation = helper.context.errorTraceInfo.failingLocation
+    
+          //   throw transformErrorTrace(e, (originalTraceLines) => {
+          //     return [
+          //       errorDissectedAtCall.delta,
+          //       replaceErrorTraceLine(errorDissectedHere.pivot, 0, (file, line, column) => [
+          //         options.sourceFile,
+          //         errorTraceLocation.lineIndex + 1,
+          //         errorTraceLocation.columnIndex + 1,
+          //       ]),
+          //       errorDissectedHere.shared,
+          //     ].join("\n")
+          //   })
+          // }
+          // throw e
         }
       }
       return helper.formulateResult()
-    }
+    } }
+    return objWithBlockFunction[functionName]
   }
 
-  const functionName = options.functionName ?? "<anonymous>"
   const objWithBlockFunction = { [functionName]: (...args: readonly unknown[]) => {
     const helper = makeHelper(args)
     try {
@@ -163,33 +198,42 @@ export function interpretThyBlockLines(
         }
       }
     } catch (e) {
-      console.log("********catching")
-      if (e instanceof Error && helper.context.errorTraceInfo) {
-        const errorHere = new Error()
-        console.log(errorHere)
-        console.log("------dissecting")
-        const errorDissectedAtCall = dissectErrorTraceAtBaseline(e, helper.context.errorTraceInfo.errorCloseToCall)
-        console.log(errorDissectedAtCall)
-        const errorDissectedHere = dissectErrorTraceAtBaseline(e, errorHere)
-        console.log(errorDissectedHere)
-        const lineHere = getErrorTraceLines(new Error()).split("\n")[0]
-        const errorTraceLocation = helper.context.errorTraceInfo.failingLocation
-
-        throw transformErrorTrace(e, (originalTraceLines) => {
-          return [
-            errorDissectedAtCall.delta,
-            replaceErrorTraceLine(errorDissectedHere.pivot, 0, (file, line, column) => [
-              options.sourceFile,
-              errorTraceLocation.lineIndex + 1,
-              errorTraceLocation.columnIndex + 1,
-            ]),
-            errorDissectedHere.shared,
-          ].join("\n")
-        })
-      }
-      throw e
+      // console.log("catch sync")
+      throwTransformedError(e, options.sourceFile)
     }
     return helper.formulateResult()
   } }
   return objWithBlockFunction[functionName]
+}
+
+function throwTransformedError(errorCloseToCall: unknown, sourceFile: string, altErrorHere?: Error) {
+  if (errorCloseToCall instanceof InterpreterErrorWithContext) {
+    if (!(errorCloseToCall.cause instanceof Error)) {
+      throw errorCloseToCall.cause
+    }
+    const e = errorCloseToCall.cause
+
+    const errorHere = new Error()
+    // console.log("==trace actual==\n", getErrorTraceLines(e))
+    // console.log("==trace close==\n", getErrorTraceLines(errorCloseToCall))
+    // const errorDissectedAtCall = dissectErrorTraceAtBaseline(e, errorCloseToCall, errorCloseToCall.additionalDepthToShave)
+    const errorDissectedAtCall = dissectErrorTraceAtCloserBaseline(e, errorCloseToCall, errorCloseToCall.additionalDepthToShave, errorCloseToCall.altCloseError, errorCloseToCall.altAdditionalDepthToShave)
+    // console.log(errorDissectedAtCall)
+    // console.log("==trace here==\n", getErrorTraceLines(errorHere))
+    const errorDissectedHere = dissectErrorTraceAtCloserBaseline(e, errorHere, 0, altErrorHere, 0)
+    const errorTraceLocation = errorCloseToCall.sourceLocation
+
+    throw transformErrorTrace(e, (originalTraceLines) => {
+      return [
+        errorDissectedAtCall.delta,
+        replaceErrorTraceLine(errorDissectedHere.pivot, 0, (file, line, column) => [
+          sourceFile,
+          errorTraceLocation.lineIndex + 1,
+          errorTraceLocation.columnIndex + 1,
+        ]),
+        errorDissectedHere.shared,
+      ].join("\n")
+    })
+  }
+  throw errorCloseToCall
 }

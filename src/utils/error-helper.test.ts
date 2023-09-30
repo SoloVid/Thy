@@ -9,7 +9,7 @@ test("getErrorTraceLinesFromStack() returns only lines with file and location in
 
 Error: f bad
     at null.f (c:\\Users\\User\\some-file.ts:15:11)
-    at null.anotherLayer (c:\\Users\\User\\anoter\\file.ts:31:10)
+    at null.anotherLayer (c:\\Users\\User\\another\\file.ts:31:10)
     at Object.objectMethod (c:\\Users\\User\\object.ts:82:24)
     at null.<anonymous> (c:\\Users\\User\\lambda.ts:146:44)
     at async w (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1722)
@@ -17,7 +17,7 @@ Error: f bad
   const traceLines = getErrorTraceLinesFromStack(exampleStackValue)
 
   assert.strictEqual(traceLines, `    at null.f (c:\\Users\\User\\some-file.ts:15:11)
-    at null.anotherLayer (c:\\Users\\User\\anoter\\file.ts:31:10)
+    at null.anotherLayer (c:\\Users\\User\\another\\file.ts:31:10)
     at Object.objectMethod (c:\\Users\\User\\object.ts:82:24)
     at null.<anonymous> (c:\\Users\\User\\lambda.ts:146:44)
     at async w (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1722)
@@ -95,7 +95,7 @@ test("dissectErrorTraceAtBaseline() splits the trace lines beyond the baseline",
 
 Error: oh noes
     at null.f (c:\\Users\\User\\some-file.ts:15:11)
-    at null.anotherLayer (c:\\Users\\User\\anoter\\file.ts:31:10)
+    at null.anotherLayer (c:\\Users\\User\\another\\file.ts:31:10)
     at Object.objectMethod (c:\\Users\\User\\object.ts:82:24)
     at null.<anonymous> (c:\\Users\\User\\lambda.ts:146:44)
     at async w (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1722)
@@ -116,19 +116,95 @@ Error: baseline
 
   const dissectedTraceLines = dissectErrorTraceAtBaseline(innerError, baselineError)
   assert.strictEqual(dissectedTraceLines.delta, `    at null.f (c:\\Users\\User\\some-file.ts:15:11)
-    at null.anotherLayer (c:\\Users\\User\\anoter\\file.ts:31:10)
+    at null.anotherLayer (c:\\Users\\User\\another\\file.ts:31:10)
     at Object.objectMethod (c:\\Users\\User\\object.ts:82:24)`)
   assert.strictEqual(dissectedTraceLines.pivot, `    at null.<anonymous> (c:\\Users\\User\\lambda.ts:146:44)`)
   assert.strictEqual(dissectedTraceLines.shared, `    at async w (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1722)
     at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
 })
 
+test("dissectErrorTraceAtBaseline() accounts for branch of baseline", async () => {
+  const innerError = new FakeError("oh noes", `c:\\Users\\User\\some-file.ts:15
+  throw new Error("oh noes")
+        ^
+
+Error: oh noes
+    at null.f (c:\\Users\\User\\some-file.ts:15:11)
+    at null.anotherLayer (c:\\Users\\User\\another\\file.ts:31:10)
+    at Object.objectMethod (c:\\Users\\User\\object.ts:82:24)
+    at null.<anonymous> (c:\\Users\\User\\lambda.ts:146:44)
+    at async w (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1722)
+    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
+  const baselineError = new FakeError("baseline", `c:\\Users\\User\\some-file.ts:15
+  throw new Error("baseline")
+        ^
+
+Error: baseline
+    at null.f (c:\\Users\\User\\some-file.ts:15:11)
+    at null.anotherLayer (c:\\Users\\User\\another\\file.ts:31:10)
+    at Object.objectMethod (c:\\Users\\User\\object.ts:82:24)
+    at null.<anonymous> (c:\\Users\\User\\lambda.ts:145:10)
+    at async w (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1722)
+    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
+  
+  const innerErrorTraceLines = getErrorTraceLines(innerError).split("\n")
+  const baselineErrorTraceLines = getErrorTraceLines(baselineError).split("\n")
+  assert.strictEqual(innerErrorTraceLines[0], baselineErrorTraceLines[0])
+  assert.strictEqual(innerErrorTraceLines[1], baselineErrorTraceLines[1])
+  assert.strictEqual(innerErrorTraceLines[2], baselineErrorTraceLines[2])
+  assert.strictEqual(innerErrorTraceLines[3].replace("146:44", ""), baselineErrorTraceLines[3].replace("145:10", ""))
+
+  const dissectedTraceLines = dissectErrorTraceAtBaseline(innerError, baselineError)
+  assert.strictEqual(dissectedTraceLines.delta, `    at null.f (c:\\Users\\User\\some-file.ts:15:11)
+    at null.anotherLayer (c:\\Users\\User\\another\\file.ts:31:10)
+    at Object.objectMethod (c:\\Users\\User\\object.ts:82:24)`)
+  assert.strictEqual(dissectedTraceLines.pivot, `    at null.<anonymous> (c:\\Users\\User\\lambda.ts:146:44)`)
+  assert.strictEqual(dissectedTraceLines.shared, `    at async w (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1722)
+    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
+})
+
+test("dissectErrorTraceAtBaseline() allows offset from baseline", async () => {
+  const innerError = new FakeError("oh noes", `c:\\Users\\User\\some-file.ts:15
+  throw new Error("oh noes")
+        ^
+
+Error: oh noes
+    at null.f (c:\\Users\\User\\some-file.ts:15:11)
+    at null.anotherLayer (c:\\Users\\User\\another\\file.ts:31:10)
+    at Object.objectMethod (c:\\Users\\User\\object.ts:82:24)
+    at null.<anonymous> (c:\\Users\\User\\lambda.ts:146:44)
+    at async w (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1722)
+    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
+  const baselineError = new FakeError("baseline", `c:\\Users\\User\\some-file.ts:15
+  throw new Error("baseline")
+        ^
+
+Error: baseline
+    at null.anotherLayer (c:\\Users\\User\\another\\file.ts:1:1)
+    at Object.objectMethod (c:\\Users\\User\\object.ts:82:24)
+    at null.<anonymous> (c:\\Users\\User\\lambda.ts:145:10)
+    at async w (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1722)
+    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
+  
+  const innerErrorTraceLines = getErrorTraceLines(innerError).split("\n")
+  const baselineErrorTraceLines = getErrorTraceLines(baselineError).split("\n")
+  assert.strictEqual(innerErrorTraceLines[3].replace("146:44", ""), baselineErrorTraceLines[2].replace("145:10", ""))
+
+  const dissectedTraceLines = dissectErrorTraceAtBaseline(innerError, baselineError, 2)
+  assert.strictEqual(dissectedTraceLines.delta, `    at null.f (c:\\Users\\User\\some-file.ts:15:11)`)
+  assert.strictEqual(dissectedTraceLines.pivot, `    at null.anotherLayer (c:\\Users\\User\\another\\file.ts:31:10)`)
+  assert.strictEqual(dissectedTraceLines.shared, `    at Object.objectMethod (c:\\Users\\User\\object.ts:82:24)
+    at null.<anonymous> (c:\\Users\\User\\lambda.ts:146:44)
+    at async w (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1722)
+    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
+})
+
 test("replaceErrorTraceLine() allows swapping trace line file and location (Windows Node 16)", async () => {
   const inputLines = `    at null.f (c:\\Users\\User\\some-file.ts:15:11)
-    at null.anotherLayer (c:\\Users\\User\\anoter\\file.ts:31:10)
+    at null.anotherLayer (c:\\Users\\User\\another\\file.ts:31:10)
     at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`
   const outputLines = replaceErrorTraceLine(inputLines, 1, (file, row, column) => {
-    assert.strictEqual(file, "c:\\Users\\User\\anoter\\file.ts")
+    assert.strictEqual(file, "c:\\Users\\User\\another\\file.ts")
     assert.strictEqual(row, 31)
     assert.strictEqual(column, 10)
     return ["test-replace-file", 12, 34]
