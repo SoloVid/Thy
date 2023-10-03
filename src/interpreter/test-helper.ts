@@ -13,5 +13,6 @@ export const makeSimpleContext = (o: Partial<ThyBlockContext> = {}): ThyBlockCon
   closureVariableIsImmutable: {},
   thatValue: undefined,
   beforeThatValue: undefined,
+  sourceFile: "<test thy source>",
   ...o,
 })

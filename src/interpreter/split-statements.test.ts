@@ -1,12 +1,27 @@
 import assert from "node:assert"
 import { test } from "under-the-sun"
+import { InterpreterErrorWithContext } from "./interpreter-error"
 import { splitThyStatements } from "./split-statements"
+import type { AtomSingle } from "./types"
+
+type AtomJustString = string | BlockJustString
+type StatementJustStrings = readonly AtomJustString[]
+type BlockJustString = readonly string[]
+
+function splitThyStatementsBasic(thySourceLines: readonly string[]): readonly StatementJustStrings[] {
+  return splitThyStatements(thySourceLines, 0).map(s => s.map(p => {
+    if ("lines" in p) {
+      return p.lines
+    }
+    return (p as AtomSingle).text
+  }))
+}
 
 test("splitThyStatements() should split line into parts", async () => {
   const inputLines = [
     "a b c",
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     ["a", "b", "c"],
   ])
 })
@@ -15,7 +30,7 @@ test("splitThyStatements() should split line into parts of complex formats", asy
   const inputLines = [
     `a.b.c -148.0 "himom"`,
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     [`a.b.c`, `-148.0`, `"himom"`],
   ])
 })
@@ -26,7 +41,7 @@ test("splitThyStatements() should return unaltered array for flat block of calls
     "b",
     "c",
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     ["a"],
     ["b"],
     ["c"],
@@ -39,7 +54,7 @@ test("splitThyStatements() should collapse nested block into parent statement pa
     "  b",
     "  c",
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     ["a", [
       "  b",
       "  c",
@@ -47,11 +62,51 @@ test("splitThyStatements() should collapse nested block into parent statement pa
   ])
 })
 
+test("splitThyStatements() should not end nested block because of indentation", async () => {
+  const inputLines = [
+    "a",
+    "  b",
+    " ",
+    "   ",
+    "  c",
+  ]
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
+    ["a", [
+      "  b",
+      " ",
+      "   ",
+      "  c",
+    ]]
+  ])
+})
+
+test("splitThyStatements() should provide location information", async () => {
+  const inputLines = [
+    "a aa",
+    "  b",
+    "c",
+  ]
+  assert.deepStrictEqual(splitThyStatements(inputLines, 5), [
+    [
+      { text: "a", lineIndex: 5, columnIndex: 0 },
+      { text: "aa", lineIndex: 5, columnIndex: 2 },
+      { lines: ["  b"], lineIndex: 6 },
+    ],
+    [{ text: "c", lineIndex: 7, columnIndex: 0 }]
+  ])
+})
+
 test("splitThyStatements() should reject `and` without a preceding statement", async () => {
   const inputLines = [
     "and a",
   ]
-  assert.throws(() => splitThyStatements(inputLines), /No preceding statement for `and`/)
+  assert.throws(() => splitThyStatementsBasic(inputLines), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /No preceding statement for `and`/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 0, columnIndex: 0 })
+    return true
+  })
 })
 
 test("splitThyStatements() should treat `and` arguments as part of preceding statement", async () => {
@@ -60,7 +115,7 @@ test("splitThyStatements() should treat `and` arguments as part of preceding sta
     "  b",
     "and c d",
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     ["a", [
       "  b",
     ], "c", "d"]
@@ -76,7 +131,7 @@ test("splitThyStatements() should support `and` with multiple blocks", async () 
     "and",
     "  f",
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     ["a", [
       "  b",
     ], "c", "d", [
@@ -96,7 +151,7 @@ test("splitThyStatements() should collapse layers of nested block into parent st
     "  e",
     "    f",
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     ["a", [
       "  b",
       "    c",
@@ -114,7 +169,7 @@ test("splitThyStatements() can handle parallel nested blocks", async () => {
     "c",
     "  d",
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     ["a", [
       "  b",
     ]],
@@ -131,7 +186,7 @@ test("splitThyStatements() should consider first indent (all indented already ca
     "  c",
     "    d",
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     ["a", [
       "    b",
     ]],
@@ -146,7 +201,13 @@ test("splitThyStatements() should fail on bad outdent", async () => {
     "    a",
     "  b",
   ]
-  assert.throws(() => splitThyStatements(inputLines), /does not match any preceding indentation level/)
+  assert.throws(() => splitThyStatementsBasic(inputLines), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /does not match any preceding indentation level/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 0 })
+    return true
+  })
 })
 
 test("splitThyStatements() should discard empty lines", async () => {
@@ -157,8 +218,11 @@ test("splitThyStatements() should discard empty lines", async () => {
     "    ",
     "b",
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
+    [],
     ["a"],
+    [],
+    [],
     ["b"],
   ])
 })
@@ -171,7 +235,7 @@ test("splitThyStatements() should discard comment lines (single line)", async ()
     "Third",
     "b",
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     [],
     ["a"],
     [],
@@ -185,7 +249,7 @@ test("splitThyStatements() should detect empty block from comment", async () => 
     "a",
     "  Empty block",
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     ["a", [
       "  Empty block",
     ]]
@@ -200,7 +264,7 @@ test("splitThyStatements() should discard multi-line comments", async () => {
     "COMMENT",
     "c",
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     [],
     [],
     [],
@@ -216,7 +280,7 @@ test("splitThyStatements() should detect empty block from multi-line comment", a
     "  b",
     "  XXX",
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     ["a", [
       "  XXX",
       "  b",
@@ -235,9 +299,28 @@ test("splitThyStatements() should collapse multiline string", async () => {
     ``,
     `g`,
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     ["f", `"\\nDear so-and-so,\\n\\nThis letter..."`],
     ["g"],
+  ])
+})
+
+test("splitThyStatements() provide location information for multiline string", async () => {
+  const inputLines = [
+    `f """`,
+    ``,
+    `  Dear so-and-so,`,
+    ``,
+    `  This letter...`,
+    ``,
+    `g`,
+  ]
+  assert.deepStrictEqual(splitThyStatements(inputLines, 5), [
+    [
+      { text: "f", lineIndex: 5, columnIndex: 0 },
+      { text: `"\\nDear so-and-so,\\n\\nThis letter..."`, lineIndex: 5, columnIndex: 2 }
+    ],
+    [{ text: "g", lineIndex: 11, columnIndex: 0 }],
   ])
 })
 
@@ -249,7 +332,7 @@ test("splitThyStatements() should track indent level", async () => {
     ``,
     `  g`,
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     ["f", `"\\nhimom"`],
     ["g"],
   ])
@@ -264,7 +347,7 @@ test("splitThyStatements() should allow multiple multiline strings", async () =>
     `and """`,
     `  three`,
   ]
-  assert.deepStrictEqual(splitThyStatements(inputLines), [
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
     ["f", `"one"`],
     ["f", `"two"`, `"three"`],
   ])

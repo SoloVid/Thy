@@ -8,7 +8,6 @@ import { fizzBuzzThy } from "../example/fizz-buzz"
 import { typesThy } from "../example/types"
 import { home, playgroundBaseUrl } from "../links"
 
-
 export default function App() {
   const [windowHeight, setWindowHeight] = useState(window.innerHeight)
   useEffect(() => {
@@ -55,6 +54,7 @@ export default function App() {
         <li><a href="vs-typescript.html">I know TypeScript. I want to compare.</a></li>
         <li><a href="from-the-top.html">I want Thy explained to me like I've never programmed before.</a></li>
         <li><a href="algorithms.html">I need to see some actual algorithms.</a></li>
+        <li><a href="misc-notes.html">I want to hear Grant ramble about language design minutia.</a></li>
       </ul>
     </div>
     <div class="column-content-sm">
@@ -100,6 +100,9 @@ export default function App() {
         But until those tools are developed, Thy is only really useful for self-contained small problems
         like <a href="https://adventofcode.com" target="_blank">Advent of Code</a> or writing out notional code on your phone as a sort of shorthand.
       </p>
+    </div>
+    <div class="column-content-sm">
+      <small>From the mind of <a href="https://www.codehousing.com" target="_blank">Grant</a>, source <a href="https://github.com/SoloVid/Thy" target="_blank">on GitHub</a>.</small>
     </div>
   </div>
 }

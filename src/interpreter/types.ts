@@ -1,7 +1,16 @@
-export type Atom = string | Block
+
+export type AtomSingle = {
+  text: string
+  lineIndex: number
+  columnIndex: number
+}
+export type Atom = AtomSingle | UnparsedBlock
 export type Statement = readonly Atom[]
 
-export type Block = readonly string[]
+export type UnparsedBlock = {
+  lines: readonly string[]
+  lineIndex: number
+}
 
 export type ThyBlockContext = {
   readonly argsToUse: unknown[]
@@ -18,4 +27,16 @@ export type ThyBlockContext = {
   thatValue: unknown
   /** `undefined` is special and indicates that no `beforeThat` value is available. */
   beforeThatValue: unknown
+  sourceFile: string
+}
+
+export function isAtomLiterally(atom: Atom | undefined, text: string) {
+  if (!atom || !("text" in atom)) {
+    return false
+  }
+  return atom.text === text
+}
+
+export function isSimpleAtom(atom: Atom | undefined): atom is AtomSingle {
+  return !!atom && "text" in atom
 }

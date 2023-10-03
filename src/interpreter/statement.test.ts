@@ -1,14 +1,20 @@
 import assert from "node:assert"
 import { test } from "under-the-sun"
+import { InterpreterErrorWithContext } from "./interpreter-error"
 import { interpretThyStatement } from "./statement"
 import { makeSimpleContext } from "./test-helper"
+import type { AtomSingle, ThyBlockContext } from "./types"
+
+function interpretThyStatementBasic(context: ThyBlockContext, parts: readonly (string | AtomSingle)[]) {
+  return interpretThyStatement(context, parts.map(p => typeof p === "string" ? ({ text: p, lineIndex: -1, columnIndex: -1 }) : p))
+}
 
 test("interpretThyStatement() should call function", async () => {
   let called = false
   const context = makeSimpleContext({
     variablesInBlock: { f: () => called = true },
   })
-  interpretThyStatement(context, [`f`])
+  interpretThyStatementBasic(context, [`f`])
   assert(called, "Function should have been called")
 })
 
@@ -17,7 +23,7 @@ test("interpretThyStatement() should call function with arguments", async () => 
   const context = makeSimpleContext({
     variablesInBlock: { f: (a: unknown) => calledWith = a },
   })
-  interpretThyStatement(context, [`f`, `67`])
+  interpretThyStatementBasic(context, [`f`, `67`])
   assert.strictEqual(calledWith, 67, "Function should have been called")
 })
 
@@ -25,7 +31,7 @@ test("interpretThyStatement() should save result of function call in an immutabl
   const context = makeSimpleContext({
     variablesInBlock: { f: (a: number) => a + 1 },
   })
-  interpretThyStatement(context, [`a`, `is`, `f`, `67`])
+  interpretThyStatementBasic(context, [`a`, `is`, `f`, `67`])
   assert.strictEqual(context.variablesInBlock["a"], 68)
 })
 
@@ -33,7 +39,7 @@ test("interpretThyStatement() should save result of function call in a mutable v
   const context = makeSimpleContext({
     variablesInBlock: { f: (a: number) => a + 1 },
   })
-  interpretThyStatement(context, [`a`, `be`, `f`, `67`])
+  interpretThyStatementBasic(context, [`a`, `be`, `f`, `67`])
   assert.strictEqual(context.variablesInBlock["a"], 68)
 })
 
@@ -41,7 +47,7 @@ test("interpretThyStatement() should overwrite mutable variable with result of f
   const context = makeSimpleContext({
     variablesInBlock: { f: (a: number) => a + 1, a: 50 },
   })
-  interpretThyStatement(context, [`a`, `to`, `f`, `a`])
+  interpretThyStatementBasic(context, [`a`, `to`, `f`, `a`])
   assert.strictEqual(context.variablesInBlock["a"], 51)
 })
 
@@ -49,19 +55,51 @@ test("interpretThyStatement() should reject second attempt to write immutable va
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },
   })
-  interpretThyStatement(context, [`a`, `is`, `f`])
-  assert.throws(() => interpretThyStatement(context, [`a`, `is`, `f`]), /a is immutable/)
-  assert.throws(() => interpretThyStatement(context, [`a`, `be`, `f`]), /a is immutable/)
-  assert.throws(() => interpretThyStatement(context, [`a`, `to`, `f`]), /a is immutable/)
+  const aToken = { text: "a", lineIndex: 2, columnIndex: 4 }
+  interpretThyStatementBasic(context, [aToken, `is`, `f`])
+  assert.throws(() => interpretThyStatementBasic(context, [aToken, `is`, `f`]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /a is immutable/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 2, columnIndex: 4 })
+    return true
+  })
+  assert.throws(() => interpretThyStatementBasic(context, [aToken, `be`, `f`]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /a is immutable/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 2, columnIndex: 4 })
+    return true
+  })
+  assert.throws(() => interpretThyStatementBasic(context, [aToken, `to`, `f`]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /a is immutable/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 2, columnIndex: 4 })
+    return true
+  })
 })
 
 test("interpretThyStatement() should reject second attempt to redefine mutable variable", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },
   })
-  interpretThyStatement(context, [`a`, `be`, `f`])
-  assert.throws(() => interpretThyStatement(context, [`a`, `be`, `f`]), /a is already defined/)
-  assert.throws(() => interpretThyStatement(context, [`a`, `is`, `f`]), /a is already defined/)
+  const aToken = { text: "a", lineIndex: 2, columnIndex: 4 }
+  interpretThyStatementBasic(context, [aToken, `be`, `f`])
+  assert.throws(() => interpretThyStatementBasic(context, [aToken, `be`, `f`]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /a is already defined/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 2, columnIndex: 4 })
+    return true
+  })
+  assert.throws(() => interpretThyStatementBasic(context, [aToken, `is`, `f`]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /a is already defined/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 2, columnIndex: 4 })
+    return true
+  })
 })
 
 test("interpretThyStatement() should reject attempt to shadow variable from closure", async () => {
@@ -69,7 +107,13 @@ test("interpretThyStatement() should reject attempt to shadow variable from clos
     variablesInBlock: { f: () => 5 },
     closure: { a: 1 },
   })
-  assert.throws(() => interpretThyStatement(context, [`a`, `be`, `f`]), /a cannot be shadowed/)
+  assert.throws(() => interpretThyStatementBasic(context, [{ text: "a", lineIndex: 2, columnIndex: 4 }, `be`, `f`]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /a cannot be shadowed/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 2, columnIndex: 4 })
+    return true
+  })
 })
 
 test("interpretThyStatement() should allow overwriting mutable variable in closure", async () => {
@@ -77,7 +121,7 @@ test("interpretThyStatement() should allow overwriting mutable variable in closu
     variablesInBlock: { f: () => 5 },
     closure: { a: 1 },
   })
-  interpretThyStatement(context, [`a`, `to`, `f`])
+  interpretThyStatementBasic(context, [`a`, `to`, `f`])
   assert.strictEqual(context.closure.a, 5)
 })
 
@@ -87,7 +131,13 @@ test("interpretThyStatement() should not allow overwriting immutable variable in
     closure: { a: 1 },
     closureVariableIsImmutable: { a: true },
   })
-  assert.throws(() => interpretThyStatement(context, [`a`, `to`, `f`]), /a is immutable/)
+  assert.throws(() => interpretThyStatementBasic(context, [{ text: "a", lineIndex: 2, columnIndex: 4 }, `to`, `f`]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /a is immutable/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 2, columnIndex: 4 })
+    return true
+  })
 })
 
 test("interpretThyStatement() should not allow overwriting implicit argument", async () => {
@@ -95,14 +145,26 @@ test("interpretThyStatement() should not allow overwriting implicit argument", a
     variablesInBlock: { f: () => 5 },
     implicitArguments: { a: 1 },
   })
-  assert.throws(() => interpretThyStatement(context, [`a`, `to`, `f`]), /implicit argument/)
+  assert.throws(() => interpretThyStatementBasic(context, [{ text: "a", lineIndex: 2, columnIndex: 4 }, `to`, `f`]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /implicit argument/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 2, columnIndex: 4 })
+    return true
+  })
 })
 
 test("interpretThyStatement() should reject invalid variable identifier", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },
   })
-  assert.throws(() => interpretThyStatement(context, [`$a`, `is`, `f`]), /\$a is not a valid identifier/)
+  assert.throws(() => interpretThyStatementBasic(context, [{ text: "$a", lineIndex: 2, columnIndex: 4 }, `is`, `f`]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /\$a is not a valid identifier/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 2, columnIndex: 4 })
+    return true
+  })
 })
 
 test("interpretThyStatement() should clear thatValue and beforeThatValue if statement is assignment", async () => {
@@ -111,7 +173,7 @@ test("interpretThyStatement() should clear thatValue and beforeThatValue if stat
     thatValue: 4,
     beforeThatValue: 5,
   })
-  interpretThyStatement(context, [`a`, `is`, `f`])
+  interpretThyStatementBasic(context, [`a`, `is`, `f`])
   assert.strictEqual(context.thatValue, undefined)
   assert.strictEqual(context.beforeThatValue, undefined)
 })
@@ -122,7 +184,7 @@ test("interpretThyStatement() should use thatValue and beforeThatValue before cl
     thatValue: 4,
     beforeThatValue: 5,
   })
-  interpretThyStatement(context, [`a`, `is`, `f`, `that`, `beforeThat`])
+  interpretThyStatementBasic(context, [`a`, `is`, `f`, `that`, `beforeThat`])
   assert.strictEqual(context.variablesInBlock.a, 9)
 })
 
@@ -131,15 +193,15 @@ test("interpretThyStatement() should store unassigned values into `that` and `be
     variablesInBlock: { f: (a: number) => a },
   })
 
-  interpretThyStatement(context, [`f`, `1`])
+  interpretThyStatementBasic(context, [`f`, `1`])
   assert.strictEqual(context.thatValue, 1)
   assert.strictEqual(context.beforeThatValue, undefined)
 
-  interpretThyStatement(context, [`f`, `2`])
+  interpretThyStatementBasic(context, [`f`, `2`])
   assert.strictEqual(context.thatValue, 2)
   assert.strictEqual(context.beforeThatValue, 1)
 
-  interpretThyStatement(context, [`f`, `3`])
+  interpretThyStatementBasic(context, [`f`, `3`])
   assert.strictEqual(context.thatValue, 3)
   assert.strictEqual(context.beforeThatValue, 2)
 })
@@ -150,7 +212,7 @@ test("interpretThyStatement() should use thatValue and beforeThatValue before co
     thatValue: 4,
     beforeThatValue: 5,
   })
-  interpretThyStatement(context, [`f`, `that`, `beforeThat`])
+  interpretThyStatementBasic(context, [`f`, `that`, `beforeThat`])
   assert.strictEqual(context.thatValue, 9)
 })
 
@@ -158,7 +220,7 @@ test("interpretThyStatement() should set exported variables", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },
   })
-  interpretThyStatement(context, [`export`, `a`, `is`, `f`])
+  interpretThyStatementBasic(context, [`export`, `a`, `is`, `f`])
   assert.strictEqual(context.variablesInBlock.a, 5)
 })
 
@@ -166,7 +228,7 @@ test("interpretThyStatement() should set private variables", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },
   })
-  interpretThyStatement(context, [`private`, `a`, `is`, `f`])
+  interpretThyStatementBasic(context, [`private`, `a`, `is`, `f`])
   assert.strictEqual(context.variablesInBlock.a, 5)
 })
 
@@ -174,7 +236,7 @@ test("interpretThyStatement() should add exported variables to context export ar
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },
   })
-  interpretThyStatement(context, [`export`, `a`, `is`, `f`])
+  interpretThyStatementBasic(context, [`export`, `a`, `is`, `f`])
   assert.deepStrictEqual(context.exportedVariables, ["a"])
 })
 
@@ -182,7 +244,7 @@ test("interpretThyStatement() should not add bare variables to context export ar
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },
   })
-  interpretThyStatement(context, [`a`, `is`, `f`])
+  interpretThyStatementBasic(context, [`a`, `is`, `f`])
   assert.deepStrictEqual(context.exportedVariables, [])
 })
 
@@ -190,7 +252,7 @@ test("interpretThyStatement() should not add private variables to context export
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },
   })
-  interpretThyStatement(context, [`private`, `a`, `is`, `f`])
+  interpretThyStatementBasic(context, [`private`, `a`, `is`, `f`])
   assert.deepStrictEqual(context.exportedVariables, [])
 })
 
@@ -198,7 +260,7 @@ test("interpretThyStatement() should add bare variables to context bare array", 
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },
   })
-  interpretThyStatement(context, [`a`, `is`, `f`])
+  interpretThyStatementBasic(context, [`a`, `is`, `f`])
   assert.deepStrictEqual(context.bareVariables, ["a"])
 })
 
@@ -206,7 +268,7 @@ test("interpretThyStatement() should not add exported variables to context bare 
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },
   })
-  interpretThyStatement(context, [`export`, `a`, `is`, `f`])
+  interpretThyStatementBasic(context, [`export`, `a`, `is`, `f`])
   assert.deepStrictEqual(context.bareVariables, [])
 })
 
@@ -214,7 +276,7 @@ test("interpretThyStatement() should not add private variables to context export
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },
   })
-  interpretThyStatement(context, [`private`, `a`, `is`, `f`])
+  interpretThyStatementBasic(context, [`private`, `a`, `is`, `f`])
   assert.deepStrictEqual(context.exportedVariables, [])
 })
 
@@ -222,7 +284,7 @@ test("interpretThyStatement() should not add re-assigned variables to context ba
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5, a: 1 },
   })
-  interpretThyStatement(context, [`a`, `to`, `f`])
+  interpretThyStatementBasic(context, [`a`, `to`, `f`])
   assert.deepStrictEqual(context.bareVariables, [])
 })
 
@@ -230,7 +292,7 @@ test("interpretThyStatement() should not return a promise if not an await call (
   const context = makeSimpleContext({
     variablesInBlock: { f: (n: number) => n }
   })
-  const thyResult = interpretThyStatement(context, [`f`, `5`])
+  const thyResult = interpretThyStatementBasic(context, [`f`, `5`])
   assert.strictEqual(thyResult, undefined)
 })
 
@@ -238,7 +300,7 @@ test("interpretThyStatement() should not return a promise if not an await call (
   const context = makeSimpleContext({
     variablesInBlock: { f: (n: number) => n }
   })
-  const thyResult = interpretThyStatement(context, [`a`, `is`, `f`, `5`])
+  const thyResult = interpretThyStatementBasic(context, [`a`, `is`, `f`, `5`])
   assert.strictEqual(thyResult, undefined)
 })
 
@@ -256,7 +318,7 @@ test("interpretThyStatement() should handle await call (no assign)", async () =>
   const context = makeSimpleContext({
     variablesInBlock: { p: p }
   })
-  const thyResult = interpretThyStatement(context, [`await`, `p`])
+  const thyResult = interpretThyStatementBasic(context, [`await`, `p`])
   assert(thyResult instanceof Promise)
   thyResult.then(() => {
     thyStatementResolveOrder = order++
@@ -273,12 +335,24 @@ test("interpretThyStatement() should handle await call (no assign)", async () =>
 
 test("interpretThyStatement() should reject await call (no assign) with no arguments", async () => {
   const context = makeSimpleContext()
-  assert.throws(() => interpretThyStatement(context, [`await`]), /`await` takes 1 argument/)
+  assert.throws(() => interpretThyStatement(context, [{ text: "await", lineIndex: 2, columnIndex: 4 }]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /`await` takes 1 argument/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 2, columnIndex: 4 })
+    return true
+  })
 })
 
 test("interpretThyStatement() should reject await call (no assign) with too many arguments", async () => {
   const context = makeSimpleContext()
-  assert.throws(() => interpretThyStatement(context, [`await`, `1`, `1`]), /`await` takes 1 argument/)
+  assert.throws(() => interpretThyStatementBasic(context, [{ text: "await", lineIndex: 2, columnIndex: 4 }, `1`, `1`]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /`await` takes 1 argument/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 2, columnIndex: 4 })
+    return true
+  })
 })
 
 test("interpretThyStatement() should handle await call with assignment", async () => {
@@ -295,7 +369,7 @@ test("interpretThyStatement() should handle await call with assignment", async (
   const context = makeSimpleContext({
     variablesInBlock: { p: p }
   })
-  const thyResult = interpretThyStatement(context, [`a`, `is`, `await`, `p`])
+  const thyResult = interpretThyStatementBasic(context, [`a`, `is`, `await`, `p`])
   assert(thyResult instanceof Promise)
   thyResult.then(() => {
     thyStatementResolveOrder = order++
@@ -312,10 +386,22 @@ test("interpretThyStatement() should handle await call with assignment", async (
 
 test("interpretThyStatement() should reject await call (with assign) with no arguments", async () => {
   const context = makeSimpleContext()
-  assert.throws(() => interpretThyStatement(context, [`a`, `is`, `await`]), /`await` takes 1 argument/)
+  assert.throws(() => interpretThyStatementBasic(context, [`a`, `is`, { text: "await", lineIndex: 2, columnIndex: 4 }]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /`await` takes 1 argument/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 2, columnIndex: 4 })
+    return true
+  })
 })
 
 test("interpretThyStatement() should reject await call (with assign) with too many arguments", async () => {
   const context = makeSimpleContext()
-  assert.throws(() => interpretThyStatement(context, [`a`, `is`, `await`, `1`, `1`]), /`await` takes 1 argument/)
+  assert.throws(() => interpretThyStatementBasic(context, [`a`, `is`, { text: "await", lineIndex: 2, columnIndex: 4 }, `1`, `1`]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /`await` takes 1 argument/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 2, columnIndex: 4 })
+    return true
+  })
 })

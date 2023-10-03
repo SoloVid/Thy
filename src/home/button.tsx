@@ -35,7 +35,7 @@ export function TryButton({
   return <Button
     text="Try"
     centered
-    style="margin:20px;"
+    style="margin:5px;"
     href={`${playgroundUrl}#b64=${btoa(source)}`}
     newTab
   ></Button>

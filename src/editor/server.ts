@@ -17,9 +17,17 @@ const server = createServer(async (req, res) => {
       case "/playground/index.html":
         await serve("playground/index.html")
         return
+      case "/code-input.css":
+      case "/playground/code-input.css":
+        await serve("playground/code-input.css")
+        return
       case "/editor-client.js":
       case "/playground/editor-client.js":
         await serve("playground/editor-client.js")
+        return
+      case "/editor-client.js.map":
+      case "/playground/editor-client.js.map":
+        await serve("playground/editor-client.js.map")
         return
       default:
         res.writeHead(404)

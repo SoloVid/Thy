@@ -1,5 +1,7 @@
 /node_modules
 /lib
 /dist
+/home/*.js
+/home/*.js.map
 /playground/*.js
 /playground/*.js.map

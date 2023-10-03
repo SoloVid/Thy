@@ -43,6 +43,7 @@ export default function CodeBlock({
   }, [isThyPrismLoaded, source])
 
   return <pre
+    className="code-block"
     ref={$pre}
     {...remainingProps}
   >

@@ -220,6 +220,7 @@ splitPath is def
 ```
 
 But variables cannot hold a value of type Void. `let` is the only part of the language with access to it.
+
 ```thy
 type A is def
     type return VoidableNullableType
@@ -245,6 +246,7 @@ This has led me to the following set of rules:
     - (It is an error to use `export` in the same block with `return`/`let`.)
 
 #### Consequence #1: Object Literals
+
 ```thy
 myObj is
     field1 is def 1
@@ -253,6 +255,7 @@ myObj is
 ```
 
 This most strictly translates to the following TypeScript:
+
 ```typescript
 const myObj = (() => {
     const field1 = 1
@@ -263,7 +266,9 @@ const myObj = (() => {
     return { field1, field2 }
 })()
 ```
+
 But it could be optimized to the more idiomatic TypeScript:
+
 ```typescript
 const myObj = {
     field1: 1,
@@ -274,6 +279,7 @@ const myObj = {
 ```
 
 #### Consequence #2: Classes
+
 ```thy
 newThing is def
     type return Thing
@@ -291,6 +297,7 @@ newThing is def
 ```
 
 This fairly strictly translates to the following TypeScript:
+
 ```typescript
 function newThing(a: NullableA): Thing {
     let aa: A
@@ -307,7 +314,9 @@ function newThing(a: NullableA): Thing {
     return { aa, aIsNull, printA }
 }
 ```
+
 But it could be optimized to the more colloquial TypeScript:
+
 ```typescript
 class ThingImpl implements Thing {
     aa: A
@@ -346,7 +355,9 @@ inst is newMyClass
 Expect print 5.
 call inst.myMethod
 ```
+
 should translate to
+
 ```typescript
 class MyClass {
     myField = 5
@@ -358,7 +369,9 @@ const inst = new MyClass()
 // Would print undefined.
 call(inst.myMethod)
 ```
+
 but is more literally
+
 ```typescript
 function newMyClass() {
     let myField = 5
@@ -373,9 +386,11 @@ call(inst.myMethod)
 ```
 
 I think the solution here long-term may be to call bind at the call site for the limited cases this happens.
+
 ```typescript
 call(inst.myMethod.bind(inst))
 ```
+
 though this has the side effect that you can't compare two such functions.
 This also requires type-aware context to pull off at the call site.
 
@@ -422,6 +437,7 @@ b
 ```
 
 If we wanted just a single thy file compiled from these, I believe the result (which should be able to work at runtime) could be:
+
 ```thy
 thy.scope .global.
     given thy
