@@ -172,8 +172,6 @@ thy1
   assert.notStrictEqual(actualError, null, "Error should be thrown")
   assert(actualError instanceof Error)
 
-  assert.strictEqual(actualError.message, "error from ts3")
-
   assertErrorTraceLineMatch(actualError, 0, /\bts3\b/)
   assertErrorTraceLineMatch(actualError, 0, /\binterpret-block.errors.test.ts\b/)
   assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:10:3\b/)
@@ -186,6 +184,42 @@ thy1
   assertErrorTraceLineMatch(actualError, 6, /\binterpreted\b/)
   assertErrorTraceLineMatch(actualError, 6, /\bprovided-source.thy:11:1\b/)
   assertErrorTraceLinesMatch(actualError, 7, errorHere, 0)
+
+  assert.strictEqual(actualError.message, "error from ts3")
+})
+
+
+test("interpretThyBlock() gracefully handles interpreter errors", () => {
+  const interpreted = interpretThyBlock(`
+f is def
+  doesNotExist
+f
+`, {
+    functionName: "interpreted",
+    sourceFile: "provided-source.thy",
+    closure: {
+      def: (thing: unknown) => thing,
+    }
+  })
+
+  const errorHere = new Error()
+
+  let actualError: unknown = null
+  try {
+    interpreted()
+  } catch (e) {
+    actualError = e
+  }
+
+  assert.notStrictEqual(actualError, null, "Error should be thrown")
+  assert(actualError instanceof Error)
+
+  assertErrorTraceLineMatch(actualError, 0, /\bprovided-source.thy:3:3\b/)
+  assertErrorTraceLineMatch(actualError, 1, /\binterpreted\b/)
+  assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:4:1\b/)
+  assertErrorTraceLinesMatch(actualError, 2, errorHere, 0)
+
+  assert.strictEqual(actualError.message, "Variable doesNotExist not found")
 })
 
 function assertErrorTraceLineMatch(error: Error, lineIndex: number, pattern: RegExp) {

@@ -1,8 +1,9 @@
 import assert from "../utils/assert"
 import { interpretThyBlockLines } from "./block"
+import { InterpreterErrorWithContext, makeInterpreterError } from "./call"
 import { exactNumberRegex, exactStringRegex, identifierRegex } from "./patterns"
 import { interpolateString, parseString } from "./string"
-import type { Atom, ThyBlockContext, UnparsedBlock } from "./types"
+import type { Atom, AtomSingle, ThyBlockContext, UnparsedBlock } from "./types"
 
 type InterpretedExpression = {
   target: unknown
@@ -16,7 +17,6 @@ export function interpretThyExpression(context: ThyBlockContext, thyExpressionAt
     return ie(resolveBlock(context, thyExpressionAtom))
   }
   const thyExpressionString = thyExpressionAtom.text
-  assert(typeof thyExpressionString === "string", "Array case should have been filtered")
 
   if (exactNumberRegex.test(thyExpressionString)) {
     return ie(parseFloat(thyExpressionString))
@@ -24,10 +24,10 @@ export function interpretThyExpression(context: ThyBlockContext, thyExpressionAt
   const stringMatch = exactStringRegex.exec(thyExpressionString)
   if (stringMatch !== null) {
     const rawString = parseString(stringMatch[0])
-    return ie(interpolateString(context, rawString))
+    return ie(interpolateString(context, rawString, thyExpressionAtom))
   }
 
-  return interpretThyIdentifier(context, thyExpressionString)
+  return interpretThyIdentifier(context, thyExpressionAtom)
 }
 
 function resolveBlock(context: ThyBlockContext, unparsedBlock: UnparsedBlock) {
@@ -41,6 +41,9 @@ function resolveBlock(context: ThyBlockContext, unparsedBlock: UnparsedBlock) {
           return context.variablesInBlock[key]
         },
         set(value) {
+          // if (context.variableIsImmutable[key]) {
+          //   throw makeInterpreterError(unparsedBlock, `${key} is immutable and cannot be reassigned`)
+          // }
           assert(!context.variableIsImmutable[key], `${key} is immutable and cannot be reassigned`)
           context.variablesInBlock[key] = value
         },
@@ -90,10 +93,10 @@ function resolveBlock(context: ThyBlockContext, unparsedBlock: UnparsedBlock) {
   }
 }
 
-export function interpretThyIdentifier(context: ThyBlockContext, thyExpression: string): InterpretedExpression {
-  const parts = thyExpression.split(".")
+export function interpretThyIdentifier(context: ThyBlockContext, thyExpression: AtomSingle): InterpretedExpression {
+  const parts = thyExpression.text.split(".")
   const [base, ...memberAccesses] = parts
-  const baseValue = interpretThyIdentifierBase(context, base)
+  const baseValue = interpretThyIdentifierBase(context, thyExpression, base)
   let priorAccess = base
   let thisValue = undefined
   let finalValue = baseValue
@@ -107,7 +110,7 @@ export function interpretThyIdentifier(context: ThyBlockContext, thyExpression: 
   return { target: finalValue, thisValue: thisValue }
 }
 
-function interpretThyIdentifierBase(context: ThyBlockContext, thyExpressionBase: string) {
+function interpretThyIdentifierBase(context: ThyBlockContext, atom: AtomSingle, thyExpressionBase: string) {
   if (thyExpressionBase === "that") {
     return interpretThat(context, "thatValue", "that")
   }
@@ -115,7 +118,7 @@ function interpretThyIdentifierBase(context: ThyBlockContext, thyExpressionBase:
     return interpretThat(context, "beforeThatValue", "beforeThat")
   }
 
-  return getVariableFromContext(context, thyExpressionBase)
+  return getVariableFromContext(context, atom, thyExpressionBase)
 }
 
 function interpretThat(context: ThyBlockContext, contextKey: "thatValue" | "beforeThatValue", keyword: "that" | "beforeThat") {
@@ -125,7 +128,7 @@ function interpretThat(context: ThyBlockContext, contextKey: "thatValue" | "befo
   return context[contextKey]
 }
 
-function getVariableFromContext(context: ThyBlockContext, variable: string) {
+function getVariableFromContext(context: ThyBlockContext, atom: AtomSingle, variable: string) {
   assert(identifierRegex.test(variable), `Invalid identifier: ${variable}`)
 
   if (context.implicitArguments && variable in context.implicitArguments) {
@@ -141,5 +144,6 @@ function getVariableFromContext(context: ThyBlockContext, variable: string) {
   if (variable in context.variablesInBlock) {
     return context.variablesInBlock[variable]
   }
+  throw new InterpreterErrorWithContext(new Error(`Variable ${variable} not found`), atom)
   throw new Error(`Variable ${variable} not found`)
 }
