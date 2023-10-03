@@ -13,7 +13,8 @@ Error: f bad
     at Object.objectMethod (c:\\Users\\User\\object.ts:82:24)
     at null.<anonymous> (c:\\Users\\User\\lambda.ts:146:44)
     at async w (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1722)
-    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`
+    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)
+    at Array.map (<anonymous>)`
   const traceLines = getErrorTraceLinesFromStack(exampleStackValue)
 
   assert.strictEqual(traceLines, `    at null.f (c:\\Users\\User\\some-file.ts:15:11)
@@ -21,7 +22,40 @@ Error: f bad
     at Object.objectMethod (c:\\Users\\User\\object.ts:82:24)
     at null.<anonymous> (c:\\Users\\User\\lambda.ts:146:44)
     at async w (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1722)
-    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
+    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)
+    at Array.map (<anonymous>)`)
+})
+
+test("getErrorTraceLinesFromStack() returns only lines with file and location info (Vivaldi 6.2)", async () => {
+  const exampleStackValue = `Error: Cannot access split on input because input has no value
+    at assert (http://localhost:8089/editor-client.js:1667:13)
+    at interpretThyIdentifier (http://localhost:8089/editor-client.js:1934:7)
+    at interpretThyExpression (http://localhost:8089/editor-client.js:1870:12)
+    at interpretThyCall (http://localhost:8089/editor-client.js:2004:17)
+    at interpretThyStatement (http://localhost:8089/editor-client.js:2249:20)
+    at Object.evaluateStatement (http://localhost:8089/editor-client.js:2323:26)
+    at <anonymous> (http://localhost:8089/editor-client.js:2390:48)
+    at http://localhost:8089/editor-client.js:1921:14
+    at interpretThyCall (http://localhost:8089/editor-client.js:2012:14)
+    at interpretThyStatement (http://localhost:8089/editor-client.js:2249:20)
+    at Object.evaluateStatement (http://localhost:8089/editor-client.js:2323:26)
+    at <anonymous> (http://localhost:8089/editor-client.js:2370:50)
+    at async run (http://localhost:8089/editor-client.js:3081:23)`
+  const traceLines = getErrorTraceLinesFromStack(exampleStackValue)
+
+  assert.strictEqual(traceLines, `    at assert (http://localhost:8089/editor-client.js:1667:13)
+    at interpretThyIdentifier (http://localhost:8089/editor-client.js:1934:7)
+    at interpretThyExpression (http://localhost:8089/editor-client.js:1870:12)
+    at interpretThyCall (http://localhost:8089/editor-client.js:2004:17)
+    at interpretThyStatement (http://localhost:8089/editor-client.js:2249:20)
+    at Object.evaluateStatement (http://localhost:8089/editor-client.js:2323:26)
+    at <anonymous> (http://localhost:8089/editor-client.js:2390:48)
+    at http://localhost:8089/editor-client.js:1921:14
+    at interpretThyCall (http://localhost:8089/editor-client.js:2012:14)
+    at interpretThyStatement (http://localhost:8089/editor-client.js:2249:20)
+    at Object.evaluateStatement (http://localhost:8089/editor-client.js:2323:26)
+    at <anonymous> (http://localhost:8089/editor-client.js:2370:50)
+    at async run (http://localhost:8089/editor-client.js:3081:23)`)
 })
 
 test("getErrorTraceLinesFromStack() returns only lines with file and location info (Firefox)", async () => {
@@ -86,6 +120,18 @@ Error: oh noes
 
 Error: oh noes
 altered trace lines`)
+})
+
+test("transformErrorTrace() gracefully degrades if trace is formatted unexpectedly", async () => {
+  const originalError = new FakeError("oh noes", `Error: oh noes
+    at null.f (c:\\Users\\User\\some-file.ts:15:11)
+    not an expected trace line
+    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
+    const transformedError = transformErrorTrace(originalError, (originalTraceLines) => "altered trace lines")
+    assert.strictEqual(transformedError.stack, `Error: oh noes
+    at null.f (c:\\Users\\User\\some-file.ts:15:11)
+    not an expected trace line
+    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
 })
 
 test("dissectErrorTraceAtBaseline() splits the trace lines beyond the baseline", async () => {
@@ -204,14 +250,14 @@ test("replaceErrorTraceLine() allows swapping trace line file and location (Wind
     at null.anotherLayer (c:\\Users\\User\\another\\file.ts:31:10)
     at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`
   const outputLines = replaceErrorTraceLine(inputLines, 1, (func, file, row, column) => {
-    assert.strictEqual(func, "anotherLayer")
+    assert.strictEqual(func, "null.anotherLayer")
     assert.strictEqual(file, "c:\\Users\\User\\another\\file.ts")
     assert.strictEqual(row, 31)
     assert.strictEqual(column, 10)
     return ["swapped", "test-replace-file", 12, 34]
   })
   assert.strictEqual(outputLines, `    at null.f (c:\\Users\\User\\some-file.ts:15:11)
-    at null.swapped (test-replace-file:12:34)
+    at swapped (test-replace-file:12:34)
     at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
 })
 

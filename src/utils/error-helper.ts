@@ -1,7 +1,7 @@
 import assert from "./assert"
 
-const v8TraceLinePattern = /^(\s+at (?:.+\.)?)(.+)( \()(.+):(\d+):(\d+)(\))$/
-const firefoxTraceLinePattern = /^(\s*(?:.+\.)?)(.*)(@)(.+):(\d+):(\d+)()$/
+const v8TraceLinePattern = /^(\s+at )([^ ]*)( \()?(.+?)(?::(\d+):(\d+))?(\)?)$/
+const firefoxTraceLinePattern = /^(\s*)([^@]*)(@)(.+?)(?::(\d+):(\d+))?()$/
 
 // TODO: Configure this elsewhere?
 Error.stackTraceLimit = 100
@@ -27,7 +27,14 @@ class TransformedError extends Error {
     const originalTraceLines = getErrorTraceLines(error)
     const newTraceLines = transform(originalTraceLines)
     const indexOfTraceLines = error.stack.lastIndexOf(originalTraceLines)
-    this.stack = error.stack.substring(0, indexOfTraceLines) + newTraceLines
+    if (indexOfTraceLines < 0) {
+      // I ran into a scenario where some trace lines got filtered out
+      // because I didn't know they could happen.
+      // Unfortunately, this made the match here fail.
+      this.stack = error.stack
+    } else {
+      this.stack = error.stack.substring(0, indexOfTraceLines) + newTraceLines
+    }
   }
 }
 

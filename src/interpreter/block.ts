@@ -145,7 +145,7 @@ export function interpretThyBlockLines(
         }
 
         // For async stack traces, the trace is a bit different before and after a true await.
-        const errorHere = new Error()
+        const errorHere = new Error("errorHere")
         try {
           const [shouldReturn, value] = helper.evaluateStatement(statement)
           if (shouldReturn) {
@@ -194,7 +194,7 @@ function throwTransformedError(
     }
     const e = errorCloseToCall.cause
 
-    const errorHere = new Error()
+    const errorHere = new Error("errorHere")
     const errorDissectedAtCall = dissectErrorTraceAtCloserBaseline(e, errorCloseToCall, errorCloseToCall.additionalDepthToShave, errorCloseToCall.altCloseError, errorCloseToCall.altAdditionalDepthToShave)
     // console.log(errorDissectedAtCall)
     const errorDissectedHere = dissectErrorTraceAtCloserBaseline(e, errorHere, additionalTraceLinesToHide, altErrorHere, additionalTraceLinesToHide)
