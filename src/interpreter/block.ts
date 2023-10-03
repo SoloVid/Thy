@@ -91,7 +91,7 @@ export function interpretThyBlockLines(
         }
         if (isAtomLiterally(parts[0], "let")) {
           if (parts.length <= 1) {
-            throw makeInterpreterError(parts[0], `\`let\` requires a function call following it`)
+            return [false, undefined]
           }
           const [letKeyword, ...theRest] = parts
           const returnValue = interpretThyCall(context, theRest)

@@ -83,15 +83,10 @@ test("interpretThyBlock() should return a function that rejects `return` with to
   })
 })
 
-test("interpretThyBlock() should return a function that rejects `let` with no call", async () => {
+test("interpretThyBlock() should return a function that allows `let` with no call", async () => {
   const interpreted = interpretThyBlock(`let\nreturn 1`)
-  assert.throws(() => interpreted(), (e) => {
-    assert(e instanceof Error)
-    assert.match(e.message, /`let` requires a function call/)
-    // assert(e instanceof InterpreterErrorWithContext)
-    // assert.deepStrictEqual(e.sourceLocation, { lineIndex: 0, columnIndex: 0 })
-    return true
-  })
+  const result = interpreted()
+  assert.strictEqual(result, 1)
 })
 
 test("interpretThyBlock() should return a function that can return undefined (when no return)", async () => {
