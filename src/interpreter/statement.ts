@@ -1,5 +1,4 @@
-import assert from "../utils/assert"
-import { InterpreterErrorWithContext, interpretThyCall } from "./call"
+import { InterpreterErrorWithContext, interpretThyCall, makeInterpreterError } from "./call"
 import { interpretThyExpression } from "./expression"
 import { identifierRegex } from "./patterns"
 import { Atom, isAtomLiterally, isSimpleAtom, ThyBlockContext } from "./types"
@@ -13,10 +12,11 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
   const [assignKeywordPart, ...callParts] = mutableParts
 
   if (isSimpleAtom(variableNamePart) && isSimpleAtom(assignKeywordPart) && ["is", "be", "to"].includes(assignKeywordPart.text)) {
+    const definedVariableNamePart = variableNamePart
     const variableName = variableNamePart.text
     const assignKeyword = assignKeywordPart.text
     if (isAtomLiterally(callParts[0], "await")) {
-      assert(callParts.length === 2, `\`await\` takes 1 argument; got ${callParts.length}`)
+      assertAwaitCallParts(callParts)
       return doAwaitStuff(callParts[0], callParts[1]).then(handleReturnedValue)
     }
   
@@ -27,7 +27,9 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
       context.thatValue = undefined
       context.beforeThatValue = undefined
 
-      assert(identifierRegex.test(variableName), `${variableName} is not a valid identifier. Variable names should begin with a lower-case letter and only contain letters and numbers.`)
+      if (!identifierRegex.test(variableName)) {
+        throw makeInterpreterError(definedVariableNamePart, `${variableName} is not a valid identifier. Variable names should begin with a lower-case letter and only contain letters and numbers.`)
+      }
 
       if (assignKeyword !== "to") {
         if (isExport) {
@@ -37,15 +39,17 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
         }
       }
 
-      assert(!(variableName in context.implicitArguments), `${variableName} is an implicit argument and cannot be overwritten`)
+      if (variableName in context.implicitArguments) {
+        throw makeInterpreterError(definedVariableNamePart, `${variableName} is an implicit argument and cannot be overwritten`)
+      }
       if (variableName in context.closure && ["is", "be"].includes(assignKeyword)) {
-        throw new Error(`${variableName} cannot be shadowed. Since it is declared in an upper scope, it cannot be redefined.`)
+        throw makeInterpreterError(definedVariableNamePart, `${variableName} cannot be shadowed. Since it is declared in an upper scope, it cannot be redefined.`)
       }
       if (context.variableIsImmutable[variableName] || context.closureVariableIsImmutable[variableName]) {
-        throw new Error(`${variableName} is immutable and cannot be reassigned. Did you mean to use \`be\` instead of \`is\` at its definition?`)
+        throw makeInterpreterError(definedVariableNamePart, `${variableName} is immutable and cannot be reassigned. Did you mean to use \`be\` instead of \`is\` at its definition?`)
       }
       if (variableName in context.variablesInBlock && assignKeyword !== "to") {
-        throw new Error(`${variableName} is already defined. Did you mean to use \`to\` instead of \`${assignKeyword}\`?`)
+        throw makeInterpreterError(definedVariableNamePart, `${variableName} is already defined. Did you mean to use \`to\` instead of \`${assignKeyword}\`?`)
       }
       if (variableName in context.closure) {
         context.closure[variableName] = newValue
@@ -62,7 +66,7 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
   function doAwaitStuff(awaitAtom: Atom, expressionAtom: Atom) {
     return (async () => {
       // For async stack traces, the trace is a bit different before and after a true await.
-      const errorHere = new Error()
+      const errorHere = new Error("errorHere")
       try {
         const result = await interpretThyExpression(context, expressionAtom).target
         context.beforeThatValue = context.thatValue
@@ -75,7 +79,7 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
   }
 
   if (isAtomLiterally(parts[0], "await")) {
-    assert(parts.length === 2, `\`await\` takes 1 argument; got ${parts.length}`)
+    assertAwaitCallParts(parts)
     return doAwaitStuff(parts[0], parts[1]).then((result) => {
       context.beforeThatValue = context.thatValue
       context.thatValue = result
@@ -85,4 +89,10 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
   const result = interpretThyCall(context, parts)
   context.beforeThatValue = context.thatValue
   context.thatValue = result
+}
+
+function assertAwaitCallParts(callParts: readonly Atom[]) {
+  if (callParts.length !== 2) {
+    throw makeInterpreterError(callParts[0], `\`await\` takes 1 argument; got ${callParts.length}`)
+  }
 }

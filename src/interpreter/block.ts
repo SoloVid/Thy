@@ -1,6 +1,5 @@
-import assert from "../utils/assert"
 import { dissectErrorTraceAtCloserBaseline, replaceErrorTraceLine, transformErrorTrace } from "../utils/error-helper"
-import { InterpreterErrorWithContext, interpretThyCall } from "./call"
+import { InterpreterErrorWithContext, interpretThyCall, makeInterpreterError } from "./call"
 import { interpretThyExpression } from "./expression"
 import { splitThyStatements } from "./split-statements"
 import { interpretThyStatement } from "./statement"
@@ -43,19 +42,19 @@ export function interpretThyBlockLines(
   for (const statement of statements) {
     if (isAtomLiterally(statement[0], "export")) {
       if (letUsed) {
-        throw new Error(`\`export\` cannot be used after \`let\``)
+        throw makeInterpreterError(statement[0], `\`export\` cannot be used after \`let\``)
       }
       exportUsed = true
     }
     if (isAtomLiterally(statement[0], "let")) {
       if (exportUsed) {
-        throw new Error(`\`let\` cannot be used after \`export\``)
+        throw makeInterpreterError(statement[0], `\`let\` cannot be used after \`export\``)
       }
       letUsed = true
     }
     if (isAtomLiterally(statement[0], "return")) {
       if (exportUsed) {
-        throw new Error(`\`return\` cannot be used after \`export\``)
+        throw makeInterpreterError(statement[0], `\`return\` cannot be used after \`export\``)
       }
     }
   }
@@ -81,11 +80,18 @@ export function interpretThyBlockLines(
       const parts = statement
       if (parts.length > 0) {
         if (isAtomLiterally(parts[0], "return")) {
-          assert(parts.length === 2, `\`return\` takes exactly one parameter`)
+          if (parts.length === 1) {
+            throw makeInterpreterError(parts[0], `\`return\` takes exactly one parameter`)
+          }
+          if (parts.length > 2) {
+            throw makeInterpreterError(parts[2], `\`return\` takes exactly one parameter`)
+          }
           return [true, interpretThyExpression(context, parts[1]).target]
         }
         if (isAtomLiterally(parts[0], "let")) {
-          assert(parts.length > 1, `\`let\` requires a function call following it`)
+          if (parts.length <= 1) {
+            throw makeInterpreterError(parts[0], `\`let\` requires a function call following it`)
+          }
           const [letKeyword, ...theRest] = parts
           const returnValue = interpretThyCall(context, theRest)
           if (returnValue !== undefined) {
@@ -136,7 +142,9 @@ export function interpretThyBlockLines(
       const helper = makeHelper(args)
       for (const statement of statements) {
         if (isAtomLiterally(statement[0], "let") && isAtomLiterally(statement[1], "await")) {
-          assert(statement.length === 3, `\`await\` takes 1 argument; got ${statement.length - 1}`)
+          if (statement.length !== 3) {
+            throw makeInterpreterError(statement[1], `\`await\` takes 1 argument; got ${statement.length - 1}`)
+          }
           const returnValue = await interpretThyExpression(helper.context, statement[2]).target
           if (returnValue !== undefined) {
             return returnValue

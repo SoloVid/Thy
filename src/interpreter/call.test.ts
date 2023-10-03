@@ -1,6 +1,6 @@
 import assert from "node:assert"
 import { test } from "under-the-sun"
-import { interpretThyCall } from "./call"
+import { InterpreterErrorWithContext, interpretThyCall } from "./call"
 import { makeSimpleContext } from "./test-helper"
 import type { ThyBlockContext } from "./types"
 
@@ -37,7 +37,14 @@ test("interpretThyCall() should barf on attempt to call non-function", async () 
   const context = makeSimpleContext({
     variablesInBlock: { f: 5 },
   })
-  assert.throws(() => interpretThyCallBasic(context, [`f`]), /f is not a function/)
+  const fToken = { text: "f", lineIndex: 4, columnIndex: 5 }
+  assert.throws(() => interpretThyCall(context, [fToken]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /f is not a function/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 4, columnIndex: 5 })
+    return true
+  })
 })
 
 test("interpretThyCall() should return context arguments for given", async () => {
@@ -69,7 +76,30 @@ test("interpretThyCall() should barf if there are no args or defaults for given"
   const context = makeSimpleContext({
     argsToUse: [],
   })
-  assert.throws(() => interpretThyCallBasic(context, [`given`]), /No argument or default available for given/)
+  const givenToken = { text: "given", lineIndex: 4, columnIndex: 5 }
+  assert.throws(() => interpretThyCall(context, [givenToken]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /No argument or default available for given/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 4, columnIndex: 5 })
+    return true
+  })
+})
+
+test("interpretThyCall() should barf if too many arguments given", async () => {
+  const context = makeSimpleContext({
+    argsToUse: [],
+  })
+  const givenToken = { text: "given", lineIndex: 4, columnIndex: 5 }
+  const aToken = { text: "given", lineIndex: 4, columnIndex: 6 }
+  const bToken = { text: "given", lineIndex: 4, columnIndex: 7 }
+  assert.throws(() => interpretThyCall(context, [givenToken, aToken, bToken]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /given may only take one argument/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 4, columnIndex: 7 })
+    return true
+  })
 })
 
 test("interpretThyCall() should barf if given is used after implicit argument", async () => {
@@ -78,7 +108,14 @@ test("interpretThyCall() should barf if given is used after implicit argument", 
     implicitArguments: { a: 1 },
     implicitArgumentFirstUsed: "a",
   })
-  assert.throws(() => interpretThyCallBasic(context, [`given`]), /\`given\` cannot be used after implicit arguments are used/)
+  const givenToken = { text: "given", lineIndex: 4, columnIndex: 5 }
+  assert.throws(() => interpretThyCall(context, [givenToken]), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /\`given\` cannot be used after implicit arguments are used/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 4, columnIndex: 5 })
+    return true
+  })
 })
 
 test("interpretThyCall() should properly pass `this` in function call", async () => {

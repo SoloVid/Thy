@@ -1,6 +1,6 @@
 import assert from "../utils/assert"
 import { interpretThyBlockLines } from "./block"
-import { InterpreterErrorWithContext, makeInterpreterError } from "./call"
+import { makeInterpreterError } from "./call"
 import { exactNumberRegex, exactStringRegex, identifierRegex } from "./patterns"
 import { interpolateString, parseString } from "./string"
 import type { Atom, AtomSingle, ThyBlockContext, UnparsedBlock } from "./types"
@@ -23,7 +23,7 @@ export function interpretThyExpression(context: ThyBlockContext, thyExpressionAt
   }
   const stringMatch = exactStringRegex.exec(thyExpressionString)
   if (stringMatch !== null) {
-    const rawString = parseString(stringMatch[0])
+    const rawString = parseString(stringMatch[0], thyExpressionAtom)
     return ie(interpolateString(context, rawString, thyExpressionAtom))
   }
 
@@ -41,9 +41,6 @@ function resolveBlock(context: ThyBlockContext, unparsedBlock: UnparsedBlock) {
           return context.variablesInBlock[key]
         },
         set(value) {
-          // if (context.variableIsImmutable[key]) {
-          //   throw makeInterpreterError(unparsedBlock, `${key} is immutable and cannot be reassigned`)
-          // }
           assert(!context.variableIsImmutable[key], `${key} is immutable and cannot be reassigned`)
           context.variablesInBlock[key] = value
         },
@@ -102,8 +99,12 @@ export function interpretThyIdentifier(context: ThyBlockContext, thyExpression: 
   let finalValue = baseValue
   for (const access of memberAccesses) {
     thisValue = finalValue
-    assert(identifierRegex.test(access), `Invalid (member) identifier: ${access}`)
-    assert(!!finalValue, `Cannot access ${access} on ${priorAccess} because ${priorAccess} has no value`)
+    if (!identifierRegex.test(access)) {
+      throw makeInterpreterError(thyExpression, `Invalid (member) identifier: ${access}`)
+    }
+    if (!finalValue) {
+      throw makeInterpreterError(thyExpression, `Cannot access ${access} on ${priorAccess} because ${priorAccess} has no value`)
+    }
     finalValue = (finalValue as Record<string, unknown>)[access]
     priorAccess = access
   }
@@ -112,27 +113,31 @@ export function interpretThyIdentifier(context: ThyBlockContext, thyExpression: 
 
 function interpretThyIdentifierBase(context: ThyBlockContext, atom: AtomSingle, thyExpressionBase: string) {
   if (thyExpressionBase === "that") {
-    return interpretThat(context, "thatValue", "that")
+    return interpretThat(context, atom, "thatValue", "that")
   }
   if (thyExpressionBase === "beforeThat") {
-    return interpretThat(context, "beforeThatValue", "beforeThat")
+    return interpretThat(context, atom, "beforeThatValue", "beforeThat")
   }
 
   return getVariableFromContext(context, atom, thyExpressionBase)
 }
 
-function interpretThat(context: ThyBlockContext, contextKey: "thatValue" | "beforeThatValue", keyword: "that" | "beforeThat") {
+function interpretThat(context: ThyBlockContext, atom: AtomSingle, contextKey: "thatValue" | "beforeThatValue", keyword: "that" | "beforeThat") {
   if (context[contextKey] === undefined) {
-    throw new Error(`Value is not available for \`${keyword}\``)
+    throw makeInterpreterError(atom, `Value is not available for \`${keyword}\``)
   }
   return context[contextKey]
 }
 
 function getVariableFromContext(context: ThyBlockContext, atom: AtomSingle, variable: string) {
-  assert(identifierRegex.test(variable), `Invalid identifier: ${variable}`)
+  if (!identifierRegex.test(variable)) {
+    throw makeInterpreterError(atom, `Invalid identifier: ${variable}`)
+  }
 
   if (context.implicitArguments && variable in context.implicitArguments) {
-    assert(!context.givenUsed, `Implicit arguments cannot be used (referenced ${variable}) after \`given\``)
+    if (context.givenUsed) {
+      throw makeInterpreterError(atom, `Implicit arguments cannot be used (referenced ${variable}) after \`given\``)
+    }
     if (context.implicitArgumentFirstUsed === null) {
       context.implicitArgumentFirstUsed = variable
     }
@@ -144,6 +149,5 @@ function getVariableFromContext(context: ThyBlockContext, atom: AtomSingle, vari
   if (variable in context.variablesInBlock) {
     return context.variablesInBlock[variable]
   }
-  throw new InterpreterErrorWithContext(new Error(`Variable ${variable} not found`), atom)
-  throw new Error(`Variable ${variable} not found`)
+  throw makeInterpreterError(atom, `Variable ${variable} not found`)
 }

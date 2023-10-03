@@ -1,5 +1,6 @@
 import assert from "node:assert"
 import { test } from "under-the-sun"
+import { InterpreterErrorWithContext } from "./call"
 import { splitThyStatements } from "./split-statements"
 import type { AtomSingle } from "./types"
 
@@ -61,6 +62,24 @@ test("splitThyStatements() should collapse nested block into parent statement pa
   ])
 })
 
+test("splitThyStatements() should not end nested block because of indentation", async () => {
+  const inputLines = [
+    "a",
+    "  b",
+    " ",
+    "   ",
+    "  c",
+  ]
+  assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
+    ["a", [
+      "  b",
+      " ",
+      "   ",
+      "  c",
+    ]]
+  ])
+})
+
 test("splitThyStatements() should provide location information", async () => {
   const inputLines = [
     "a aa",
@@ -81,7 +100,13 @@ test("splitThyStatements() should reject `and` without a preceding statement", a
   const inputLines = [
     "and a",
   ]
-  assert.throws(() => splitThyStatementsBasic(inputLines), /No preceding statement for `and`/)
+  assert.throws(() => splitThyStatementsBasic(inputLines), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /No preceding statement for `and`/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 0, columnIndex: 0 })
+    return true
+  })
 })
 
 test("splitThyStatements() should treat `and` arguments as part of preceding statement", async () => {
@@ -176,7 +201,13 @@ test("splitThyStatements() should fail on bad outdent", async () => {
     "    a",
     "  b",
   ]
-  assert.throws(() => splitThyStatementsBasic(inputLines), /does not match any preceding indentation level/)
+  assert.throws(() => splitThyStatementsBasic(inputLines), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /does not match any preceding indentation level/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 0 })
+    return true
+  })
 })
 
 test("splitThyStatements() should discard empty lines", async () => {
@@ -188,7 +219,10 @@ test("splitThyStatements() should discard empty lines", async () => {
     "b",
   ]
   assert.deepStrictEqual(splitThyStatementsBasic(inputLines), [
+    [],
     ["a"],
+    [],
+    [],
     ["b"],
   ])
 })

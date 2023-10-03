@@ -241,3 +241,31 @@ function assertErrorTraceLinesMatch(actualError: Error, actualErrorLineIndex: nu
   const expectedLine = expectedTraceLines[expectedErrorLineIndex].replace(/:\d+:\d+/, ":XXX:XXX")
   assert.strictEqual(actualLine, expectedLine, `Line ${actualErrorLineIndex + 1} of actual error should match line ${expectedErrorLineIndex + 1} of expected error\nActual:\n${traceLinesString}\nExpected:\n${expectedTraceLinesString}\n<end trace>`)
 }
+
+test("interpretThyBlock() Thy stack trace counts empty lines and comment lines", () => {
+  const interpreted = interpretThyBlock(`f is given\n\nComment here (empty line above)\nf`, {
+    functionName: "interpreted",
+    sourceFile: "provided-source.thy",
+  })
+  function foo() {
+    throw new Error("f bad")
+  }
+
+  const errorHere = new Error()
+
+  let actualError: unknown = null
+  try {
+    interpreted(foo)
+  } catch (e) {
+    actualError = e
+  }
+
+  assert.notStrictEqual(actualError, null, "Error should be thrown")
+  assert(actualError instanceof Error)
+
+  assertErrorTraceLineMatch(actualError, 0, /\bfoo\b/)
+  assertErrorTraceLineMatch(actualError, 0, /\binterpret-block.errors.test.ts\b/)
+  assertErrorTraceLineMatch(actualError, 1, /\binterpreted\b/)
+  assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:4:1\b/)
+  assertErrorTraceLinesMatch(actualError, 2, errorHere, 0)
+})

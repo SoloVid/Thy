@@ -1,4 +1,5 @@
 import assert from "../utils/assert"
+import { makeInterpreterError } from "./call"
 import { extractIndent, getFirstIndent } from "./indentation"
 import { LinePart, splitLineParts } from "./split-line"
 import { interpretThyMultilineString, RawMultilineStringData } from "./string"
@@ -50,7 +51,13 @@ export function splitThyStatements(thySourceLines: readonly string[], startingLi
       }
     }
     if (line.trim() === "") {
-      return soFar
+      if (soFar.blockLines !== null) {
+        return addToBlockLines()
+      }
+      return {
+        ...soFar,
+        statements: [...soFar.statements, []],
+      }
     }
     if (soFar.multilineCommentTag !== null) {
       return {
@@ -89,7 +96,9 @@ export function splitThyStatements(thySourceLines: readonly string[], startingLi
       if (isAtomLiterally(andPart, "and")) {
         const precedingStatements = [...soFar.statements]
         const lastStatement = precedingStatements.pop() as Statement
-        assert(!!lastStatement, "No preceding statement for `and` to match")
+        if (!lastStatement) {
+          throw makeInterpreterError(andPart, "No preceding statement for `and` to match")
+        }
         const precedingParts = [...lastStatement]
         precedingParts.pop()
         return {
@@ -107,6 +116,10 @@ export function splitThyStatements(thySourceLines: readonly string[], startingLi
       }
     }
     if (lineLevelIndent.length > ourLevelIndent.length) {
+      return addToBlockLines()
+    }
+
+    function addToBlockLines() {
       const precedingStatements = [...soFar.statements]
       const lastStatement = precedingStatements.pop() as Statement
       assert(!!lastStatement, "No last statement")
@@ -134,7 +147,11 @@ export function splitThyStatements(thySourceLines: readonly string[], startingLi
         statements: [...precedingStatements, updatedStatement]
       }
     }
-    throw new Error(`Bad outdent (indent is not the start of a block and does not match any preceding indentation level)`)
+
+    throw makeInterpreterError(
+      { text: ourLevelIndent, lineIndex: startingLineIndex + lineIndex, columnIndex: 0 },
+      `Bad outdent (indent is not the start of a block and does not match any preceding indentation level)`
+    )
   }, {
     blockLines: null,
     statements: [],

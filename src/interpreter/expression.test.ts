@@ -1,5 +1,6 @@
 import assert from "node:assert"
 import { test } from "under-the-sun"
+import { InterpreterErrorWithContext } from "./call"
 import { interpretThyExpression } from "./expression"
 import { makeSimpleContext } from "./test-helper"
 import type { ThyBlockContext } from "./types"
@@ -93,7 +94,14 @@ test("interpretThyExpression() barfs if implicit argument used after given", asy
     givenUsed: true,
     implicitArguments: { x: 5 }
   })
-  assert.throws(() => interpretThyExpressionBasic(context, `x`), /Implicit arguments cannot be used \(referenced x\) after `given`/)
+  const token = { text: "x", lineIndex: 1, columnIndex: 2 }
+  assert.throws(() => interpretThyExpression(context, token), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /Implicit arguments cannot be used \(referenced x\) after `given`/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
+    return true
+  })
 })
 
 test("interpretThyExpression() can do member access", async () => {
@@ -110,21 +118,42 @@ test("interpretThyExpression() barfs if variable is not found", async () => {
 
 test("interpretThyExpression() barfs if identifier is invalid", async () => {
   const context = makeSimpleContext()
-  assert.throws(() => interpretThyExpressionBasic(context, `$x`), /Invalid identifier: \$x/)
+  const identifierToken = { text: "$x", lineIndex: 1, columnIndex: 2 }
+  assert.throws(() => interpretThyExpression(context, identifierToken), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /Invalid identifier: \$x/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
+    return true
+  })
 })
 
 test("interpretThyExpression() barfs if member access is invalid", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { x: { $y: { z: 6 } } }
   })
-  assert.throws(() => interpretThyExpressionBasic(context, `x.$y.z`), /Invalid \(member\) identifier: \$y/)
+  const token = { text: `x.$y.z`, lineIndex: 1, columnIndex: 2 }
+  assert.throws(() => interpretThyExpression(context, token), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /Invalid \(member\) identifier: \$y/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
+    return true
+  })
 })
 
 test("interpretThyExpression() barfs if member access is attempted on falsey value", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { x: { y: null } }
   })
-  assert.throws(() => interpretThyExpressionBasic(context, `x.y.z`), /y has no value/)
+  const token = { text: `x.y.z`, lineIndex: 1, columnIndex: 2 }
+  assert.throws(() => interpretThyExpression(context, token), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /y has no value/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
+    return true
+  })
 })
 
 test("interpretThyExpression() interprets array as block", async () => {
@@ -236,7 +265,14 @@ test("interpretThyExpression() barfs on `that` if value is unavailable from cont
   const context = makeSimpleContext({
     thatValue: undefined,
   })
-  assert.throws(() => interpretThyExpressionBasic(context, "that"), /Value is not available for `that`/)
+  const thatToken = { text: "that", lineIndex: 1, columnIndex: 2 }
+  assert.throws(() => interpretThyExpression(context, thatToken), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /Value is not available for `that`/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
+    return true
+  })
 })
 
 test("interpretThyExpression() replaces `beforeThat` with stored value from context", async () => {
@@ -254,5 +290,12 @@ test("interpretThyExpression() barfs on `beforeThat` if value is unavailable fro
   const context = makeSimpleContext({
     beforeThatValue: undefined,
   })
-  assert.throws(() => interpretThyExpressionBasic(context, "beforeThat"), /Value is not available for `beforeThat`/)
+  const beforeThatToken = { text: "beforeThat", lineIndex: 1, columnIndex: 2 }
+  assert.throws(() => interpretThyExpression(context, beforeThatToken), (e) => {
+    assert(e instanceof Error)
+    assert.match(e.message, /Value is not available for `beforeThat`/)
+    assert(e instanceof InterpreterErrorWithContext)
+    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
+    return true
+  })
 })
