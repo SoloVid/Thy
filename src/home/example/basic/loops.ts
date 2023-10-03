@@ -16,8 +16,9 @@ loop.times 10
   private i is given
   print i
 loop.elements arr
-  private e is given
+  e is given
   print e
+  let
 loop.forever
   check.asc a b
   check.not that

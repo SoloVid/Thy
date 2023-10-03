@@ -64,3 +64,15 @@ a:hover {
 .code-comparison {
 
 }
+
+code {
+  font-family: monospace;
+}
+
+code:not(pre code) {
+  font-weight: bold;
+  background: #f2f1f1;
+  padding: 0.125rem 0.25rem;
+  border-radius: 4px;
+  box-decoration-break: clone;
+}
