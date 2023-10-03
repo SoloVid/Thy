@@ -1,6 +1,6 @@
 import assert from "../utils/assert"
 import { interpretThyBlockLines } from "./block"
-import { makeInterpreterError } from "./call"
+import { makeInterpreterError } from "./interpreter-error"
 import { exactNumberRegex, exactStringRegex, identifierRegex } from "./patterns"
 import { interpolateString, parseString } from "./string"
 import type { Atom, AtomSingle, ThyBlockContext, UnparsedBlock } from "./types"

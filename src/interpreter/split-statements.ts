@@ -1,7 +1,7 @@
 import assert from "../utils/assert"
-import { makeInterpreterError } from "./call"
 import { extractIndent, getFirstIndent } from "./indentation"
-import { LinePart, splitLineParts } from "./split-line"
+import { makeInterpreterError } from "./interpreter-error"
+import { splitLineParts } from "./split-line"
 import { interpretThyMultilineString, RawMultilineStringData } from "./string"
 import { Atom, AtomSingle, isAtomLiterally, Statement, UnparsedBlock } from "./types"
 

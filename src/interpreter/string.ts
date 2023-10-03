@@ -1,5 +1,5 @@
-import { makeInterpreterError } from "./call"
 import { interpretThyIdentifier } from "./expression"
+import { makeInterpreterError } from "./interpreter-error"
 import { generateUID } from "./split-line"
 import type { AtomSingle, ThyBlockContext } from "./types"
 

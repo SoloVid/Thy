@@ -1,5 +1,6 @@
-import { InterpreterErrorWithContext, interpretThyCall, makeInterpreterError } from "./call"
+import { interpretThyCall } from "./call"
 import { interpretThyExpression } from "./expression"
+import { InterpreterErrorWithContext, makeInterpreterError } from "./interpreter-error"
 import { identifierRegex } from "./patterns"
 import { Atom, isAtomLiterally, isSimpleAtom, ThyBlockContext } from "./types"
 

@@ -1,8 +1,8 @@
-import assert from "assert"
+import assert from "node:assert"
 import { test } from "under-the-sun"
 import { core } from "../std-lib"
 import { interpretThyBlock } from "./block"
-import { InterpreterErrorWithContext } from "./call"
+import { InterpreterErrorWithContext } from "./interpreter-error"
 
 test("interpretThyBlock() should return a function that can return a number", async () => {
   const interpreted = interpretThyBlock(`return 5`)

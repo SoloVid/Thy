@@ -1,6 +1,6 @@
 import assert from "node:assert"
 import { test } from "under-the-sun"
-import { InterpreterErrorWithContext } from "./call"
+import { InterpreterErrorWithContext } from "./interpreter-error"
 import { splitThyStatements } from "./split-statements"
 import type { AtomSingle } from "./types"
 

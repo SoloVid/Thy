@@ -1,6 +1,7 @@
 import { dissectErrorTraceAtCloserBaseline, replaceErrorTraceLine, transformErrorTrace } from "../utils/error-helper"
-import { InterpreterErrorWithContext, interpretThyCall, makeInterpreterError } from "./call"
+import { interpretThyCall } from "./call"
 import { interpretThyExpression } from "./expression"
+import { InterpreterErrorWithContext, makeInterpreterError } from "./interpreter-error"
 import { splitThyStatements } from "./split-statements"
 import { interpretThyStatement } from "./statement"
 import { isAtomLiterally, Statement, ThyBlockContext } from "./types"

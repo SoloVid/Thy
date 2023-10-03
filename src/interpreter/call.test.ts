@@ -1,6 +1,7 @@
 import assert from "node:assert"
 import { test } from "under-the-sun"
-import { InterpreterErrorWithContext, interpretThyCall } from "./call"
+import { interpretThyCall } from "./call"
+import { InterpreterErrorWithContext } from "./interpreter-error"
 import { makeSimpleContext } from "./test-helper"
 import type { ThyBlockContext } from "./types"
 
