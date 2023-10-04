@@ -102,7 +102,12 @@ export default function App() {
       </p>
     </div>
     <div class="column-content-sm">
-      <small>From the mind of <a href="https://www.codehousing.com" target="_blank">Grant</a>, source <a href="https://github.com/SoloVid/Thy" target="_blank">on GitHub</a>.</small>
+      <p>
+        <small>
+          From the mind of <a href="https://www.codehousing.com" target="_blank">Grant</a>,
+          source <a href="https://github.com/SoloVid/Thy" target="_blank">on GitHub</a>.
+        </small>
+      </p>
     </div>
   </div>
 }

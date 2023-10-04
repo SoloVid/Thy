@@ -47,11 +47,12 @@ export const thyPrismGrammar: Grammar = {
         /\bprivate\b/,
         /\btype\b/,
       ],
+      'control': {
+        pattern: /\b(await|return|throw)\b/,
+        alias: ["keyword"],
+      },
       'builtin': [
-        /\bawait\b/,
         /\bgiven\b/,
-        /\breturn\b/,
-        /\bthrow\b/,
       ],
       'let-call': {
         pattern: /\blet\b.*$/,
@@ -60,7 +61,10 @@ export const thyPrismGrammar: Grammar = {
             pattern: /(\blet )[a-z][a-zA-Z0-9]*(?=\s|$)/,
             lookbehind: true,
           },
-          'keyword': /\blet\b/,
+          'control': {
+            pattern: /\blet\b/,
+            alias: ["keyword"],
+          },
         }
       },
       'continuation': {
@@ -72,17 +76,17 @@ export const thyPrismGrammar: Grammar = {
         }
       },
       'assignment': {
-        pattern: /.+\b(be|is|to)\b.+$/,
+        pattern: /.+\b(be|is|to)\b.*$/,
         inside: {
           'function': [
             {
               pattern: /(\b(?:is|be|to)\s+([a-z][a-zA-Z0-9]*\.)*)[a-z][a-zA-Z0-9]*/,
               lookbehind: true,
             },
-            {
-              pattern: /(\b(?:is|be|to)\s+([a-zA-Z][a-zA-Z0-9]*\.)*)[A-Z][a-zA-Z0-9]*/,
-              lookbehind: true,
-            },
+            // {
+            //   pattern: /(\b(?:is|be|to)\s+([a-zA-Z][a-zA-Z0-9]*\.)*)[A-Z][a-zA-Z0-9]*/,
+            //   lookbehind: true,
+            // },
           ],
           'operator': [
             /\bbe\b/,

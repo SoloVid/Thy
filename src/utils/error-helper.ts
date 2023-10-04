@@ -1,13 +1,19 @@
 import assert from "./assert"
 
-const v8TraceLinePattern = /^(\s+at )([^ ]*)( \()?(.+?)(?::(\d+):(\d+))?(\)?)$/
-const firefoxTraceLinePattern = /^(\s*)([^@]*)(@)(.+?)(?::(\d+):(\d+))?()$/
+const v8TraceLinePattern = /^(\s+at )(?:([^ ]*)(?: \())?(.+?)(?::(\d+):(\d+))?\)?$/
+const firefoxTraceLinePattern = /^(\s*)([^@]*)@(.+?)(?::(\d+):(\d+))?$/
 
 // TODO: Configure this elsewhere?
 Error.stackTraceLimit = 100
 
 export function getErrorTraceLinesFromStack(stack: string): string {
-  return stack.split("\n").filter(l => v8TraceLinePattern.test(l) || firefoxTraceLinePattern.test(l)).join("\n")
+  let hitTraceLine = false
+  return stack.split("\n").filter(l => {
+    if (v8TraceLinePattern.test(l) || firefoxTraceLinePattern.test(l)) {
+      hitTraceLine = true
+    }
+    return hitTraceLine
+  }).join("\n")
 }
 
 export function getErrorTraceLines(error: Error): string {
@@ -102,11 +108,16 @@ export function replaceErrorTraceLine(traceLines: string, lineIndex: number, tra
     if (i !== lineIndex) {
       return l
     }
-    const pattern = firefoxTraceLinePattern.test(l) ? firefoxTraceLinePattern : v8TraceLinePattern
-    if (pattern.test(l)) {
-      return l.replace(pattern, (m, prefix1, func, prefix2, file, line, column, postfix) => {
+    if (firefoxTraceLinePattern.test(l)) {
+      return l.replace(firefoxTraceLinePattern, (m, prefix1, func, file, line, column) => {
         const [newFunc, newFile, newLine, newColumn] = transform(func, file, parseInt(line), parseInt(column))
-        return `${prefix1}${newFunc}${prefix2}${newFile}:${newLine}:${newColumn}${postfix}`
+        return `${prefix1}${newFunc}@${newFile}:${newLine}:${newColumn}`
+      })
+    }
+    if (v8TraceLinePattern.test(l)) {
+      return l.replace(v8TraceLinePattern, (m, prefix1, func, file, line, column) => {
+        const [newFunc, newFile, newLine, newColumn] = transform(func, file, parseInt(line), parseInt(column))
+        return `${prefix1}${newFunc} (${newFile}:${newLine}:${newColumn})`
       })
     }
     return l

@@ -2,9 +2,9 @@
 ## Open Questions
 
 - Names for built-in functions?
-    - Arrays
-        - array access - `get myArr 3`?
-        - array element set - `set myArr 3 myVal`?
+  - Arrays
+    - array access - `get myArr 3`?
+    - array element set - `set myArr 3 myVal`?
 
 ## Overview of Language Strategy
 
@@ -18,7 +18,7 @@
 
 ### No Special Characters
 
-The only symbol that is syntactically special is `.`.
+The only symbols that are syntactically special are `.` and `"`.
 Everything else is done with letters (and numbers if desired).
 
 ### Strong Static Types
@@ -62,12 +62,12 @@ Because binary operations are so common, `beforeThat` is provided to go one more
 ### Encourage Good Programming Practices
 
 - Immutable by default
-    - Note to self: This includes arrays. I'll probably have an alternative like `arrayMutable`. May use `as const` (in generated TypeScript) at call site?
+  - Note to self: This includes arrays. I'll probably have an alternative like `arrayMutable`. May use `as const` (in generated TypeScript) at call site?
 - No variable name ghosting
-    - Note to self: Compiler error for this.
+  - Note to self: Compiler error for this.
 - No classes
 - No inheritance
-- Targeted loop interfaces (e.g. no while/do-while, no awkward for(...;...;...) loop)
+- Targeted loop interfaces (e.g. no while/do-while, no awkward `for(...;...;...)` loop)
 - Switch cases don't fall through
 - `break` is replaced by more uniform interface (let/return)
 
@@ -77,84 +77,83 @@ Because binary operations are so common, `beforeThat` is provided to go one more
 
 These keywords need to be recognized by the lexer since they are part of the language grammar.
 
-- and - continues function call on new line
-- be - denotes preceding identifier as not a function call
-- export - modifier for declarations
-- is - denotes preceding identifier as not a function call
-- private - modifier for declarations
-- to - denotes preceding identifier as not a function call
-- type - type-related operations just start breaking the standard language stuff
-- let - precedes another function call on the same line and potentially effects a return
+- `and`: continues function call on new line
+- `be`: denotes preceding identifier as not a function call
+- `export`: modifier for declarations
+- `is`: denotes preceding identifier as not a function call
+- `private`: modifier for declarations
+- `to`: denotes preceding identifier as not a function call
+- `type`: type-related operations just start breaking the standard language stuff
+- `let`: precedes another function call on the same line and potentially effects a return
 
 ### Language Feature Functions
 
 These "functions" allow non-special grammar.
 Their usage is significantly different from functions you can write in this language.
 
-- await - affects standard language control flow
-- given - not really a runtime call
-- return - affects standard language control flow
-- throw - affects standard language control flow
+- `await`: affects standard language control flow
+- `given`: not really a runtime call
+- `return`: affects standard language control flow
 
 ### Reserved Value Names
 
 These values/functions have an interface like stuff you can write in thy,
-but you couldn't actually implement them in thy.
+but you couldn't actually (most of these) implement them in thy.
 
-- array - define an array
-- arrayMutable - define a mutable array
-- beforeThat - context-dependent value
-- catch - sentinel value argument for try
-- else - sentinel value argument for if
-- false - value
-- finally - sentinel value argument for try
-- get - array access
-- getter - define as getter
-- if - function
-- null - value
-- set - array mutate
-- setter - define as setter
-- switch - function
-- that - context-dependent value
-- thy - function / value
-- true - value
-- try - function
-- val - function
+- `array`: define an array
+- `arrayMutable`: define a mutable array
+- `beforeThat`: context-dependent value
+- `catch`: sentinel value argument for try
+- `def`: function
+- `else`: sentinel value argument for if
+- `false`: value
+- `finally`: sentinel value argument for try
+- `get`: array access (may make this a member instead?)
+- `if`: function
+- `null`: value
+- `set`: array mutate (may make this a member instead?)
+- `switch`: function
+- `that`: context-dependent value
+- `throw`: function
+- `thy`: function / value
+- `true`: value
+- `try`: function
 
 ### Reserved Type Names
 
-- Array (1 type parameter)
-- ArrayMutable (1 type parameter)
-- Boolean
-- If (4 type parameters)
-- Null (0 or 1 type parameters)
-- Number
-- String
-- Unknown
-- Void
+- `Array` (1 type parameter)
+- `ArrayMutable` (1 type parameter)
+- `Boolean`
+- `Function` (something like `(...args: any) => any` in TypeScript)
+- `If` (4 type parameters) (this may not be a thing after all as it is tightly coupled to TypeScript's type idiosyncrasies)
+- `Null` (0 or 1 type parameters)
+- `Number`
+- `String`
+- `Unknown`
+- `Void`
 
 ### Other Provided Stuff
 
-- boolean - runtime cast to boolean
-- cast - compile-time cast
-- check
-    - all - logical AND
-    - asc - less than
-    - desc - greater than
-    - equal
-    - not - logical NOT
-    - some - logical OR
-- def - shorthand function that returns the value of the first argument
-- loop - container for for-loop functions
-    - forever
-    - elements
-    - times
-- math
-    - add
-    - subtract
-    - multiply
-    - divide
-- string - runtime cast to string
+- `boolean`: runtime cast to boolean
+- `cast`: compile-time cast
+- `check`
+  - `all`: logical AND
+  - `asc`: less than
+  - `desc`: greater than
+  - `equal`
+  - `not`: logical NOT
+  - `some`: logical OR
+- `def`: shorthand function that returns the value of the first argument
+- `loop`: container for for-loop functions
+  - `forever`
+  - `elements`
+  - `times`
+- `math`
+  - `add`
+  - `subtract`
+  - `multiply`
+  - `divide`
+- `string`: runtime cast to string
 
 ## Building Blocks
 
@@ -167,7 +166,7 @@ These are the fundamental building blocks of the language:
 ### Code Blocks
 
 A code block is a section of code delimited by indentation.
-It can be `given` types and values and return a single value along with any number of types.
+It can be `given` types and values and return a single value (which can be used as a type).
 
 ### Values
 
@@ -177,9 +176,8 @@ Values, variables. Tomato, potato.
 
 Types are purely a compile-time aid for static code analysis.
 
-Types can be used in three places:
+Types can be used in two places:
 - `type` statements
-- Variable declarations (`be`)
 - Function calls (as type arguments)
 
 ## Return values
@@ -190,18 +188,18 @@ It takes a condition, a function, and additional else-related stuff.
 One common paradigm this makes difficult is early returns:
 
 ```typescript
-    if (condition) {
-        return earlyValue;
-    }
-    ... // continue on
+if (condition) {
+  return earlyValue;
+}
+// Continue on
 ```
 
 So I have this idea to have a `let` keyword:
 
 ```thy
 let if condition
-    return earlyValue
-... Continue on
+  return earlyValue
+Continue on
 ```
 
 Here's what I've come up with to make this work.
@@ -210,20 +208,20 @@ and/or a special Void type.
 
 ```thy
 splitPath is def
-    type MyNullableType is Null MyType
-    type SplitPathReturn is Void MyNullableType
-    type return SplitPathReturn
-    let if condition
-        return null
-    doSomethingCool
-    There is an implicit void return here that translates to TS `return` or `return undefined`.
+  type MyNullableType is Null MyType
+  type SplitPathReturn is Void MyNullableType
+  type return SplitPathReturn
+  let if condition
+    return null
+  doSomethingCool
+  There is an implicit void return here that translates to TS `return` or `return undefined`.
 ```
 
 But variables cannot hold a value of type Void. `let` is the only part of the language with access to it.
 
 ```thy
 type A is def
-    type return VoidableNullableType
+  type return VoidableNullableType
 given A a
 
 Execute the function and either return NullableType or continue (if void was returned).
@@ -239,31 +237,31 @@ I also really want classes and object literals to follow the same rules as other
 This has led me to the following set of rules:
 - Every indentation level of the program has the same rules.
 - Every block (and these rules only require evaluating at the single indentation level) has some return value/type.
-    - If a block uses `return` or `let`, it will only return the types of the returned/let'ed functions (plus Void if the last statement of the block is not a `return` statement).
-    - If a block uses `export` (on a function or variable), it will return an object containing members of all exported declarations.
-    - If a block meets neither of the above criteria, it will return an object with all declarations exported.
-        - `private` provides a black-listing alternative to `export`.
-    - (It is an error to use `export` in the same block with `return`/`let`.)
+  - If a block uses `return` or `let`, it will only return the types of the returned/let'ed functions (plus Void if the last statement of the block is not a `return` statement).
+  - If a block uses `export` (on a function or variable), it will return an object containing members of all exported declarations.
+  - If a block meets neither of the above criteria, it will return an object with all declarations exported.
+    - `private` provides a black-listing alternative to `export`.
+  - (It is an error to use `export` in the same block with `return`/`let`.)
 
 #### Consequence #1: Object Literals
 
 ```thy
 myObj is
-    field1 is def 1
-    field2 is
-        a is def .himom.
+  field1 is def 1
+  field2 is
+    a is def "himom"
 ```
 
 This most strictly translates to the following TypeScript:
 
 ```typescript
 const myObj = (() => {
-    const field1 = 1
-    const field2 = (() => {
-        const a = "himom"
-        return { a }
-    })()
-    return { field1, field2 }
+  const field1 = 1
+  const field2 = (() => {
+    const a = "himom"
+    return { a }
+  })()
+  return { field1, field2 }
 })()
 ```
 
@@ -271,10 +269,10 @@ But it could be optimized to the more idiomatic TypeScript:
 
 ```typescript
 const myObj = {
-    field1: 1,
-    field2: {
-        a: "himom"
-    }
+  field1: 1,
+  field2: {
+    a: "himom"
+  }
 }
 ```
 
@@ -282,36 +280,36 @@ const myObj = {
 
 ```thy
 newThing is def
-    type return Thing
-    given NullableA a
+  type return Thing
+  given NullableA a
 
-    compare.equal a null
-    aa be if A that
-        return newA
-    and else
-        return a
+  compare.equal a null
+  aa be if A that
+    return newA
+  and else
+    return a
 
-    printA is def
-        type return Void
-        console.log aa
+  printA is def
+    type return Void
+    console.log aa
 ```
 
 This fairly strictly translates to the following TypeScript:
 
 ```typescript
 function newThing(a: NullableA): Thing {
-    let aa: A
-    if (a === null) {
-        aa = newA()
-    } else {
-        aa = a
-    }
+  let aa: A
+  if (a === null) {
+    aa = newA()
+  } else {
+    aa = a
+  }
 
-    function printA(): void {
-        console.log(aa)
-    }
+  function printA(): void {
+    console.log(aa)
+  }
 
-    return { aa, aIsNull, printA }
+  return { aa, aIsNull, printA }
 }
 ```
 
@@ -319,19 +317,19 @@ But it could be optimized to the more colloquial TypeScript:
 
 ```typescript
 class ThingImpl implements Thing {
-    aa: A
+  aa: A
 
-    constructor(a: NullableA) {
-        if (a === null) {
-            this.aa = new A()
-        } else {
-            this.aa = a
-        }
+  constructor(a: NullableA) {
+    if (a === null) {
+      this.aa = new A()
+    } else {
+      this.aa = a
     }
+  }
 
-    printA(): void {
-        console.log(this.aa)
-    }
+  printA(): void {
+    console.log(this.aa)
+  }
 }
 ```
 
@@ -348,9 +346,9 @@ When you pass a method as a function value, it won't have `this` bound.
 
 ```thy
 newMyClass is def
-    myField is def 5
-    myMethod is def
-        print myField
+  myField is def 5
+  myMethod is def
+    print myField
 inst is newMyClass
 Expect print 5.
 call inst.myMethod
@@ -360,10 +358,10 @@ should translate to
 
 ```typescript
 class MyClass {
-    myField = 5
-    myMethod() {
-        print(this.myField)
-    }
+  myField = 5
+  myMethod() {
+    print(this.myField)
+  }
 }
 const inst = new MyClass()
 // Would print undefined.
@@ -374,11 +372,11 @@ but is more literally
 
 ```typescript
 function newMyClass() {
-    let myField = 5
-    function myMethod() {
-        print(myField)
-    }
-    return { myField, myMethod }
+  let myField = 5
+  function myMethod() {
+    print(myField)
+  }
+  return { myField, myMethod }
 }
 const inst = newMyClass()
 // Would print 5.
@@ -400,62 +398,7 @@ and I'd like that rule not to be divergent depending on whether you use `newBlah
 
 ## Interfile Dependencies
 
-Namespaces are the primary means of dependency management in this language.
-
-Logically, a call to the `namespace` "function" does a couple things:
-- Declare part of a namespace object by name within the current scope.
-- Run the code inside the block some time (no guarantees when it will be run except that it will be run after the preceding non-namespace statements).
-- Run the block with correct dependencies injected after they are available.
-- Provide the partial namespace object to the calling context.
-
-WIP: Haven't quite thought through everything here yet.
-
-```thy
-File one.thy
-
-thy.scope .my.space.
-    a is fun
-        print .himom.
-```
-
-```thy
-File two.thy
-
-thy.scope .my.space.
-    b is fun
-        print .hello.
-```
-
-```thy
-File three.thy
-
-a is thy .my.space.a.
-b is thy .my.space.b.
-
-a
-b
-```
-
-If we wanted just a single thy file compiled from these, I believe the result (which should be able to work at runtime) could be:
-
-```thy
-thy.scope .global.
-    given thy
-    thy.scope .my.space.
-        fun a
-            print .himom.
-thy.scope .global.
-    given thy
-    thy.scope .my.space.
-        fun b
-            print .hello.
-thy.scope .global.
-    given thy
-    a is thy .my.space.a.
-    b is thy .my.space.b.
-    a
-    b
-```
+TODO: Fill in some updated musings on `thy()` function.
 
 ## Parameters
 
@@ -475,37 +418,4 @@ Rest parameters are not provided in thy.
 
 Getter/setter from TypeScript should be fully usable.
 
-Here is a somewhat-minimally-language-wrecking implementation for getter/setter pattern.
-
-```thy
-fun newMyClass MyInterface
-    getSetField1 is getter
-        return 4
-    and setter
-        given n
-        doSet n
-
-    getSetField2 is setter
-        given n
-        doSet n
-    and getter
-        return 4
-```
-
-```typescript
-class MyClass implements MyInterface {
-    get getSetField1() {
-        return 4
-    }
-    set getSetField1(n) {
-        doSet(n)
-    }
-
-    set getSetField2(n) {
-        doSet(n)
-    }
-    get getSetField2() {
-        return 4
-    }
-}
-```
+Getter/setter pattern cannot be written in Thy.

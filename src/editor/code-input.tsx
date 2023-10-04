@@ -170,6 +170,9 @@ export default function CodeInput({
     if ($textarea.current === null) {
       return
     }
+    if ($textarea.current.selectionEnd > $textarea.current.selectionStart) {
+      return
+    }
     const clipboardData = e.clipboardData
     if (!clipboardData) {
       return

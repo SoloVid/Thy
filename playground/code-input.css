@@ -21,7 +21,7 @@
 
   /* Can be scrolled */
   overflow: auto;
-  white-space: nowrap; /* Allows textarea to scroll horizontally */
+  white-space: pre; /* Allows textarea to scroll horizontally */
 }
 .code-input textarea, .code-input pre.highlighted, .code-input pre.highlighted > code, .code-input .line-numbers {
   /* Also add text styles to highlighting tokens */
