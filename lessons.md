@@ -559,8 +559,8 @@ The `if` **function** will check to see if the first **argument** is `true` or `
 If it is `true`, the second **argument** (i.e. the first **block**) will be executed.
 Otherwise, the fourth **argument** (i.e. the second **block**) will be executed.
 
-_Many other popular languages provide `if` as a `keyword` (like `is` and `and` in Thy) rather than a `function`,
-but the usage is pretty similar._
+_Many other popular languages provide `if` as a `keyword` (like `is` and `and` in Thy) rather than a `function`,_
+_but the usage is pretty similar._
 
 If this explanation all sounds too complicated regarding how `if` works,
 just look back at the example and don't stress over this formal description.
@@ -749,5 +749,5 @@ There are still a bunch of things left to learn, but you must master these basic
 - Tooling
 - Undefined behaviors
   - Assigning void
-  - Wasn't there one other main one?
+  - Shadowing implicit parameters
 - Classes?
