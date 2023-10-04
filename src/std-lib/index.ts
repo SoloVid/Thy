@@ -1,4 +1,4 @@
-import { arrayBuiltin, mutableArrayBuiltin } from "./array";
+import { arrayBuiltin, getBuiltin, mutableArrayBuiltin, setBuiltin } from "./array";
 import { castBuiltin } from "./cast";
 import { check } from "./check";
 import { defBuiltin } from "./def";
@@ -11,10 +11,13 @@ import { mutableMapBuiltin } from "./map";
 import { math } from "./math";
 import { printBuiltin } from "./print";
 import { regexBuiltin } from "./regex";
+import { string } from "./string";
 
 export const core = {
   "array": arrayBuiltin,
   "arrayMutable": mutableArrayBuiltin,
+  "get": getBuiltin,
+  "set": setBuiltin,
   "cast": castBuiltin,
   "check": check,
   "def": defBuiltin,
@@ -34,6 +37,7 @@ export const core = {
   "math": math,
   "print": printBuiltin,
   "regex": regexBuiltin,
+  "string": string,
 
   "true": trueBuiltin,
   "false": falseBuiltin,
