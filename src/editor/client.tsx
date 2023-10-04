@@ -1,16 +1,14 @@
 import "preact/debug"
 
 import { render } from "preact"
-import Prism from "prismjs"
-import { useEffect, useRef, useState } from "preact/hooks"
+import { useEffect, useState } from "preact/hooks"
 import { interpretThyBlock } from "../interpreter/block"
 import { generateUID } from "../interpreter/split-line"
 import { core } from "../std-lib"
+import { dissectErrorTraceAtCloserBaseline } from "../utils/error-helper"
+import CodeInput from "./code-input"
 import { makeThyFilesApi } from "./files-api"
 import { makeFileManager, useLocalFiles } from "./local-files"
-import CodeInput from "./code-input"
-import { thyPrismGrammar } from "./prism-grammar"
-import { dissectErrorTraceAtCloserBaseline } from "../utils/error-helper"
 
 type Output = {
   readonly error: null | string
@@ -21,8 +19,6 @@ type Output = {
 window.onbeforeunload = function() {
   return true
 }
-
-// Prism.languages.thy = thyPrismGrammar
 
 export default function App() {
   const [windowHeight, setWindowHeight] = useState(window.innerHeight)
@@ -175,7 +171,7 @@ export default function App() {
         </div>}
         {output.returnValue !== undefined && <div>
           <h3>Return Value</h3>
-          <pre className="output">{JSON.stringify(output.returnValue)}</pre>
+          <pre className="output">{JSON.stringify(output.returnValue, null, 2)}</pre>
           <hr/>
         </div>}
         {output.printedLines.length > 0 && <div>

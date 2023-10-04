@@ -11,7 +11,6 @@ This **program** just prints the text `Hello there!` to the screen.
 `print` is a **function** (we'll talk about these a lot more later).
 `"Hello there!"` is a **string** **literal**.
 A **string** is a sequence of characters, in this case the 12-character sequence `Hello there!`.
-Most languages denote strings with quotation marks (e.g. `"Hello there!"`), but in Thy we use periods.
 
 **Programs** can have more than one **statement** (a line in Thy).
 Multiple **statements** within a **program** will execute in the order they are written.
@@ -59,8 +58,8 @@ print message
 The `message is` part creates a **variable** called `message` and assigns it the **value** to the right.
 (`is` is our first Thy **keyword**.)
 So after line 1, `message` (a name we made up) holds the **string** `Hello there! (etc)`.
-Instead of using the **string** _literal_ `"Hello there! (etc)"` (notice the periods) with `print`,
-we are instead using the **variable** `message` (notice no periods) which holds the same **string** **value**.
+Instead of using the **string** _literal_ `"Hello there! (etc)"` (notice the quotation marks) with `print`,
+we are instead using the **variable** `message` (notice no quotation marks) which holds the same **string** **value**.
 
 The **program** prints the message once on line 2 and again on line 3.
 

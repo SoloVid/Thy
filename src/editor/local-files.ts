@@ -16,8 +16,16 @@ export function makeFileManager() {
     return `${storageFileKeyPrefix}${name}`
   }
 
+  function checkFileExists(name: string) {
+    return localStorage.getItem(getStorageKey(name)) !== null
+  }
+
   function getFile(name: string) {
-    return localStorage.getItem(getStorageKey(name))
+    const contents = localStorage.getItem(getStorageKey(name))
+    if (contents === null) {
+      throw new Error(`File ${name} not found`)
+    }
+    return contents
   }
 
   function saveFile(name: string, sourceCode: string) {
@@ -35,6 +43,7 @@ export function makeFileManager() {
   }
 
   return {
+    checkFileExists,
     getFilesList,
     getFile,
     saveFile,
