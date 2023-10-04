@@ -10,6 +10,7 @@ import { makeThyFilesApi } from "./files-api"
 import { makeFileManager, useLocalFiles } from "./local-files"
 import CodeInput from "./code-input"
 import { thyPrismGrammar } from "./prism-grammar"
+import { dissectErrorTraceAtCloserBaseline } from "../utils/error-helper"
 
 type Output = {
   readonly error: null | string
@@ -53,6 +54,7 @@ export default function App() {
     let error: null | string = null
     let returnValue: unknown = undefined
     let printedLines: string[] = []
+    const errorHere = new Error()
     try {
       const interpreted = interpretThyBlock(sourceCodeToRun)
       const playgroundLib = {
@@ -68,7 +70,12 @@ export default function App() {
     } catch (e) {
       console.error(e)
       if (e instanceof Error) {
-        error = e.stack ?? e.message
+        if (!e.stack) {
+          error = e.message
+        } else {
+          const dissectedError = dissectErrorTraceAtCloserBaseline(e, errorHere, 0, new Error(), 0)
+          error = `${e.name}: ${e.message}\n${dissectedError.delta}`
+        }
       } else {
         error = JSON.stringify(e)
       }

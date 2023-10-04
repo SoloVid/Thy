@@ -24,7 +24,7 @@ export function interpretThyBlock(
     closure: options.closure ?? {},
     closureVariableIsImmutable: options.closureVariableIsImmutable ?? {},
     functionName: options.functionName,
-    sourceFile: options.sourceFile ?? "<inline thy code>",
+    sourceFile: options.sourceFile ?? "inline-thy-code",
     startingLineIndex: options.startingLineIndex ?? 0,
     additionalTraceLinesToHide: options.additionalTraceLinesToHide ?? 0,
   })

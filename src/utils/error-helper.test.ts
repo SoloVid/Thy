@@ -26,6 +26,22 @@ Error: f bad
     at Array.map (<anonymous>)`)
 })
 
+test("getErrorTraceLinesFromStack() gracefully degrades with lines including unexpected (Windows Node 16)", async () => {
+  const exampleStackValue = `c:\\Users\\User\\some-file.ts:15
+  throw new Error("f bad")
+        ^
+
+Error: f bad
+    at null.f (c:\\Users\\User\\some-file.ts:15:11)
+    line not a stack frame
+    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`
+  const traceLines = getErrorTraceLinesFromStack(exampleStackValue)
+
+  assert.strictEqual(traceLines, `    at null.f (c:\\Users\\User\\some-file.ts:15:11)
+    line not a stack frame
+    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
+})
+
 test("getErrorTraceLinesFromStack() returns only lines with file and location info (Vivaldi 6.2)", async () => {
   const exampleStackValue = `Error: Cannot access split on input because input has no value
     at assert (http://localhost:8089/editor-client.js:1667:13)
@@ -58,9 +74,29 @@ test("getErrorTraceLinesFromStack() returns only lines with file and location in
     at async run (http://localhost:8089/editor-client.js:3081:23)`)
 })
 
+test("getErrorTraceLinesFromStack() gracefully degrades with lines including unexpected (Vivaldi 6.2)", async () => {
+  const exampleStackValue = `Error: Cannot access split on input because input has no value
+    at assert (http://localhost:8089/editor-client.js:1667:13)
+    line not a stack frame
+    at async run (http://localhost:8089/editor-client.js:3081:23)`
+  const traceLines = getErrorTraceLinesFromStack(exampleStackValue)
+
+  assert.strictEqual(traceLines, `    at assert (http://localhost:8089/editor-client.js:1667:13)
+    line not a stack frame
+    at async run (http://localhost:8089/editor-client.js:3081:23)`)
+})
+
 test("getErrorTraceLinesFromStack() returns only lines with file and location info (Firefox)", async () => {
   const exampleStackValue = `f@file:///C:/Users/User/code/thy/test.html:4:9
 go@file:///C:/Users/User/code/thy/test.html:8:3
+@file:///C:/Users/User/code/thy/test.html:12:3`
+  const traceLines = getErrorTraceLinesFromStack(exampleStackValue)
+  assert.strictEqual(traceLines, exampleStackValue)
+})
+
+test("getErrorTraceLinesFromStack() gracefully degrades with lines including unexpected (Firefox)", async () => {
+  const exampleStackValue = `f@file:///C:/Users/User/code/thy/test.html:4:9
+line not a stack frame
 @file:///C:/Users/User/code/thy/test.html:12:3`
   const traceLines = getErrorTraceLinesFromStack(exampleStackValue)
   assert.strictEqual(traceLines, exampleStackValue)
@@ -120,18 +156,6 @@ Error: oh noes
 
 Error: oh noes
 altered trace lines`)
-})
-
-test("transformErrorTrace() gracefully degrades if trace is formatted unexpectedly", async () => {
-  const originalError = new FakeError("oh noes", `Error: oh noes
-    at null.f (c:\\Users\\User\\some-file.ts:15:11)
-    not an expected trace line
-    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
-    const transformedError = transformErrorTrace(originalError, (originalTraceLines) => "altered trace lines")
-    assert.strictEqual(transformedError.stack, `Error: oh noes
-    at null.f (c:\\Users\\User\\some-file.ts:15:11)
-    not an expected trace line
-    at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
 })
 
 test("dissectErrorTraceAtBaseline() splits the trace lines beyond the baseline", async () => {
@@ -259,6 +283,22 @@ test("replaceErrorTraceLine() allows swapping trace line file and location (Wind
   assert.strictEqual(outputLines, `    at null.f (c:\\Users\\User\\some-file.ts:15:11)
     at swapped (test-replace-file:12:34)
     at async Object.run (C:\\Users\\User\\node_modules\\under-the-sun\\lib\\index.js:1:1834)`)
+})
+
+test("replaceErrorTraceLine() allows swapping trace line file and location (Vivaldi 6.2, just file)", async () => {
+  const inputLines = `    at <anonymous> (http://127.0.0.1:8000/block.ts:180:46)
+    at http://127.0.0.1:8000/expression.ts:89:12
+    at interpretThyCall (http://127.0.0.1:8000/call.ts:39:12)`
+  const outputLines = replaceErrorTraceLine(inputLines, 1, (func, file, row, column) => {
+    assert.strictEqual(func, undefined)
+    assert.strictEqual(file, "http://127.0.0.1:8000/expression.ts")
+    assert.strictEqual(row, 89)
+    assert.strictEqual(column, 12)
+    return ["swapped", "test-replace-file", 12, 34]
+  })
+  assert.strictEqual(outputLines, `    at <anonymous> (http://127.0.0.1:8000/block.ts:180:46)
+    at swapped (test-replace-file:12:34)
+    at interpretThyCall (http://127.0.0.1:8000/call.ts:39:12)`)
 })
 
 test("replaceErrorTraceLine() allows swapping trace line file and location (Firefox)", async () => {
