@@ -36,7 +36,7 @@ export function TryButton({
     text="Try"
     centered
     style="margin:5px;"
-    href={`${playgroundUrl}#b64=${btoa(source)}`}
+    href={`${playgroundUrl}#b64=${btoa(source.trim())}`}
     newTab
   ></Button>
 }

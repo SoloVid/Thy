@@ -19,6 +19,6 @@ export default function TsThyComparison({
       source2={thy}
       language2="thy"
     ></CodeComparison>
-    <TryButton playgroundUrl={playground} source={thy.trim()}></TryButton>
+    <TryButton playgroundUrl={playground} source={thy}></TryButton>
   </>
 }

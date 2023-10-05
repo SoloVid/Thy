@@ -1,5 +1,3 @@
-import "preact/debug"
-
 import { render } from "preact"
 import { useEffect, useState } from "preact/hooks"
 import { interpretThyBlock } from "../interpreter/block"
@@ -16,11 +14,7 @@ type Output = {
   readonly printedLines: readonly string[]
 }
 
-window.onbeforeunload = function() {
-  return true
-}
-
-export default function App() {
+export default function Playground() {
   const [windowHeight, setWindowHeight] = useState(window.innerHeight)
   useEffect(() => {
     const listener = () => {
@@ -183,5 +177,3 @@ export default function App() {
     </div>
   </div>
 }
-
-render(<App />, document.getElementById('app') as HTMLElement);

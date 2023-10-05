@@ -6,20 +6,16 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "esbuild src/index.ts --bundle --platform=node --outfile=lib/index.js",
-    "editor-client:build": "esbuild src/editor/client.tsx --bundle --platform=browser --jsx=automatic --outfile=playground/editor-client.js --minify --sourcemap",
-    "editor-client:dev": "esbuild src/editor/client.tsx --bundle --platform=browser --jsx=automatic --outfile=playground/editor-client.js --sourcemap --servedir=playground",
     "check-types": "tsc --noEmit",
     "clean": "node -p \"require('fs').rmSync('lib',{force:true,recursive:true})\"",
     "generate-declarations": "tsc --emitDeclarationOnly",
-    "home:build": "esbuild src/home/pages/index.tsx src/home/pages/algorithms.tsx src/home/pages/from-the-top.tsx src/home/pages/misc-notes.tsx src/home/pages/vs-typescript.tsx --bundle --loader:.md=text --platform=browser --jsx=automatic --outdir=home --outbase=src/home/pages --minify --sourcemap",
-    "home:dev": "esbuild src/home/pages/index.tsx src/home/pages/algorithms.tsx src/home/pages/from-the-top.tsx src/home/pages/misc-notes.tsx src/home/pages/vs-typescript.tsx --bundle --loader:.md=text --platform=browser --jsx=automatic --outdir=home --outbase=src/home/pages --sourcemap --servedir=home",
+    "site:build": "esbuild src/home/pages/index.tsx src/home/pages/algorithms.tsx src/home/pages/from-the-top.tsx src/home/pages/misc-notes.tsx src/home/pages/play/index.tsx src/home/pages/vs-typescript.tsx --bundle --loader:.md=text --platform=browser --jsx=automatic --outdir=public --outbase=src/home/pages --minify --sourcemap",
+    "site:dev": "npm run site:build -- --servedir=public",
     "interpret": "node -r esbuild-register src/interpreter/cli.ts",
-    "apreprepublish": "npm run clean",
-    "aprepublish": "run-p --aggregate-output build test generate-declarations",
     "serve": "node -r esbuild-register src/editor/server.ts",
     "start": "node lib/index.js",
     "test": "uts -r esbuild-register src",
-    "test:watch": "watchlist --eager src -- npm run test:uts"
+    "test:watch": "watchlist --eager src -- npm run test"
   },
   "author": "Grant Dennison",
   "license": "MIT",
