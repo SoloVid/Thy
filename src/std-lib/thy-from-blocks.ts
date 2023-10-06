@@ -22,7 +22,7 @@ type MakeThyOptions<BlockMap extends BaseBlockMap> = {
   blockMap: BlockMap
 }
 
-export function makeThy<
+export function makeThyFromBlocks<
   BlockMap extends BaseBlockMap,
 >({
   blocks,

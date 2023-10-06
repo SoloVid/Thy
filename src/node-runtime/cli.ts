@@ -2,7 +2,7 @@
 
 import { readFile } from "node:fs/promises"
 import { core } from "../std-lib"
-import { interpretThyBlock } from "./block"
+import { interpretThyBlock } from "../interpreter/block"
 
 const sourceFile = process.argv[2]
 

@@ -3,13 +3,13 @@ import { defineTestGroup } from "under-the-sun";
 import { assertType } from "../utils/assert";
 import { permute } from "../utils/permute";
 import type { DebugNever } from "../utils/utility-types";
-import { makeThy, ThyFunction } from "./thy";
+import { makeThyFromBlocks, ThyFunction } from "./thy-from-blocks";
 
-const testMakeThy = defineTestGroup("makeThy() ")
+const testMakeThy = defineTestGroup("makeThyFromBlocks() ")
 
 testMakeThy("should not run passed functions on construction", async () => {
   let flag = false
-  makeThy({
+  makeThyFromBlocks({
     blocks: [() => {
       flag = true
     }],
@@ -23,7 +23,7 @@ testMakeThy("function should run all passed functions", async () => {
   let functions = calledFlags.map((e,i) => () => {
     calledFlags[i] = true
   })
-  const thy = makeThy({
+  const thy = makeThyFromBlocks({
     blocks: functions,
     blockMap: {},
   })
@@ -38,7 +38,7 @@ testMakeThy("function should run all functions once", async () => {
   let functions = calledTimes.map((e, i) => () => {
     calledTimes[i]++
   })
-  const thy = makeThy({
+  const thy = makeThyFromBlocks({
     blocks: functions,
     blockMap: {},
   })
@@ -58,7 +58,7 @@ testMakeThy("function should not run non-targeted blocks", async () => {
   const provider3 = () => {
     unintendedCall = true
   }
-  const thy = makeThy({
+  const thy = makeThyFromBlocks({
     blocks: [
       provider1,
       provider2,
@@ -79,7 +79,7 @@ for (const perm of permutations3) {
     const provider1 = () => ({ a: 1 as const, b: 2 })
     const provider2 = () => ({ c: "3" })
     const provider3 = () => {}
-    const thy = makeThy<{
+    const thy = makeThyFromBlocks<{
       "a": typeof provider1
       "b": typeof provider1
       "c": typeof provider2
@@ -121,7 +121,7 @@ for (const perm of permutations3) {
       "abc": typeof provider3
     }
     type Thy = ThyFunction<ProviderMap>
-    const thy = makeThy<ProviderMap>({
+    const thy = makeThyFromBlocks<ProviderMap>({
       blocks: perm.map((i) => ([
         provider1,
         provider2,
@@ -155,7 +155,7 @@ testMakeThy("function should error on bad key", async () => {
   type ProviderMap = {
     "a": typeof provider1
   }
-  const thy = makeThy<ProviderMap>({
+  const thy = makeThyFromBlocks<ProviderMap>({
     blocks: [
       provider1,
     ] as const,
@@ -177,7 +177,7 @@ testMakeThy("function should reject bad typing", async () => {
     "a": typeof provider1
     "b": typeof provider1
   }
-  const thy = makeThy<ProviderMap>({
+  const thy = makeThyFromBlocks<ProviderMap>({
     blocks: [
       provider1,
     ] as const,
@@ -201,7 +201,7 @@ testMakeThy("function should reject bad provider map", async () => {
   type ProviderMap = {
     "b": typeof provider1
   }
-  const thy = makeThy<ProviderMap>({
+  const thy = makeThyFromBlocks<ProviderMap>({
     blocks: [
       provider1,
     ] as const,
@@ -223,7 +223,7 @@ testMakeThy("function should reject overlapping definitions", async () => {
   type ProviderMap = {
     "a": typeof provider1
   }
-  const thy = makeThy<ProviderMap>({
+  const thy = makeThyFromBlocks<ProviderMap>({
     // @ts-expect-error blocks is invalid here
     blocks: [
       provider1,
