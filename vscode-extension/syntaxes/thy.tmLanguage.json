@@ -41,7 +41,7 @@
 			"patterns": [
 				{
 					"name": "meta.line.thy",
-					"match": "^(\\s*)([a-z].+)$",
+					"match": "^(\\s*)([a-z].*)$",
 					"captures": {
 						"2": {
 							"name": "meta.line.content.thy",
