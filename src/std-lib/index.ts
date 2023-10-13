@@ -11,7 +11,7 @@ import { mutableMapBuiltin } from "./map";
 import { math } from "./math";
 import { printBuiltin } from "./print";
 import { regexBuiltin } from "./regex";
-import { string } from "./string";
+import { stringBuiltin } from "./string";
 
 export const core = {
   "array": arrayBuiltin,
@@ -37,7 +37,7 @@ export const core = {
   "math": math,
   "print": printBuiltin,
   "regex": regexBuiltin,
-  "string": string,
+  "string": stringBuiltin,
 
   "true": trueBuiltin,
   "false": falseBuiltin,

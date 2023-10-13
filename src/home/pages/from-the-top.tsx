@@ -1,5 +1,5 @@
 // @ts-expect-error This import is only valid because of esbuild magic.
-import lessonsMd from "../../../lessons.md"
+import lessonsMd from "../../../docs/imperative-programming-101.md"
 import { ThyMarkdown } from "../markdown-code-block-replace"
 import { renderStandardPage } from "../standard-page-frame"
 

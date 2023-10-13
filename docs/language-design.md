@@ -1,15 +1,7 @@
-
-## Open Questions
-
-- Names for built-in functions?
-  - Arrays
-    - array access - `get myArr 3`?
-    - array element set - `set myArr 3 myVal`?
-
 ## Overview of Language Strategy
 
 - No special characters (mobile friendly)
-- Naturalness (e.g. not foreign to mainstream programming)
+- Naturalness (not foreign to mainstream programming)
 - Strong static types
 - Simple compiler
 - Simple rules
@@ -46,7 +38,7 @@ Implications:
 I want Thy to be simple both because it will be easier to implement/maintain and because it will be easier to learn.
 
 - Every level is just a block of code
-- Every (almost) operation is just a function call
+- Every operation (almost) is just a function call
 
 A function call looks like `functionName [TypeArgument ...] [argument ...]`.
 Every argument must be a single term.
@@ -84,11 +76,12 @@ These keywords need to be recognized by the lexer since they are part of the lan
 - `private`: modifier for declarations
 - `to`: denotes preceding identifier as not a function call
 - `type`: type-related operations just start breaking the standard language stuff
-- `let`: precedes another function call on the same line and potentially effects a return
+- `let`: precedes a function call on the same line and potentially effects a return
 
 ### Language Feature Functions
 
-These "functions" allow non-special grammar.
+These "functions" allow non-special grammar
+(i.e. the lexer and parser can treat them as function calls).
 Their usage is significantly different from functions you can write in this language.
 
 - `await`: affects standard language control flow
@@ -98,7 +91,7 @@ Their usage is significantly different from functions you can write in this lang
 ### Reserved Value Names
 
 These values/functions have an interface like stuff you can write in thy,
-but you couldn't actually (most of these) implement them in thy.
+but you couldn't actually implement them in thy.
 
 - `array`: define an array
 - `arrayMutable`: define a mutable array
@@ -125,8 +118,7 @@ but you couldn't actually (most of these) implement them in thy.
 - `ArrayMutable` (1 type parameter)
 - `Boolean`
 - `Function` (something like `(...args: any) => any` in TypeScript)
-- `If` (4 type parameters) (this may not be a thing after all as it is tightly coupled to TypeScript's type idiosyncrasies)
-- `Null` (0 or 1 type parameters)
+- `Null`
 - `Number`
 - `String`
 - `Unknown`

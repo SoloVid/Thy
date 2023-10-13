@@ -142,7 +142,7 @@ The **program** above calculates the product of `1` and `2.5`, and it prints the
 ```thy
 greeting is def "Heya, "
 name is def "Joe"
-message is string.concat greeting name
+message is string greeting name
 Prints "Heya, Joe"
 print message
 ```
@@ -165,12 +165,12 @@ print that
 
 greeting is def "Heya, "
 name is def "Joe"
-string.concat greeting name
+string greeting name
 print that
 ```
 
 Notice that we did not store the **return** **value** of
-`math.multiply` on line 3 or `string.concat` on line 8
+`math.multiply` on line 3 or `string` on line 8
 but instead used `that` in the subsequent lines (4 and 9) to use the **value**.
 
 `that` is a very handy tool to mitigate some of the limitations of Thy,
@@ -236,7 +236,7 @@ Let's **define** a **function** which greets someone by name:
 ```thy
 greet is def
   name is given String
-  message is string.concat "Hello there, " name
+  message is string "Hello there, " name
   print message
 
 Call the function. Prints "Hello there, Norm"
@@ -246,7 +246,7 @@ greet "Norm"
 The new line here is `name is given String`.
 This line says that our **function** has a **parameter** named `name` which will have the **type** `String`.
 Once we have specified a **parameter** like this, we can use it as we would use any other **variable**.
-In this case, we've **passed** `name` as the second **argument** to `string.concat`
+In this case, we've **passed** `name` as the second **argument** to `string`
 to build the **string** we want to print.
 
 What if we want to receive multiple **parameters**?
@@ -255,7 +255,7 @@ What if we want to receive multiple **parameters**?
 greet is def
   name is given String
   extraMessage is given String
-  message is string.concat "Hello there, " name
+  message is string "Hello there, " name
   print message
   print extraMessage
 

@@ -1,5 +1,5 @@
 // @ts-expect-error This import is only valid because of esbuild magic.
-import notesMd from "../../../notes.md"
+import notesMd from "../../../docs/language-design.md"
 import { ThyMarkdown } from "../markdown-code-block-replace"
 import { renderStandardPage } from "../standard-page-frame"
 
