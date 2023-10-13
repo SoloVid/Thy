@@ -1,7 +1,7 @@
 import assert from "node:assert"
 import { test } from "under-the-sun"
 import { collectFiles } from "./collect-files"
-import { testFileDir } from "./test-files"
+import { testFileDir } from "../node-runtime/test-files"
 
 test("collectFiles() should return recursive list of files, sorted by depth", async () => {
   const files = await collectFiles(testFileDir)

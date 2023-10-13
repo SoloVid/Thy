@@ -1,19 +1,7 @@
 import { readdir } from "node:fs/promises"
 import path from "node:path"
 
-export async function collectFiles(directory: string) {
-  const files: string[] = []
-  await walkFiles({
-    rootDir: directory,
-    dir: "",
-    ignorePattern: /TODO/,
-  }, async (f) => {
-    files.push(f)
-  })
-  return files
-}
-
-type WalkOptions = {
+export type WalkOptions = {
   rootDir: string
   dir: string
   ignorePattern: RegExp

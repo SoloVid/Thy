@@ -1,5 +1,6 @@
 /node_modules
 /lib
 /dist
+/public/**/*.html
 /public/**/*.js
 /public/**/*.js.map

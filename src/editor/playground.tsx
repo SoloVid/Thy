@@ -15,6 +15,9 @@ type Output = {
 }
 
 export default function Playground() {
+  useEffect(() => {
+    document.title = "Thy Playground"
+  }, [])
   const [windowHeight, setWindowHeight] = useState(window.innerHeight)
   useEffect(() => {
     const listener = () => {
@@ -112,45 +115,45 @@ export default function Playground() {
       runCode={() => runThenSetOutput(sourceCode)}
     ></CodeInput>
     <div>
-      <div className="btn-panel">
-        <span onClick={() => runThenSetOutput(sourceCode)} className="btn">Run</span>
-        <span onClick={() => setShowFileMenu(before => !before)} className="btn">File</span>
+      <div className="button-panel">
+        <a onClick={() => runThenSetOutput(sourceCode)} className="large button">Run</a>
+        <a onClick={() => setShowFileMenu(before => !before)} className="large button">File</a>
       </div>
       {showFileMenu && (<>
         <ul>
           {fileMan.files.length === 0 && <li>No saved files</li>}
           {fileMan.files.map(f => (
             <li>
-              <span className="small-btn" onClick={() => {
+              <a className="small button" onClick={() => {
                 fileMan.saveFile(f, sourceCode)
                 setFileLoaded(f)
-              }}>Save</span>
-              <span className="small-btn" onClick={() => {
+              }}>Save</a>
+              <a className="small button" onClick={() => {
                 const contents = fileMan.getFile(f)
                 if (contents === null) {
                   return
                 }
                 setSourceCode(contents)
                 setFileLoaded(f)
-              }}>Load</span>
-              <span className="small-btn" onClick={() => fileMan.deleteFile(f)}>Delete</span>
+              }}>Load</a>
+              <a className="small button" onClick={() => fileMan.deleteFile(f)}>Delete</a>
               <strong>{f}</strong>
             </li>
           ))}
             <li>
-              <span className="small-btn" onClick={() => {
+              <a className="small button" onClick={() => {
                 const newName = fileMan.saveAsNew(sourceCode)
                 if (!!newName) {
                   setFileLoaded(newName)
                 }
-              }}>Save as New</span>
-              <span className="small-btn" onClick={() => {
+              }}>Save as New</a>
+              <a className="small button" onClick={() => {
                 if (!window.confirm("Clear editor?")) {
                   return
                 }
                 setSourceCode("")
                 setFileLoaded("")
-              }}>Clear</span>
+              }}>Clear</a>
             </li>
         </ul>
         <hr/>
