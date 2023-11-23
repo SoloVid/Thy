@@ -10,9 +10,11 @@ as their equivalents in TypeScript and documentation left to external sources.
 
 Here are some general rules for Thy program structure:
 
-* Every program is a **block**
-* Every **block** consists of **statements** (and non-code lines)
-* Every **statement** contains exactly one **call**
+* Every program is a [**block**](#blocks)
+* Every [**block**](#blocks) consists of [**statements**](#statements) (and non-code lines)
+* Every [**statement**](#statements) contains exactly one [**call**](#calls)
+* Every [**call**](#calls) contains one [**expression**](#expressions) to call
+  and additional [**expressions**](#expressions) as arguments
 
 ## Non-Code Lines
 
@@ -54,6 +56,133 @@ calculateSomething a b c
 
 > In other C-like languages, this would look like 
 > `calculateSomething(a, b, c)`.
+
+## Statements
+
+A **statement** in Thy contains exactly one **call**,
+but there are three variants:
+
+1. Bare **calls**
+```thy
+foo a b c
+```
+2. **Calls** with [variable assignment](#variable-assignments-is-be-to)
+```thy
+myResult is foo a b c
+```
+3. [`let` **statements**](#early-return-let)
+```thy
+let foo a b c
+```
+
+## Variable Assignments (`is`, `be`, `to`)
+
+Although a **statement** in Thy may only have a **call**
+(commonly for **functions** with side effects),
+the return value of the call may be captured in a variable in the same statement.
+
+```thy
+myResult is foo a b c
+```
+
+In this example, the function `foo` is called with arguments `a`, `b`, and `c`,
+and the return value of the call is stored in the variable `myResult`.
+
+> In other C-like languages, this would look like
+> `myResult = foo(a, b, c)`.
+
+Thy provides three keywords (`is`, `be`, `to`) for assignment.
+All three assign the return value of the call to the variable on the left,
+but they have slightly different meanings.
+
+### Immutable Assignments (`is`)
+
+The `is` keyword in Thy is the assignment keyword that creates a new
+immutable (constant) variable.
+This variable cannot be subsequently reassigned.
+
+```thy
+First time here is good.
+x is foo a b
+Trying to reassign `x` is an error.
+x is foo x c
+```
+
+The `is` keyword should be your go-to assignment keyword
+since immutable variables are generally easier to maintain.
+
+The `is` keyword in Thy corresponds to the [`const` keyword in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const):
+
+```js
+const x = foo(a, b)
+```
+
+### Mutable Assignments (`be`/`to`)
+
+If a mutable variable is required, the `be` and `to` keywords in Thy
+provide mutable assignment.
+The `be` keyword creates a new mutable variable, and the `to` keyword
+mutates (updates) an existing mutable variable.
+
+```thy
+First time use `be` to create.
+x be foo a b
+Then use `to` to reassign.
+x to foo x c
+x to foo x d
+```
+
+The `be` and `to` keywords should be avoided when possible
+because mutable variables are generally more difficult to maintain.
+
+The `be` keyword in Thy corresponds to the [`let` keyword in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let):
+
+```js
+let x = foo(a, b)
+```
+
+The `to` keyword in Thy corresponds to the [assignment (=) operator in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Assignment):
+
+```js
+x = foo(x, c)
+```
+
+Note that the `to` keyword will always be the keyword used
+for assignment to object properties.
+
+```thy
+myThing.someProp to foo a b
+```
+
+### Implicit Assignments (`that`/`beforeThat`)
+
+If a call's return value is not captured via explicit variable assignment,
+it is implicitly available as `that` in the next statement
+and as `beforeThat` in the statement after that.
+
+A common pattern of usage would be something like this:
+
+```thy
+check.equal foo "A"
+check.equal bar 2
+check.all that beforeThat
+if that
+  doSomething
+```
+
+The example above is logically equivalent to the following:
+
+```thy
+r1 is check.equal foo "A"
+r2 is check.equal bar 2
+r3 is check.all r1 r2
+r4 is if r3
+  r5 is doSomething
+```
+
+The `that` and `beforeThat` keywords in Thy minimize
+the unnecessary proliferation of variable names
+that would otherwise come with the one-call-per-statement design of Thy.
 
 ## Expressions
 
@@ -210,134 +339,142 @@ crunchSomeNumbers 1 -3.14 9999999999.000000000001
 
 In this example, three numbers were passed as arguments to `crunchSomeNumbers`.
 
-## Statements
+## Data Types
 
-A **statement** in Thy contains exactly one **call**,
-but there are three variants:
+Thy provides 6 data types:
 
-1. Bare **calls**
-```thy
-foo a b c
-```
-2. **Calls** with variable assignment
-```thy
-myResult is foo a b c
-```
-3. `let` **statements**
-```thy
-let foo a b c
-```
+1. Blocks
+2. Strings
+3. Numbers
+4. Booleans
+5. Null
+6. Objects
 
-## Variable Assignments (`is`, `be`, `to`)
+Every [expression](#expressions) in Thy has a value
+represented by one of these types.
 
-Although a **statement** in Thy may only have a **call**
-(commonly for **functions** with side effects),
-the return value of the call may be captured in a variable in the same statement.
+### Blocks
 
-```thy
-myResult is foo a b c
-```
+Blocks are the **function** construct in Thy.
 
-In this example, the function `foo` is called with arguments `a`, `b`, and `c`,
-and the return value of the call is stored in the variable `myResult`.
+> In other C-like languages, the terms "function", "method", or "lambda"
+> may describe similar constructs.
 
-> In other C-like languages, this would look like
-> `myResult = foo(a, b, c)`.
-
-Thy provides three keywords (`is`, `be`, `to`) for assignment.
-All three assign the return value of the call to the variable on the left,
-but they have slightly different meanings.
-
-### Immutable Assignments (`is`)
-
-The `is` keyword in Thy is the assignment keyword that creates a new
-immutable (constant) variable.
-This variable cannot be subsequently reassigned.
+Blocks consist of a series of sequential [**statements**](#statements)
+(and [non-code lines](#non-code-lines)).
 
 ```thy
-First time here is good.
-x is foo a b
-Trying to reassign `x` is an error.
-x is foo x c
+This is a comment that does nothing
+result is doOneThing
+
+doAnotherThing result "yes"
 ```
 
-The `is` keyword should be your go-to assignment keyword
-since immutable variables are generally easier to maintain.
+Blocks may take some number of [parameters](#explicit-parameters-given)
+and [return](#explicit-return-return) a value.
 
-The `is` keyword in Thy corresponds to the [`const` keyword in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const):
+```thy
+The first parameter is `a`.
+a is given
+The second parameter is `b`.
+b is given
+
+someValue is doSomeStuff a b
+
+return someValue
+```
+
+Blocks in Thy are equivalent to [arrow functions in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions):
 
 ```js
-const x = foo(a, b)
+(a, b) => {
+  const someValue is doSomeStuff(a, b)
+  return someValue
+}
 ```
 
-### Mutable Assignments (`be`/`to`)
-
-If a mutable variable is required, the `be` and `to` keywords in Thy
-provide mutable assignment.
-The `be` keyword creates a new mutable variable, and the `to` keyword
-mutates (updates) an existing mutable variable.
+Blocks are typically captured as reusable functions in Thy
+via the `def` function from the core standard library:
 
 ```thy
-First time use `be` to create.
-x be foo a b
-Then use `to` to reassign.
-x to foo x c
-x to foo x d
+myFunction is def
+  a is given
+  b is given
+  someValue is doSomeStuff a b
+  return someValue
+
+And later...
+myFunction 1 2
 ```
 
-The `be` and `to` keywords should be avoided when possible
-because mutable variables are generally more difficult to maintain.
+### Strings
 
-The `be` keyword in Thy corresponds to the [`let` keyword in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let):
+Strings are one of the primitive types in Thy.
+Strings in Thy are equivalent to [strings in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type),
+including all methods specified from ECMAScript.
 
-```js
-let x = foo(a, b)
-```
+### Numbers
 
-The `to` keyword in Thy corresponds to the [assignment (=) operator in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Assignment):
+Numbers are one of the primitive types in Thy.
+Numbers in Thy are equivalent to [numbers in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type),
+including all methods specified from ECMAScript.
 
-```js
-x = foo(x, c)
-```
+> Some languages provide additional specific numeric types like integers,
+> but Thy only has the single floating point number type provided by TypeScript.
 
-Note that the `to` keyword will always be the keyword used
-for assignment to object properties.
+### Booleans
+
+Booleans are one of the primitive types in Thy.
+Booleans in Thy are equivalent to [booleans in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type).
+
+### Null
+
+`null` is a special value in Thy that is equivalent to [`null` in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#null_type).
+
+### Objects
+
+Objects in Thy are equivalent to [objects in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Language_overview#objects),
+but the functionality provided in Thy for constructing objects
+is much simplified as compared to TypeScript.
+
+Objects are typically constructed in Thy via [implicit block return](#implicit-return-exportprivate).
 
 ```thy
-myThing.someProp to foo a b
+makeMyThing is def
+  propA is def "A"
+  propB is calculateSomething
+
+myThing is makeMyThing
 ```
 
-### Implicit Assignments (`that`/`beforeThat`)
+In this example, `myThing` will end up with an object value
+with properties `propA` and `propB` as assigned in the initializer.
 
-If a call's return value is not captured via explicit variable assignment,
-it is implicitly available as `that` in the next statement
-and as `beforeThat` in the statement after that.
+> Unlike many other C-like languages, Thy does not have classes.
 
-A common pattern of usage would be something like this:
+Blocks can even be [immediately invoked](#immediately-invoked-blocks) to create objects
+similar to [object literals in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer).
 
 ```thy
-check.equal foo "A"
-check.equal bar 2
-check.all that beforeThat
-if that
-  doSomething
+myThing is
+  propA is def "A"
+  propB is calculateSomething
 ```
 
-The example above is logically equivalent to the following:
-
-```thy
-r1 is check.equal foo "A"
-r2 is check.equal bar 2
-r3 is check.all r1 r2
-r4 is if r3
-  r5 is doSomething
-```
-
-The `that` and `beforeThat` keywords in Thy minimize
-the unnecessary proliferation of variable names
-that would otherwise come with the one-call-per-statement design of Thy.
+In this example, there is no identifier expression following `is`,
+so the function that gets called is the block literal.
+As a result, `myThing` ends up with an object value defined
+the same as the previous example.
 
 ## Parameters
+
+When functions are called with arguments,
+the values are received in defined parameters.
+
+Thy provides two ways for a block to receive parameters:
+
+1. Explicit parameters (`given`)
+2. Implicit parameters
 
 ### Explicit Parameters (`given`)
 
@@ -421,6 +558,15 @@ This language feature is generally only something used with blocks
 passed literally in function calls, not with blocks defined as reusable functions.
 
 ## Returns
+
+Functions may return values.
+
+Thy provides multiple ways for a block to return a value:
+
+1. Explicit return (`return`)
+2. Early return (`let`)
+3. Implicit return (`export`/`private`)
+4. No return
 
 ### Explicit Return (`return`)
 
@@ -532,119 +678,6 @@ to effect an early return in the calling scope.
 
 The `void` (no return) value in Thy is technically equivalent to
 [`undefined` in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined).
-
-## Blocks
-
-Blocks are the **function** construct in Thy.
-
-> In other C-like languages, the terms "function", "method", or "lambda"
-> may describe similar constructs.
-
-Blocks consist of a series of sequential [**statements**](#statements)
-(and [non-code lines](#non-code-lines)).
-
-```thy
-This is a comment that does nothing
-result is doOneThing
-
-doAnotherThing result "yes"
-```
-
-Blocks may take some number of [parameters](#explicit-parameters-given)
-and [return](#explicit-return-return) a value.
-
-```thy
-The first parameter is `a`.
-a is given
-The second parameter is `b`.
-b is given
-
-someValue is doSomeStuff a b
-
-return someValue
-```
-
-Blocks in Thy are equivalent to [arrow functions in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions):
-
-```js
-(a, b) => {
-  const someValue is doSomeStuff(a, b)
-  return someValue
-}
-```
-
-Blocks are typically captured as reusable functions in Thy
-via the `def` function from the core standard library:
-
-```thy
-myFunction is def
-  a is given
-  b is given
-  someValue is doSomeStuff a b
-  return someValue
-
-And later...
-myFunction 1 2
-```
-
-## Strings
-
-Strings are one of the primitive types in Thy.
-Strings in Thy are equivalent to [strings in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type),
-including all methods specified from ECMAScript.
-
-## Numbers
-
-Numbers are one of the primitive types in Thy.
-Numbers in Thy are equivalent to [numbers in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type),
-including all methods specified from ECMAScript.
-
-> Some languages provide additional specific numeric types like integers,
-> but Thy only has the single floating point number type provided by TypeScript.
-
-## Booleans
-
-Booleans are one of the primitive types in Thy.
-Booleans in Thy are equivalent to [booleans in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type).
-
-## Null
-
-`null` is a special value in Thy that is equivalent to [`null` in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#null_type).
-
-## Objects
-
-Objects in Thy are equivalent to [objects in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Language_overview#objects),
-but the functionality provided in Thy for constructing objects
-is much simplified as compared to TypeScript.
-
-Objects are typically constructed in Thy via [implicit block return](#implicit-return-exportprivate).
-
-```thy
-makeMyThing is def
-  propA is def "A"
-  propB is calculateSomething
-
-myThing is makeMyThing
-```
-
-In this example, `myThing` will end up with an object value
-with properties `propA` and `propB` as assigned in the initializer.
-
-> Unlike many other C-like languages, Thy does not have classes.
-
-Blocks can even be [immediately invoked](#immediately-invoked-blocks) to create objects
-similar to [object literals in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer).
-
-```thy
-myThing is
-  propA is def "A"
-  propB is calculateSomething
-```
-
-In this example, there is no identifier expression following `is`,
-so the function that gets called is the block literal.
-As a result, `myThing` ends up with an object value defined
-the same as the previous example.
 
 ## Asynchronous Code (`await`)
 
