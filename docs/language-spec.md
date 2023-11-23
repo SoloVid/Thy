@@ -130,7 +130,7 @@ if condition1
     do2b
 ```
 
-#### Call Continuance (`and`)
+#### Statement Continuance (`and`)
 
 Because a function may take additional parameters after a block literal,
 the `and` keyword in Thy allows additional arguments after a block literal argument.
@@ -145,6 +145,19 @@ and else
 In this example, the `if` function was called with four arguments:
 `someCondition`, the block literal calling `doIfTrue`,
 `else`, and the block literal calling `doIfFalse`.
+
+#### Immediately Invoked Blocks
+
+Similar to [IIFEs in TypeScript](https://developer.mozilla.org/en-US/docs/Glossary/IIFE),
+blocks can be immediately invoked in Thy
+by providing them as the "expression to call" part of a call.
+_This syntax is not currently supported for the "bare call"_
+_variant of Thy statements._
+
+```thy
+myValue is
+  return 5
+```
 
 ### String Literals
 
@@ -345,6 +358,19 @@ foo "a" 2
 ```
 
 `param1` would be `"a"` and `param2` would be `2`.
+
+A parameter can be marked as optional by passing a value to the `given` function.
+
+```thy
+foo is def
+  optionalParam is given "no message"
+  print optionalParam
+
+Print "hi mom"
+foo "hi mom"
+Print "no message"
+foo
+```
 
 ### Implicit Parameters
 
@@ -547,23 +573,78 @@ Blocks in Thy are equivalent to [arrow functions in TypeScript](https://develope
 }
 ```
 
+Blocks are typically captured as reusable functions in Thy
+via the `def` function from the core standard library:
+
+```thy
+myFunction is def
+  a is given
+  b is given
+  someValue is doSomeStuff a b
+  return someValue
+
+And later...
+myFunction 1 2
+```
+
 ## Strings
 
 Strings are one of the primitive types in Thy.
-Strings in Thy are equivalent to [strings in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String),
+Strings in Thy are equivalent to [strings in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type),
 including all methods specified from ECMAScript.
 
 ## Numbers
 
-Strings are one of the primitive types in Thy.
-Strings in Thy are equivalent to [strings in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number),
+Numbers are one of the primitive types in Thy.
+Numbers in Thy are equivalent to [numbers in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type),
 including all methods specified from ECMAScript.
+
+> Some languages provide additional specific numeric types like integers,
+> but Thy only has the single floating point number type provided by TypeScript.
 
 ## Booleans
 
+Booleans are one of the primitive types in Thy.
+Booleans in Thy are equivalent to [booleans in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type).
+
+## Null
+
+`null` is a special value in Thy that is equivalent to [`null` in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#null_type).
+
 ## Objects
 
-## Blocks
+Objects in Thy are equivalent to [objects in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Language_overview#objects),
+but the functionality provided in Thy for constructing objects
+is much simplified as compared to TypeScript.
+
+Objects are typically constructed in Thy via [implicit block return](#implicit-return-exportprivate).
+
+```thy
+makeMyThing is def
+  propA is def "A"
+  propB is calculateSomething
+
+myThing is makeMyThing
+```
+
+In this example, `myThing` will end up with an object value
+with properties `propA` and `propB` as assigned in the initializer.
+
+> Unlike many other C-like languages, Thy does not have classes.
+
+Blocks can even be [immediately invoked](#immediately-invoked-blocks) to create objects
+similar to [object literals in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer).
+
+```thy
+myThing is
+  propA is def "A"
+  propB is calculateSomething
+```
+
+In this example, there is no identifier expression following `is`,
+so the function that gets called is the block literal.
+As a result, `myThing` ends up with an object value defined
+the same as the previous example.
 
 ## Asynchronous Code (`await`)
 
