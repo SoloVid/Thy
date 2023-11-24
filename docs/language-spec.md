@@ -376,6 +376,25 @@ this is not
 > Some other languages use something like `//` or `#` to begin a comment,
 > but Thy aims not to use special characters for mobile-friendliness.
 
+Multiline comments in Thy start with some all-caps
+three-letter (or more) sequence and end with the same sequence.
+
+```thy
+notCommented
+XYZ
+commented
+ABC
+commented
+XYZ
+notCommented
+```
+
+> Some other languages use `/* ... */` for multiline comments.
+
+Although the same sequence could be used (e.g. `XXX`),
+we recommend picking a different sequence every time
+to avoid accidentally overlapping multiline comments.
+
 ### Variable Assignments (`is`, `be`, `to`)
 
 Although a statement in Thy may only have a [call](#calls)
@@ -599,6 +618,9 @@ foo "hi mom"
 Print "no message"
 foo
 ```
+
+In production code, [explicit types](#parameter-types) should be specified
+in all `given` calls to ensure program type integrity.
 
 #### Implicit Parameters
 
@@ -828,4 +850,214 @@ rather than a keyword as in TypeScript.
 
 ## Types
 
-TODO: Fill in notes about types.
+> Note: Types are not checked in the interpreter (playground).
+
+Up to this point, this document has pretty much only described Thy
+as it directly translates to JavaScript,
+but Thy aspires to have the strong static type safety of TypeScript.
+
+There are three fundamental principles for understanding types in Thy:
+
+1. Thy's type checking is entirely built on TypeScript.
+2. Thy uses the `type` keyword to define types independent of [calls](#calls)
+3. Thy uses function type parameters to impose types on variables
+
+### TypeScript Type Checking
+
+TypeScript is a superset of JavaScript that adds strong static type checking
+on top of existing JavaScript runtime code.
+The basic idea is that it adds type annotations to the JavaScript code,
+such that it can do type checking but output valid JavaScript code
+just by removing the type annotations.
+As such, type annotations do not affect runtime code
+since all type-related code is removed from the code that actually runs.
+
+Thy heavily relies on [type inference](https://www.typescriptlang.org/docs/handbook/type-inference.html)
+and [function generics](https://www.typescriptlang.org/docs/handbook/2/generics.html)
+from TypeScript to satisfy its type-checking needs.
+
+Since Thy does not provide a way to directly annotate a variable's type,
+Thy applies [TypeScript's `as const`](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-inference)
+to every literal value.
+
+Although there are some cases where Thy does some back-bending
+to make TypeScript happy for Thy constructs,
+every Thy type construct can be conceptually tied back to a basic TypeScript feature.
+
+It may never be relevant for writing Thy code,
+but types are actually tracked in Thy via _variables_ in TypeScript,
+rather than actual _types_.
+
+### Type Identifiers
+
+Type identifiers in Thy are similar to [variable identifiers](#identifier-expressions),
+except that they always **begin with a capital letter**.
+
+`String` and `Number` are examples of types in Thy.
+
+New types can be created in Thy with the `type` keyword:
+
+```thy
+type MyNewType is def String
+```
+
+In this example the type `MyNewType` is created as an alias for the type `String`.
+
+### Type Parameters
+
+The most important construct for types in Thy is type parameters.
+
+Type parameters are optional parameters specified by functions,
+which can be passed prior to the value parameters.
+
+```thy
+callSomeFunction TypeArg1 TypeArg2 valueArg1 valueArg2
+```
+
+> In TypeScript (and some other C-like languages), this would look like 
+> `callSomeFunction<TypeArg1, TypeArg2>(valueArg1, valueArg2)`.
+
+As with TypeScript, these parameters are optional and may be omitted.
+In these cases, the type parameters will be inferred.
+
+```thy
+callSomeFunction valueArg1 valueArg2
+```
+
+Type parameters can be defined in [blocks](#blocks) via the special `Given` type:
+
+```thy
+callSomeFunction is def
+  type TypeParam1 is Given Unknown
+  type TypeParam2 is Given String
+  valueParam1 is given
+  valueParam2 is given
+```
+
+The `Given` type takes one type parameter that is its [generic constraint](https://www.typescriptlang.org/docs/handbook/2/generics.html#generic-constraints).
+
+#### Parameter Types
+
+In common use, type parameters will be passed to `given` calls
+to enforce type safety of parameters:
+
+```thy
+doSomeMath is def
+  a is given Number
+  b is given Number
+```
+
+#### Explicit Variable Types
+
+In the case of mutable variables, it may be desirable to explicitly specify a
+variable's type by passing a type parameter to `def`:
+
+```thy
+myStr be def String "some initial value"
+```
+
+### Type Statements
+
+Thy starts to feel a bit more foreign once in the `type` statement territory.
+However, every line in Thy that begins with `type` is strictly relevant
+to static type checking and should not affect runtime logic.
+
+There are only two types of `type` statements in Thy:
+
+1. Type return statements
+2. Type assignment statements
+
+#### Type Return Statements
+
+Type return statements in Thy provide a mechanism for
+explicitly specifying the return type of a block.
+Return types are automatically inferred for blocks,
+but there may be scenarios where constraining the block
+to an explicit return type may be desired.
+
+```thy
+myFunction is def
+  a is given Number
+  b is given Number
+  type return Number
+
+  Do some math or something down here.
+```
+
+The logically equivalent TypeScript for this example would be the following:
+
+```ts
+const myFunction = (a: Number, b: Number): Number => {
+  // Do some math or something down here.
+}
+```
+
+By convention, we recommend putting the type return statement immediately
+after the last `given` statement before any implementation.
+However, there is no such restriction from a technical perspective
+where in the block the type return statement lives.
+
+#### Type Assignment Statements
+
+Type assignment statements in Thy provide a mechanism for creating new types,
+especially for [objects](#objects) and [functions](#functions).
+
+Type assignment statements generally look similar to immutable variable assignment statements.
+
+```thy
+type MyNewType is calculateSomeValue 1 2 3
+```
+
+However, there are several differences:
+1. Types are always immutable (only `is` available).
+2. The function expression can be a type.
+
+```thy
+type MyNewType is Union "a" "b"
+```
+
+3. Function arguments are optional.
+
+```thy
+someFunction is def
+  type T is Given Unknown
+  param1 is given T
+  param2 is given Number
+  type return T
+  Etc
+myTypedValue is getSomeTypedValue
+Only supplying the first value parameter,
+So that the T type parameter is inferred for return type.
+The second parameter has no bearing on the type.
+type MyNewType is someFunction myTypedValue
+```
+
+##### Object Types
+
+Creating a custom object type is as easy as creating an object:
+
+```thy
+type MyObjectType is
+  field1 is def String
+  field2 is def Number
+```
+
+If using a factory function for creating a particular object type,
+the type of the object can easily be inferred for use elsewhere:
+
+```thy
+makeMyObject is def
+  field1 is def "hi"
+  field2 is def 5
+type MyObjectType is makeMyObject
+```
+
+##### Function Types
+
+Creating a custom function type is as easy as creating a function:
+
+```thy
+type MyFunctionType is def
+  param1 is given Number
+  type return String
+```

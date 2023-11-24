@@ -1,6 +1,7 @@
 ## Overview of Language Strategy
 
 - No special characters (mobile friendly)
+- Interoperability with TypeScript
 - Naturalness (not foreign to mainstream programming)
 - Strong static types
 - Simple compiler
