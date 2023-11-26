@@ -5,6 +5,8 @@ import arrayMutableDoc from "../../../../docs/std-lib/array-mutable.md"
 // @ts-expect-error Import only valid because of esbuild magic.
 import castDoc from "../../../../docs/std-lib/cast.md"
 // @ts-expect-error Import only valid because of esbuild magic.
+import catchDoc from "../../../../docs/std-lib/catch.md"
+// @ts-expect-error Import only valid because of esbuild magic.
 import checkAllDoc from "../../../../docs/std-lib/check.all.md"
 // @ts-expect-error Import only valid because of esbuild magic.
 import checkAscDoc from "../../../../docs/std-lib/check.asc.md"
@@ -24,6 +26,8 @@ import delayDoc from "../../../../docs/std-lib/delay.md"
 import elseDoc from "../../../../docs/std-lib/else.md"
 // @ts-expect-error Import only valid because of esbuild magic.
 import falseDoc from "../../../../docs/std-lib/false.md"
+// @ts-expect-error Import only valid because of esbuild magic.
+import finallyDoc from "../../../../docs/std-lib/finally.md"
 // @ts-expect-error Import only valid because of esbuild magic.
 import getDoc from "../../../../docs/std-lib/get.md"
 // @ts-expect-error Import only valid because of esbuild magic.
@@ -69,7 +73,11 @@ import stringDoc from "../../../../docs/std-lib/string.md"
 // @ts-expect-error Import only valid because of esbuild magic.
 import switchDoc from "../../../../docs/std-lib/switch.md"
 // @ts-expect-error Import only valid because of esbuild magic.
+import throwDoc from "../../../../docs/std-lib/throw.md"
+// @ts-expect-error Import only valid because of esbuild magic.
 import trueDoc from "../../../../docs/std-lib/true.md"
+// @ts-expect-error Import only valid because of esbuild magic.
+import tryDoc from "../../../../docs/std-lib/try.md"
 
 import { ThyMarkdown } from "../../markdown-code-block-replace"
 import { renderStandardPage } from "../../standard-page-frame"
@@ -78,6 +86,7 @@ const sections = [
   ["array", arrayDoc],
   ["arrayMutable", arrayMutableDoc],
   ["cast", castDoc],
+  ["catch", catchDoc],
   ["check.all", checkAllDoc],
   ["check.asc", checkAscDoc],
   ["check.desc", checkDescDoc],
@@ -88,6 +97,7 @@ const sections = [
   ["delay", delayDoc],
   ["else", elseDoc],
   ["false", falseDoc],
+  ["finally", finallyDoc],
   ["get", getDoc],
   ["if", ifDoc],
   ["json.decode", jsonDecodeDoc],
@@ -110,7 +120,9 @@ const sections = [
   ["set", setDoc],
   ["string", stringDoc],
   ["switch", switchDoc],
+  ["throw", throwDoc],
   ["true", trueDoc],
+  ["try", tryDoc],
 ] as const
 
 function nameAsId(name: string) {
