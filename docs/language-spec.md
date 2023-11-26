@@ -6,6 +6,8 @@ Every construct in Thy maps directly to some equivalent concept in TypeScript.
 Some constructs may merely be referenced (and linked)
 as their equivalents in TypeScript and documentation left to external sources.
 
+> Anything you can do Thy can do better. 🎶
+
 ## Overview
 
 Here are some general rules for Thy program structure:

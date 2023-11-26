@@ -3,6 +3,7 @@ import "preact/debug"
 import { ComponentChild, render } from "preact"
 import { useEffect } from "preact/hooks"
 import { home } from "./links"
+import PageWithNavigationBar from "./navigation-bar"
 
 type StandardPageFrameProps = {
   children: ComponentChild
@@ -13,11 +14,11 @@ export default function StandardPageFrame({ title, children }: StandardPageFrame
   useEffect(() => {
     document.title = title
   }, [])
-  return <div class="background">
+  return <PageWithNavigationBar><div class="background">
     <div class="column-content-sm">
       <a href={home}><h1 class="text-center">Thy (lang)</h1></a>
       <h4 class="text-center">
-        <em>My language is thy language</em>
+        <em>My language is Thy language</em>
       </h4>
     </div>
     {children}
@@ -29,7 +30,7 @@ export default function StandardPageFrame({ title, children }: StandardPageFrame
         </small>
       </p>
     </div>
-  </div>
+  </div></PageWithNavigationBar>
 }
 
 export function renderStandardPage(title: string, content: ComponentChild) {

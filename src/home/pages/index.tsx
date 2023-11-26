@@ -37,7 +37,7 @@ renderStandardPage("Thy (lang)", <>
     <h4>Where to?</h4>
     <ul>
       <li><a href="vs-typescript.html">I know TypeScript. I want to compare.</a></li>
-      <li><a href="from-the-top.html">Explain Thy to me like I've never programmed before.</a></li>
+      <li><a href="programming-101.html">Explain Thy to me like I've never programmed before.</a></li>
       <li><a href="algorithms.html">I need to see some actual algorithms.</a></li>
       <li><a href="language-spec.html">Show me the spec.</a></li>
       <li><a href="misc-notes.html">Grant, please ramble about language design minutia.</a></li>

@@ -108,3 +108,101 @@ pre.output {
   white-space: pre-wrap;
   word-break: break-all;
 }
+
+#navigation-page-container {
+  height: 100%;
+}
+
+#navigation-page-container > .content {
+  overflow: auto;
+}
+
+@media (min-width: 1300px) {
+  #navigation-bar {
+    position: fixed;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1300px) {
+  #navigation-page-container {
+    display: flex;
+  }
+
+  #navigation-page-container > .content {
+    flex: 1;
+  }
+}
+
+
+@media (max-width: 768px) {
+  #navigation-bar {
+    position: fixed;
+    display: none;
+    background-color: white;
+  }
+
+  #navigation-bar.open {
+    display: block;
+  }
+
+  #navigation-page-container > .hamburger {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  #navigation-page-container > .hamburger {
+    display: none;
+  }
+
+  .code-comparison {
+    display:flex;
+    flex-direction:row;
+  }
+
+  .code-comparison .sample {
+    flex:0 0 47%;
+    overflow:hidden;
+  }
+
+  .code-comparison .divider {
+    flex:0 0 6%;
+  }
+}
+
+
+#navigation-bar {
+  width: 240px;
+  height: 100%;
+  border-right: 1px solid lightgray;
+  transition: transform 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+#navigation-bar > .nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#navigation-bar > .nav ul {
+  padding-left: 20px;
+}
+
+#navigation-bar > .nav li {
+  padding-top: 2px;
+}
+
+#navigation-bar > .nav > li {
+  padding: 10px 20px;
+  border-bottom: 1px solid lightgray;
+}
+
+#navigation-page-container > .hamburger {
+  cursor: pointer;
+  margin: 20px;
+  font-weight: bold;
+  font-size: x-large;
+  position: fixed;
+  right: 0;
+}
