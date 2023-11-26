@@ -8,8 +8,8 @@ export const pageOutputDir = join(rootDir, "public")
 let pageInputs: readonly string[] | null = null
 export async function getPageInputs() {
   return await collectFiles(pageInputDir)
-  if (pageInputs === null) {
-    pageInputs = await collectFiles(pageInputDir)
-  }
-  return pageInputs
+  // if (pageInputs === null) {
+  //   pageInputs = await collectFiles(pageInputDir)
+  // }
+  // return pageInputs
 }
