@@ -1,6 +1,6 @@
 import assert from "assert";
 import { defineTestGroup } from "under-the-sun";
-import { core } from "../std-lib";
+import { core } from "../std-lib/core";
 import { testFileA, testFileB, testFileBar, testFileBaz } from "./test-files";
 import { makeThyFromFiles } from "./thy-from-files";
 

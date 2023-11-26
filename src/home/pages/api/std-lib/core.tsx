@@ -1,86 +1,86 @@
 // @ts-expect-error Import only valid because of esbuild magic.
-import arrayDoc from "../../../../docs/std-lib/array.md"
+import arrayDoc from "../../../../../docs/std-lib/core/array.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import arrayMutableDoc from "../../../../docs/std-lib/array-mutable.md"
+import arrayMutableDoc from "../../../../../docs/std-lib/core/array-mutable.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import castDoc from "../../../../docs/std-lib/cast.md"
+import castDoc from "../../../../../docs/std-lib/core/cast.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import catchDoc from "../../../../docs/std-lib/catch.md"
+import catchDoc from "../../../../../docs/std-lib/core/catch.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import checkAllDoc from "../../../../docs/std-lib/check.all.md"
+import checkAllDoc from "../../../../../docs/std-lib/core/check.all.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import checkAscDoc from "../../../../docs/std-lib/check.asc.md"
+import checkAscDoc from "../../../../../docs/std-lib/core/check.asc.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import checkDescDoc from "../../../../docs/std-lib/check.desc.md"
+import checkDescDoc from "../../../../../docs/std-lib/core/check.desc.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import checkEqualDoc from "../../../../docs/std-lib/check.equal.md"
+import checkEqualDoc from "../../../../../docs/std-lib/core/check.equal.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import checkNotDoc from "../../../../docs/std-lib/check.not.md"
+import checkNotDoc from "../../../../../docs/std-lib/core/check.not.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import checkSomeDoc from "../../../../docs/std-lib/check.some.md"
+import checkSomeDoc from "../../../../../docs/std-lib/core/check.some.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import defDoc from "../../../../docs/std-lib/def.md"
+import defDoc from "../../../../../docs/std-lib/core/def.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import delayDoc from "../../../../docs/std-lib/delay.md"
+import delayDoc from "../../../../../docs/std-lib/core/delay.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import elseDoc from "../../../../docs/std-lib/else.md"
+import elseDoc from "../../../../../docs/std-lib/core/else.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import falseDoc from "../../../../docs/std-lib/false.md"
+import falseDoc from "../../../../../docs/std-lib/core/false.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import finallyDoc from "../../../../docs/std-lib/finally.md"
+import finallyDoc from "../../../../../docs/std-lib/core/finally.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import getDoc from "../../../../docs/std-lib/get.md"
+import getDoc from "../../../../../docs/std-lib/core/get.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import ifDoc from "../../../../docs/std-lib/if.md"
+import ifDoc from "../../../../../docs/std-lib/core/if.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import jsonDecodeDoc from "../../../../docs/std-lib/json.decode.md"
+import jsonDecodeDoc from "../../../../../docs/std-lib/core/json.decode.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import jsonEncodeDoc from "../../../../docs/std-lib/json.encode.md"
+import jsonEncodeDoc from "../../../../../docs/std-lib/core/json.encode.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import loopAsyncDoc from "../../../../docs/std-lib/loop.async.md"
+import loopAsyncDoc from "../../../../../docs/std-lib/core/loop.async.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import loopElementsDoc from "../../../../docs/std-lib/loop.elements.md"
+import loopElementsDoc from "../../../../../docs/std-lib/core/loop.elements.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import loopForeverDoc from "../../../../docs/std-lib/loop.forever.md"
+import loopForeverDoc from "../../../../../docs/std-lib/core/loop.forever.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import loopTimesDoc from "../../../../docs/std-lib/loop.times.md"
+import loopTimesDoc from "../../../../../docs/std-lib/core/loop.times.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import mapDoc from "../../../../docs/std-lib/map.md"
+import mapDoc from "../../../../../docs/std-lib/core/map.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import mathAddDoc from "../../../../docs/std-lib/math.add.md"
+import mathAddDoc from "../../../../../docs/std-lib/core/math.add.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import mathDivideDoc from "../../../../docs/std-lib/math.divide.md"
+import mathDivideDoc from "../../../../../docs/std-lib/core/math.divide.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import mathModDoc from "../../../../docs/std-lib/math.mod.md"
+import mathModDoc from "../../../../../docs/std-lib/core/math.mod.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import mathMultiplyDoc from "../../../../docs/std-lib/math.multiply.md"
+import mathMultiplyDoc from "../../../../../docs/std-lib/core/math.multiply.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import mathPowDoc from "../../../../docs/std-lib/math.pow.md"
+import mathPowDoc from "../../../../../docs/std-lib/core/math.pow.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import mathRootDoc from "../../../../docs/std-lib/math.root.md"
+import mathRootDoc from "../../../../../docs/std-lib/core/math.root.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import mathSubtractDoc from "../../../../docs/std-lib/math.subtract.md"
+import mathSubtractDoc from "../../../../../docs/std-lib/core/math.subtract.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import nullDoc from "../../../../docs/std-lib/null.md"
+import nullDoc from "../../../../../docs/std-lib/core/null.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import printDoc from "../../../../docs/std-lib/print.md"
+import printDoc from "../../../../../docs/std-lib/core/print.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import regexDoc from "../../../../docs/std-lib/regex.md"
+import regexDoc from "../../../../../docs/std-lib/core/regex.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import setDoc from "../../../../docs/std-lib/set.md"
+import setDoc from "../../../../../docs/std-lib/core/set.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import stringDoc from "../../../../docs/std-lib/string.md"
+import stringDoc from "../../../../../docs/std-lib/core/string.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import switchDoc from "../../../../docs/std-lib/switch.md"
+import switchDoc from "../../../../../docs/std-lib/core/switch.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import throwDoc from "../../../../docs/std-lib/throw.md"
+import throwDoc from "../../../../../docs/std-lib/core/throw.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import trueDoc from "../../../../docs/std-lib/true.md"
+import trueDoc from "../../../../../docs/std-lib/core/true.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import tryDoc from "../../../../docs/std-lib/try.md"
+import tryDoc from "../../../../../docs/std-lib/core/try.md"
 
-import { ThyMarkdown } from "../../markdown-code-block-replace"
-import { renderStandardPage } from "../../standard-page-frame"
+import { ThyMarkdown } from "../../../markdown-code-block-replace"
+import { renderStandardPage } from "../../../standard-page-frame"
 
 const sections = [
   ["array", arrayDoc],

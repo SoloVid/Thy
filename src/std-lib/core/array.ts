@@ -1,4 +1,4 @@
-import assert from "../utils/assert"
+import assert from "../../utils/assert"
 
 export type ArrayInitFunction<T> = (args: ArrayInitArgs<T>) => void
 
