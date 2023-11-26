@@ -102,7 +102,7 @@ is much simplified as compared to TypeScript.
 
 User data might be an example of an object:
 
-```json
+```js
 {
   "id": 1,
   "username": "chuck.norris",
@@ -839,6 +839,9 @@ The `void` (no return) value in Thy is technically equivalent to
 [`undefined` in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined).
 
 ### Asynchronous Blocks (`await`)
+
+Thy is single-threaded as TypeScript is,
+and Thy provides the same [asynchronous functionality TypeScript provides](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous).
 
 Asynchronous blocks in Thy are equivalent to [async arrow functions in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function).
 Blocks are implicitly declared "async" (to use the term from TypeScript)
