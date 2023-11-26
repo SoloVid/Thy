@@ -11,6 +11,9 @@ type return Void
 Set an array element at the specified index.
 (Provides write property accessor in lieu of [JavaScript's bracket notation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors#bracket_notation).)
 
+Developers are discouraged from using this function
+since accessing array elements by index is error-prone.
+
 **Example:**
 
 ```thy

@@ -3,7 +3,8 @@ export const subtractBuiltin = (_a: number, _b: number) => _a - _b
 export const multiplyBuiltin = (_a: number, _b: number) => _a * _b
 export const divideBuiltin = (_a: number, _b: number) => _a / _b
 export const modBuiltin = (_a: number, _b: number) => _a % _b
-export const sqrtBuiltin = (_a: number) => Math.sqrt(_a)
+export const powBuiltin = (_base: number, _exponent: number) => Math.pow(_base, _exponent)
+export const rootBuiltin = (_x: number, _n: number = 2) => Math.pow(_x, 1 / _n)
 
 export const math = {
   "add": addBuiltin,
@@ -11,5 +12,6 @@ export const math = {
   "multiply": multiplyBuiltin,
   "divide": divideBuiltin,
   "mod": modBuiltin,
-  "sqrt": sqrtBuiltin,
+  "pow": powBuiltin,
+  "root": rootBuiltin,
 }

@@ -8,7 +8,7 @@ type return Boolean
 ```
 
 Check if all of the supplied terms are the same
-([strict equality](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality)).
+([strict equality (`===`)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality)).
 
 **Example:**
 

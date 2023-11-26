@@ -1,5 +1,5 @@
 export const jsonEncodeBuiltin = (thing: unknown) => {
-  return JSON.stringify(thing)
+  return JSON.stringify(thing, null, 2)
 }
 
 export const jsonDecodeBuiltin = (json: string) => {

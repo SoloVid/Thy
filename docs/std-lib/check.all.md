@@ -8,7 +8,7 @@ type return Boolean
 ```
 
 Check if all of the supplied terms are true
-([logical AND operation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND)).
+([logical AND (`&&`) operation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND)).
 
 **Example:**
 

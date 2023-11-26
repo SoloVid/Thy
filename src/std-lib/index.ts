@@ -2,6 +2,7 @@ import { arrayBuiltin, getBuiltin, mutableArrayBuiltin, setBuiltin } from "./arr
 import { castBuiltin } from "./cast";
 import { check } from "./check";
 import { defBuiltin } from "./def";
+import { delayBuiltin } from "./delay";
 import { elseBuiltin, falseBuiltin, nullBuiltin, trueBuiltin } from "./globals";
 import { ifBuiltin } from "./if";
 import { json } from "./json";
@@ -12,6 +13,7 @@ import { math } from "./math";
 import { printBuiltin } from "./print";
 import { regexBuiltin } from "./regex";
 import { stringBuiltin } from "./string";
+import { switchBuiltin } from "./switch";
 
 export const core = {
   "array": arrayBuiltin,
@@ -21,6 +23,7 @@ export const core = {
   "cast": castBuiltin,
   "check": check,
   "def": defBuiltin,
+  "delay": delayBuiltin,
   "if": ifBuiltin,
   "json": json,
   "loop": {
@@ -38,6 +41,7 @@ export const core = {
   "print": printBuiltin,
   "regex": regexBuiltin,
   "string": stringBuiltin,
+  "switch": switchBuiltin,
 
   "true": trueBuiltin,
   "false": falseBuiltin,

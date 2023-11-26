@@ -1,11 +1,8 @@
 ```thy
 a is given Number
-math.subtract a 1
-b is given Number that
-math.subtract b 1
-c is given Number that
-math.subtract c 1
-d is given Number that
+b is given Number default
+c is given Number default
+d is given Number default
 
 type return Boolean
 ```

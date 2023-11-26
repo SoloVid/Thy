@@ -24,6 +24,6 @@ f is def
   message is given String
   print message
 
-Call the function (just to complete the demonstration).
+Call the function (for completeness).
 f s
 ```

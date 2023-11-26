@@ -1,16 +1,19 @@
 ```thy
 type T is Given Unknown
-default is def
-  let
 init is given Function default
 
-type return Array
+type ReturnType is Array T
+type return ReturnType
 ```
 
-Create an immutable array.
+Create an immutable array 
+(implemented with [JavaScript Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array);
+typed as `readonly T[]`).
 
 This function optionally takes an initialization block
 which can be used to populate the array prior to it being frozen.
+
+If no `init` function is provided, an empty array will be created.
 
 **Example:**
 
