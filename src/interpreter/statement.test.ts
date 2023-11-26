@@ -1,13 +1,24 @@
 import assert from "node:assert"
 import { test } from "under-the-sun"
 import { InterpreterErrorWithContext } from "./interpreter-error"
-import { interpretThyStatement } from "./statement"
+import { interpretThyStatement, parseThyStatement } from "./statement"
 import { makeSimpleContext } from "./test-helper"
 import type { AtomSingle, ThyBlockContext } from "./types"
 
 function interpretThyStatementBasic(context: ThyBlockContext, parts: readonly (string | AtomSingle)[]) {
   return interpretThyStatement(context, parts.map(p => typeof p === "string" ? ({ text: p, lineIndex: -1, columnIndex: -1 }) : p))
 }
+
+const tt = (literal: string) => ({ text: literal, lineIndex: -1, columnIndex: -1 })
+
+test("parseThyStatement() should return call information", () => {
+  const callParts = [tt(`f`)]
+  const parsed = parseThyStatement(callParts)
+  assert(!parsed.assignment)
+  assert.deepStrictEqual(parsed.call, {
+    parts: callParts,
+  })
+})
 
 test("interpretThyStatement() should call function", async () => {
   let called = false
@@ -27,6 +38,21 @@ test("interpretThyStatement() should call function with arguments", async () => 
   assert.strictEqual(calledWith, 67, "Function should have been called")
 })
 
+test("parseThyStatement() should return immutable variable information", () => {
+  const callParts = [tt(`f`), tt(`67`)]
+  const varPart = tt(`a`)
+  const assignPart = tt(`is`)
+  const parsed = parseThyStatement([varPart, assignPart, ...callParts])
+  assert.deepStrictEqual(parsed.assignment, {
+    varModifierPart: undefined,
+    varPart: varPart,
+    assignPart: assignPart,
+  })
+  assert.deepStrictEqual(parsed.call, {
+    parts: callParts,
+  })
+})
+
 test("interpretThyStatement() should save result of function call in an immutable variable", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { f: (a: number) => a + 1 },
@@ -35,12 +61,42 @@ test("interpretThyStatement() should save result of function call in an immutabl
   assert.strictEqual(context.variablesInBlock["a"], 68)
 })
 
+test("parseThyStatement() should return mutable variable information", () => {
+  const callParts = [tt(`f`), tt(`67`)]
+  const varPart = tt(`a`)
+  const assignPart = tt(`be`)
+  const parsed = parseThyStatement([varPart, assignPart, ...callParts])
+  assert.deepStrictEqual(parsed.assignment, {
+    varModifierPart: undefined,
+    varPart: varPart,
+    assignPart: assignPart,
+  })
+  assert.deepStrictEqual(parsed.call, {
+    parts: callParts,
+  })
+})
+
 test("interpretThyStatement() should save result of function call in a mutable variable", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { f: (a: number) => a + 1 },
   })
   interpretThyStatementBasic(context, [`a`, `be`, `f`, `67`])
   assert.strictEqual(context.variablesInBlock["a"], 68)
+})
+
+test("parseThyStatement() should return mutable variable information", () => {
+  const callParts = [tt(`f`), tt(`67`)]
+  const varPart = tt(`a`)
+  const assignPart = tt(`to`)
+  const parsed = parseThyStatement([varPart, assignPart, ...callParts])
+  assert.deepStrictEqual(parsed.assignment, {
+    varModifierPart: undefined,
+    varPart: varPart,
+    assignPart: assignPart,
+  })
+  assert.deepStrictEqual(parsed.call, {
+    parts: callParts,
+  })
 })
 
 test("interpretThyStatement() should overwrite mutable variable with result of function call", async () => {
@@ -216,12 +272,44 @@ test("interpretThyStatement() should use thatValue and beforeThatValue before co
   assert.strictEqual(context.thatValue, 9)
 })
 
+test("parseThyStatement() should return exported variable information", () => {
+  const callParts = [tt(`f`)]
+  const varModifierPart = tt(`export`)
+  const varPart = tt(`a`)
+  const assignPart = tt(`is`)
+  const parsed = parseThyStatement([varModifierPart, varPart, assignPart, ...callParts])
+  assert.deepStrictEqual(parsed.assignment, {
+    varModifierPart: varModifierPart,
+    varPart: varPart,
+    assignPart: assignPart,
+  })
+  assert.deepStrictEqual(parsed.call, {
+    parts: callParts,
+  })
+})
+
 test("interpretThyStatement() should set exported variables", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },
   })
   interpretThyStatementBasic(context, [`export`, `a`, `is`, `f`])
   assert.strictEqual(context.variablesInBlock.a, 5)
+})
+
+test("parseThyStatement() should return private variable information", () => {
+  const callParts = [tt(`f`)]
+  const varModifierPart = tt(`private`)
+  const varPart = tt(`a`)
+  const assignPart = tt(`is`)
+  const parsed = parseThyStatement([varModifierPart, varPart, assignPart, ...callParts])
+  assert.deepStrictEqual(parsed.assignment, {
+    varModifierPart: varModifierPart,
+    varPart: varPart,
+    assignPart: assignPart,
+  })
+  assert.deepStrictEqual(parsed.call, {
+    parts: callParts,
+  })
 })
 
 test("interpretThyStatement() should set private variables", async () => {

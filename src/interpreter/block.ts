@@ -3,8 +3,8 @@ import { interpretThyCall } from "./call"
 import { interpretThyExpression } from "./expression"
 import { InterpreterErrorWithContext, makeInterpreterError } from "./interpreter-error"
 import { splitThyStatements } from "./split-statements"
-import { interpretThyStatement } from "./statement"
-import { isAtomLiterally, Statement, ThyBlockContext } from "./types"
+import { interpretThyStatement, parseThyStatement } from "./statement"
+import { isAtomLiterally, isSimpleAtom, Statement, ThyBlockContext } from "./types"
 
 type BlockOptions = {
   closure: ThyBlockContext["closure"]
@@ -15,12 +15,33 @@ type BlockOptions = {
   additionalTraceLinesToHide?: number
 }
 
+type UnknownFunction = (...args: readonly unknown[]) => unknown
+type InterpretedBlockReturnStyleReturnMetadata = {
+  style: "return"
+}
+type InterpretedBlockExportsStyleReturnMetadata = {
+  style: "exports"
+  exports: readonly string[]
+}
+type InterpretedBlockReturnMeta = InterpretedBlockReturnStyleReturnMetadata | InterpretedBlockExportsStyleReturnMetadata
+type InterpretedBlockWithMeta = {
+  interpreted: UnknownFunction
+  returns: InterpretedBlockReturnMeta
+}
+
 export function interpretThyBlock(
   thySource: string,
   options: Partial<BlockOptions> = {},
-): (...args: readonly unknown[]) => unknown {
+): UnknownFunction {
+  return interpretThyBlockWithMeta(thySource, options).interpreted
+}
+
+export function interpretThyBlockWithMeta(
+  thySource: string,
+  options: Partial<BlockOptions> = {},
+): InterpretedBlockWithMeta {
   const lines = thySource.split(/\r\n|\n/)
-  return interpretThyBlockLines(lines, {
+  return interpretThyBlockLinesWithMeta(lines, {
     closure: options.closure ?? {},
     closureVariableIsImmutable: options.closureVariableIsImmutable ?? {},
     functionName: options.functionName,
@@ -33,13 +54,23 @@ export function interpretThyBlock(
 export function interpretThyBlockLines(
   thySourceLines: readonly string[],
   options: BlockOptions,
-): (...args: readonly unknown[]) => unknown {
+): UnknownFunction {
+  return interpretThyBlockLinesWithMeta(thySourceLines, options).interpreted
+}
+
+export function interpretThyBlockLinesWithMeta(
+  thySourceLines: readonly string[],
+  options: BlockOptions,
+): InterpretedBlockWithMeta {
   // I don't fully understand the -1 here, but somehow we want a different number of lines masked in the top-level case vs. thy-internal cases.
   const additionalTraceLinesToHide = options.additionalTraceLinesToHide ?? -1
   const statements = splitThyStatements(thySourceLines, options.startingLineIndex)
   const isAsync = statements.some(s => s.some(a => isAtomLiterally(a, "await")))
   let exportUsed = false
   let letUsed = false
+  let returnUsed = false
+  const explicitExports: string[] = []
+  const bareVariables: string[] = []
   for (const statement of statements) {
     if (isAtomLiterally(statement[0], "export")) {
       if (letUsed) {
@@ -57,7 +88,20 @@ export function interpretThyBlockLines(
       if (exportUsed) {
         throw makeInterpreterError(statement[0], `\`return\` cannot be used after \`export\``)
       }
+      returnUsed = true
     }
+    const parsed = parseThyStatement(statement)
+    if (parsed.assignment) {
+      if (isAtomLiterally(parsed.assignment.varModifierPart, "export")) {
+        explicitExports.push(parsed.assignment.varPart.text)
+      } else if (!parsed.assignment.varModifierPart) {
+        bareVariables.push(parsed.assignment.varPart.text)
+      }
+    }
+  }
+  const returns: InterpretedBlockReturnMeta = letUsed || returnUsed ? { style: "return" } : {
+    style: "exports",
+    exports: explicitExports.length > 0 ? explicitExports : bareVariables,
   }
 
   function makeHelper(args: readonly unknown[]) {
@@ -126,7 +170,7 @@ export function interpretThyBlockLines(
         }
         return implicitReturn
       }
-      return undefined  
+      return undefined
     }
 
     return {
@@ -154,7 +198,7 @@ export function interpretThyBlockLines(
         }
 
         // For async stack traces, the trace is a bit different before and after a true await.
-        const errorHere = new Error("errorHere")
+        const errorHere = new Error()
         try {
           const [shouldReturn, value] = helper.evaluateStatement(statement)
           if (shouldReturn) {
@@ -170,7 +214,10 @@ export function interpretThyBlockLines(
       }
       return helper.formulateResult()
     } }
-    return objWithBlockFunction[functionName]
+    return {
+      interpreted: objWithBlockFunction[functionName],
+      returns,
+    }
   }
 
   const objWithBlockFunction = { [functionName]: (...args: readonly unknown[]) => {
@@ -187,7 +234,10 @@ export function interpretThyBlockLines(
     }
     return helper.formulateResult()
   } }
-  return objWithBlockFunction[functionName]
+  return {
+    interpreted: objWithBlockFunction[functionName],
+    returns,
+}
 }
 
 function throwTransformedError(
@@ -203,17 +253,17 @@ function throwTransformedError(
     }
     const e = errorCloseToCall.cause
 
-    const errorHere = new Error("errorHere")
+    const errorHere = new Error()
     const errorDissectedAtCall = dissectErrorTraceAtCloserBaseline(e, errorCloseToCall, errorCloseToCall.additionalDepthToShave, errorCloseToCall.altCloseError, errorCloseToCall.altAdditionalDepthToShave)
     // console.log(errorDissectedAtCall)
     const errorDissectedHere = dissectErrorTraceAtCloserBaseline(e, errorHere, additionalTraceLinesToHide, altErrorHere, additionalTraceLinesToHide)
     // console.log(errorDissectedHere)
     const errorTraceLocation = errorCloseToCall.sourceLocation
 
-    throw transformErrorTrace(e, (originalTraceLines) => {
+    throw transformErrorTrace(e, () => {
       return [
         errorDissectedAtCall.delta,
-        replaceErrorTraceLine(errorDissectedHere.pivot, 0, (func, file, line, column) => [
+        replaceErrorTraceLine(errorDissectedHere.pivot, 0, () => [
           functionName,
           sourceFile,
           errorTraceLocation.lineIndex + 1,

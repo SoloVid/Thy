@@ -1,6 +1,6 @@
 import assert from "node:assert"
 import { test } from "under-the-sun"
-import { core } from "../std-lib"
+import { core } from "../std-lib/core"
 import { interpretThyBlock } from "./block"
 import { InterpreterErrorWithContext } from "./interpreter-error"
 

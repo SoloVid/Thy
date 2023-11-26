@@ -13,16 +13,16 @@ export default function CodeComparison({
   source2,
   language2,
 }: CodeComparisonProps) {
-  return <div class="code-comparison" style={`display:flex;flex-direction:row;`}>
-    <div style="flex:0 0 47%;overflow:hidden;">
-    <div class="text-center"><em>{language1}</em></div>
+  return <div class="code-comparison">
+    <div class="sample">
+      <div class="text-center"><em>{language1}</em></div>
       <CodeBlock
         source={source1}
         language={language1}
       ></CodeBlock>
     </div>
-    <div style="flex:0 0 6%;"></div>
-    <div style="flex:0 0 47%;overflow:hidden;">
+    <div class="divider"></div>
+    <div class="sample">
       <div class="text-center"><em>{language2}</em></div>
       <CodeBlock
         source={source2}

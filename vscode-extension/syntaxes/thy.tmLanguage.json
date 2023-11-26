@@ -41,7 +41,7 @@
 			"patterns": [
 				{
 					"name": "meta.line.thy",
-					"match": "^(\\s*)([a-z].+)$",
+					"match": "^(\\s*)([a-z].*)$",
 					"captures": {
 						"2": {
 							"name": "meta.line.content.thy",
@@ -105,7 +105,7 @@
 			"patterns": [
 				{
 					"name": "meta.let.thy",
-					"match": "(let) (.+)$",
+					"match": "(let)(?: (.+)?)?$",
 					"captures": {
 						"1": {"name": "keyword.control.let.thy"},
 						"2": {
