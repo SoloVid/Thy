@@ -21,6 +21,14 @@ export default function StandardPageFrame({ title, children }: StandardPageFrame
       </h4>
     </div>
     {children}
+    <div class="column-content-sm">
+      <p>
+        <small>
+          From the mind of <a href="https://www.codehousing.com" target="_blank">Grant</a>,
+          source <a href="https://github.com/SoloVid/Thy" target="_blank">on GitHub</a>.
+        </small>
+      </p>
+    </div>
   </div>
 }
 

@@ -3,14 +3,14 @@ From https://code.golf/fizz-buzz
 Define function and store in new variable
 fizzBuzz is def
   This function takes one parameter "iterations"
-  iterations is given
+  iterations is given Number
 
   loop.times iterations
     This lambda takes one parameter "i"
     Argument provided by the loop.times function
-    private i is given
+    i is given
 
-    private n is math.add i 1
+    n is math.add i 1
     Compute n % 3
     math.mod n 3
     Compare the last result to 0
@@ -24,6 +24,7 @@ fizzBuzz is def
         print "buzz"
       and else
         print n
+    let
 
 Run the fizzBuzz function
 print "== case 10 =="

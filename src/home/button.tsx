@@ -16,7 +16,7 @@ export default function Button({
   onClick,
   ...remainingProps
 }: ButtonProps & JSX.HTMLAttributes<HTMLAnchorElement>) {
-  const button = <a class="button" href={href} target={newTab ? "_blank" : undefined} onClick={onClick} {...remainingProps}>{text}</a>
+  const button = <a class="button" href={href} target={newTab ? "_blank" : undefined} onClick={onClick} style="margin:5px;" {...remainingProps}>{text}</a>
   if (centered) {
     return <div class="text-center">{button}</div>
   }
@@ -35,7 +35,6 @@ export function TryButton({
   return <Button
     text="Try"
     centered
-    style="margin:5px;"
     href={`${playgroundUrl}#b64=${btoa(source.trim())}`}
     newTab
   ></Button>

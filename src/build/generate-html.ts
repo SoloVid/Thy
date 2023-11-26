@@ -21,7 +21,7 @@ function makeHtml(inputScript: string) {
     <title>Thy (lang)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,400;1,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/prism-theme.css">
     <link rel="stylesheet" href="/home.css">
     <link rel="stylesheet" href="/code-input.css">
