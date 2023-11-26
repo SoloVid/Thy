@@ -105,7 +105,7 @@
 			"patterns": [
 				{
 					"name": "meta.let.thy",
-					"match": "(let) (.+)$",
+					"match": "(let)(?: (.+)?)?$",
 					"captures": {
 						"1": {"name": "keyword.control.let.thy"},
 						"2": {
