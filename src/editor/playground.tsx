@@ -1,5 +1,6 @@
-import { render } from "preact"
+import { compressToEncodedURIComponent as compressLz, decompressFromEncodedURIComponent as decompressLz } from "lz-string"
 import { useEffect, useState } from "preact/hooks"
+import { CopyToClipboardButton } from "../home/button"
 import { interpretThyBlock } from "../interpreter/block"
 import { generateUID } from "../interpreter/split-line"
 import { core } from "../std-lib/core"
@@ -7,8 +8,6 @@ import { dissectErrorTraceAtCloserBaseline } from "../utils/error-helper"
 import CodeInput from "./code-input"
 import { makeThyFilesApi } from "./files-api"
 import { makeFileManager, useLocalFiles } from "./local-files"
-import { compressToEncodedURIComponent as compressLz, decompressFromEncodedURIComponent as decompressLz } from "lz-string"
-import { CopyToClipboardButton } from "../home/button"
 
 type Output = {
   readonly error: null | string
@@ -55,13 +54,6 @@ export default function Playground() {
       }
       setEditorLanguage(state.language)
       setFileLoaded(state.fileName)
-      // if (e.state !== history.state) {
-      //   console.log("States don't match!")
-      // }
-      // const { language = "thy", fileName = "" } = history.state ?? {}
-      // setSourceCode(getInitialSourceCode())
-      // setEditorLanguage(language)
-      // setFileLoaded(fileName)
     }
     window.addEventListener("popstate", listener)
     return () => window.removeEventListener("popstate", listener)
@@ -124,7 +116,6 @@ export default function Playground() {
   function getInitialSourceCode() {
     const sourceFromUrl = extractCodeFromUrl()
     if (sourceFromUrl) {
-      // saveCodeInHistory(fileLoaded, sourceFromUrl, editorLanguage)
       return sourceFromUrl
     }
     const sourceFromHistory = extractCodeFromHistoryState()
@@ -133,18 +124,6 @@ export default function Playground() {
     }
     return `return "himom"\n`
   }
-
-  // function extractLanguageFromHistoryState() {
-  //   try {
-  //     const lang = history.state?.language as string | undefined
-  //     if (lang) {
-  //       return lang
-  //     }
-  //   } catch (e) {
-  //     console.error(e)
-  //   }
-  //   return "thy"
-  // }
 
   const [editorLanguage, setEditorLanguage] = useState<string>(() => getDataFromHistory().language)
   const [sourceCode, setSourceCodeInner] = useState(getInitialSourceCode)
@@ -221,7 +200,6 @@ export default function Playground() {
 
   function setSourceCode(newSource: string) {
     setSourceCodeInner(newSource)
-    // saveCodeInHistory(fileLoaded, newSource, editorLanguage)
   }
 
   return <div class="playground-container" style={`height:100vh;height:${windowHeight}px;`}>
@@ -269,7 +247,6 @@ export default function Playground() {
                 const metadata = fileMan.getMetadata(f)
                 setEditorLanguage(metadata.language ?? "thy")
                 setFileLoaded(f)
-                // saveCodeInHistory(f, contents, metadata.language ?? "thy")
               }}>Load</a>
               <a className="small button" onClick={() => fileMan.deleteFile(f)}>Delete</a>
               <strong>{f}</strong>
@@ -299,7 +276,6 @@ export default function Playground() {
           <select value={editorLanguage} onChange={(e) => {
             const newLang = (e.target as HTMLSelectElement).value
             setEditorLanguage(newLang)
-            // saveCodeInHistory(fileLoaded, sourceCode, newLang)
           }}>
             <option value="thy">thy</option>
             <option value="text">text</option>
