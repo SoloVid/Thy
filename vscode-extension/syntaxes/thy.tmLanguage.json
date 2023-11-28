@@ -218,7 +218,7 @@
 		"multiline-strings-plus": {
 			"name": "meta.multiline-string-plus.thy",
 			"begin": "^((\\s*)[a-z].+)(\"\"\")$",
-			"end": "^(?=\\2\\S)",
+			"end": "^(?!\\2\\s+\\S|\\s*$)",
 			"beginCaptures": {
 				"3": { "name": "string.quoted.multiline.thy" },
 				"1": {

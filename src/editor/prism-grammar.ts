@@ -14,6 +14,19 @@ const innerParts: Grammar = {
     /\b-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?\b/,
   ],
 }
+const insideString: Grammar = {
+  'string-interpolation': {
+    pattern: /(\.)([a-z][a-zA-Z0-9]*)(\.)/g,
+    inside: {
+      'punctuation': {
+        pattern: /\./g,
+      },
+      'variable': {
+        pattern: /[a-zA-Z0-9]+/,
+      }
+    }
+  }
+}
 export const thyPrismGrammar: Grammar = {
   'whitespace': [
     {
@@ -30,6 +43,13 @@ export const thyPrismGrammar: Grammar = {
       lookbehind: true,
     },
   ],
+  'multiline-string-line': {
+    pattern: /^(([ \t]*)[a-z].+)(""")$(?:\r?\n)(?:.|[\n\r])+?(?:^(?!(?:\2[ \t]+\S|[ \t]*$))|$(?!(?:.|[\r\n])))/gm,
+    greedy: true,
+    lookbehind: true,
+    alias: ['string'],
+    inside: insideString,
+  },
   'code-line': {
     pattern: /(^\s*)[a-z].*$/gm,
     lookbehind: true,
@@ -38,6 +58,7 @@ export const thyPrismGrammar: Grammar = {
         {
           pattern: /"(\\.|[^"])*"/g,
           greedy: true,
+          inside: insideString
         }
       ],
       'keyword': [
