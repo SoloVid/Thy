@@ -266,3 +266,12 @@ pre.output {
   padding: 5px 10px;
   border-radius: 5px;
 }
+
+label {
+  vertical-align: middle;
+}
+
+select {
+  margin: 5px;
+  padding: 5px;
+}

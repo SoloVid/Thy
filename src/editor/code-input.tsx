@@ -6,6 +6,7 @@ import { addThyPrismGrammarAndAwaitAvailable } from "./prism-grammar"
 export type CodeInputProps = {
   id: string
   style: string
+  language?: string
   value: string
   setValue: (newValue: string) => void
   runCode: () => void
@@ -24,6 +25,7 @@ export function useThyPrism() {
 export default function CodeInput({
   id,
   style,
+  language = "thy",
   value,
   setValue,
   runCode,
@@ -49,8 +51,8 @@ export default function CodeInput({
 
   const highlightedHtml = useMemo(() => {
     const valueToHighlight = value[value.length - 1] == "\n" ? value + " " : value
-    return Prism.highlight(valueToHighlight, Prism.languages.thy ?? Prism.languages.javascript, "thy")
-  }, [isThyPrismLoaded, value])
+    return Prism.highlight(valueToHighlight, Prism.languages[language] ?? Prism.languages.text, language)
+  }, [isThyPrismLoaded, value, language])
 
   const lineNumbers = value.split("\n").map((l, i) => i + 1)
 
@@ -244,7 +246,7 @@ export default function CodeInput({
           aria-hidden="true"
           // class="line-numbers"
         >
-        <code dangerouslySetInnerHTML={{__html: highlightedHtml}} class="language-thy"></code>
+        <code dangerouslySetInnerHTML={{__html: highlightedHtml}} class={`language-${language}`}></code>
         </pre>
       </div>
     </div>
