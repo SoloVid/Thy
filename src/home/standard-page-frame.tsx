@@ -16,7 +16,7 @@ export default function StandardPageFrame({ title, children }: StandardPageFrame
   }, [])
   return <PageWithNavigationBar><div class="background">
     <div class="column-content-sm">
-      <a href={home}><h1 class="text-center">Thy (lang)</h1></a>
+    <h1 class="text-center"><a href={home}>Thy (lang)</a></h1>
       <h4 class="text-center">
         <em>My language is Thy language</em>
       </h4>

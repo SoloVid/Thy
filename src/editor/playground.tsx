@@ -106,7 +106,7 @@ export default function Playground() {
   const [showFileMenu, setShowFileMenu] = useState(false)
   const [fileLoaded, setFileLoaded] = useState("")
 
-  return <div style={`height:100vh;height:${windowHeight}px;`}>
+  return <div class="playground-container" style={`height:100vh;height:${windowHeight}px;`}>
     <CodeInput
       id="editor"
       style={`position:relative; width: 100%; height: ${editorHeight}px;`}
