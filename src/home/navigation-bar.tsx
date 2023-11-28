@@ -30,7 +30,7 @@ export default function PageWithNavigationBar({ children }: Props) {
             Standard Library
             <ul className="nested">
               <li><a href="/api/std-lib/core.html">Core</a></li>
-              <li>More to come...</li>
+              <li><a href="/api/std-lib/playground.html">Playground</a></li>
             </ul>
           </li>
         </ul>

@@ -161,8 +161,9 @@ export default function Playground() {
           console.log(thing)
           printedLines.push("" + thing)
         },
+        encodeURIComponent,
         fetch,
-        files: makeThyFilesApi(rawFileManager)
+        file: makeThyFilesApi(rawFileManager)
       }
       returnValue = await interpreted(playgroundLib)
     } catch (e) {
