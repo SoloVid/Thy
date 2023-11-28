@@ -227,6 +227,9 @@ export default function CodeInput({
       <textarea
         ref={$textarea}
         spellcheck={false}
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
         onInput={(e) => {
           update((e.target as HTMLTextAreaElement).value)
           syncScroll()
