@@ -1,8 +1,7 @@
 import Button, { TryButton } from "../button"
 import CodeBlock from "../code-block"
 import { fizzBuzzThy } from "../example/fizz-buzz"
-import { typesThy } from "../example/types"
-import { home, playgroundBaseUrl } from "../links"
+import { playgroundBaseUrl } from "../links"
 import { renderStandardPage } from "../standard-page-frame"
 
 renderStandardPage("Thy (lang)", <>

@@ -1,5 +1,6 @@
-import { render } from "preact"
+import { compressToEncodedURIComponent as compressLz, decompressFromEncodedURIComponent as decompressLz } from "lz-string"
 import { useEffect, useState } from "preact/hooks"
+import { CopyToClipboardButton } from "../home/button"
 import { interpretThyBlock } from "../interpreter/block"
 import { generateUID } from "../interpreter/split-line"
 import { core } from "../std-lib/core"
@@ -32,13 +33,117 @@ export default function Playground() {
   })
   const editorHeight = Math.min(windowHeight, 500)
 
-  const [sourceCode, setSourceCodeInner] = useState(() => {
-    const base64SourceMatch = /b64=([^&]+)/.exec(window.location.hash)
-    if (base64SourceMatch !== null) {
-      return atob(base64SourceMatch[1])
+  function getDataFromHistory() {
+    const {
+      language = "thy",
+      fileName = "",
+      lz = null,
+    } = (history.state ?? {}) as Record<string, string | undefined>
+    return {
+      language,
+      fileName,
+      lz,
+    }
+  }
+
+  useEffect(() => {
+    const listener = (e: PopStateEvent) => {
+      const state = getDataFromHistory()
+      if (state.lz) {
+        setSourceCode(decompressLz(state.lz))
+      }
+      setEditorLanguage(state.language)
+      setFileLoaded(state.fileName)
+    }
+    window.addEventListener("popstate", listener)
+    return () => window.removeEventListener("popstate", listener)
+  })
+
+  function saveCodeInHistory(fileName: string, newSource: string, language: string) {
+    try {
+      history.replaceState(
+        {
+          lz: compressLz(newSource),
+          language: language,
+          fileName: fileName,
+        },
+        "",
+        window.location.pathname + window.location.search
+      )
+    } catch (e) {
+      // MDN warns that an exception could be thrown if the data is too big.
+      // In that event, we just want to ignore the error.
+      // Better to have no history than failing editor.
+
+      history.replaceState(
+        null,
+        "",
+        window.location.pathname + window.location.search
+      )
+    }
+  }
+
+  function extractCodeFromUrl() {
+    try {
+      const base64UrlSourceMatch = /b64=([^&]+)/.exec(window.location.hash)
+      if (base64UrlSourceMatch !== null) {
+        return atob(base64UrlSourceMatch[1])
+      }
+      const lzUrlSourceMatch = /lz=([^&]+)/.exec(window.location.hash)
+      if (lzUrlSourceMatch !== null) {
+        return decompressLz(lzUrlSourceMatch[1])
+      }
+    } catch (e) {
+      console.error(e)
+      window.alert(`Error parsing source in URL: ${e}`)
+    }
+    return null
+  }
+
+  function extractCodeFromHistoryState() {
+    try {
+      const lzString = getDataFromHistory().lz
+      if (lzString) {
+        return decompressLz(lzString)
+      }
+    } catch (e) {
+      console.error(e)
+      window.alert(`Error parsing source in history state: ${e}`)
+    }
+    return null
+  }
+
+  function getInitialSourceCode() {
+    const sourceFromUrl = extractCodeFromUrl()
+    if (sourceFromUrl) {
+      return sourceFromUrl
+    }
+    const sourceFromHistory = extractCodeFromHistoryState()
+    if (sourceFromHistory) {
+      return sourceFromHistory
     }
     return `return "himom"\n`
+  }
+
+  const [editorLanguage, setEditorLanguage] = useState<string>(() => getDataFromHistory().language)
+  const [sourceCode, setSourceCodeInner] = useState(getInitialSourceCode)
+
+  const [menuShowing, setMenuShowing] = useState<"file" | "options" | null>(null)
+  const [fileLoaded, setFileLoaded] = useState(() => getDataFromHistory().fileName)
+
+  const [output, setOutput] = useState<Output | string>({
+    error: null,
+    returnValue: undefined,
+    printedLines: [],
   })
+
+  useEffect(() => {
+    saveCodeInHistory(fileLoaded, sourceCode, editorLanguage)
+  }, [fileLoaded, sourceCode, editorLanguage])
+
+  function getShareUrl() {
+    return window.location.protocol + "//" + window.location.host + window.location.pathname + window.location.search + "#lz=" + compressLz(sourceCode)
+  }
 
   const rawFileManager = makeFileManager()
   const fileMan = useLocalFiles(rawFileManager)
@@ -80,11 +185,6 @@ export default function Playground() {
     }
   }
 
-  const [output, setOutput] = useState<Output | string>({
-    error: null,
-    returnValue: undefined,
-    printedLines: [],
-  })
   function runThenSetOutput(code: string) {
     const uid = generateUID()
     setOutput(uid)
@@ -100,16 +200,13 @@ export default function Playground() {
 
   function setSourceCode(newSource: string) {
     setSourceCodeInner(newSource)
-    history.replaceState(null, "", `#b64=${btoa(newSource)}`)
   }
-
-  const [showFileMenu, setShowFileMenu] = useState(false)
-  const [fileLoaded, setFileLoaded] = useState("")
 
   return <div class="playground-container" style={`height:100vh;height:${windowHeight}px;`}>
     <CodeInput
       id="editor"
       style={`position:relative; width: 100%; height: ${editorHeight}px;`}
+      language={editorLanguage}
       value={sourceCode}
       setValue={setSourceCode}
       runCode={() => runThenSetOutput(sourceCode)}
@@ -117,15 +214,26 @@ export default function Playground() {
     <div>
       <div className="button-panel">
         <a onClick={() => runThenSetOutput(sourceCode)} className="large button">Run</a>
-        <a onClick={() => setShowFileMenu(before => !before)} className="large button">File</a>
+        <a onClick={() => setMenuShowing(before => before === "file" ? null : "file")} className="large button">File</a>
+        <CopyToClipboardButton
+          extraButtonClass="large"
+          getValue={() => getShareUrl()}
+          tooltip="Copied URL"
+        >Share</CopyToClipboardButton>
+        <CopyToClipboardButton
+          extraButtonClass="large"
+          getValue={() => sourceCode}
+          tooltip="Copied code"
+        >Copy</CopyToClipboardButton>
+        <a onClick={() => setMenuShowing(before => before === "options" ? null : "options")} className="large button">Options</a>
       </div>
-      {showFileMenu && (<>
+      {menuShowing === "file" && (<>
         <ul>
           {fileMan.files.length === 0 && <li>No saved files</li>}
           {fileMan.files.map(f => (
             <li>
               <a className="small button" onClick={() => {
-                fileMan.saveFile(f, sourceCode)
+                fileMan.saveFile(f, sourceCode, { language: editorLanguage })
                 setFileLoaded(f)
               }}>Save</a>
               <a className="small button" onClick={() => {
@@ -133,7 +241,11 @@ export default function Playground() {
                 if (contents === null) {
                   return
                 }
+                // Push a new state for browser history.
+                history.pushState(history.state, "", "")
                 setSourceCode(contents)
+                const metadata = fileMan.getMetadata(f)
+                setEditorLanguage(metadata.language ?? "thy")
                 setFileLoaded(f)
               }}>Load</a>
               <a className="small button" onClick={() => fileMan.deleteFile(f)}>Delete</a>
@@ -158,6 +270,19 @@ export default function Playground() {
         </ul>
         <hr/>
       </>)}
+      {menuShowing === "options" && <>
+        <label>
+          Language:
+          <select value={editorLanguage} onChange={(e) => {
+            const newLang = (e.target as HTMLSelectElement).value
+            setEditorLanguage(newLang)
+          }}>
+            <option value="thy">thy</option>
+            <option value="text">text</option>
+          </select>
+        </label>
+        <hr/>
+      </>}
       {typeof output === "string" ? (
         <h4>Running...</h4>
       ): (<>

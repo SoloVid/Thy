@@ -2,6 +2,7 @@ import { useState } from "preact/hooks"
 
 const storageFilesListKey = "files"
 const storageFileKeyPrefix = "file:"
+const storageFileMetaKeyPrefix = "file-meta:"
 
 export function makeFileManager() {
   function getFilesList() {
@@ -10,6 +11,10 @@ export function makeFileManager() {
   }
   function updateFilesList(newFilesList: readonly string[]) {
     localStorage.setItem(storageFilesListKey, JSON.stringify(newFilesList))
+  }
+
+  function getStorageMetaKey(name: string) {
+    return `${storageFileMetaKeyPrefix}${name}`
   }
 
   function getStorageKey(name: string) {
@@ -28,8 +33,17 @@ export function makeFileManager() {
     return contents
   }
 
-  function saveFile(name: string, sourceCode: string) {
-    localStorage.setItem(getStorageKey(name), sourceCode)
+  function getMetadata(name: string): Record<string, string> {
+    const rawMeta = localStorage.getItem(getStorageMetaKey(name))
+    if (rawMeta === null) {
+      return {}
+    }
+    return JSON.parse(rawMeta)
+  }
+
+  function saveFile(name: string, text: string, metadata: Record<string, string> = {}) {
+    localStorage.setItem(getStorageKey(name), text)
+    localStorage.setItem(getStorageMetaKey(name), JSON.stringify(metadata))
     const before = getFilesList()
     if (!before.includes(name)) {
       updateFilesList([...before, name])
@@ -38,6 +52,7 @@ export function makeFileManager() {
 
   function deleteFile(name: string) {
     localStorage.removeItem(getStorageKey(name))
+    localStorage.removeItem(getStorageMetaKey(name))
     const before = getFilesList()
     updateFilesList(before.filter(f => f !== name))
   }
@@ -46,6 +61,7 @@ export function makeFileManager() {
     checkFileExists,
     getFilesList,
     getFile,
+    getMetadata,
     saveFile,
     deleteFile,
   }
@@ -67,8 +83,8 @@ export function useLocalFiles(implementation: FileManager) {
     return name
   }
 
-  function saveFile(name: string, sourceCode: string) {
-    implementation.saveFile(name, sourceCode)
+  function saveFile(name: string, sourceCode: string, metadata: Record<string, string> = {}) {
+    implementation.saveFile(name, sourceCode, metadata)
     bumpVersion()
   }
 
@@ -83,6 +99,7 @@ export function useLocalFiles(implementation: FileManager) {
   return {
     files: files as readonly string[],
     getFile: implementation.getFile,
+    getMetadata: implementation.getMetadata,
     saveAsNew,
     saveFile,
     deleteFile,

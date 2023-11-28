@@ -252,3 +252,26 @@ pre.output {
   position: fixed;
   right: 0;
 }
+
+.tooltip {
+  position: absolute;
+  z-index: 1;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  width: max-content;
+  background: #000;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+label {
+  vertical-align: middle;
+}
+
+select {
+  margin: 5px;
+  padding: 5px;
+}
