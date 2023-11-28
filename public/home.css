@@ -21,6 +21,7 @@ body {
   --btn-text-color: #fff;
   --code-bkg-color: #f2f1f1;
   --nav-bkg-color: var(--bkg-color);
+  --play-bkg-color: var(--bkg-color);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -31,6 +32,7 @@ body {
     --btn-text-color: #ddd;
     --code-bkg-color: #272822;
     --nav-bkg-color: var(--code-bkg-color);
+    --play-bkg-color: var(--code-bkg-color);
   }
 }
 
@@ -39,7 +41,8 @@ body {
 }
 
 .playground-container {
-  background: var(--code-bkg-color);
+  background: var(--play-bkg-color);
+  overflow: auto;
 }
 
 * {
