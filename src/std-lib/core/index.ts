@@ -3,6 +3,7 @@ import { castBuiltin } from "./cast";
 import { check } from "./check";
 import { defBuiltin } from "./def";
 import { delayBuiltin } from "./delay";
+import { doBuiltin } from "./do";
 import { catchBuiltin, elseBuiltin, falseBuiltin, finallyBuiltin, nullBuiltin, trueBuiltin } from "./globals";
 import { ifBuiltin } from "./if";
 import { json } from "./json";
@@ -25,6 +26,7 @@ export const core = {
   "check": check,
   "def": defBuiltin,
   "delay": delayBuiltin,
+  "do": doBuiltin,
   "if": ifBuiltin,
   "json": json,
   "loop": {

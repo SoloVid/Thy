@@ -23,6 +23,8 @@ import defDoc from "../../../../../docs/std-lib/core/def.md"
 // @ts-expect-error Import only valid because of esbuild magic.
 import delayDoc from "../../../../../docs/std-lib/core/delay.md"
 // @ts-expect-error Import only valid because of esbuild magic.
+import doDoc from "../../../../../docs/std-lib/core/do.md"
+// @ts-expect-error Import only valid because of esbuild magic.
 import elseDoc from "../../../../../docs/std-lib/core/else.md"
 // @ts-expect-error Import only valid because of esbuild magic.
 import falseDoc from "../../../../../docs/std-lib/core/false.md"
@@ -79,7 +81,7 @@ import trueDoc from "../../../../../docs/std-lib/core/true.md"
 // @ts-expect-error Import only valid because of esbuild magic.
 import tryDoc from "../../../../../docs/std-lib/core/try.md"
 
-import { ThyMarkdown } from "../../../markdown-code-block-replace"
+import { makeMultiMarkdown } from "../../../multi-markdown"
 import { renderStandardPage } from "../../../standard-page-frame"
 
 const sections = [
@@ -95,6 +97,7 @@ const sections = [
   ["check.some", checkSomeDoc],
   ["def", defDoc],
   ["delay", delayDoc],
+  ["do", doDoc],
   ["else", elseDoc],
   ["false", falseDoc],
   ["finally", finallyDoc],
@@ -125,28 +128,13 @@ const sections = [
   ["try", tryDoc],
 ] as const
 
-function nameAsId(name: string) {
-  return name.replace(/[^a-z]/g, "-")
-}
+const { toc, renderedSections } = makeMultiMarkdown(sections)
 
-const toc = sections.map(([name]) => <>
-  <li><a href={`#${nameAsId(name)}`}>{name}</a></li>
-</>)
-
-const renderedSections = sections.map(([name, doc]) => <>
-  <hr/>
-  <a href={`#${nameAsId(name)}`}>
-    <h3 id={nameAsId(name)}>{name}</h3>
-  </a>
-  <ThyMarkdown noTry>{doc}</ThyMarkdown>
-  <em><a href="#top">back to top</a></em>
-</>)
-
-renderStandardPage("Standard Library - Thy (lang)", <>
+renderStandardPage("Core Standard Library - Thy (lang)", <>
   <div class="column-content-sm">
     <h2>Overview</h2>
     <p>
-      The standard library for Thy is the base set of functions and values
+      The core standard library for Thy is the base set of functions and values
       that should be available in any Thy runtime environment.
       Many of these functions are provided as language features
       in other languages.
