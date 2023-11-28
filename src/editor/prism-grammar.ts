@@ -15,14 +15,12 @@ const innerParts: Grammar = {
   ],
 }
 export const thyPrismGrammar: Grammar = {
-  // 'keyword': /TS/,
   'whitespace': [
     {
       pattern: /^\s+/,
     }
   ],
   'comment': [
-    // /^\s*([A-Z].*)/,
     {
       pattern: /^(\s*)([A-Z]{3,})(?:.|[\n\r])+?^(\1)(\2)$/gm,
       greedy: true,
@@ -33,7 +31,7 @@ export const thyPrismGrammar: Grammar = {
     },
   ],
   'code-line': {
-    pattern: /(^\s*)[a-z].+$/gm,
+    pattern: /(^\s*)[a-z].*$/gm,
     lookbehind: true,
     inside: {
       'string': [

@@ -129,7 +129,7 @@ which itself is another nested object.
 Functions are snippets of code written somewhere else.
 Function values are used to break down code into smaller manageable chunks
 and allow reuse of common code functionality in multiple places.
-Functions in Thy are equivalent to [objects in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Language_overview#functions),
+Functions in Thy are equivalent to [functions in TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Language_overview#functions),
 but the functionality provided in Thy for constructing functions
 is much simplified as compared to TypeScript.
 
