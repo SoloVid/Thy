@@ -104,6 +104,15 @@ test("interpretThyExpression() barfs if implicit argument used after given", asy
   })
 })
 
+test("interpretThyExpression() returns variable of same name as implicit argument if implicit arguments not used", async () => {
+  const context = makeSimpleContext({
+    givenUsed: true,
+    implicitArguments: { x: 5 },
+    variablesInBlock: { x: 6 },
+  })
+  assert.strictEqual(interpretThyExpressionBasic(context, `x`).target, 6)
+})
+
 test("interpretThyExpression() can do member access", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { x: { y: { z: 6 } } }

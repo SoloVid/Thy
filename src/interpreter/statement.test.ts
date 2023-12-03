@@ -196,10 +196,11 @@ test("interpretThyStatement() should not allow overwriting immutable variable in
   })
 })
 
-test("interpretThyStatement() should not allow overwriting implicit argument", async () => {
+test("interpretThyStatement() should not allow overwriting implicit argument if implicit arguments are used", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { f: () => 5 },
     implicitArguments: { a: 1 },
+    implicitArgumentFirstUsed: "a",
   })
   assert.throws(() => interpretThyStatementBasic(context, [{ text: "a", lineIndex: 2, columnIndex: 4 }, `to`, `f`]), (e) => {
     assert(e instanceof Error)
@@ -208,6 +209,16 @@ test("interpretThyStatement() should not allow overwriting implicit argument", a
     assert.deepStrictEqual(e.sourceLocation, { lineIndex: 2, columnIndex: 4 })
     return true
   })
+})
+
+test("interpretThyStatement() should allow overwriting implicit argument if implicit arguments are not used", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { f: () => 5 },
+    implicitArguments: { a: 1 },
+    implicitArgumentFirstUsed: null,
+  })
+  interpretThyStatementBasic(context, [{ text: "a", lineIndex: 2, columnIndex: 4 }, `to`, `f`])
+  assert.strictEqual(context.variablesInBlock["a"], 5)
 })
 
 test("interpretThyStatement() should reject invalid variable identifier", async () => {

@@ -67,7 +67,7 @@ export function interpolateString(context: ThyBlockContext, thyString: string, a
 }
 
 export function parseString(stringLiteral: string, atom: AtomSingle): string {
-  const m = /^"(.+)"$/.exec(stringLiteral)
+  const m = /^"(.*)"$/.exec(stringLiteral)
   if (m === null) {
     throw makeInterpreterError(atom, `Invalid string literal: ${stringLiteral}`)
   }

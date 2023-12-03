@@ -134,10 +134,7 @@ function getVariableFromContext(context: ThyBlockContext, atom: AtomSingle, vari
     throw makeInterpreterError(atom, `Invalid identifier: ${variable}`)
   }
 
-  if (context.implicitArguments && variable in context.implicitArguments) {
-    if (context.givenUsed) {
-      throw makeInterpreterError(atom, `Implicit arguments cannot be used (referenced ${variable}) after \`given\``)
-    }
+  if (!context.givenUsed && context.implicitArguments && variable in context.implicitArguments) {
     if (context.implicitArgumentFirstUsed === null) {
       context.implicitArgumentFirstUsed = variable
     }
@@ -148,6 +145,9 @@ function getVariableFromContext(context: ThyBlockContext, atom: AtomSingle, vari
   }
   if (variable in context.variablesInBlock) {
     return context.variablesInBlock[variable]
+  }
+  if (context.givenUsed) {
+    throw makeInterpreterError(atom, `Implicit arguments cannot be used (referenced ${variable}) after \`given\``)
   }
   throw makeInterpreterError(atom, `Variable ${variable} not found`)
 }

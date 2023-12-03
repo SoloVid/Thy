@@ -133,6 +133,11 @@ test("interpolateString() should allow escaping periods", async () => {
 //   assert.strictEqual(interpolateString(context, "\\\\.a.", simpleAtom), "\\1")
 // })
 
+
+test("parseString() should allow empty string", async () => {
+  assert.strictEqual(parseString(`""`, simpleAtom), "")
+})
+
 test("parseString() should behave similar to JSON.parse()", async () => {
   assert.strictEqual(parseString(`"a\\"\\n"`, simpleAtom), `a"\n`)
 })

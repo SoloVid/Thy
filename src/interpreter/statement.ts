@@ -67,7 +67,7 @@ export function interpretThyStatement(context: ThyBlockContext, parts: readonly 
           }
         }
   
-        if (variableName in context.implicitArguments) {
+        if (context.implicitArgumentFirstUsed !== null && variableName in context.implicitArguments) {
           throw makeInterpreterError(definedVariableNamePart, `${variableName} is an implicit argument and cannot be overwritten`)
         }
         if (variableName in context.closure && ["is", "be"].includes(assignKeyword)) {
