@@ -1,7 +1,7 @@
 ```thy
 a is given Unknown
 
-type return String
+type return Number
 ```
 
 Convert the input argument to a number.
