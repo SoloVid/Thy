@@ -146,7 +146,7 @@ function getVariableFromContext(context: ThyBlockContext, atom: AtomSingle, vari
   if (variable in context.variablesInBlock) {
     return context.variablesInBlock[variable]
   }
-  if (context.givenUsed) {
+  if (context.givenUsed && context.implicitArguments && variable in context.implicitArguments) {
     throw makeInterpreterError(atom, `Implicit arguments cannot be used (referenced ${variable}) after \`given\``)
   }
   throw makeInterpreterError(atom, `Variable ${variable} not found`)
