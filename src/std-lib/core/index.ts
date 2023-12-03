@@ -11,6 +11,7 @@ import { loopElementsBuiltin, loopForeverBuiltin, loopTimesBuiltin } from "./loo
 import { loopAsyncElementsBuiltin, loopAsyncForeverBuiltin, loopAsyncTimesBuiltin } from "./loop-async";
 import { mutableMapBuiltin } from "./map";
 import { math } from "./math";
+import { numberBuiltin } from "./number";
 import { printBuiltin } from "./print";
 import { regexBuiltin } from "./regex";
 import { stringBuiltin } from "./string";
@@ -41,6 +42,7 @@ export const core = {
   },
   "map": mutableMapBuiltin,
   "math": math,
+  "number": numberBuiltin,
   "print": printBuiltin,
   "regex": regexBuiltin,
   "string": stringBuiltin,

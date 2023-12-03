@@ -65,6 +65,8 @@ import mathSubtractDoc from "../../../../../docs/std-lib/core/math.subtract.md"
 // @ts-expect-error Import only valid because of esbuild magic.
 import nullDoc from "../../../../../docs/std-lib/core/null.md"
 // @ts-expect-error Import only valid because of esbuild magic.
+import numberDoc from "../../../../../docs/std-lib/core/number.md"
+// @ts-expect-error Import only valid because of esbuild magic.
 import printDoc from "../../../../../docs/std-lib/core/print.md"
 // @ts-expect-error Import only valid because of esbuild magic.
 import regexDoc from "../../../../../docs/std-lib/core/regex.md"
@@ -118,6 +120,7 @@ const sections = [
   ["math.root", mathRootDoc],
   ["math.subtract", mathSubtractDoc],
   ["null", nullDoc],
+  ["number", numberDoc],
   ["print", printDoc],
   ["regex", regexDoc],
   ["set", setDoc],
