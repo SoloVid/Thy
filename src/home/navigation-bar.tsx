@@ -56,7 +56,7 @@ export default function PageWithNavigationBar({ children }: Props) {
         <div className="line"></div> */}
         { isOpen ? "✖" : "☰" }
       </div>
-      <div class="content" onClick={() => setIsOpen(!isOpen)}>
+      <div class="content" onClick={() => setIsOpen(false)}>
         {children}
       </div>
     {/* </div> */}

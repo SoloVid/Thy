@@ -20,7 +20,7 @@ export function useThyPrism() {
 }
 
 function escapeHTML(html: string) {
-  var element = document.createElement('div');
+  const element = document.createElement('div');
   element.textContent = html;
   return element.innerHTML;
 }
