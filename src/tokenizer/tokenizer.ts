@@ -1,16 +1,10 @@
 import { CompileError, tokenError } from "../compile-error";
-import { matchComment, matchMultilineComment } from "./comment-tokenizer";
 import { debug } from "./debug";
-import { memberAccessOperatorTokenizer, typeIdentifierTokenizer, valueIdentifierTokenizer } from "./identifier-tokenizer";
-import { makeIndentTokenizers } from "./indent-tokenizer";
-import { awaitTokenizer, beTokenizer, exportTokenizer, givenTokenizer, isTokenizer, letTokenizer, privateTokenizer, returnTokenizer, statementContinuationTokenizer, thatTokenizer, toTokenizer, typeTokenizer } from "./keyword-tokenizers";
-import { numberTokenizer } from "./number-tokenizer";
-import { skipToken, TokenFinder } from "./single-tokenizer";
-import { simpleStringLiteralTokenizer } from "./string-tokenizer";
+import { skipToken, TokenMatcher } from "./token-matcher";
 import type { Token } from "./token";
-import { tEndBlock, tErrorToken, TokenType, tStartBlock } from "./token-type";
-import { makeTokenizerState, TokenizerState } from "./tokenizer-state";
-import { statementTerminatorTokenizer, whitespaceTokenizer } from "./whitespace-tokenizer";
+import { makeTokenHere, startTokenHere } from "./token-helper";
+import { tErrorToken } from "./token-type";
+import type { TokenizerState } from "./tokenizer-state";
 
 export const endOfStream = Symbol('endOfStream')
 
@@ -21,91 +15,7 @@ export interface Tokenizer {
 
 export type TokenizerFactory = (source: string, errors: CompileError[]) => Tokenizer
 
-function startTokenHere(state: TokenizerState, type: TokenType): Omit<Token, "text"> {
-    return {
-        type: type,
-        offset: state.offset,
-        line: state.line,
-        column: state.column,
-    }
-}
-
-function makeTokenHere(state: TokenizerState, type: TokenType, text: string) {
-    const partial = startTokenHere(state, type)
-    state.advance(type, text.length)
-    return {
-        ...partial,
-        text
-    }
-}
-
-export function makeBlockTokenizer(source: string, errors: CompileError[]): Tokenizer {
-    const indentation = makeIndentTokenizers()
-
-    const state = makeTokenizerState(source)
-
-    const finders: readonly TokenFinder[] = [
-        // indentation tokens must appear before Spaces, otherwise all indentation will always be consumed as spaces.
-        // Outdent must appear before Indent for handling zero spaces outdents.
-        indentation.outdent,
-        indentation.indent,
-        statementContinuationTokenizer,
-        statementTerminatorTokenizer,
-        matchMultilineComment,
-        matchComment,
-        whitespaceTokenizer,
-
-        // Keywords
-        isTokenizer,
-        beTokenizer,
-        toTokenizer,
-        exportTokenizer,
-        privateTokenizer,
-        typeTokenizer,
-        letTokenizer,
-
-        // Semi-keywords
-        awaitTokenizer,
-        givenTokenizer,
-        returnTokenizer,
-        thatTokenizer,
-
-        // Variable expressions
-        numberTokenizer,
-        memberAccessOperatorTokenizer,
-        typeIdentifierTokenizer,
-        valueIdentifierTokenizer,
-        simpleStringLiteralTokenizer,
-    ]
-
-    const innerTokenizer = makeTokenizer(finders, state, errors, () => !state.hasMoreText())
-
-    let startTokenGiven = false
-    let closingEndBlocks: null | number = null
-
-    return {
-        getNextToken() {
-            if (!startTokenGiven) {
-                startTokenGiven = true
-                return makeTokenHere(state, tStartBlock, "")
-            }
-            let token = innerTokenizer.getNextToken()
-            if (token === null) {
-                if (closingEndBlocks === null) {
-                    closingEndBlocks = indentation.currentIndentLevels + 1
-                }
-                if (closingEndBlocks > 0) {
-                    closingEndBlocks--
-                    return makeTokenHere(state, tEndBlock, "")
-                }
-                return null
-            }
-            return token
-        },
-    }
-}
-
-export function makeTokenizer(finders: readonly TokenFinder[], state: TokenizerState, errors: CompileError[], isDone: () => boolean): Tokenizer {
+export function makeGenericTokenizer(finders: readonly TokenMatcher[], state: TokenizerState, errors: CompileError[], isDone: () => boolean): Tokenizer {
     const itsAnError = Symbol('itsAnError')
 
     let nextToken: Token | null = null

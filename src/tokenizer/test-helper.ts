@@ -1,10 +1,10 @@
 import { expect } from "expect"
 import { defineTestGroup } from "under-the-sun"
+import { makeTokenizer } from "."
 import type { CompileError } from "../compile-error"
 import { readExampleFile } from "../example"
 import type { Token } from "./token"
 import type { TokenType } from "./token-type"
-import { makeBlockTokenizer } from "./tokenizer"
 
 export const testTokenizer = defineTestGroup("tokenizer ")
 
@@ -25,7 +25,7 @@ export async function checkExampleProgramTokens(exampleProgram: string, tokens: 
 export async function tokenizeExampleProgram(exampleProgram: string) {
   const source = await readExampleFile(exampleProgram)
   const errors: CompileError[] = []
-  const tokenizer = makeBlockTokenizer(source, errors)
+  const tokenizer = makeTokenizer(source, errors)
   const outputs: Token[] = []
   for (let i = 0; i < maxTestN; i++) {
     const nextToken = tokenizer.getNextToken()

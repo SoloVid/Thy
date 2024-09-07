@@ -1,4 +1,3 @@
-import type { Token } from "./token"
 import type { TokenType } from "./token-type"
 
 export type TokenizerState = {
@@ -10,6 +9,10 @@ export type TokenizerState = {
   readonly lastTokenType: TokenType | null
   readonly hasMoreText: () => boolean
   readonly currentIndentWidth: number
+}
+
+export function makeTokenizerState(source: string): TokenizerState {
+  const statefulIndentRegex = new RegExp(/^ */, "my")
   /**
    * For line (0-based index i), what is the absolute offset in the file?
    *
@@ -17,11 +20,6 @@ export type TokenizerState = {
    * Line 1 would have offset 10 if line 0 had 10 characters.
    * Line 2 would have offset 15 if line 1 had 5 characters.
    */
-  readonly lineOffsets: readonly number[]
-}
-
-export function makeTokenizerState(source: string): TokenizerState {
-  const statefulIndentRegex = new RegExp(/^ */, "my")
   const lineOffsets = source.split("\n").reduce((soFar, line) => {
     return {
         nextOffset: soFar.nextOffset + line.length + 1, // +1 for newline

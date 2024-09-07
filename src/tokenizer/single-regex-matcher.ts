@@ -1,8 +1,8 @@
 import { debug } from "./debug"
-import type { skipToken, TokenFinder } from "./single-tokenizer"
+import type { skipToken, TokenMatcher } from "./token-matcher"
 import type { TokenType } from "./token-type"
 
-export function makeSingleRegexTokenizer(type: TokenType | typeof skipToken, regex: RegExp): TokenFinder {
+export function makeSingleRegexMatcher(type: TokenType | typeof skipToken, regex: RegExp): TokenMatcher {
     const statefulRegex = new RegExp(regex, 'y')
     return (state) => {
         statefulRegex.lastIndex = state.offset

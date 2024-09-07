@@ -2,12 +2,12 @@ import { tsGenerator } from "./code-gen/ts/generate-ts"
 import { standardLibraryCore } from "./code-gen/ts/standard-library/core"
 import { parse } from "./parser/parser"
 import { readProgram } from "./read-program"
-import { makeTokenizer } from "./tokenizer/tokenizer"
+import { makeGenericTokenizer } from "./tokenizer/tokenizer"
 
 async function run() {
     try {
         const source = await readProgram("example-program.thy")
-        const tokenizer = makeTokenizer(source, [])
+        const tokenizer = makeGenericTokenizer(source, [])
 
         // let token = tokenizer.getNextToken()
         // while (token !== null) {

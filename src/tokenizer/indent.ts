@@ -1,15 +1,14 @@
-import type { TokenFinder } from "./single-tokenizer";
+import type { TokenMatcher } from "./token-matcher";
 import { tEndBlock, tStartBlock } from "./token-type";
 import type { TokenizerState } from "./tokenizer-state";
 
 export interface IndentTokenizers {
-    indent: TokenFinder
-    outdent: TokenFinder
+    matchIndent: TokenMatcher
+    matchOutdent: TokenMatcher
     readonly currentIndentLevels: number
-    readonly currentIndentWidth: number
 }
 
-export function makeIndentTokenizers(): IndentTokenizers {
+export function makeIndentMatchers(): IndentTokenizers {
     // State required for matching the indentations
     const indentStack = [0]
 
@@ -96,13 +95,10 @@ export function makeIndentTokenizers(): IndentTokenizers {
     }
 
     return {
-        indent: matchIndent,
-        outdent: matchOutdent,
+        matchIndent: matchIndent,
+        matchOutdent: matchOutdent,
         get currentIndentLevels() {
             return indentStack.length - 1
         },
-        get currentIndentWidth() {
-            return indentStack[indentStack.length - 1]
-        }
     }
 }
