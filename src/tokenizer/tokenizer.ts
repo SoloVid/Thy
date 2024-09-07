@@ -1,13 +1,15 @@
 import { CompileError, tokenError } from "../compile-error";
-import { commentTokenizer, multilineCommentTokenizer } from "./comment-tokenizer";
+import { matchComment, matchMultilineComment } from "./comment-tokenizer";
+import { debug } from "./debug";
 import { memberAccessOperatorTokenizer, typeIdentifierTokenizer, valueIdentifierTokenizer } from "./identifier-tokenizer";
 import { makeIndentTokenizers } from "./indent-tokenizer";
-import { statementContinuationTokenizer, beTokenizer, exportTokenizer, isTokenizer, privateTokenizer, toTokenizer, typeTokenizer, letTokenizer } from "./keyword-tokenizers";
+import { awaitTokenizer, beTokenizer, exportTokenizer, givenTokenizer, isTokenizer, letTokenizer, privateTokenizer, returnTokenizer, statementContinuationTokenizer, thatTokenizer, toTokenizer, typeTokenizer } from "./keyword-tokenizers";
 import { numberTokenizer } from "./number-tokenizer";
-import type { SingleTokenizer } from "./single-tokenizer";
-import { stringLiteralTokenizer } from "./string-tokenizer";
-import type { SourcePosition, Token } from "./token";
+import { skipToken, TokenFinder } from "./single-tokenizer";
+import { simpleStringLiteralTokenizer } from "./string-tokenizer";
+import type { Token } from "./token";
 import { tEndBlock, tErrorToken, TokenType, tStartBlock } from "./token-type";
+import { makeTokenizerState, TokenizerState } from "./tokenizer-state";
 import { statementTerminatorTokenizer, whitespaceTokenizer } from "./whitespace-tokenizer";
 
 export const endOfStream = Symbol('endOfStream')
@@ -15,25 +17,42 @@ export const endOfStream = Symbol('endOfStream')
 export interface Tokenizer {
     /** Returns null at end of stream. */
     getNextToken(): Token | null
-
-    getCurrentPosition(): SourcePosition
 }
 
 export type TokenizerFactory = (source: string, errors: CompileError[]) => Tokenizer
 
-export function makeTokenizer(source: string, errors: CompileError[]): Tokenizer {
+function startTokenHere(state: TokenizerState, type: TokenType): Omit<Token, "text"> {
+    return {
+        type: type,
+        offset: state.offset,
+        line: state.line,
+        column: state.column,
+    }
+}
+
+function makeTokenHere(state: TokenizerState, type: TokenType, text: string) {
+    const partial = startTokenHere(state, type)
+    state.advance(type, text.length)
+    return {
+        ...partial,
+        text
+    }
+}
+
+export function makeBlockTokenizer(source: string, errors: CompileError[]): Tokenizer {
     const indentation = makeIndentTokenizers()
 
-    const tokenizers: readonly SingleTokenizer[] = [
+    const state = makeTokenizerState(source)
 
+    const finders: readonly TokenFinder[] = [
         // indentation tokens must appear before Spaces, otherwise all indentation will always be consumed as spaces.
         // Outdent must appear before Indent for handling zero spaces outdents.
         indentation.outdent,
         indentation.indent,
         statementContinuationTokenizer,
         statementTerminatorTokenizer,
-        multilineCommentTokenizer,
-        commentTokenizer,
+        matchMultilineComment,
+        matchComment,
         whitespaceTokenizer,
 
         // Keywords
@@ -45,68 +64,72 @@ export function makeTokenizer(source: string, errors: CompileError[]): Tokenizer
         typeTokenizer,
         letTokenizer,
 
+        // Semi-keywords
+        awaitTokenizer,
+        givenTokenizer,
+        returnTokenizer,
+        thatTokenizer,
+
         // Variable expressions
         numberTokenizer,
         memberAccessOperatorTokenizer,
         typeIdentifierTokenizer,
         valueIdentifierTokenizer,
-        stringLiteralTokenizer,
+        simpleStringLiteralTokenizer,
     ]
 
-    const state = {
-        text: source,
-        offset: 0,
-        lastTokenType: null as TokenType | null,
-        get currentIndentWidth() {
-            return indentation.currentIndentWidth
-        }
+    const innerTokenizer = makeTokenizer(finders, state, errors, () => !state.hasMoreText())
+
+    let startTokenGiven = false
+    let closingEndBlocks: null | number = null
+
+    return {
+        getNextToken() {
+            if (!startTokenGiven) {
+                startTokenGiven = true
+                return makeTokenHere(state, tStartBlock, "")
+            }
+            let token = innerTokenizer.getNextToken()
+            if (token === null) {
+                if (closingEndBlocks === null) {
+                    closingEndBlocks = indentation.currentIndentLevels + 1
+                }
+                if (closingEndBlocks > 0) {
+                    closingEndBlocks--
+                    return makeTokenHere(state, tEndBlock, "")
+                }
+                return null
+            }
+            return token
+        },
     }
+}
 
-    const lineOffsets = [0]
-
-    function startTokenHere(type: TokenType): Omit<Token, "text"> {
-        const currentOffset = state.offset
-        const currentLine = lineOffsets.length - 1
-        const currentColumn = currentOffset - lineOffsets[currentLine]
-        return {
-            type: type,
-            offset: currentOffset,
-            line: currentLine,
-            column: currentColumn
-        }
-    }
-
-    function makeTokenHere(type: TokenType, text: string) {
-        state.lastTokenType = type
-        const partial = startTokenHere(type)
-        return {
-            ...partial,
-            text
-        }
-    }
-
-    const noToken = Symbol('noToken')
+export function makeTokenizer(finders: readonly TokenFinder[], state: TokenizerState, errors: CompileError[], isDone: () => boolean): Tokenizer {
     const itsAnError = Symbol('itsAnError')
 
     let nextToken: Token | null = null
+    let delegatedTokenizer: Tokenizer | null = null
 
     function getNextValidToken(): Token | typeof endOfStream {
+        debug(() => ["getNextValidToken()", state.offset])
         let errorCharacters = 0
-        const errorPartialToken = startTokenHere(tErrorToken)
-        while (nextToken === null && state.offset < source.length) {
-            const t = tryTokenizers()
+        const errorPartialToken = startTokenHere(state, tErrorToken)
+        while (nextToken === null && !isDone()) {
+            const t = trySources()
             if (t === itsAnError) {
                 errorCharacters++
-                state.offset++
-            } else if (t !== noToken) {
+                state.advance(tErrorToken, 1)
+            } else {
                 nextToken = t
             }
         }
 
         if (errorCharacters > 0) {
+            const substringStart = state.offset - errorCharacters
             const t = {
                 ...errorPartialToken,
-                text: state.text.substr(state.offset - errorCharacters, errorCharacters)
+                text: state.text.substring(substringStart, substringStart + errorCharacters)
             }
             errors.push(tokenError(t, 'Unexpected token'))
             return t
@@ -121,52 +144,46 @@ export function makeTokenizer(source: string, errors: CompileError[]): Tokenizer
         return endOfStream
     }
 
-    function tryTokenizers(): Token | typeof noToken | typeof itsAnError {
-        for (const tokenizer of tokenizers) {
-            const match = tokenizer.match(state)
-            if (match !== null) {
-                const token = tokenizer.type === null ? noToken : makeTokenHere(tokenizer.type, match)
-
-                for (let i = 0; i < match.length; i++) {
-                    const c = match.charAt(i)
-                    if (c === "\n") {
-                        lineOffsets.push(state.offset + i + 1)
-                    }
-                }
-
-                state.offset += match.length
-
+    function trySources(): Token | null | typeof itsAnError {
+        debug(() => ["trySources()"])
+        if (delegatedTokenizer) {
+            debug(() => ["delegating..."])
+            const token = delegatedTokenizer.getNextToken()
+            if (token !== null) {
                 return token
+            } else {
+                delegatedTokenizer = null
+            }
+        }
+        debug(() => ["finding at ", JSON.stringify(state.text.substring(state.offset, state.offset + 5))])
+        for (const finder of finders) {
+            const match = finder(state, errors)
+            if (match !== null) {
+                debug(() => ["token found ", match])
+                if ("tokenizer" in match) {
+                    delegatedTokenizer = match.tokenizer
+                }
+                if (match.type === skipToken) {
+                    state.advance(null, match.text.length)
+                    return null
+                }
+                return makeTokenHere(state, match.type, match.text)
             }
         }
         return itsAnError
     }
 
-    let startTokenGiven = false
-    let closingEndBlocks: null | number = null
-
     return {
         getNextToken() {
-            if (!startTokenGiven) {
-                startTokenGiven = true
-                return makeTokenHere(tStartBlock, "")
+            if (isDone()) {
+                return null
             }
-            let token = getNextValidToken()
+            const token = getNextValidToken()
             if (token === endOfStream) {
-                if (closingEndBlocks === null) {
-                    closingEndBlocks = indentation.currentIndentLevels + 1
-                }
-                if (closingEndBlocks > 0) {
-                    closingEndBlocks--;
-                    return makeTokenHere(tEndBlock, "")
-                }
                 return null
             }
             return token
         },
-        getCurrentPosition() {
-            return startTokenHere('not a token')
-        }
     }
 }
 

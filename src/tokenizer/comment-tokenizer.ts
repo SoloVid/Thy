@@ -1,20 +1,12 @@
-import type { TokenizerState } from "./single-tokenizer"
+import type { TokenFinderResult } from "./single-tokenizer"
 import { tComment, tEndBlock, tStartBlock, tStatementTerminator } from "./token-type"
-
-export const multilineCommentTokenizer = {
-    type: tComment,
-    match: matchMultilineComment
-}
-export const commentTokenizer = {
-    type: tComment,
-    match: matchComment
-}
+import type { TokenizerState } from "./tokenizer-state"
 
 function isStartOfLine(state: TokenizerState): boolean {
     return [null, tStatementTerminator, tStartBlock, tEndBlock].includes(state.lastTokenType)
 }
 
-export function matchMultilineComment(state: TokenizerState): string | null {
+export function matchMultilineComment(state: TokenizerState): TokenFinderResult {
     if (!isStartOfLine(state)) {
         return null
     }
@@ -36,10 +28,13 @@ export function matchMultilineComment(state: TokenizerState): string | null {
         return null
     }
 
-    return result[0]
+    return {
+        type: tComment,
+        text: result[0],
+    }
 }
 
-export function matchComment(state: TokenizerState): string | null {
+export function matchComment(state: TokenizerState): TokenFinderResult {
     if (!isStartOfLine(state)) {
         return null
     }
@@ -49,5 +44,8 @@ export function matchComment(state: TokenizerState): string | null {
     if (result === null) {
         return null
     }
-    return result[0]
+    return {
+        type: tComment,
+        text: result[0],
+    }
 }

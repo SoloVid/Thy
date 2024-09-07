@@ -1,15 +1,19 @@
-import type { TokenType } from "./token-type";
+import type { CompileError } from "../compile-error"
+import type { TokenType } from "./token-type"
+import type { Tokenizer } from "./tokenizer"
+import type { TokenizerState } from "./tokenizer-state"
 
-export interface SingleTokenizer {
-    readonly type: TokenType | null
-    match: SingleMatcher
-}
+export const skipToken = Symbol("skipToken")
 
-export type SingleMatcher = (state: TokenizerState) => string | null
-
-export interface TokenizerState {
+export type TokenFinderSingleResult = {
+    readonly type: TokenType | typeof skipToken
     readonly text: string
-    readonly offset: number
-    readonly lastTokenType: TokenType | null
-    readonly currentIndentWidth: number
 }
+
+export type TokenFinderMultiResult = TokenFinderSingleResult & {
+    readonly tokenizer: Tokenizer
+}
+
+export type TokenFinderResult = TokenFinderSingleResult | TokenFinderMultiResult | null
+
+export type TokenFinder = (state: TokenizerState, errors: CompileError[]) => TokenFinderResult

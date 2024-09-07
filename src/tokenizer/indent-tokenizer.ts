@@ -1,9 +1,10 @@
-import type { SingleTokenizer, TokenizerState } from "./single-tokenizer";
+import type { TokenFinder } from "./single-tokenizer";
 import { tEndBlock, tStartBlock } from "./token-type";
+import type { TokenizerState } from "./tokenizer-state";
 
 export interface IndentTokenizers {
-    indent: SingleTokenizer
-    outdent: SingleTokenizer
+    indent: TokenFinder
+    outdent: TokenFinder
     readonly currentIndentLevels: number
     readonly currentIndentWidth: number
 }
@@ -29,17 +30,25 @@ export function makeIndentTokenizers(): IndentTokenizers {
         }
 
         indentStack.push(currIndentLevel)
-        return match[0]
+        return {
+            type: tStartBlock,
+            text: match[0],
+        } as const
     }
 
     let lastOutdentOffset = -1
     let outdentsOutstanding = 0
 
+    const outdentResult = {
+        type: tEndBlock,
+        text: "",
+    } as const
+
     function matchOutdent(state: TokenizerState) {
         if (outdentsOutstanding > 0) {
             indentStack.pop()
             outdentsOutstanding--
-            return ""
+            return outdentResult
         }
 
         // We're often not consuming anything but just generating tokens.
@@ -83,18 +92,12 @@ export function makeIndentTokenizers(): IndentTokenizers {
         outdentsOutstanding = numOutdents - 1
 
         indentStack.pop()
-        return ""
+        return outdentResult
     }
 
     return {
-        indent: {
-            type: tStartBlock,
-            match: matchIndent
-        },
-        outdent: {
-            type: tEndBlock,
-            match: matchOutdent
-        },
+        indent: matchIndent,
+        outdent: matchOutdent,
         get currentIndentLevels() {
             return indentStack.length - 1
         },

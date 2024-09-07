@@ -6,7 +6,7 @@ export interface OneTokenizer {
 }
 
 export interface Token<T extends TokenType = TokenType> extends SourcePosition {
-    readonly type: string//T
+    readonly type: T
     /** Literal text of token from source. */
     readonly text: string
 }
