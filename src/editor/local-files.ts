@@ -41,7 +41,11 @@ export function makeFileManager() {
     return JSON.parse(rawMeta)
   }
 
-  function saveFile(name: string, text: string, metadata: Record<string, string> = {}) {
+  function saveFile(
+    name: string,
+    text: string,
+    metadata: Record<string, string> = {},
+  ) {
     localStorage.setItem(getStorageKey(name), text)
     localStorage.setItem(getStorageMetaKey(name), JSON.stringify(metadata))
     const before = getFilesList()
@@ -54,7 +58,7 @@ export function makeFileManager() {
     localStorage.removeItem(getStorageKey(name))
     localStorage.removeItem(getStorageMetaKey(name))
     const before = getFilesList()
-    updateFilesList(before.filter(f => f !== name))
+    updateFilesList(before.filter((f) => f !== name))
   }
 
   return {
@@ -70,7 +74,7 @@ export function makeFileManager() {
 export function useLocalFiles(implementation: FileManager) {
   // This is only here to allow forcing re-render.
   const [version, setVersion] = useState(0)
-  const bumpVersion = () => setVersion(before => before + 1)
+  const bumpVersion = () => setVersion((before) => before + 1)
 
   const files = implementation.getFilesList().sort()
 
@@ -83,7 +87,11 @@ export function useLocalFiles(implementation: FileManager) {
     return name
   }
 
-  function saveFile(name: string, sourceCode: string, metadata: Record<string, string> = {}) {
+  function saveFile(
+    name: string,
+    sourceCode: string,
+    metadata: Record<string, string> = {},
+  ) {
     implementation.saveFile(name, sourceCode, metadata)
     bumpVersion()
   }

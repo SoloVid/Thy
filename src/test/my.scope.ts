@@ -1,1 +1,1 @@
-export { my_scope_thing as thing } from './thing'
+export { my_scope_thing as thing } from "./thing"

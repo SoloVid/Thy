@@ -1,10 +1,22 @@
-import { dissectErrorTraceAtCloserBaseline, replaceErrorTraceLine, transformErrorTrace } from "../utils/error-helper"
+import {
+  dissectErrorTraceAtCloserBaseline,
+  replaceErrorTraceLine,
+  transformErrorTrace,
+} from "../utils/error-helper"
 import { interpretThyCall } from "./call"
 import { interpretThyExpression } from "./expression"
-import { InterpreterErrorWithContext, makeInterpreterError } from "./interpreter-error"
+import {
+  InterpreterErrorWithContext,
+  makeInterpreterError,
+} from "./interpreter-error"
 import { splitThyStatements } from "./split-statements"
 import { interpretThyStatement, parseThyStatement } from "./statement"
-import { isAtomLiterally, isSimpleAtom, Statement, ThyBlockContext } from "./types"
+import {
+  isAtomLiterally,
+  isSimpleAtom,
+  Statement,
+  ThyBlockContext,
+} from "./types"
 
 type BlockOptions = {
   closure: ThyBlockContext["closure"]
@@ -23,7 +35,9 @@ type InterpretedBlockExportsStyleReturnMetadata = {
   style: "exports"
   exports: readonly string[]
 }
-type InterpretedBlockReturnMeta = InterpretedBlockReturnStyleReturnMetadata | InterpretedBlockExportsStyleReturnMetadata
+type InterpretedBlockReturnMeta =
+  | InterpretedBlockReturnStyleReturnMetadata
+  | InterpretedBlockExportsStyleReturnMetadata
 type InterpretedBlockWithMeta = {
   interpreted: UnknownFunction
   returns: InterpretedBlockReturnMeta
@@ -64,8 +78,13 @@ export function interpretThyBlockLinesWithMeta(
 ): InterpretedBlockWithMeta {
   // I don't fully understand the -1 here, but somehow we want a different number of lines masked in the top-level case vs. thy-internal cases.
   const additionalTraceLinesToHide = options.additionalTraceLinesToHide ?? -1
-  const statements = splitThyStatements(thySourceLines, options.startingLineIndex)
-  const isAsync = statements.some(s => s.some(a => isAtomLiterally(a, "await")))
+  const statements = splitThyStatements(
+    thySourceLines,
+    options.startingLineIndex,
+  )
+  const isAsync = statements.some((s) =>
+    s.some((a) => isAtomLiterally(a, "await")),
+  )
   let exportUsed = false
   let letUsed = false
   let returnUsed = false
@@ -74,19 +93,28 @@ export function interpretThyBlockLinesWithMeta(
   for (const statement of statements) {
     if (isAtomLiterally(statement[0], "export")) {
       if (letUsed) {
-        throw makeInterpreterError(statement[0], `\`export\` cannot be used after \`let\``)
+        throw makeInterpreterError(
+          statement[0],
+          `\`export\` cannot be used after \`let\``,
+        )
       }
       exportUsed = true
     }
     if (isAtomLiterally(statement[0], "let")) {
       if (exportUsed) {
-        throw makeInterpreterError(statement[0], `\`let\` cannot be used after \`export\``)
+        throw makeInterpreterError(
+          statement[0],
+          `\`let\` cannot be used after \`export\``,
+        )
       }
       letUsed = true
     }
     if (isAtomLiterally(statement[0], "return")) {
       if (exportUsed) {
-        throw makeInterpreterError(statement[0], `\`return\` cannot be used after \`export\``)
+        throw makeInterpreterError(
+          statement[0],
+          `\`return\` cannot be used after \`export\``,
+        )
       }
       returnUsed = true
     }
@@ -99,16 +127,22 @@ export function interpretThyBlockLinesWithMeta(
       }
     }
   }
-  const returns: InterpretedBlockReturnMeta = letUsed || returnUsed ? { style: "return" } : {
-    style: "exports",
-    exports: explicitExports.length > 0 ? explicitExports : bareVariables,
-  }
+  const returns: InterpretedBlockReturnMeta =
+    letUsed || returnUsed
+      ? { style: "return" }
+      : {
+          style: "exports",
+          exports: explicitExports.length > 0 ? explicitExports : bareVariables,
+        }
 
   function makeHelper(args: readonly unknown[]) {
     const context: ThyBlockContext = {
       argsToUse: [...args],
       givenUsed: false,
-      implicitArguments: args.length > 0 && typeof args[0] === "object" && !!args[0] ? args[0] as Record<string, unknown> : {},
+      implicitArguments:
+        args.length > 0 && typeof args[0] === "object" && !!args[0]
+          ? (args[0] as Record<string, unknown>)
+          : {},
       implicitArgumentFirstUsed: null,
       variablesInBlock: {},
       variableIsImmutable: {},
@@ -121,15 +155,23 @@ export function interpretThyBlockLinesWithMeta(
       sourceFile: options.sourceFile,
     }
 
-    function evaluateStatement(statement: Statement): [shouldReturn: boolean, value: unknown] {
+    function evaluateStatement(
+      statement: Statement,
+    ): [shouldReturn: boolean, value: unknown] {
       const parts = statement
       if (parts.length > 0) {
         if (isAtomLiterally(parts[0], "return")) {
           if (parts.length === 1) {
-            throw makeInterpreterError(parts[0], `\`return\` takes exactly one parameter`)
+            throw makeInterpreterError(
+              parts[0],
+              `\`return\` takes exactly one parameter`,
+            )
           }
           if (parts.length > 2) {
-            throw makeInterpreterError(parts[2], `\`return\` takes exactly one parameter`)
+            throw makeInterpreterError(
+              parts[2],
+              `\`return\` takes exactly one parameter`,
+            )
           }
           return [true, interpretThyExpression(context, parts[1]).target]
         }
@@ -151,7 +193,10 @@ export function interpretThyBlockLinesWithMeta(
     }
 
     function formulateResult() {
-      const exportSource = context.exportedVariables.length > 0 ? context.exportedVariables : context.bareVariables
+      const exportSource =
+        context.exportedVariables.length > 0
+          ? context.exportedVariables
+          : context.bareVariables
       if (!letUsed && exportSource.length > 0) {
         const implicitReturn: Record<string, unknown> = {}
         for (const variableName of exportSource) {
@@ -162,7 +207,9 @@ export function interpretThyBlockLinesWithMeta(
             },
             set(newValue) {
               if (context.variableIsImmutable[variableName]) {
-                throw new Error(`${variableName} is immutable and cannot be overwritten`)
+                throw new Error(
+                  `${variableName} is immutable and cannot be overwritten`,
+                )
               }
               context.variablesInBlock[variableName] = newValue
             },
@@ -183,61 +230,85 @@ export function interpretThyBlockLinesWithMeta(
   const functionName = options.functionName ?? "<anonymous>"
 
   if (isAsync) {
-    const objWithBlockFunction = { [functionName]:  async (...args: readonly unknown[]) => {
-      const helper = makeHelper(args)
-      for (const statement of statements) {
-        if (isAtomLiterally(statement[0], "let") && isAtomLiterally(statement[1], "await")) {
-          if (statement.length !== 3) {
-            throw makeInterpreterError(statement[1], `\`await\` takes 1 argument; got ${statement.length - 1}`)
-          }
-          const returnValue = await interpretThyExpression(helper.context, statement[2]).target
-          if (returnValue !== undefined) {
-            return returnValue
-          }
-          continue
-        }
-
-        // For async stack traces, the trace is a bit different before and after a true await.
-        const errorHere = new Error()
-        try {
-          const [shouldReturn, value] = helper.evaluateStatement(statement)
-          if (shouldReturn) {
-            return value
-          } else {
-            if (value instanceof Promise) {
-              await value
+    const objWithBlockFunction = {
+      [functionName]: async (...args: readonly unknown[]) => {
+        const helper = makeHelper(args)
+        for (const statement of statements) {
+          if (
+            isAtomLiterally(statement[0], "let") &&
+            isAtomLiterally(statement[1], "await")
+          ) {
+            if (statement.length !== 3) {
+              throw makeInterpreterError(
+                statement[1],
+                `\`await\` takes 1 argument; got ${statement.length - 1}`,
+              )
             }
+            const returnValue = await interpretThyExpression(
+              helper.context,
+              statement[2],
+            ).target
+            if (returnValue !== undefined) {
+              return returnValue
+            }
+            continue
           }
-        } catch (e) {
-          throwTransformedError(e, functionName, options.sourceFile, additionalTraceLinesToHide, errorHere)
+
+          // For async stack traces, the trace is a bit different before and after a true await.
+          const errorHere = new Error()
+          try {
+            const [shouldReturn, value] = helper.evaluateStatement(statement)
+            if (shouldReturn) {
+              return value
+            } else {
+              if (value instanceof Promise) {
+                await value
+              }
+            }
+          } catch (e) {
+            throwTransformedError(
+              e,
+              functionName,
+              options.sourceFile,
+              additionalTraceLinesToHide,
+              errorHere,
+            )
+          }
         }
-      }
-      return helper.formulateResult()
-    } }
+        return helper.formulateResult()
+      },
+    }
     return {
       interpreted: objWithBlockFunction[functionName],
       returns,
     }
   }
 
-  const objWithBlockFunction = { [functionName]: (...args: readonly unknown[]) => {
-    const helper = makeHelper(args)
-    try {
-      for (const statement of statements) {
-        const [shouldReturn, value] = helper.evaluateStatement(statement)
-        if (shouldReturn) {
-          return value
+  const objWithBlockFunction = {
+    [functionName]: (...args: readonly unknown[]) => {
+      const helper = makeHelper(args)
+      try {
+        for (const statement of statements) {
+          const [shouldReturn, value] = helper.evaluateStatement(statement)
+          if (shouldReturn) {
+            return value
+          }
         }
+      } catch (e) {
+        throwTransformedError(
+          e,
+          functionName,
+          options.sourceFile,
+          additionalTraceLinesToHide,
+        )
       }
-    } catch (e) {
-      throwTransformedError(e, functionName, options.sourceFile, additionalTraceLinesToHide)
-    }
-    return helper.formulateResult()
-  } }
+      return helper.formulateResult()
+    },
+  }
   return {
     interpreted: objWithBlockFunction[functionName],
     returns,
-}
+  }
 }
 
 function throwTransformedError(
@@ -245,7 +316,7 @@ function throwTransformedError(
   functionName: string,
   sourceFile: string,
   additionalTraceLinesToHide: number,
-  altErrorHere?: Error
+  altErrorHere?: Error,
 ) {
   if (errorCloseToCall instanceof InterpreterErrorWithContext) {
     if (!(errorCloseToCall.cause instanceof Error)) {
@@ -254,9 +325,21 @@ function throwTransformedError(
     const e = errorCloseToCall.cause
 
     const errorHere = new Error()
-    const errorDissectedAtCall = dissectErrorTraceAtCloserBaseline(e, errorCloseToCall, errorCloseToCall.additionalDepthToShave, errorCloseToCall.altCloseError, errorCloseToCall.altAdditionalDepthToShave)
+    const errorDissectedAtCall = dissectErrorTraceAtCloserBaseline(
+      e,
+      errorCloseToCall,
+      errorCloseToCall.additionalDepthToShave,
+      errorCloseToCall.altCloseError,
+      errorCloseToCall.altAdditionalDepthToShave,
+    )
     // console.log(errorDissectedAtCall)
-    const errorDissectedHere = dissectErrorTraceAtCloserBaseline(e, errorHere, additionalTraceLinesToHide, altErrorHere, additionalTraceLinesToHide)
+    const errorDissectedHere = dissectErrorTraceAtCloserBaseline(
+      e,
+      errorHere,
+      additionalTraceLinesToHide,
+      altErrorHere,
+      additionalTraceLinesToHide,
+    )
     // console.log(errorDissectedHere)
     const errorTraceLocation = errorCloseToCall.sourceLocation
 

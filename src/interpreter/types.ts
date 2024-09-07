@@ -1,4 +1,3 @@
-
 export type AtomSingle = {
   text: string
   lineIndex: number

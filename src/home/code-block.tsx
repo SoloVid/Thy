@@ -20,9 +20,9 @@ export function useThyPrism() {
 }
 
 function escapeHTML(html: string) {
-  const element = document.createElement('div');
-  element.textContent = html;
-  return element.innerHTML;
+  const element = document.createElement("div")
+  element.textContent = html
+  return element.innerHTML
 }
 
 export default function CodeBlock({
@@ -42,11 +42,12 @@ export default function CodeBlock({
     return Prism.highlight(source, Prism.languages[language], language)
   }, [isThyPrismLoaded, source])
 
-  return <pre
-    className="code-block"
-    ref={$pre}
-    {...remainingProps}
-  >
-    <code dangerouslySetInnerHTML={{__html: highlightedHtml}} class={`language-${language}`}></code>
-  </pre>
+  return (
+    <pre className="code-block" ref={$pre} {...remainingProps}>
+      <code
+        dangerouslySetInnerHTML={{ __html: highlightedHtml }}
+        class={`language-${language}`}
+      ></code>
+    </pre>
+  )
 }

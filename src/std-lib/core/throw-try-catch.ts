@@ -7,7 +7,7 @@ export const throwBuiltin = (_message: string) => {
 export const tryBuiltin = <_T>(
   tryBlock: () => _T,
   catchOrFinally: typeof catchBuiltin | typeof finallyBuiltin,
-  secondBlock: (e: unknown) => _T | undefined
+  secondBlock: (e: unknown) => _T | undefined,
 ) => {
   try {
     return tryBlock()

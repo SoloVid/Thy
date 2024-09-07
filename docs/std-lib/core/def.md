@@ -12,7 +12,7 @@ the problem in Thy where every variable declaration/assignment
 requires a function call.
 
 The technical difference between this function and `cast`
-is that `cast` *unsafely* casts the value.
+is that `cast` _unsafely_ casts the value.
 
 **Example:**
 

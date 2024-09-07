@@ -1,4 +1,6 @@
-html, body, #app {
+html,
+body,
+#app {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -85,7 +87,8 @@ h1 a {
   display: block;
   width: auto;
 }
-.button, input[type='submit'] {
+.button,
+input[type="submit"] {
   font-size: medium;
   display: inline-block;
   cursor: pointer;
@@ -99,7 +102,8 @@ h1 a {
   border-radius: 5px;
   /* transition: background-color .5s, color .5s, box-shadow .5s; */
 }
-.button:hover, input[type='submit']:hover {
+.button:hover,
+input[type="submit"]:hover {
   color: var(--btn-text-color);
   background-color: var(--btn-hover-color);
   text-decoration: none;
@@ -129,7 +133,7 @@ a {
 }
 a:hover {
   text-decoration: underline;
-  color: var(--btn-hover-color)
+  color: var(--btn-hover-color);
 }
 
 code {
@@ -178,7 +182,6 @@ pre.output {
   }
 }
 
-
 @media (max-width: 768px) {
   #navigation-bar {
     position: fixed;
@@ -200,20 +203,19 @@ pre.output {
   }
 
   .code-comparison {
-    display:flex;
-    flex-direction:row;
+    display: flex;
+    flex-direction: row;
   }
 
   .code-comparison .sample {
-    flex:0 0 47%;
-    overflow:hidden;
+    flex: 0 0 47%;
+    overflow: hidden;
   }
 
   .code-comparison .divider {
-    flex:0 0 6%;
+    flex: 0 0 6%;
   }
 }
-
 
 #navigation-bar {
   width: 240px;

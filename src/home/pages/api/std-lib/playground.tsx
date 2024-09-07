@@ -29,22 +29,23 @@ const sections = [
 
 const { toc, renderedSections } = makeMultiMarkdown(sections)
 
-renderStandardPage("Playground Standard Library - Thy (lang)", <>
-  <div class="column-content-sm">
-    <h2>Overview</h2>
-    <p>
-      In addition to the Core Standard Library,
-      the <a href={playgroundBaseUrl} target="_blank">Thy Playground</a> also
-      provides a set of functions and values specific to that environment.
-      Where appropriate, links are provided to equivalent
-      JavaScript functionality for further reading.
-    </p>
-    <h2>On this page</h2>
-    <ul>
-      {toc}
-    </ul>
-  </div>
-  <div class="column-content-sm">
-    {renderedSections}
-  </div>
-</>)
+renderStandardPage(
+  "Playground Standard Library - Thy (lang)",
+  <>
+    <div class="column-content-sm">
+      <h2>Overview</h2>
+      <p>
+        In addition to the Core Standard Library, the{" "}
+        <a href={playgroundBaseUrl} target="_blank">
+          Thy Playground
+        </a>{" "}
+        also provides a set of functions and values specific to that
+        environment. Where appropriate, links are provided to equivalent
+        JavaScript functionality for further reading.
+      </p>
+      <h2>On this page</h2>
+      <ul>{toc}</ul>
+    </div>
+    <div class="column-content-sm">{renderedSections}</div>
+  </>,
+)

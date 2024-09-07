@@ -1,1 +1,1 @@
-import { a } from './my.scope.thing'
+import { a } from "./my.scope.thing"

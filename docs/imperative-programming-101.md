@@ -227,7 +227,7 @@ How do we receive **arguments** in our own **function**?
 By specifying **parameters** in our **function**!
 
 > What's the difference between an **argument** and a **parameter**?
-> You may hear these terms used interchangeably, but the difference is that 
+> You may hear these terms used interchangeably, but the difference is that
 > the **arguments** are the **values** **passed** in when the **function** is **called** and
 > the **parameters** are the corresponding **variables** within the **function** **definition**.
 
@@ -364,7 +364,7 @@ stammer printHi 5 printNope
 stammer printNope 1 printNope
 ```
 
-### Calling Non-Functions 
+### Calling Non-Functions
 
 You may be wondering, "If I can pass functions like other variables, can I call other variables like functions?"
 What even is the difference between a **function** and some other **value**?
@@ -644,6 +644,7 @@ and that the `else` line and corresponding indentation have been removed.
 `let` here means, "If the `if` call returns a value, return that value."
 
 So if the condition `that` is true...
+
 1. The `if` **function** calls our **block**.
 2. Our block **returns** `0`.
 3. The `if` **function** **returns** that `0`.
@@ -651,6 +652,7 @@ So if the condition `that` is true...
 5. `let` promptly **returns** (from `doCalc`).
 
 On the other hand, if the condition `that` is not true...
+
 1. The `if` **function** doesn't call our **block**.
 2. The `if` **function** does not **return** a **value**.
 3. `let` receives no **value**.
@@ -742,7 +744,7 @@ There are still a bunch of things left to learn, but you must master these basic
 - Formalization of language rules
 - Asynchronous (and parallel?) Programming
 - Standard library functions
-- Dependency 
+- Dependency
 - Compiling
   - Interoperability with TypeScript
 - Tooling

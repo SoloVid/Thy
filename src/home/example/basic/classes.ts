@@ -1,4 +1,3 @@
-
 export const classesTs = `
 class Thing {
   private secret: string

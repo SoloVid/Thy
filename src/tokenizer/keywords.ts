@@ -1,10 +1,32 @@
 import { makeSingleRegexMatcher } from "./single-regex-matcher"
-import { tAwait, tConstDeclAssign, tExport, tGiven, tLet, tNoDeclAssign, tPrivate, tReturn, tStatementContinuation, tThat, tType, tVarDeclAssign } from "./token-type"
+import {
+  tAwait,
+  tConstDeclAssign,
+  tExport,
+  tGiven,
+  tLet,
+  tNoDeclAssign,
+  tPrivate,
+  tReturn,
+  tStatementContinuation,
+  tThat,
+  tType,
+  tVarDeclAssign,
+} from "./token-type"
 
-export const matchStatementContinuation = makeSingleRegexMatcher(tStatementContinuation, /\r?\n *and\b/)
+export const matchStatementContinuation = makeSingleRegexMatcher(
+  tStatementContinuation,
+  /\r?\n *and\b/,
+)
 
-export const matchConstDeclAssign = makeSingleRegexMatcher(tConstDeclAssign, /\bis\b/)
-export const matchVarDeclAssign = makeSingleRegexMatcher(tVarDeclAssign, /\bbe\b/)
+export const matchConstDeclAssign = makeSingleRegexMatcher(
+  tConstDeclAssign,
+  /\bis\b/,
+)
+export const matchVarDeclAssign = makeSingleRegexMatcher(
+  tVarDeclAssign,
+  /\bbe\b/,
+)
 export const matchNoDeclAssign = makeSingleRegexMatcher(tNoDeclAssign, /\bto\b/)
 export const matchExport = makeSingleRegexMatcher(tExport, /\bexport\b/)
 export const matchPrivate = makeSingleRegexMatcher(tPrivate, /\bprivate\b/)

@@ -1,4 +1,3 @@
-
 const blocks = [a, b] as const
 
 // function makeThy() {
@@ -6,7 +5,7 @@ const blocks = [a, b] as const
 // }
 
 // const thy = makeThy()
-function thy<Key extends ("a" | "b")>(key: Key) {
+function thy<Key extends "a" | "b">(key: Key) {
   return null as unknown as Key extends "a" ? "A" : "AB"
 }
 

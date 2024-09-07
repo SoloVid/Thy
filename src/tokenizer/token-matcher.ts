@@ -6,14 +6,20 @@ import type { TokenizerState } from "./tokenizer-state"
 export const skipToken = Symbol("skipToken")
 
 export type TokenMatcherSingleResult = {
-    readonly type: TokenType | typeof skipToken
-    readonly text: string
+  readonly type: TokenType | typeof skipToken
+  readonly text: string
 }
 
 export type TokenMatcherMultiResult = TokenMatcherSingleResult & {
-    readonly tokenizer: Tokenizer
+  readonly tokenizer: Tokenizer
 }
 
-export type TokenMatcherResult = TokenMatcherSingleResult | TokenMatcherMultiResult | null
+export type TokenMatcherResult =
+  | TokenMatcherSingleResult
+  | TokenMatcherMultiResult
+  | null
 
-export type TokenMatcher = (state: TokenizerState, errors: CompileError[]) => TokenMatcherResult
+export type TokenMatcher = (
+  state: TokenizerState,
+  errors: CompileError[],
+) => TokenMatcherResult

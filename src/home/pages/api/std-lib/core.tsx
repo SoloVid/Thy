@@ -133,23 +133,21 @@ const sections = [
 
 const { toc, renderedSections } = makeMultiMarkdown(sections)
 
-renderStandardPage("Core Standard Library - Thy (lang)", <>
-  <div class="column-content-sm">
-    <h2>Overview</h2>
-    <p>
-      The core standard library for Thy is the base set of functions and values
-      that should be available in any Thy runtime environment.
-      Many of these functions are provided as language features
-      in other languages.
-      Where appropriate, links are provided to equivalent
-      TypeScript functionality for further reading.
-    </p>
-    <h2>On this page</h2>
-    <ul>
-      {toc}
-    </ul>
-  </div>
-  <div class="column-content-sm">
-    {renderedSections}
-  </div>
-</>)
+renderStandardPage(
+  "Core Standard Library - Thy (lang)",
+  <>
+    <div class="column-content-sm">
+      <h2>Overview</h2>
+      <p>
+        The core standard library for Thy is the base set of functions and
+        values that should be available in any Thy runtime environment. Many of
+        these functions are provided as language features in other languages.
+        Where appropriate, links are provided to equivalent TypeScript
+        functionality for further reading.
+      </p>
+      <h2>On this page</h2>
+      <ul>{toc}</ul>
+    </div>
+    <div class="column-content-sm">{renderedSections}</div>
+  </>,
+)

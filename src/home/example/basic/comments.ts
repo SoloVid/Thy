@@ -1,4 +1,3 @@
-
 export const commentsTs = `
 // This is a one-line comment
 console.log("")

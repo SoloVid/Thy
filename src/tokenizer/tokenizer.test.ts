@@ -1,5 +1,13 @@
 import { checkExampleProgramTokenTypes, testTokenizer } from "./test-helper"
-import { tEndBlock, tEndString, tStartBlock, tStartString, tStatementTerminator, tStringText, tValueIdentifier } from "./token-type"
+import {
+  tEndBlock,
+  tEndString,
+  tStartBlock,
+  tStartString,
+  tStatementTerminator,
+  tStringText,
+  tValueIdentifier,
+} from "./token-type"
 
 testTokenizer("should tokenize Hello World", async () => {
   await checkExampleProgramTokenTypes("hello-world.thy", [
@@ -9,6 +17,6 @@ testTokenizer("should tokenize Hello World", async () => {
     tStringText,
     tEndString,
     tStatementTerminator,
-    tEndBlock
+    tEndBlock,
   ])
 })

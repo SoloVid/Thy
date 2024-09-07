@@ -1,4 +1,3 @@
-
 export const objectsTs = `
 const o = {
   a: {

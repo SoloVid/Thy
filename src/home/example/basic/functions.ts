@@ -1,4 +1,3 @@
-
 export const functionsTs = `
 function foo(a: string, b: number = 5): boolean {
   return a + b

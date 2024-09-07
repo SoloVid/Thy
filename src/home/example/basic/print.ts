@@ -1,4 +1,3 @@
-
 export const printTs = `
 console.log("himom")
 `

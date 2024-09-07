@@ -1,9 +1,9 @@
-console.log(((1 + 1) / (1 * 1)) === 1)
+console.log((1 + 1) / (1 * 1) === 1)
 
 const makeFunctionFunction = (a: number) => {
   return (b: number) => {
     return (c: number) => {
-      return (a < b) && (b < c)
+      return a < b && b < c
     }
   }
 }

@@ -1,4 +1,7 @@
-import { compressToEncodedURIComponent as compressLz, decompressFromEncodedURIComponent as decompressLz } from "lz-string"
+import {
+  compressToEncodedURIComponent as compressLz,
+  decompressFromEncodedURIComponent as decompressLz,
+} from "lz-string"
 import { useEffect, useState } from "preact/hooks"
 import { CopyToClipboardButton } from "../home/button"
 import { interpretThyBlock } from "../interpreter/block"
@@ -59,7 +62,11 @@ export default function Playground() {
     return () => window.removeEventListener("popstate", listener)
   })
 
-  function saveCodeInHistory(fileName: string, newSource: string, language: string) {
+  function saveCodeInHistory(
+    fileName: string,
+    newSource: string,
+    language: string,
+  ) {
     try {
       history.replaceState(
         {
@@ -68,7 +75,7 @@ export default function Playground() {
           fileName: fileName,
         },
         "",
-        window.location.pathname + window.location.search
+        window.location.pathname + window.location.search,
       )
     } catch (e) {
       // MDN warns that an exception could be thrown if the data is too big.
@@ -78,7 +85,7 @@ export default function Playground() {
       history.replaceState(
         null,
         "",
-        window.location.pathname + window.location.search
+        window.location.pathname + window.location.search,
       )
     }
   }
@@ -125,11 +132,17 @@ export default function Playground() {
     return `return "himom"\n`
   }
 
-  const [editorLanguage, setEditorLanguage] = useState<string>(() => getDataFromHistory().language)
+  const [editorLanguage, setEditorLanguage] = useState<string>(
+    () => getDataFromHistory().language,
+  )
   const [sourceCode, setSourceCodeInner] = useState(getInitialSourceCode)
 
-  const [menuShowing, setMenuShowing] = useState<"file" | "options" | null>(null)
-  const [fileLoaded, setFileLoaded] = useState(() => getDataFromHistory().fileName)
+  const [menuShowing, setMenuShowing] = useState<"file" | "options" | null>(
+    null,
+  )
+  const [fileLoaded, setFileLoaded] = useState(
+    () => getDataFromHistory().fileName,
+  )
 
   const [output, setOutput] = useState<Output | string>({
     error: null,
@@ -142,7 +155,15 @@ export default function Playground() {
   }, [fileLoaded, sourceCode, editorLanguage])
 
   function getShareUrl() {
-    return window.location.protocol + "//" + window.location.host + window.location.pathname + window.location.search + "#lz=" + compressLz(sourceCode)
+    return (
+      window.location.protocol +
+      "//" +
+      window.location.host +
+      window.location.pathname +
+      window.location.search +
+      "#lz=" +
+      compressLz(sourceCode)
+    )
   }
 
   const rawFileManager = makeFileManager()
@@ -163,7 +184,7 @@ export default function Playground() {
         },
         encodeURIComponent,
         fetch,
-        file: makeThyFilesApi(rawFileManager)
+        file: makeThyFilesApi(rawFileManager),
       }
       returnValue = await interpreted(playgroundLib)
     } catch (e) {
@@ -172,7 +193,13 @@ export default function Playground() {
         if (!e.stack) {
           error = e.message
         } else {
-          const dissectedError = dissectErrorTraceAtCloserBaseline(e, errorHere, 0, new Error(), 0)
+          const dissectedError = dissectErrorTraceAtCloserBaseline(
+            e,
+            errorHere,
+            0,
+            new Error(),
+            0,
+          )
           error = `${e.name}: ${e.message}\n${dissectedError.delta}`
         }
       } else {
@@ -203,106 +230,180 @@ export default function Playground() {
     setSourceCodeInner(newSource)
   }
 
-  return <div class="playground-container" style={`height:100vh;height:${windowHeight}px;`}>
-    <CodeInput
-      id="editor"
-      style={`position:relative; width: 100%; height: ${editorHeight}px;`}
-      language={editorLanguage}
-      value={sourceCode}
-      setValue={setSourceCode}
-      runCode={() => runThenSetOutput(sourceCode)}
-    ></CodeInput>
-    <div>
-      <div className="button-panel">
-        <a onClick={() => runThenSetOutput(sourceCode)} className="large button">Run</a>
-        <a onClick={() => setMenuShowing(before => before === "file" ? null : "file")} className="large button">File</a>
-        <CopyToClipboardButton
-          extraButtonClass="large"
-          getValue={() => getShareUrl()}
-          tooltip="Copied URL"
-        >Share</CopyToClipboardButton>
-        <CopyToClipboardButton
-          extraButtonClass="large"
-          getValue={() => sourceCode}
-          tooltip="Copied code"
-        >Copy</CopyToClipboardButton>
-        <a onClick={() => setMenuShowing(before => before === "options" ? null : "options")} className="large button">Options</a>
+  return (
+    <div
+      class="playground-container"
+      style={`height:100vh;height:${windowHeight}px;`}
+    >
+      <CodeInput
+        id="editor"
+        style={`position:relative; width: 100%; height: ${editorHeight}px;`}
+        language={editorLanguage}
+        value={sourceCode}
+        setValue={setSourceCode}
+        runCode={() => runThenSetOutput(sourceCode)}
+      ></CodeInput>
+      <div>
+        <div className="button-panel">
+          <a
+            onClick={() => runThenSetOutput(sourceCode)}
+            className="large button"
+          >
+            Run
+          </a>
+          <a
+            onClick={() =>
+              setMenuShowing((before) => (before === "file" ? null : "file"))
+            }
+            className="large button"
+          >
+            File
+          </a>
+          <CopyToClipboardButton
+            extraButtonClass="large"
+            getValue={() => getShareUrl()}
+            tooltip="Copied URL"
+          >
+            Share
+          </CopyToClipboardButton>
+          <CopyToClipboardButton
+            extraButtonClass="large"
+            getValue={() => sourceCode}
+            tooltip="Copied code"
+          >
+            Copy
+          </CopyToClipboardButton>
+          <a
+            onClick={() =>
+              setMenuShowing((before) =>
+                before === "options" ? null : "options",
+              )
+            }
+            className="large button"
+          >
+            Options
+          </a>
+        </div>
+        {menuShowing === "file" && (
+          <>
+            <ul>
+              {fileMan.files.length === 0 && <li>No saved files</li>}
+              {fileMan.files.map((f) => (
+                <li>
+                  <a
+                    className="small button"
+                    onClick={() => {
+                      fileMan.saveFile(f, sourceCode, {
+                        language: editorLanguage,
+                      })
+                      setFileLoaded(f)
+                    }}
+                  >
+                    Save
+                  </a>
+                  <a
+                    className="small button"
+                    onClick={() => {
+                      const contents = fileMan.getFile(f)
+                      if (contents === null) {
+                        return
+                      }
+                      // Push a new state for browser history.
+                      history.pushState(history.state, "", "")
+                      setSourceCode(contents)
+                      const metadata = fileMan.getMetadata(f)
+                      setEditorLanguage(metadata.language ?? "thy")
+                      setFileLoaded(f)
+                    }}
+                  >
+                    Load
+                  </a>
+                  <a
+                    className="small button"
+                    onClick={() => fileMan.deleteFile(f)}
+                  >
+                    Delete
+                  </a>
+                  <strong>{f}</strong>
+                </li>
+              ))}
+              <li>
+                <a
+                  className="small button"
+                  onClick={() => {
+                    const newName = fileMan.saveAsNew(sourceCode)
+                    if (!!newName) {
+                      setFileLoaded(newName)
+                    }
+                  }}
+                >
+                  Save as New
+                </a>
+                <a
+                  className="small button"
+                  onClick={() => {
+                    if (!window.confirm("Clear editor?")) {
+                      return
+                    }
+                    setSourceCode("")
+                    setFileLoaded("")
+                  }}
+                >
+                  Clear
+                </a>
+              </li>
+            </ul>
+            <hr />
+          </>
+        )}
+        {menuShowing === "options" && (
+          <>
+            <label>
+              Language:
+              <select
+                value={editorLanguage}
+                onChange={(e) => {
+                  const newLang = (e.target as HTMLSelectElement).value
+                  setEditorLanguage(newLang)
+                }}
+              >
+                <option value="thy">thy</option>
+                <option value="text">text</option>
+              </select>
+            </label>
+            <hr />
+          </>
+        )}
+        {typeof output === "string" ? (
+          <h4>Running...</h4>
+        ) : (
+          <>
+            {output.error !== null && (
+              <div>
+                <h3>Error</h3>
+                <pre className="output">{output.error}</pre>
+                <hr />
+              </div>
+            )}
+            {output.returnValue !== undefined && (
+              <div>
+                <h3>Return Value</h3>
+                <pre className="output">
+                  {JSON.stringify(output.returnValue, null, 2)}
+                </pre>
+                <hr />
+              </div>
+            )}
+            {output.printedLines.length > 0 && (
+              <div>
+                <h3>Printed Lines</h3>
+                <pre className="output">{output.printedLines.join("\n")}</pre>
+                <hr />
+              </div>
+            )}
+          </>
+        )}
       </div>
-      {menuShowing === "file" && (<>
-        <ul>
-          {fileMan.files.length === 0 && <li>No saved files</li>}
-          {fileMan.files.map(f => (
-            <li>
-              <a className="small button" onClick={() => {
-                fileMan.saveFile(f, sourceCode, { language: editorLanguage })
-                setFileLoaded(f)
-              }}>Save</a>
-              <a className="small button" onClick={() => {
-                const contents = fileMan.getFile(f)
-                if (contents === null) {
-                  return
-                }
-                // Push a new state for browser history.
-                history.pushState(history.state, "", "")
-                setSourceCode(contents)
-                const metadata = fileMan.getMetadata(f)
-                setEditorLanguage(metadata.language ?? "thy")
-                setFileLoaded(f)
-              }}>Load</a>
-              <a className="small button" onClick={() => fileMan.deleteFile(f)}>Delete</a>
-              <strong>{f}</strong>
-            </li>
-          ))}
-            <li>
-              <a className="small button" onClick={() => {
-                const newName = fileMan.saveAsNew(sourceCode)
-                if (!!newName) {
-                  setFileLoaded(newName)
-                }
-              }}>Save as New</a>
-              <a className="small button" onClick={() => {
-                if (!window.confirm("Clear editor?")) {
-                  return
-                }
-                setSourceCode("")
-                setFileLoaded("")
-              }}>Clear</a>
-            </li>
-        </ul>
-        <hr/>
-      </>)}
-      {menuShowing === "options" && <>
-        <label>
-          Language:
-          <select value={editorLanguage} onChange={(e) => {
-            const newLang = (e.target as HTMLSelectElement).value
-            setEditorLanguage(newLang)
-          }}>
-            <option value="thy">thy</option>
-            <option value="text">text</option>
-          </select>
-        </label>
-        <hr/>
-      </>}
-      {typeof output === "string" ? (
-        <h4>Running...</h4>
-      ): (<>
-        {output.error !== null && <div>
-          <h3>Error</h3>
-          <pre className="output">{output.error}</pre>
-          <hr/>
-        </div>}
-        {output.returnValue !== undefined && <div>
-          <h3>Return Value</h3>
-          <pre className="output">{JSON.stringify(output.returnValue, null, 2)}</pre>
-          <hr/>
-        </div>}
-        {output.printedLines.length > 0 && <div>
-          <h3>Printed Lines</h3>
-          <pre className="output">{output.printedLines.join("\n")}</pre>
-          <hr/>
-        </div>}
-      </>)}
     </div>
-  </div>
+  )
 }

@@ -22,15 +22,15 @@ test("interpretThyBlock() should return a function that can return a parameter p
 test("interpretThyBlock() should return a function that can call a function passed in", async () => {
   const interpreted = interpretThyBlock(`a is given\na`)
   let called = false
-  const f = () => called = true
+  const f = () => (called = true)
   interpreted(f)
   assert(called, `Function should have been called`)
 })
 
 test("interpretThyBlock() should return a function that can call a function passed in with arguments", async () => {
   const interpreted = interpretThyBlock(`a is given\na 2 "two"`)
-  let calledWithArgs: null|unknown[] = null
-  const f = (...args: unknown[]) => calledWithArgs = args
+  let calledWithArgs: null | unknown[] = null
+  const f = (...args: unknown[]) => (calledWithArgs = args)
   interpreted(f)
   assert.deepStrictEqual(calledWithArgs, [2, "two"])
 })
@@ -43,8 +43,8 @@ test("interpretThyBlock() should return a function that can call a function pass
 
 test("interpretThyBlock() should return a function that can call a function passed in (implicit argument)", async () => {
   const interpreted = interpretThyBlock(`f 2 "two"`)
-  let calledWithArgs: null|unknown[] = null
-  const f = (...args: unknown[]) => calledWithArgs = args
+  let calledWithArgs: null | unknown[] = null
+  const f = (...args: unknown[]) => (calledWithArgs = args)
   interpreted({ f })
   assert.deepStrictEqual(calledWithArgs, [2, "two"])
 })
@@ -63,24 +63,30 @@ test("interpretThyBlock() should return a function that can forgo early return v
 
 test("interpretThyBlock() should return a function that rejects `return` with no argument", async () => {
   const interpreted = interpretThyBlock(`return`)
-  assert.throws(() => interpreted(), (e) => {
-    assert(e instanceof Error)
-    assert.match(e.message, /`return` takes exactly one parameter/)
-    // assert(e instanceof InterpreterErrorWithContext)
-    // assert.deepStrictEqual(e.sourceLocation, { lineIndex: 0, columnIndex: 0 })
-    return true
-  })
+  assert.throws(
+    () => interpreted(),
+    (e) => {
+      assert(e instanceof Error)
+      assert.match(e.message, /`return` takes exactly one parameter/)
+      // assert(e instanceof InterpreterErrorWithContext)
+      // assert.deepStrictEqual(e.sourceLocation, { lineIndex: 0, columnIndex: 0 })
+      return true
+    },
+  )
 })
 
 test("interpretThyBlock() should return a function that rejects `return` with too many arguments", async () => {
   const interpreted = interpretThyBlock(`return 1 2`)
-  assert.throws(() => interpreted(), (e) => {
-    assert(e instanceof Error)
-    assert.match(e.message, /`return` takes exactly one parameter/)
-    // assert(e instanceof InterpreterErrorWithContext)
-    // assert.deepStrictEqual(e.sourceLocation, { lineIndex: 0, columnIndex: 9 })
-    return true
-  })
+  assert.throws(
+    () => interpreted(),
+    (e) => {
+      assert(e instanceof Error)
+      assert.match(e.message, /`return` takes exactly one parameter/)
+      // assert(e instanceof InterpreterErrorWithContext)
+      // assert.deepStrictEqual(e.sourceLocation, { lineIndex: 0, columnIndex: 9 })
+      return true
+    },
+  )
 })
 
 test("interpretThyBlock() should return a function that allows `let` with no call", async () => {
@@ -116,38 +122,47 @@ test("interpretThyBlock() should return object of exported variables, appropriat
   const result = interpreted({ f })
   assert(result !== null && typeof result === "object")
   const record = result as Record<string, unknown>
-  assert.throws(() => record.a = 6, /a is immutable/)
+  assert.throws(() => (record.a = 6), /a is immutable/)
   assert.deepStrictEqual(result, { a: 5 })
 })
 
 test("interpretThyBlock() should reject export after let", async () => {
-  assert.throws(() => interpretThyBlock(`let f\nexport a is f`), (e) => {
-    assert(e instanceof Error)
-    assert.match(e.message, /`export` cannot be used after `let`/)
-    assert(e instanceof InterpreterErrorWithContext)
-    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 0 })
-    return true
-  })
+  assert.throws(
+    () => interpretThyBlock(`let f\nexport a is f`),
+    (e) => {
+      assert(e instanceof Error)
+      assert.match(e.message, /`export` cannot be used after `let`/)
+      assert(e instanceof InterpreterErrorWithContext)
+      assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 0 })
+      return true
+    },
+  )
 })
 
 test("interpretThyBlock() should reject let after export", async () => {
-  assert.throws(() => interpretThyBlock(`export a is f\nlet f`), (e) => {
-    assert(e instanceof Error)
-    assert.match(e.message, /`let` cannot be used after `export`/)
-    assert(e instanceof InterpreterErrorWithContext)
-    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 0 })
-    return true
-  })
+  assert.throws(
+    () => interpretThyBlock(`export a is f\nlet f`),
+    (e) => {
+      assert(e instanceof Error)
+      assert.match(e.message, /`let` cannot be used after `export`/)
+      assert(e instanceof InterpreterErrorWithContext)
+      assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 0 })
+      return true
+    },
+  )
 })
 
 test("interpretThyBlock() should reject return after export", async () => {
-  assert.throws(() => interpretThyBlock(`export a is f\nreturn 5`), (e) => {
-    assert(e instanceof Error)
-    assert.match(e.message, /`return` cannot be used after `export`/)
-    assert(e instanceof InterpreterErrorWithContext)
-    assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 0 })
-    return true
-  })
+  assert.throws(
+    () => interpretThyBlock(`export a is f\nreturn 5`),
+    (e) => {
+      assert(e instanceof Error)
+      assert.match(e.message, /`return` cannot be used after `export`/)
+      assert(e instanceof InterpreterErrorWithContext)
+      assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 0 })
+      return true
+    },
+  )
 })
 
 test("interpretThyBlock() should return object of implicitly exported variables", async () => {
@@ -172,7 +187,7 @@ test("interpretThyBlock() should return object of implicitly exported variables,
   const result = interpreted({ f })
   assert(result !== null && typeof result === "object")
   const record = result as Record<string, unknown>
-  assert.throws(() => record.a = 6, /a is immutable/)
+  assert.throws(() => (record.a = 6), /a is immutable/)
   assert.deepStrictEqual(result, { a: 5 })
 })
 
@@ -183,7 +198,9 @@ test("interpretThyBlock() should not return object of implicitly exported variab
 })
 
 test("interpretThyBlock() should share mutable variable state", async () => {
-  const interpreted = interpretThyBlock(`a be def 1\nf is def\n  aBefore is def a\n  a to def 2\n  return aBefore`)
+  const interpreted = interpretThyBlock(
+    `a be def 1\nf is def\n  aBefore is def a\n  a to def 2\n  return aBefore`,
+  )
   const result = interpreted({ def: (a: unknown) => a })
   assert(result !== null && typeof result === "object")
   const record = result as Record<string, unknown>

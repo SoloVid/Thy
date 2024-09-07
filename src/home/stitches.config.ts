@@ -1,4 +1,4 @@
-import { createStitches } from '@stitches/react'
+import { createStitches } from "@stitches/react"
 
 export const {
   styled,
@@ -11,10 +11,9 @@ export const {
   config,
 } = createStitches({
   theme: {
-    colors: {
-    },
+    colors: {},
   },
   media: {
-    bp1: '(min-width: 480px)',
+    bp1: "(min-width: 480px)",
   },
 })

@@ -1,4 +1,3 @@
-
 export const ifTs = `
 if (a === b) {
   console.log("yes")

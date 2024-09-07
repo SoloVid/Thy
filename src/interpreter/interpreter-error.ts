@@ -6,13 +6,13 @@ export function makeInterpreterError(atom: Atom, message: string) {
 
 export class InterpreterErrorWithContext extends Error {
   readonly cause: unknown
-  readonly sourceLocation: { lineIndex: number, columnIndex: number }
+  readonly sourceLocation: { lineIndex: number; columnIndex: number }
   constructor(
     cause: unknown,
     atom: Atom,
     public readonly additionalDepthToShave: number = 0,
     public readonly altCloseError?: Error,
-    public readonly altAdditionalDepthToShave: number = 0
+    public readonly altAdditionalDepthToShave: number = 0,
   ) {
     super(cause instanceof Error ? cause.message : undefined)
     this.cause = cause

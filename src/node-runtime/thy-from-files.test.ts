@@ -1,8 +1,8 @@
-import assert from "assert";
-import { defineTestGroup } from "under-the-sun";
-import { core } from "../std-lib/core";
-import { testFileA, testFileB, testFileBar, testFileBaz } from "./test-files";
-import { makeThyFromFiles } from "./thy-from-files";
+import assert from "assert"
+import { defineTestGroup } from "under-the-sun"
+import { core } from "../std-lib/core"
+import { testFileA, testFileB, testFileBar, testFileBaz } from "./test-files"
+import { makeThyFromFiles } from "./thy-from-files"
 
 const testMakeThy = defineTestGroup("makeThyFromFiles() ")
 
@@ -33,7 +33,12 @@ testMakeThy("function should run all passed functions", async () => {
     },
   })
   thy()
-  assert.deepStrictEqual(prints, [["Hi from A"], ["Hi from B"], ["Hi from bar"], ["Hi from baz"]])
+  assert.deepStrictEqual(prints, [
+    ["Hi from A"],
+    ["Hi from B"],
+    ["Hi from bar"],
+    ["Hi from baz"],
+  ])
 })
 
 // testMakeThy("function should run all functions once", async () => {

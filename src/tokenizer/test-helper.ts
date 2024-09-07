@@ -10,16 +10,22 @@ export const testTokenizer = defineTestGroup("tokenizer ")
 
 const maxTestN = 1000
 
-export async function checkExampleProgramTokenTypes(exampleProgram: string, tokenTypes: readonly TokenType[]) {
+export async function checkExampleProgramTokenTypes(
+  exampleProgram: string,
+  tokenTypes: readonly TokenType[],
+) {
   const { errors, outputs } = await tokenizeExampleProgram(exampleProgram)
   expect(errors).toEqual([])
-  expect(outputs.map(t => t.type)).toEqual(tokenTypes)
+  expect(outputs.map((t) => t.type)).toEqual(tokenTypes)
 }
 
-export async function checkExampleProgramTokens(exampleProgram: string, tokens: readonly (readonly [TokenType, string])[]) {
+export async function checkExampleProgramTokens(
+  exampleProgram: string,
+  tokens: readonly (readonly [TokenType, string])[],
+) {
   const { errors, outputs } = await tokenizeExampleProgram(exampleProgram)
   expect(errors).toEqual([])
-  expect(outputs.map(t => [t.type, t.text])).toEqual(tokens)
+  expect(outputs.map((t) => [t.type, t.text])).toEqual(tokens)
 }
 
 export async function tokenizeExampleProgram(exampleProgram: string) {

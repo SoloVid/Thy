@@ -1,5 +1,7 @@
 // Adapted from https://stackoverflow.com/a/20871714/4639640
-export const permute = <T>(inputArr: readonly T[]): readonly (readonly T[])[] => {
+export const permute = <T>(
+  inputArr: readonly T[],
+): readonly (readonly T[])[] => {
   let result: T[][] = []
 
   const permuteInner = (arr: readonly T[], m: T[] = []) => {

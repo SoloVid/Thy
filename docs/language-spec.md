@@ -12,9 +12,9 @@ as their equivalents in TypeScript and documentation left to external sources.
 
 Here are some general rules for Thy program structure:
 
-* Every program is a [block](#blocks)
-* Every [block](#blocks) consists of [statements](#statements)
-* Every [statement](#statements) contains exactly one [call](#calls)
+- Every program is a [block](#blocks)
+- Every [block](#blocks) consists of [statements](#statements)
+- Every [statement](#statements) contains exactly one [call](#calls)
 
 ## Variables
 
@@ -160,7 +160,7 @@ in a space-separated list following the function expression:
 calculateSomething a b c
 ```
 
-> In other C-like languages, this would look like 
+> In other C-like languages, this would look like
 > `calculateSomething(a, b, c)`.
 
 There are 4 types of expressions in Thy that can be used as arguments to calls:
@@ -352,14 +352,19 @@ A statement in Thy contains exactly one [call](#calls),
 but there are three variants:
 
 1. Bare [calls](#calls)
+
 ```thy
 foo a b c
 ```
+
 2. [Calls](#calls) with [variable assignment](#variable-assignments-is-be-to)
+
 ```thy
 myResult is foo a b c
 ```
+
 3. [`let` statements](#let-statements)
+
 ```thy
 let foo a b c
 ```
@@ -780,7 +785,7 @@ In this example, the block will return the object (formatted as JSON) `{ "b": 2 
 The `export` and `private` keywords can both be used in the same block,
 but generally it makes sense to pick one and use that.
 
-However, `export`/`private` is mutually exclusive with `return`/`let`. 
+However, `export`/`private` is mutually exclusive with `return`/`let`.
 It is an error to use `return` or `let` in a block that uses `export`.
 
 ##### Object Construction Patterns
@@ -789,7 +794,7 @@ It is an error to use `return` or `let` in a block that uses `export`.
 but it may not seem obvious how they are created.
 
 A common pattern for factories (reusable functions for creating similar objects)
-in Thy might look like this: 
+in Thy might look like this:
 
 ```thy
 makeMyThing is def
@@ -919,7 +924,7 @@ which can be passed prior to the value parameters.
 callSomeFunction TypeArg1 TypeArg2 valueArg1 valueArg2
 ```
 
-> In TypeScript (and some other C-like languages), this would look like 
+> In TypeScript (and some other C-like languages), this would look like
 > `callSomeFunction<TypeArg1, TypeArg2>(valueArg1, valueArg2)`.
 
 As with TypeScript, these parameters are optional and may be omitted.
@@ -1014,6 +1019,7 @@ type MyNewType is calculateSomeValue 1 2 3
 ```
 
 However, there are several differences:
+
 1. Types are always immutable (only `is` available).
 2. The function expression can be a type.
 

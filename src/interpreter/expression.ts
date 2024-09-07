@@ -12,7 +12,10 @@ type InterpretedExpression = {
 
 const ie = (value: unknown): InterpretedExpression => ({ target: value })
 
-export function interpretThyExpression(context: ThyBlockContext, thyExpressionAtom: Atom): InterpretedExpression {
+export function interpretThyExpression(
+  context: ThyBlockContext,
+  thyExpressionAtom: Atom,
+): InterpretedExpression {
   if ("lines" in thyExpressionAtom) {
     return ie(resolveBlock(context, thyExpressionAtom))
   }
@@ -32,7 +35,9 @@ export function interpretThyExpression(context: ThyBlockContext, thyExpressionAt
 
 function resolveBlock(context: ThyBlockContext, unparsedBlock: UnparsedBlock) {
   function initialize() {
-    const childClosure: ThyBlockContext["closure"] = { ...context.implicitArguments }
+    const childClosure: ThyBlockContext["closure"] = {
+      ...context.implicitArguments,
+    }
     const childClosureVariableIsImmutable: Record<string, boolean> = {}
     for (const key of Object.keys(context.variablesInBlock)) {
       Object.defineProperty(childClosure, key, {
@@ -41,7 +46,10 @@ function resolveBlock(context: ThyBlockContext, unparsedBlock: UnparsedBlock) {
           return context.variablesInBlock[key]
         },
         set(value) {
-          assert(!context.variableIsImmutable[key], `${key} is immutable and cannot be reassigned`)
+          assert(
+            !context.variableIsImmutable[key],
+            `${key} is immutable and cannot be reassigned`,
+          )
           context.variablesInBlock[key] = value
         },
       })
@@ -59,19 +67,23 @@ function resolveBlock(context: ThyBlockContext, unparsedBlock: UnparsedBlock) {
           return context.closure[key]
         },
         set(value) {
-          assert(!context.closureVariableIsImmutable[key], `${key} is immutable and cannot be reassigned`)
+          assert(
+            !context.closureVariableIsImmutable[key],
+            `${key} is immutable and cannot be reassigned`,
+          )
           context.closure[key] = value
         },
       })
       if (key in context.closureVariableIsImmutable) {
-        childClosureVariableIsImmutable[key] = context.closureVariableIsImmutable[key]
+        childClosureVariableIsImmutable[key] =
+          context.closureVariableIsImmutable[key]
       }
     }
     return interpretThyBlockLines(unparsedBlock.lines, {
       closure: childClosure,
       closureVariableIsImmutable: childClosureVariableIsImmutable,
       sourceFile: context.sourceFile,
-      startingLineIndex: unparsedBlock.lineIndex
+      startingLineIndex: unparsedBlock.lineIndex,
     })
   }
 
@@ -90,7 +102,10 @@ function resolveBlock(context: ThyBlockContext, unparsedBlock: UnparsedBlock) {
   }
 }
 
-export function interpretThyIdentifier(context: ThyBlockContext, thyExpression: AtomSingle): InterpretedExpression {
+export function interpretThyIdentifier(
+  context: ThyBlockContext,
+  thyExpression: AtomSingle,
+): InterpretedExpression {
   const parts = thyExpression.text.split(".")
   const [base, ...memberAccesses] = parts
   const baseValue = interpretThyIdentifierBase(context, thyExpression, base)
@@ -100,10 +115,16 @@ export function interpretThyIdentifier(context: ThyBlockContext, thyExpression: 
   for (const access of memberAccesses) {
     thisValue = finalValue
     if (!identifierRegex.test(access)) {
-      throw makeInterpreterError(thyExpression, `Invalid (member) identifier: ${access}`)
+      throw makeInterpreterError(
+        thyExpression,
+        `Invalid (member) identifier: ${access}`,
+      )
     }
     if (!finalValue) {
-      throw makeInterpreterError(thyExpression, `Cannot access ${access} on ${priorAccess} because ${priorAccess} has no value`)
+      throw makeInterpreterError(
+        thyExpression,
+        `Cannot access ${access} on ${priorAccess} because ${priorAccess} has no value`,
+      )
     }
     finalValue = (finalValue as Record<string, unknown>)[access]
     priorAccess = access
@@ -111,7 +132,11 @@ export function interpretThyIdentifier(context: ThyBlockContext, thyExpression: 
   return { target: finalValue, thisValue: thisValue }
 }
 
-function interpretThyIdentifierBase(context: ThyBlockContext, atom: AtomSingle, thyExpressionBase: string) {
+function interpretThyIdentifierBase(
+  context: ThyBlockContext,
+  atom: AtomSingle,
+  thyExpressionBase: string,
+) {
   if (thyExpressionBase === "that") {
     return interpretThat(context, atom, "thatValue", "that")
   }
@@ -122,19 +147,35 @@ function interpretThyIdentifierBase(context: ThyBlockContext, atom: AtomSingle, 
   return getVariableFromContext(context, atom, thyExpressionBase)
 }
 
-function interpretThat(context: ThyBlockContext, atom: AtomSingle, contextKey: "thatValue" | "beforeThatValue", keyword: "that" | "beforeThat") {
+function interpretThat(
+  context: ThyBlockContext,
+  atom: AtomSingle,
+  contextKey: "thatValue" | "beforeThatValue",
+  keyword: "that" | "beforeThat",
+) {
   if (context[contextKey] === undefined) {
-    throw makeInterpreterError(atom, `Value is not available for \`${keyword}\``)
+    throw makeInterpreterError(
+      atom,
+      `Value is not available for \`${keyword}\``,
+    )
   }
   return context[contextKey]
 }
 
-function getVariableFromContext(context: ThyBlockContext, atom: AtomSingle, variable: string) {
+function getVariableFromContext(
+  context: ThyBlockContext,
+  atom: AtomSingle,
+  variable: string,
+) {
   if (!identifierRegex.test(variable)) {
     throw makeInterpreterError(atom, `Invalid identifier: ${variable}`)
   }
 
-  if (!context.givenUsed && context.implicitArguments && variable in context.implicitArguments) {
+  if (
+    !context.givenUsed &&
+    context.implicitArguments &&
+    variable in context.implicitArguments
+  ) {
     if (context.implicitArgumentFirstUsed === null) {
       context.implicitArgumentFirstUsed = variable
     }
@@ -146,8 +187,15 @@ function getVariableFromContext(context: ThyBlockContext, atom: AtomSingle, vari
   if (variable in context.variablesInBlock) {
     return context.variablesInBlock[variable]
   }
-  if (context.givenUsed && context.implicitArguments && variable in context.implicitArguments) {
-    throw makeInterpreterError(atom, `Implicit arguments cannot be used (referenced ${variable}) after \`given\``)
+  if (
+    context.givenUsed &&
+    context.implicitArguments &&
+    variable in context.implicitArguments
+  ) {
+    throw makeInterpreterError(
+      atom,
+      `Implicit arguments cannot be used (referenced ${variable}) after \`given\``,
+    )
   }
   throw makeInterpreterError(atom, `Variable ${variable} not found`)
 }

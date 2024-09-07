@@ -15,17 +15,9 @@ test("getFirstIndent() should return indent of single line", async () => {
 })
 
 test("getFirstIndent() should skip empty lines", async () => {
-  assert.strictEqual(getFirstIndent([
-    ``,
-    `    `,
-    `  a`,
-  ]), "  ")
+  assert.strictEqual(getFirstIndent([``, `    `, `  a`]), "  ")
 })
 
 test("getFirstIndent() should return empty string if there are no non-empty lines", async () => {
-  assert.strictEqual(getFirstIndent([
-    `  `,
-    ``,
-    `    `,
-  ]), "")
+  assert.strictEqual(getFirstIndent([`  `, ``, `    `]), "")
 })

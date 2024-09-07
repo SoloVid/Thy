@@ -1,4 +1,3 @@
-
 export const errorsTs = `
 try {
   throw new Error("Oh noes!")

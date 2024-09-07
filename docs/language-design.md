@@ -20,6 +20,7 @@ TypeScript has a pretty solid type system.
 Null safety and disallowance of `any` take the system further.
 Thy should support most common (and good practice) patterns of types in TypeScript.
 This includes (but is not necessarily limited to):
+
 - Explicit and implicit typing
 - Union and intersection types
 - Parameterized types
@@ -32,6 +33,7 @@ The plan is to just compile to TypeScript and let tsc take it from there.
 I'm mainly trying to avoid writing a type-checker.
 
 Implications:
+
 - A language feature cannot require type information (from elsewhere) to determine what TS should be generated.
 
 ### Simple Rules
@@ -170,19 +172,21 @@ Values, variables. Tomato, potato.
 Types are purely a compile-time aid for static code analysis.
 
 Types can be used in two places:
+
 - `type` statements
 - Function calls (as type arguments)
 
 ## Return values
 
 ### Early Returns (let)
+
 I really want to make `if` a function in this language.
 It takes a condition, a function, and additional else-related stuff.
 One common paradigm this makes difficult is early returns:
 
 ```typescript
 if (condition) {
-  return earlyValue;
+  return earlyValue
 }
 // Continue on
 ```
@@ -226,8 +230,10 @@ X aa is a
 ```
 
 ### Classes
+
 I also really want classes and object literals to follow the same rules as other code for blocks.
 This has led me to the following set of rules:
+
 - Every indentation level of the program has the same rules.
 - Every block (and these rules only require evaluating at the single indentation level) has some return value/type.
   - If a block uses `return` or `let`, it will only return the types of the returned/let'ed functions (plus Void if the last statement of the block is not a `return` statement).
@@ -264,8 +270,8 @@ But it could be optimized to the more idiomatic TypeScript:
 const myObj = {
   field1: 1,
   field2: {
-    a: "himom"
-  }
+    a: "himom",
+  },
 }
 ```
 

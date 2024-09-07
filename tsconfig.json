@@ -1,28 +1,25 @@
 {
-    "compilerOptions": {
-        "lib": ["es2021"],
-        "module": "commonjs",
-        "target": "es2021",
-        "strict": true,
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
-        "moduleResolution": "node",
-        "declaration": true,
-        "declarationMap": true,
-        "sourceMap": true,
-        "rootDir": "src",
-        "outDir": "lib",
-        "importsNotUsedAsValues": "error",
-        "jsx": "react-jsx",
-        "jsxImportSource": "preact",
-        "paths": {
-            "react": ["./node_modules/preact/compat"],
-            "react-dom": ["./node_modules/preact/compat"]
-        }
-    },
-    "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx"
-    ]
+  "compilerOptions": {
+    "lib": ["es2021"],
+    "module": "commonjs",
+    "target": "es2021",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "rootDir": "src",
+    "outDir": "lib",
+    "importsNotUsedAsValues": "error",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "paths": {
+      "react": ["./node_modules/preact/compat"],
+      "react-dom": ["./node_modules/preact/compat"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

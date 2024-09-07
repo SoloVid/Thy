@@ -4,19 +4,26 @@ import CodeBlock from "./code-block"
 import { playgroundBaseUrl } from "./links"
 
 export type ThyCodeBlockProps = {
-  children: { props: { class: string, children: string }}
+  children: { props: { class: string; children: string } }
 }
 
 export function makeMarkdownCodeBlockReplace(addTryLinks: boolean) {
   return (props: ThyCodeBlockProps) => {
-    const lang = props.children.props.class.replace('lang-', '')
-    return <>
-      <CodeBlock
-        language={lang}
-        source={props.children.props.children}
-      ></CodeBlock>
-      { lang === "thy" && addTryLinks && <TryButton playgroundUrl={playgroundBaseUrl} source={props.children.props.children}></TryButton>}
-    </>
+    const lang = props.children.props.class.replace("lang-", "")
+    return (
+      <>
+        <CodeBlock
+          language={lang}
+          source={props.children.props.children}
+        ></CodeBlock>
+        {lang === "thy" && addTryLinks && (
+          <TryButton
+            playgroundUrl={playgroundBaseUrl}
+            source={props.children.props.children}
+          ></TryButton>
+        )}
+      </>
+    )
   }
 }
 
@@ -25,12 +32,16 @@ export type ThyMarkdownProps = {
   noTry?: boolean
 }
 
-export function ThyMarkdown({ children:source, noTry }: ThyMarkdownProps) {
-  return <Markdown
-    options={{
-      overrides: {
-        pre: makeMarkdownCodeBlockReplace(!noTry)
-      }
-    }}
-  >{source}</Markdown>
+export function ThyMarkdown({ children: source, noTry }: ThyMarkdownProps) {
+  return (
+    <Markdown
+      options={{
+        overrides: {
+          pre: makeMarkdownCodeBlockReplace(!noTry),
+        },
+      }}
+    >
+      {source}
+    </Markdown>
+  )
 }

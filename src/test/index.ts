@@ -1,1 +1,1 @@
-export * as my from './my'
+export * as my from "./my"

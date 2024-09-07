@@ -1,4 +1,3 @@
-
 export const callAssignTs = `
 // Call a function imperatively
 console.log("himom")

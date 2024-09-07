@@ -8,6 +8,7 @@
     "build": "esbuild src/index.ts --bundle --platform=node --outfile=lib/index.js",
     "check-types": "tsc --noEmit",
     "clean": "node -p \"require('fs').rmSync('lib',{force:true,recursive:true})\"",
+    "format": "prettier --no-semi . --write",
     "generate-declarations": "tsc --emitDeclarationOnly",
     "site:build": "node -r esbuild-register src/build/build-site.ts",
     "site:dev": "node -r esbuild-register src/build/dev-site.ts",
@@ -15,6 +16,7 @@
     "serve": "node -r esbuild-register src/editor/server.ts",
     "start": "node lib/index.js",
     "test": "uts -r esbuild-register src",
+    "test:coverage": "nyc npm run test",
     "test:watch": "watchlist --eager src -- npm run test"
   },
   "author": "Grant Dennison",
@@ -44,7 +46,9 @@
     "expect": "^28.1.3",
     "markdown-to-jsx": "^7.3.2",
     "npm-run-all": "^4.1.5",
+    "nyc": "^15.1.0",
     "preact": "^10.11.3",
+    "prettier": "~3.3",
     "typescript": "~4.7",
     "under-the-sun": "^2",
     "watchlist": "^0.3.1"

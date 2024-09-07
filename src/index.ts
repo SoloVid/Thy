@@ -5,28 +5,28 @@ import { readProgram } from "./read-program"
 import { makeGenericTokenizer } from "./tokenizer/tokenizer"
 
 async function run() {
-    try {
-        const source = await readProgram("example-program.thy")
-        const tokenizer = makeGenericTokenizer(source, [])
+  try {
+    const source = await readProgram("example-program.thy")
+    const tokenizer = makeGenericTokenizer(source, [])
 
-        // let token = tokenizer.getNextToken()
-        // while (token !== null) {
-        //     console.log(`${token.line}:${token.type}:${JSON.stringify(token.text)}`)
-        //     // console.log(token)
-        //     token = tokenizer.getNextToken()
-        // }
+    // let token = tokenizer.getNextToken()
+    // while (token !== null) {
+    //     console.log(`${token.line}:${token.type}:${JSON.stringify(token.text)}`)
+    //     // console.log(token)
+    //     token = tokenizer.getNextToken()
+    // }
 
-        const parserOutput = parse(tokenizer)
-        for (const err of parserOutput.errors) {
-            console.error(err)
-        }
-        const tree = parserOutput.top
-        console.log(tree)
-
-        console.log(tsGenerator(standardLibraryCore)(tree))
-    } catch (e: unknown) {
-        console.error(e)
+    const parserOutput = parse(tokenizer)
+    for (const err of parserOutput.errors) {
+      console.error(err)
     }
+    const tree = parserOutput.top
+    console.log(tree)
+
+    console.log(tsGenerator(standardLibraryCore)(tree))
+  } catch (e: unknown) {
+    console.error(e)
+  }
 }
 
 run()

@@ -4,11 +4,13 @@ import { getPageInputs, pageOutputDir } from "./page-file-paths"
 
 export async function generateHtml() {
   const pageInputs = await getPageInputs()
-  await Promise.all(pageInputs.map(async (f) => {
-    const targetPath = join(pageOutputDir, f.replace(/\.tsx?$/, ".html"))
-    await mkdir(dirname(targetPath), { recursive: true })
-    await writeFile(targetPath, makeHtml(f))
-  }))
+  await Promise.all(
+    pageInputs.map(async (f) => {
+      const targetPath = join(pageOutputDir, f.replace(/\.tsx?$/, ".html"))
+      await mkdir(dirname(targetPath), { recursive: true })
+      await writeFile(targetPath, makeHtml(f))
+    }),
+  )
 }
 
 function makeHtml(inputScript: string) {

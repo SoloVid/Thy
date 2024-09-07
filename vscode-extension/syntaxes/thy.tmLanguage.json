@@ -1,291 +1,283 @@
 {
-	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-	"name": "Thy Lang",
-	"patterns": [
-		{"include": "#script-parts"}
-	],
-	"repository": {
-		"script-parts": {
-			"patterns": [
-				{"include": "#comments"},
-				{"include": "#multiline-strings-plus"},
-				{"include": "#code-lines"},
-				{
-					"name": "invalid.illegal.thy",
-					"match": "."
-				}
-			]
-		},
-		"comments": {
-			"patterns": [
-				{
-					"begin": "^(\\s*)([A-Z]{3,})$",
-					"end": "^(\\1)(\\2)$",
-					"beginCaptures": {
-						"2": { "name": "comment.block.thy" }
-					},
-					"contentName": "comment.block.thy",
-					"endCaptures": {
-						"2": { "name": "comment.block.thy" }
-					}
-				},
-				{
-					"match": "^\\s*([A-Z].*)$",
-					"captures": {
-						"1": { "name": "comment.line.thy" }
-					}
-				}
-			]
-		},
-		"code-lines": {
-			"patterns": [
-				{
-					"name": "meta.line.thy",
-					"match": "^(\\s*)([a-z].*)$",
-					"captures": {
-						"2": {
-							"name": "meta.line.content.thy",
-							"patterns": [
-								{ "include": "#type-assignments" },
-								{ "include": "#type-call-statements" },
-								{ "include": "#assignments" },
-								{ "include": "#lets" },
-								{ "include": "#call-continuations" },
-								{ "include": "#calls" }
-							]
-						}
-					}
-				}
-			]
-		},
-		"assignments": {
-			"patterns": [
-				{
-					"name": "meta.assignment.thy",
-					"match": "(?:(export) +)?(?:(private) +)?([^ ]+) +(be|is|to)( +.*)?$",
-					"captures": {
-						"1": {"name": "keyword.control.export.thy"},
-						"2": {"name": "storage.modifier.private.thy"},
-						"3": {"patterns": [{"include": "#value-identifiers"}]},
-						"4": {"name": "keyword.operator.thy"},
-						"5": {"patterns": [{"include": "#calls"}]}
-					}
-				}
-			]
-		},
-		"type-assignments": {
-			"patterns": [
-				{
-					"name": "meta.type-assignment.thy",
-					"match": "\\b(?:(export) +)?(?:(private) +)?(?:(type) +)([A-Z][^ ]*) +(is)( +.*)?$",
-					"captures": {
-						"1": {"name": "keyword.control.export.thy"},
-						"2": {"name": "storage.modifier.private.thy"},
-						"3": {"name":"storage.type.type.thy"},
-						"4": {"patterns": [{"include": "#type-identifiers"}]},
-						"5": {"name": "keyword.operator.thy"},
-						"6": {"patterns": [{"include": "#type-calls"}]}
-					}
-				}
-			]
-		},
-		"type-call-statements": {
-			"patterns": [
-				{
-					"name": "meta.type-call-statement.thy",
-					"match": "\\b(type)\\b( +.*)?",
-					"captures": {
-						"1": {"name":"storage.type.type.thy"},
-						"2": {"patterns": [{"include": "#type-calls"}]}
-					}
-				}
-			]
-		},
-		"lets": {
-			"patterns": [
-				{
-					"name": "meta.let.thy",
-					"match": "(let)(?: (.+)?)?$",
-					"captures": {
-						"1": {"name": "keyword.control.let.thy"},
-						"2": {
-							"patterns": [{"include": "#calls"}]
-						}
-					}
-				}
-			]
-		},
-		"call-continuations": {
-			"patterns": [
-				{
-					"name": "meta.call.continuation.thy",
-					"match": "(and)( .*)?$",
-					"captures": {
-						"1": {"name": "keyword.operator.and.thy"},
-						"2": {"patterns": [{"include": "#values"}]}
-					}
-				}
-			]
-		},
-		"calls": {
-			"patterns": [
-				{
-					"name": "meta.call.thy",
-					"match": "([^ ]+)( .*)?$",
-					"captures": {
-						"1": {
-							"patterns": [
-								{"include": "#special-functions"},
-								{
-									"match": "(?:(.+?)\\.)?(\\b[^. ]+\\b(?!\\.))?",
-									"captures": {
-										"1": {"patterns": [{"include": "#values"}]},
-										"2": {
-											"patterns": [
-												{
-													"name": "entity.name.function.thy",
-													"match": "\\b[a-z].*\\b"
-												},
-												{
-													"name": "invalid.illegal.thy",
-													"match": "\\b.+\\b"
-												}
-											]
-										}
-									}
-								}
-							]
-						},
-						"2": {
-							"name": "meta.arguments.thy",
-							"patterns": [
-								{"include": "#type-identifiers"},
-								{"include": "#values"}
-							]
-						}
-					}
-				}
-			]
-		},
-		"type-calls": {
-			"patterns": [
-				{
-					"name": "meta.type-call.thy",
-					"match": "([^ ]+)( .*)?$",
-					"captures": {
-						"1": {
-							"patterns": [
-								{"include": "#special-functions"},
-								{
-									"match": "(?:(.+?)\\.)?(\\b[^. ]+\\b(?!\\.))?",
-									"captures": {
-										"1": {"patterns": [{"include": "#values"}]},
-										"2": {
-											"patterns": [
-												{
-													"name": "entity.name.function.thy",
-													"match": "\\b[a-zA-Z].*\\b"
-												},
-												{
-													"name": "invalid.illegal.thy",
-													"match": "\\b.+\\b"
-												}
-											]
-										}
-									}
-								}
-							]
-						},
-						"2": {
-							"name": "meta.arguments.thy",
-							"patterns": [
-								{"include": "#type-identifiers"},
-								{"include": "#values"}
-							]
-						}
-					}
-				}
-			]
-		},
-		"values": {
-			"patterns": [
-				{"include": "#strings"},
-				{"include": "#numeric-literals"},
-				{"include": "#special-values"},
-				{"include": "#value-identifiers"}
-			]
-		},
-		"multiline-strings-plus": {
-			"name": "meta.multiline-string-plus.thy",
-			"begin": "^((\\s*)[a-z].+)(\"\"\")$",
-			"end": "^(?!\\2\\s+\\S|\\s*$)",
-			"beginCaptures": {
-				"3": { "name": "string.quoted.multiline.thy" },
-				"1": {
-					"patterns": [
-						{ "include": "#code-lines" }
-					]
-				}
-			},
-			"contentName": "string.quoted.multiline.thy",
-			"patterns": [
-				{"include": "#inside-strings"}
-			]
-		},
-		"strings": {
-			"name": "string.quoted.inline.thy",
-			"begin": "\"",
-			"end": "\"",
-			"patterns": [
-				{"include": "#inside-strings"}
-			]
-		},
-		"inside-strings": {
-			"name": "meta.inside-string.thy",
-			"patterns": [
-				{
-					"name": "constant.character.escape.thy",
-					"match": "\\\\."
-				},
-				{
-					"name": "meta.string-interpolation.thy",
-					"match": "(\\.)([a-z][a-zA-Z0-9]*)(\\.)",
-					"captures": {
-						"2": { "name": "variable.other.thy" },
-						"1": { "name": "constant.character.escape.thy" },
-						"3": { "name": "constant.character.escape.thy" }
-					}
-				}
-			]
-		},
-		"numeric-literals": {
-			"name": "constant.numeric.thy",
-			"match": "-?(0|[1-9]\\d*)(\\.\\d+)?([eE][+-]?\\d+)?"
-		},
-		"special-functions": {
-			"patterns": [
-				{
-					"name": "keyword.control.thy",
-					"match": "(?<!\\.)\\b(await|return|throw)\\b"
-				}
-			]
-		},
-		"special-values": {
-			"patterns": [
-				{
-					"name": "variable.language.that.thy",
-					"match": "(?<!\\.)\\b(that|beforeThat)\\b"
-				}
-			]
-		},
-		"type-identifiers": {
-			"name": "entity.name.type.thy",
-			"match": "\\b[A-Z][a-zA-Z0-9]*\\b"
-		},
-		"value-identifiers": {
-			"name": "variable.other.thy",
-			"match": "\\b[a-z][a-zA-Z0-9]*\\b"
-		}
-	},
-	"scopeName": "source.thy"
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Thy Lang",
+  "patterns": [{ "include": "#script-parts" }],
+  "repository": {
+    "script-parts": {
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#multiline-strings-plus" },
+        { "include": "#code-lines" },
+        {
+          "name": "invalid.illegal.thy",
+          "match": "."
+        }
+      ]
+    },
+    "comments": {
+      "patterns": [
+        {
+          "begin": "^(\\s*)([A-Z]{3,})$",
+          "end": "^(\\1)(\\2)$",
+          "beginCaptures": {
+            "2": { "name": "comment.block.thy" }
+          },
+          "contentName": "comment.block.thy",
+          "endCaptures": {
+            "2": { "name": "comment.block.thy" }
+          }
+        },
+        {
+          "match": "^\\s*([A-Z].*)$",
+          "captures": {
+            "1": { "name": "comment.line.thy" }
+          }
+        }
+      ]
+    },
+    "code-lines": {
+      "patterns": [
+        {
+          "name": "meta.line.thy",
+          "match": "^(\\s*)([a-z].*)$",
+          "captures": {
+            "2": {
+              "name": "meta.line.content.thy",
+              "patterns": [
+                { "include": "#type-assignments" },
+                { "include": "#type-call-statements" },
+                { "include": "#assignments" },
+                { "include": "#lets" },
+                { "include": "#call-continuations" },
+                { "include": "#calls" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "assignments": {
+      "patterns": [
+        {
+          "name": "meta.assignment.thy",
+          "match": "(?:(export) +)?(?:(private) +)?([^ ]+) +(be|is|to)( +.*)?$",
+          "captures": {
+            "1": { "name": "keyword.control.export.thy" },
+            "2": { "name": "storage.modifier.private.thy" },
+            "3": { "patterns": [{ "include": "#value-identifiers" }] },
+            "4": { "name": "keyword.operator.thy" },
+            "5": { "patterns": [{ "include": "#calls" }] }
+          }
+        }
+      ]
+    },
+    "type-assignments": {
+      "patterns": [
+        {
+          "name": "meta.type-assignment.thy",
+          "match": "\\b(?:(export) +)?(?:(private) +)?(?:(type) +)([A-Z][^ ]*) +(is)( +.*)?$",
+          "captures": {
+            "1": { "name": "keyword.control.export.thy" },
+            "2": { "name": "storage.modifier.private.thy" },
+            "3": { "name": "storage.type.type.thy" },
+            "4": { "patterns": [{ "include": "#type-identifiers" }] },
+            "5": { "name": "keyword.operator.thy" },
+            "6": { "patterns": [{ "include": "#type-calls" }] }
+          }
+        }
+      ]
+    },
+    "type-call-statements": {
+      "patterns": [
+        {
+          "name": "meta.type-call-statement.thy",
+          "match": "\\b(type)\\b( +.*)?",
+          "captures": {
+            "1": { "name": "storage.type.type.thy" },
+            "2": { "patterns": [{ "include": "#type-calls" }] }
+          }
+        }
+      ]
+    },
+    "lets": {
+      "patterns": [
+        {
+          "name": "meta.let.thy",
+          "match": "(let)(?: (.+)?)?$",
+          "captures": {
+            "1": { "name": "keyword.control.let.thy" },
+            "2": {
+              "patterns": [{ "include": "#calls" }]
+            }
+          }
+        }
+      ]
+    },
+    "call-continuations": {
+      "patterns": [
+        {
+          "name": "meta.call.continuation.thy",
+          "match": "(and)( .*)?$",
+          "captures": {
+            "1": { "name": "keyword.operator.and.thy" },
+            "2": { "patterns": [{ "include": "#values" }] }
+          }
+        }
+      ]
+    },
+    "calls": {
+      "patterns": [
+        {
+          "name": "meta.call.thy",
+          "match": "([^ ]+)( .*)?$",
+          "captures": {
+            "1": {
+              "patterns": [
+                { "include": "#special-functions" },
+                {
+                  "match": "(?:(.+?)\\.)?(\\b[^. ]+\\b(?!\\.))?",
+                  "captures": {
+                    "1": { "patterns": [{ "include": "#values" }] },
+                    "2": {
+                      "patterns": [
+                        {
+                          "name": "entity.name.function.thy",
+                          "match": "\\b[a-z].*\\b"
+                        },
+                        {
+                          "name": "invalid.illegal.thy",
+                          "match": "\\b.+\\b"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            "2": {
+              "name": "meta.arguments.thy",
+              "patterns": [
+                { "include": "#type-identifiers" },
+                { "include": "#values" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "type-calls": {
+      "patterns": [
+        {
+          "name": "meta.type-call.thy",
+          "match": "([^ ]+)( .*)?$",
+          "captures": {
+            "1": {
+              "patterns": [
+                { "include": "#special-functions" },
+                {
+                  "match": "(?:(.+?)\\.)?(\\b[^. ]+\\b(?!\\.))?",
+                  "captures": {
+                    "1": { "patterns": [{ "include": "#values" }] },
+                    "2": {
+                      "patterns": [
+                        {
+                          "name": "entity.name.function.thy",
+                          "match": "\\b[a-zA-Z].*\\b"
+                        },
+                        {
+                          "name": "invalid.illegal.thy",
+                          "match": "\\b.+\\b"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            "2": {
+              "name": "meta.arguments.thy",
+              "patterns": [
+                { "include": "#type-identifiers" },
+                { "include": "#values" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "values": {
+      "patterns": [
+        { "include": "#strings" },
+        { "include": "#numeric-literals" },
+        { "include": "#special-values" },
+        { "include": "#value-identifiers" }
+      ]
+    },
+    "multiline-strings-plus": {
+      "name": "meta.multiline-string-plus.thy",
+      "begin": "^((\\s*)[a-z].+)(\"\"\")$",
+      "end": "^(?!\\2\\s+\\S|\\s*$)",
+      "beginCaptures": {
+        "3": { "name": "string.quoted.multiline.thy" },
+        "1": {
+          "patterns": [{ "include": "#code-lines" }]
+        }
+      },
+      "contentName": "string.quoted.multiline.thy",
+      "patterns": [{ "include": "#inside-strings" }]
+    },
+    "strings": {
+      "name": "string.quoted.inline.thy",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [{ "include": "#inside-strings" }]
+    },
+    "inside-strings": {
+      "name": "meta.inside-string.thy",
+      "patterns": [
+        {
+          "name": "constant.character.escape.thy",
+          "match": "\\\\."
+        },
+        {
+          "name": "meta.string-interpolation.thy",
+          "match": "(\\.)([a-z][a-zA-Z0-9]*)(\\.)",
+          "captures": {
+            "2": { "name": "variable.other.thy" },
+            "1": { "name": "constant.character.escape.thy" },
+            "3": { "name": "constant.character.escape.thy" }
+          }
+        }
+      ]
+    },
+    "numeric-literals": {
+      "name": "constant.numeric.thy",
+      "match": "-?(0|[1-9]\\d*)(\\.\\d+)?([eE][+-]?\\d+)?"
+    },
+    "special-functions": {
+      "patterns": [
+        {
+          "name": "keyword.control.thy",
+          "match": "(?<!\\.)\\b(await|return|throw)\\b"
+        }
+      ]
+    },
+    "special-values": {
+      "patterns": [
+        {
+          "name": "variable.language.that.thy",
+          "match": "(?<!\\.)\\b(that|beforeThat)\\b"
+        }
+      ]
+    },
+    "type-identifiers": {
+      "name": "entity.name.type.thy",
+      "match": "\\b[A-Z][a-zA-Z0-9]*\\b"
+    },
+    "value-identifiers": {
+      "name": "variable.other.thy",
+      "match": "\\b[a-z][a-zA-Z0-9]*\\b"
+    }
+  },
+  "scopeName": "source.thy"
 }

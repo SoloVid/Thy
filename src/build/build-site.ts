@@ -5,8 +5,5 @@ import { compileTs } from "./compile-ts"
 import { generateHtml } from "./generate-html"
 
 runNodeCli(async () => {
-  await Promise.all([
-    generateHtml(),
-    compileTs(),
-  ])
+  await Promise.all([generateHtml(), compileTs()])
 })

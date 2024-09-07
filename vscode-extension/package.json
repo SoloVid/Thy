@@ -1,48 +1,48 @@
 {
-    "name": "thy-lang",
-    "displayName": "Thy Lang",
-    "description": "Syntax highlighting for thy lang",
-    "version": "0.0.1",
-    "engines": {
-        "vscode": "^1.56.0"
-    },
-    "categories": [
-        "Programming Languages"
-    ],
-    "contributes": {
-        "languages": [
-            {
-                "id": "thy",
-                "aliases": [
-                    "Thy Lang",
-                    "thy"
-                ],
-                "extensions": [
-                    ".thy"
-                ],
-                "configuration": "./language-configuration.json"
-            },
-            {
-                "id": "thy-injection"
-            }
+  "name": "thy-lang",
+  "displayName": "Thy Lang",
+  "description": "Syntax highlighting for thy lang",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.56.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "thy",
+        "aliases": [
+          "Thy Lang",
+          "thy"
         ],
-        "grammars": [
-            {
-                "language": "thy",
-                "scopeName": "source.thy",
-                "path": "./syntaxes/thy.tmLanguage.json"
-            },
-            {
-                "language": "thy-injection",
-                "scopeName": "markdown.thy.codeblock",
-                "path": "./syntaxes/thy-codeblock.tmLanguage.json",
-                "injectTo": [
-                    "text.html.markdown"
-                ],
-                "embeddedLanguages": {
-                    "meta.embedded.block.thy": "thy"
-                }
-            }
-        ]
-    }
+        "extensions": [
+          ".thy"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "thy-injection"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "thy",
+        "scopeName": "source.thy",
+        "path": "./syntaxes/thy.tmLanguage.json"
+      },
+      {
+        "language": "thy-injection",
+        "scopeName": "markdown.thy.codeblock",
+        "path": "./syntaxes/thy-codeblock.tmLanguage.json",
+        "injectTo": [
+          "text.html.markdown"
+        ],
+        "embeddedLanguages": {
+          "meta.embedded.block.thy": "thy"
+        }
+      }
+    ]
+  }
 }

@@ -5,8 +5,11 @@ import { renderStandardPage } from "../standard-page-frame"
 
 const specMdAsString = specMd as string
 
-renderStandardPage("Language Spec - Thy (lang)", <>
-  <div class="column-content-md">
-    <ThyMarkdown noTry>{specMdAsString}</ThyMarkdown>
-  </div>
-</>)
+renderStandardPage(
+  "Language Spec - Thy (lang)",
+  <>
+    <div class="column-content-md">
+      <ThyMarkdown noTry>{specMdAsString}</ThyMarkdown>
+    </div>
+  </>,
+)

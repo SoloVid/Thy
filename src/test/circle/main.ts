@@ -1,4 +1,4 @@
-import { printA, printB, printC } from ".";
+import { printA, printB, printC } from "."
 
 printA()
 printB()

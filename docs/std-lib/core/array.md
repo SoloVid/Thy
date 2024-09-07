@@ -6,7 +6,7 @@ type ReturnType is Array T
 type return ReturnType
 ```
 
-Create an immutable array 
+Create an immutable array
 (implemented with [JavaScript Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array);
 typed as `readonly T[]`).
 

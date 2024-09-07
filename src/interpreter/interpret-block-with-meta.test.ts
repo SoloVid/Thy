@@ -9,14 +9,18 @@ test("interpretThyBlockWithMeta() should properly process a block that explicitl
 })
 
 test("interpretThyBlockWithMeta() should properly process a block that explicitly exports", async () => {
-  const { interpreted, returns } = interpretThyBlockWithMeta(`export a is\n  return 5\nprivate b is\n  return 2\nc is\n  return 3`)
+  const { interpreted, returns } = interpretThyBlockWithMeta(
+    `export a is\n  return 5\nprivate b is\n  return 2\nc is\n  return 3`,
+  )
   assert(returns.style === "exports")
   assert.deepStrictEqual(returns.exports, ["a"])
   assert.deepStrictEqual(interpreted(), { a: 5 })
 })
 
 test("interpretThyBlockWithMeta() should properly process a block that implicitly exports", async () => {
-  const { interpreted, returns } = interpretThyBlockWithMeta(`private a is\n  return 5\nb is\n  return 2`)
+  const { interpreted, returns } = interpretThyBlockWithMeta(
+    `private a is\n  return 5\nb is\n  return 2`,
+  )
   assert(returns.style === "exports")
   assert.deepStrictEqual(returns.exports, ["b"])
   assert.deepStrictEqual(interpreted(), { b: 2 })

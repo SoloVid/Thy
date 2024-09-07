@@ -16,24 +16,32 @@ export async function makeThyFromFiles({
   args,
 }: MakeThyFromFilesOptions) {
   const blockMapToFiles = await makeThyBlockMapFromFiles(files)
-  const blockPairs = await saferPromiseAll(files.map(async (f) => {
-    const contents = await readFile(f, "utf-8")
-    return {
-      file: f,
-      block: interpretThyBlock(contents, {
-        closure: args,
-        sourceFile: f,
-      }),
-    }
-  }))
-  const fileToBlock = blockPairs.reduce((soFar, {file, block}) => ({
-    ...soFar,
-    [file]: block,
-  }), {} as Record<string, UnknownFunction>)
-  const blockMap = Object.entries(blockMapToFiles).reduce((soFar, [field, file]) => ({
-    ...soFar,
-    [field]: fileToBlock[file],
-  }), {} as Record<string, UnknownFunction>)
+  const blockPairs = await saferPromiseAll(
+    files.map(async (f) => {
+      const contents = await readFile(f, "utf-8")
+      return {
+        file: f,
+        block: interpretThyBlock(contents, {
+          closure: args,
+          sourceFile: f,
+        }),
+      }
+    }),
+  )
+  const fileToBlock = blockPairs.reduce(
+    (soFar, { file, block }) => ({
+      ...soFar,
+      [file]: block,
+    }),
+    {} as Record<string, UnknownFunction>,
+  )
+  const blockMap = Object.entries(blockMapToFiles).reduce(
+    (soFar, [field, file]) => ({
+      ...soFar,
+      [field]: fileToBlock[file],
+    }),
+    {} as Record<string, UnknownFunction>,
+  )
   const blocks = blockPairs.map(({ block }) => block)
   return makeThyFromBlocks({
     blocks,

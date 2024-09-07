@@ -1,4 +1,3 @@
-
 // From https://stackoverflow.com/a/249937/4639640
 export const stringRegex = /"((?:[^"\\]|\\.)*)"/
 export const exactStringRegex = /^"((?:[^"\\]|\\.)*)"$/

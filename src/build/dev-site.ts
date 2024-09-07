@@ -12,27 +12,27 @@ runNodeCli(async () => {
   runBuild()
 
   chokidar
-  .watch(join(__dirname, ".."), {
-    ignoreInitial: true,
-  })
-  .on("all", (event, path) => {
-    // This timeout gives the parent process a moment to shut us down before double printing.
-    setTimeout(() => {
-      console.info(`Change detected: ${path}`)
-      runBuild()
-    }, 10)
-  })
+    .watch(join(__dirname, ".."), {
+      ignoreInitial: true,
+    })
+    .on("all", (event, path) => {
+      // This timeout gives the parent process a moment to shut us down before double printing.
+      setTimeout(() => {
+        console.info(`Change detected: ${path}`)
+        runBuild()
+      }, 10)
+    })
 
   serveFiles(pageOutputDir, 8089)
 })
 
 function runBuild() {
-  Promise.all([
-    generateHtml(),
-    compileTs(),
-  ]).then(() => {
-    console.info("Build complete")
-  }, (e) => {
-    console.error(e)
-  })
+  Promise.all([generateHtml(), compileTs()]).then(
+    () => {
+      console.info("Build complete")
+    },
+    (e) => {
+      console.error(e)
+    },
+  )
 }

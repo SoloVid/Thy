@@ -5,7 +5,10 @@ import { interpretThyBlock } from "./block"
 test("interpretThyBlock() should return an async function if the block contains `await` call-only line", async () => {
   const interpreted = interpretThyBlock(`await 5\nreturn that`)
   const result = interpreted()
-  assert(result instanceof Promise, "Return value from interpreted block should be a promise")
+  assert(
+    result instanceof Promise,
+    "Return value from interpreted block should be a promise",
+  )
   const awaitedResult = await result
   assert.strictEqual(awaitedResult, 5)
 })
@@ -13,7 +16,10 @@ test("interpretThyBlock() should return an async function if the block contains 
 test("interpretThyBlock() should return an async function if the block contains `await` assignment statement", async () => {
   const interpreted = interpretThyBlock(`a is await 5\nreturn a`)
   const result = interpreted()
-  assert(result instanceof Promise, "Return value from interpreted block should be a promise")
+  assert(
+    result instanceof Promise,
+    "Return value from interpreted block should be a promise",
+  )
   const awaitedResult = await result
   assert.strictEqual(awaitedResult, 5)
 })
@@ -22,16 +28,23 @@ test("interpretThyBlock() can return an async function that can early return a c
   const interpreted = interpretThyBlock(`f\nlet await that\nreturn 1`)
   const f = () => new Promise((resolve) => setTimeout(() => resolve(5), 10))
   const result = interpreted({ f })
-  assert(result instanceof Promise, "Return value from interpreted block should be a promise")
+  assert(
+    result instanceof Promise,
+    "Return value from interpreted block should be a promise",
+  )
   const awaitedResult = await result
   assert.strictEqual(awaitedResult, 5)
 })
 
 test("interpretThyBlock() can return an async function that can forgo early return via `let`", async () => {
   const interpreted = interpretThyBlock(`f\nlet await that\nreturn 1`)
-  const f = () => new Promise((resolve) => setTimeout(() => resolve(undefined), 10))
+  const f = () =>
+    new Promise((resolve) => setTimeout(() => resolve(undefined), 10))
   const result = interpreted({ f })
-  assert(result instanceof Promise, "Return value from interpreted block should be a promise")
+  assert(
+    result instanceof Promise,
+    "Return value from interpreted block should be a promise",
+  )
   const awaitedResult = await result
   assert.strictEqual(awaitedResult, 1)
 })

@@ -5,7 +5,6 @@ It is the same [`fetch` function provided by JavaScript](https://developer.mozil
 > for most URLs you may try to hit.
 > You may find a service like [corsproxy.io](https://corsproxy.io) useful in that scenario.
 
-
 **Example:**
 
 ```thy

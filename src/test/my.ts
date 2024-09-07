@@ -1,1 +1,1 @@
-export * as scope from './my.scope'
+export * as scope from "./my.scope"

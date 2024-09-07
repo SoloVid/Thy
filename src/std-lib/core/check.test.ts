@@ -1,10 +1,24 @@
 import assert from "assert"
 import { test } from "under-the-sun"
-import { allBuiltin, ascBuiltin, descBuiltin, equalBuiltin, notBuiltin, someBuiltin } from "./check"
+import {
+  allBuiltin,
+  ascBuiltin,
+  descBuiltin,
+  equalBuiltin,
+  notBuiltin,
+  someBuiltin,
+} from "./check"
 
-function testCheckFunction<T>(f: (a: T, b?: T, c?: T, d?: T) => boolean, testPairs: [[T]|[T,T]|[T,T,T]|[T,T,T,T],boolean][]) {
+function testCheckFunction<T>(
+  f: (a: T, b?: T, c?: T, d?: T) => boolean,
+  testPairs: [[T] | [T, T] | [T, T, T] | [T, T, T, T], boolean][],
+) {
   for (const [args, expectedOutput] of testPairs) {
-    assert.strictEqual(f(...(args as Parameters<typeof f>)), expectedOutput, `Failure for ${JSON.stringify(args)}`)
+    assert.strictEqual(
+      f(...(args as Parameters<typeof f>)),
+      expectedOutput,
+      `Failure for ${JSON.stringify(args)}`,
+    )
   }
 }
 
