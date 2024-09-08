@@ -30,7 +30,6 @@ export function makeGenericTokenizer(
   let delegatedTokenizer: Tokenizer | null = null
 
   function getNextValidToken(): Token | typeof endOfStream {
-    debug(() => ["getNextValidToken()", state.offset])
     let errorCharacters = 0
     const errorPartialToken = startTokenHere(state, tErrorToken)
     while (nextToken === null && !isDone()) {
@@ -44,14 +43,14 @@ export function makeGenericTokenizer(
     }
 
     if (errorCharacters > 0) {
-      const substringStart = state.offset - errorCharacters
       const t = {
         ...errorPartialToken,
         text: state.text.substring(
-          substringStart,
-          substringStart + errorCharacters,
+            errorPartialToken.offset,
+            errorPartialToken.offset + errorCharacters,
         ),
       }
+      debug(() => ["error:", t])
       errors.push(tokenError(t, "Unexpected token"))
       return t
     }
@@ -66,9 +65,8 @@ export function makeGenericTokenizer(
   }
 
   function trySources(): Token | null | typeof itsAnError {
-    debug(() => ["trySources()"])
     if (delegatedTokenizer) {
-      debug(() => ["delegating..."])
+      debug(() => ["delegating to nested tokenizer..."])
       const token = delegatedTokenizer.getNextToken()
       if (token !== null) {
         return token
@@ -77,13 +75,12 @@ export function makeGenericTokenizer(
       }
     }
     debug(() => [
-      "finding at ",
-      JSON.stringify(state.text.substring(state.offset, state.offset + 5)),
+      `finding at ${state.offset} (${JSON.stringify(state.text.substring(state.offset, state.offset + 10))})`,
     ])
     for (const finder of finders) {
       const match = finder(state, errors)
       if (match !== null) {
-        debug(() => ["token found ", match])
+        debug(() => ["token found:", match])
         if ("tokenizer" in match) {
           delegatedTokenizer = match.tokenizer
         }

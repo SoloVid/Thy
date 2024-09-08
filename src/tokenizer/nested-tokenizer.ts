@@ -10,6 +10,15 @@ export function makeNestedTokenizerMatcher(
   finders: readonly TokenMatcher[],
   isDone: (state: TokenizerState) => boolean,
 ): TokenMatcher {
+  return makeNestedDynamicTokenizerMatcher(firstTokenType, firstTokenRegex, () => finders, isDone)
+}
+
+export function makeNestedDynamicTokenizerMatcher(
+  firstTokenType: TokenType,
+  firstTokenRegex: RegExp,
+  makeFinders: (state: TokenizerState) => readonly TokenMatcher[],
+  isDone: (state: TokenizerState) => boolean,
+): TokenMatcher {
   const statefulFirstTokenRegex = new RegExp(firstTokenRegex, "y")
   return (state: TokenizerState, errors: CompileError[]) => {
     statefulFirstTokenRegex.lastIndex = state.offset
@@ -20,7 +29,7 @@ export function makeNestedTokenizerMatcher(
     return {
       type: firstTokenType,
       text: match[0],
-      tokenizer: makeGenericTokenizer(finders, state, errors, () =>
+      tokenizer: makeGenericTokenizer(makeFinders(state), state, errors, () =>
         isDone(state),
       ),
     }

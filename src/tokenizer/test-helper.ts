@@ -10,6 +10,9 @@ export const testTokenizer = defineTestGroup("tokenizer ")
 
 const maxTestN = 1000
 
+/**
+ * @deprecated Just use {@link checkExampleProgramTokens} instead
+ */
 export async function checkExampleProgramTokenTypes(
   exampleProgram: string,
   tokenTypes: readonly TokenType[],
@@ -21,11 +24,11 @@ export async function checkExampleProgramTokenTypes(
 
 export async function checkExampleProgramTokens(
   exampleProgram: string,
-  tokens: readonly (readonly [TokenType, string])[],
+  tokens: readonly (TokenType | (readonly [TokenType, string | { asymmetricMatch(other: unknown): boolean }]))[],
 ) {
   const { errors, outputs } = await tokenizeExampleProgram(exampleProgram)
   expect(errors).toEqual([])
-  expect(outputs.map((t) => [t.type, t.text])).toEqual(tokens)
+  expect(outputs.map((t) => [t.type, t.text])).toEqual(tokens.map((t) => Array.isArray(t) ? t : [t, expect.anything()]))
 }
 
 export async function tokenizeExampleProgram(exampleProgram: string) {

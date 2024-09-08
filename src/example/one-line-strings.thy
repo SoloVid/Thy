@@ -1,7 +1,0 @@
-name is def "joe"
-print ""
-print "Greetings, .name.!"
-print "Some \"tea\" for you?"
-print "Just a period."
-print "Not. interpolation."
-print "like \.name\."

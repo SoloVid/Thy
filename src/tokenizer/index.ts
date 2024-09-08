@@ -1,3 +1,3 @@
-import { makeBlockTokenizer } from "./block"
+import { makeTopTokenizer } from "./top"
 
-export const makeTokenizer = makeBlockTokenizer
+export const makeTokenizer = makeTopTokenizer

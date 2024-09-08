@@ -22,14 +22,14 @@ import {
 } from "./keywords"
 import { matchNumber } from "./number"
 import type { TokenMatcher } from "./token-matcher"
-import { matchSimpleStringLiteral } from "./strings"
+import { matchMultiLineStringLiteral, matchSimpleStringLiteral } from "./strings"
 import { makeTokenHere } from "./token-helper"
 import { tEndBlock, tStartBlock } from "./token-type"
 import { makeGenericTokenizer, Tokenizer } from "./tokenizer"
 import { makeTokenizerState } from "./tokenizer-state"
 import { matchStatementTerminator, matchWhitespace } from "./whitespace"
 
-export function makeBlockTokenizer(
+export function makeTopTokenizer(
   source: string,
   errors: CompileError[],
 ): Tokenizer {
@@ -69,6 +69,7 @@ export function makeBlockTokenizer(
     matchTypeIdentifier,
     matchValueIdentifier,
     matchSimpleStringLiteral,
+    matchMultiLineStringLiteral,
   ]
 
   const innerTokenizer = makeGenericTokenizer(
@@ -78,19 +79,14 @@ export function makeBlockTokenizer(
     () => !state.hasMoreText(),
   )
 
-  let startTokenGiven = false
   let closingEndBlocks: null | number = null
 
   return {
     getNextToken() {
-      if (!startTokenGiven) {
-        startTokenGiven = true
-        return makeTokenHere(state, tStartBlock, "")
-      }
       let token = innerTokenizer.getNextToken()
       if (token === null) {
         if (closingEndBlocks === null) {
-          closingEndBlocks = indentation.currentIndentLevels + 1
+          closingEndBlocks = indentation.currentIndentLevels
         }
         if (closingEndBlocks > 0) {
           closingEndBlocks--

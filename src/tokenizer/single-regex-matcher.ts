@@ -6,10 +6,10 @@ export function makeSingleRegexMatcher(
   type: TokenType | typeof skipToken,
   regex: RegExp,
 ): TokenMatcher {
-  const statefulRegex = new RegExp(regex, "y")
+  const statefulRegex = new RegExp(regex, "my")
   return (state) => {
     statefulRegex.lastIndex = state.offset
-    debug(() => ["Looking for ", statefulRegex])
+    debug(() => ["matching:", statefulRegex])
     const result = statefulRegex.exec(state.text)
     if (result === null) {
       return null
