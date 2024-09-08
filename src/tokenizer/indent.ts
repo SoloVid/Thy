@@ -103,12 +103,15 @@ export function makeIndentMatchers(): IndentTokenizers {
     if (matchIndentIndex === -1) {
       // If we're in this state, flag an error and try popping off a layer
       // of indent to see if that gets us into a recovered state.
-      outdentsOutstanding = 1
+      outdentsOutstanding = indentStack.reduceRight(
+        (soFar, level) => (currIndentLevel < level ? soFar + 1 : soFar),
+        0,
+      )
       statementTerminatorsOutstanding = outdentsOutstanding
       return {
         type: skipToken,
         text: "",
-        error: `invalid outdent at offset: ${state.offset} (line ${state.line + lines.length})`,
+        error: `invalid outdent at offset: ${state.offset} (line ${state.line + lines.length + 1})`,
       } as const
     }
 

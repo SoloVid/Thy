@@ -53,11 +53,13 @@ testTokenizer("should error on bad outdent but gracefully recover", () => {
 
     print2
       print3
-    print4
+ print4
   print5
 `
   const { outputs, errors } = tokenizeSource(source)
 
+  // The specifics on how this token stream turns out are questionable,
+  // but we can't very well interpret the intent of the programmer anyway.
   expect(outputs.map((t) => [t.type, t.text])).toEqual([
     [tValueIdentifier, "if"],
     [tValueIdentifier, "condition1"],
@@ -76,12 +78,16 @@ testTokenizer("should error on bad outdent but gracefully recover", () => {
     [tStatementTerminator, expect.anything()],
     [tEndBlock, expect.anything()],
     [tStatementTerminator, expect.anything()],
-    [tValueIdentifier, "print4"],
-    [tStatementTerminator, expect.anything()],
     [tEndBlock, expect.anything()],
     [tStatementTerminator, expect.anything()],
+    [tEndBlock, expect.anything()],
+    [tStartBlock, expect.anything()],
+    [tValueIdentifier, "print4"],
+    [tStartBlock, expect.anything()],
     [tValueIdentifier, "print5"],
     [tStatementTerminator, expect.anything()],
+    [tStatementTerminator, expect.anything()],
+    [tEndBlock, expect.anything()],
     [tStatementTerminator, expect.anything()],
     [tEndBlock, expect.anything()],
     [tStatementTerminator, expect.anything()],
@@ -95,7 +101,17 @@ testTokenizer("should error on bad outdent but gracefully recover", () => {
         text: "",
         type: "ErrorToken",
       },
-      message: "invalid outdent at offset: 42 (line 4)",
+      message: "invalid outdent at offset: 42 (line 5)",
+    }),
+    expect.objectContaining({
+      start: {
+        column: 6,
+        line: 5,
+        offset: 67,
+        text: "",
+        type: "ErrorToken",
+      },
+      message: "invalid outdent at offset: 67 (line 7)",
     }),
   ])
 })
