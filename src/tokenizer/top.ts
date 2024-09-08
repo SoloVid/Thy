@@ -1,5 +1,6 @@
 import type { CompileError } from "../compile-error"
 import { matchComment, matchMultilineComment } from "./comment"
+import { debug } from "./debug"
 import {
   matchMemberAccessOperator,
   matchTypeIdentifier,
@@ -27,7 +28,7 @@ import {
 } from "./strings"
 import { makeTokenHere } from "./token-helper"
 import type { TokenMatcher } from "./token-matcher"
-import { tEndBlock } from "./token-type"
+import { tEndBlock, tStatementTerminator } from "./token-type"
 import { makeGenericTokenizer, Tokenizer } from "./tokenizer"
 import { makeTokenizerState } from "./tokenizer-state"
 import { matchStatementTerminator, matchWhitespace } from "./whitespace"
@@ -83,13 +84,25 @@ export function makeTopTokenizer(
   )
 
   let closingEndBlocks: null | number = null
+  let closingTerminators: null | number = null
 
   return {
     getNextToken() {
       let token = innerTokenizer.getNextToken()
       if (token === null) {
+        if (closingTerminators === null) {
+          closingTerminators = indentation.currentIndentLevels + 1
+          debug(() => [
+            `statement terminators to close with: ${closingTerminators}`,
+          ])
+        }
         if (closingEndBlocks === null) {
           closingEndBlocks = indentation.currentIndentLevels
+          debug(() => [`end blocks to close with: ${closingEndBlocks}`])
+        }
+        if (closingTerminators > 0 && closingTerminators > closingEndBlocks) {
+          closingTerminators--
+          return makeTokenHere(state, tStatementTerminator, "")
         }
         if (closingEndBlocks > 0) {
           closingEndBlocks--

@@ -29,27 +29,32 @@ testTokenizer("should tokenize indented blocks", () => {
     [tValueIdentifier, "do3"],
     tStatementTerminator,
     [tValueIdentifier, "do3b"],
+    tStatementTerminator,
     tEndBlock,
+    tStatementTerminator,
     tEndBlock,
     tStatementTerminator,
     [tValueIdentifier, "if"],
     tValueIdentifier,
     tStartBlock,
     [tValueIdentifier, "do2b"],
+    tStatementTerminator,
     tEndBlock,
+    tStatementTerminator,
     tEndBlock,
+    tStatementTerminator,
   ])
 })
 
 testTokenizer("should error on bad outdent but gracefully recover", () => {
   const source = `if condition1
   if condition2
-      print
+      print1
 
-    print
-      print
-    print
-  print
+    print2
+      print3
+    print4
+  print5
 `
   const { outputs, errors } = tokenizeSource(source)
 
@@ -60,33 +65,37 @@ testTokenizer("should error on bad outdent but gracefully recover", () => {
     [tValueIdentifier, "if"],
     [tValueIdentifier, "condition2"],
     [tStartBlock, expect.anything()],
-    [tValueIdentifier, "print"],
-    [tErrorToken, ""],
+    [tValueIdentifier, "print1"],
+    [tStatementTerminator, expect.anything()],
     [tEndBlock, expect.anything()],
     [tStatementTerminator, expect.anything()],
     [tStartBlock, expect.anything()],
-    [tValueIdentifier, "print"],
+    [tValueIdentifier, "print2"],
     [tStartBlock, expect.anything()],
-    [tValueIdentifier, "print"],
-    [tEndBlock, expect.anything()],
-    [tStatementTerminator, expect.anything()],
-    [tValueIdentifier, "print"],
-    [tEndBlock, expect.anything()],
-    [tStatementTerminator, expect.anything()],
-    [tValueIdentifier, "print"],
+    [tValueIdentifier, "print3"],
     [tStatementTerminator, expect.anything()],
     [tEndBlock, expect.anything()],
+    [tStatementTerminator, expect.anything()],
+    [tValueIdentifier, "print4"],
+    [tStatementTerminator, expect.anything()],
+    [tEndBlock, expect.anything()],
+    [tStatementTerminator, expect.anything()],
+    [tValueIdentifier, "print5"],
+    [tStatementTerminator, expect.anything()],
+    [tStatementTerminator, expect.anything()],
+    [tEndBlock, expect.anything()],
+    [tStatementTerminator, expect.anything()],
   ])
   expect(errors).toEqual([
     expect.objectContaining({
       start: {
         column: 6,
         line: 2,
-        offset: 41,
+        offset: 42,
         text: "",
         type: "ErrorToken",
       },
-      message: "invalid outdent at offset: 41 (line 4)",
+      message: "invalid outdent at offset: 42 (line 4)",
     }),
   ])
 })

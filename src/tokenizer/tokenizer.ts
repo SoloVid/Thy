@@ -92,12 +92,12 @@ export function makeGenericTokenizer(
       const match = finder(state, errors)
       if (match !== null) {
         debug(() => ["token found:", match])
-        if (match.type === tErrorToken) {
+        if ("error" in match) {
           debug(() => ["error:", match])
           errors.push(
             tokenError(
               {
-                type: match.type,
+                type: tErrorToken,
                 offset: state.offset,
                 line: state.line,
                 column: state.column,

@@ -12,7 +12,7 @@ export type TokenMatcherResultNotNull = {
 }
 
 export type TokenMatcherError = {
-  readonly type: typeof tErrorToken
+  readonly type: typeof skipToken | typeof tErrorToken
   readonly text: string
   readonly error: string
 }

@@ -11,6 +11,8 @@ export interface Token<T extends TokenType = TokenType> extends SourcePosition {
   readonly text: string
 }
 
+export type SaferToken<T extends TokenType = never> = Token<T>
+
 export interface SourcePosition {
   /** 0-based index of character relative to start of file. */
   readonly offset: number

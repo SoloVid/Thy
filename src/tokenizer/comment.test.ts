@@ -22,12 +22,16 @@ And another
     tStatementTerminator,
     [tComment, "And another"],
     tStatementTerminator,
+    tStatementTerminator,
   ])
 })
 
 testTokenizer("should allow single-line comments at end of file", () => {
   const source = `This is a comment`
-  checkSourceTokens(source, [[tComment, "This is a comment"]])
+  checkSourceTokens(source, [
+    [tComment, "This is a comment"],
+    tStatementTerminator,
+  ])
 })
 
 testTokenizer("should tokenize multi-line comments", () => {
@@ -52,6 +56,7 @@ XYZ`,
     ],
     tStatementTerminator,
     tValueIdentifier,
+    tStatementTerminator,
     tStatementTerminator,
   ])
 })
@@ -79,6 +84,7 @@ XYZ`,
     tStatementTerminator,
     tValueIdentifier,
     tStatementTerminator,
+    tStatementTerminator,
   ])
 })
 
@@ -102,9 +108,11 @@ notCommented
     commented
   XYZ`,
     ],
+    tStatementTerminator,
     tEndBlock,
     tStatementTerminator,
     tValueIdentifier,
+    tStatementTerminator,
     tStatementTerminator,
   ])
 })
@@ -136,7 +144,9 @@ XYZ
 unfortunatelyStillCommented
 `,
       ],
+      tStatementTerminator,
       tEndBlock,
+      tStatementTerminator,
     ])
   },
 )

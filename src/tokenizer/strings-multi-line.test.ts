@@ -40,6 +40,7 @@ testTokenizer(
       [tStringText, "I hope this letter finds you!"],
       tEndString,
       tStatementTerminator,
+      tStatementTerminator,
     ])
   },
 )
@@ -57,6 +58,7 @@ testTokenizer(
       tStartString,
       [tStringText, "like \\.name\\."],
       tEndString,
+      tStatementTerminator,
       tStatementTerminator,
     ])
   },
@@ -108,6 +110,7 @@ testTokenizer(
       tEndStringInterpolation,
       tEndString,
       tStatementTerminator,
+      tStatementTerminator,
     ])
   },
 )
@@ -126,6 +129,7 @@ testTokenizer(
       [tStringText, "himom"],
       tEndString,
       tStatementTerminator,
+      tStatementTerminator,
     ])
   },
 )
@@ -143,6 +147,7 @@ testTokenizer(
       [tStringText, expect.stringMatching(/\r?\n/)],
       [tStringText, "himom"],
       tEndString,
+      tStatementTerminator,
       tStatementTerminator,
     ])
   },
@@ -166,6 +171,7 @@ testTokenizer(
       [tStringText, "himom"],
       tEndString,
       tStatementTerminator,
+      tStatementTerminator,
     ])
   },
 )
@@ -182,6 +188,7 @@ testTokenizer(
       tStartString,
       [tStringText, "himom"],
       tEndString,
+      tStatementTerminator,
       tStatementTerminator,
       tStatementTerminator,
     ])
@@ -202,6 +209,7 @@ testTokenizer(
       tEndString,
       tStatementTerminator,
       tStatementTerminator,
+      tStatementTerminator,
     ])
   },
 )
@@ -220,6 +228,7 @@ testTokenizer(
       tStartString,
       [tStringText, "himom"],
       tEndString,
+      tStatementTerminator,
       tStatementTerminator,
       tStatementTerminator,
       tStatementTerminator,
@@ -252,6 +261,7 @@ print "done"
       [tStringText, "done"],
       tEndString,
       tStatementTerminator,
+      tStatementTerminator,
     ])
   },
 )
@@ -266,6 +276,7 @@ testTokenizer(
       tStartString,
       [tStringText, "himom"],
       tEndString,
+      tStatementTerminator,
     ])
   },
 )
@@ -278,6 +289,7 @@ testTokenizer(
       [tValueIdentifier, "print"],
       tStartString,
       tEndString,
+      tStatementTerminator,
     ])
   },
 )
@@ -298,7 +310,9 @@ testTokenizer(
       [tStringText, "himom"],
       tEndString,
       tStatementTerminator,
+      tStatementTerminator,
       tEndBlock,
+      tStatementTerminator,
     ])
   },
 )
@@ -322,7 +336,9 @@ testTokenizer(
       tStatementTerminator,
       tValueIdentifier,
       tStatementTerminator,
+      tStatementTerminator,
       tEndBlock,
+      tStatementTerminator,
     ])
   },
 )
@@ -343,9 +359,11 @@ print
       tStartString,
       [tStringText, "himom"],
       tEndString,
+      tStatementTerminator,
       tEndBlock,
       tStatementTerminator,
       tValueIdentifier,
+      tStatementTerminator,
       tStatementTerminator,
     ])
   },
@@ -375,7 +393,9 @@ testTokenizer(
       [tStringText, "himom"],
       tEndString,
       tStatementTerminator,
+      tStatementTerminator,
       tEndBlock,
+      tStatementTerminator,
     ])
   },
 )
@@ -397,13 +417,16 @@ and else
       tStartString,
       [tStringText, "himom"],
       tEndString,
+      tStatementTerminator,
       tEndBlock,
       tStatementContinuation,
       tValueIdentifier,
       tStartBlock,
-      tValueIdentifier,
+      [tValueIdentifier, "print"],
+      tStatementTerminator,
       tStatementTerminator,
       tEndBlock,
+      tStatementTerminator,
     ])
   },
 )

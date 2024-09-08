@@ -21,6 +21,7 @@ testTokenizer("should tokenize simple one-line strings correctly", async () => {
     [tStringText, "himom"],
     tEndString,
     tStatementTerminator,
+    tStatementTerminator,
   ])
 })
 
@@ -37,6 +38,7 @@ testTokenizer(
       tStartString,
       [tStringText, "like \\.name\\."],
       tEndString,
+      tStatementTerminator,
       tStatementTerminator,
     ])
   },
@@ -87,6 +89,7 @@ testTokenizer(
       [tValueIdentifier, "name2"],
       tEndStringInterpolation,
       tEndString,
+      tStatementTerminator,
       tStatementTerminator,
     ])
   },
@@ -139,6 +142,7 @@ testTokenizer(
         tEndStringInterpolation,
         [tStringText, "."],
         tEndString,
+        tStatementTerminator,
         tStatementTerminator,
       ],
     )

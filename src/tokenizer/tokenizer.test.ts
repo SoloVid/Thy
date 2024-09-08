@@ -17,5 +17,6 @@ testTokenizer("should tokenize Hello World", async () => {
     tStringText,
     tEndString,
     tStatementTerminator,
+    tStatementTerminator,
   ])
 })

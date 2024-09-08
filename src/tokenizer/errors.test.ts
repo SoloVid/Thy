@@ -1,6 +1,10 @@
 import { expect } from "expect"
 import { testTokenizer, tokenizeSource } from "./test-helper"
-import { tErrorToken, tValueIdentifier } from "./token-type"
+import {
+  tErrorToken,
+  tStatementTerminator,
+  tValueIdentifier,
+} from "./token-type"
 
 testTokenizer("can return error tokens and recover", () => {
   const source = "crash !$@ recover"
@@ -10,6 +14,7 @@ testTokenizer("can return error tokens and recover", () => {
     [tValueIdentifier, "crash"],
     [tErrorToken, "!$@"],
     [tValueIdentifier, "recover"],
+    [tStatementTerminator, expect.anything()],
   ])
   expect(errors).toEqual([
     {
