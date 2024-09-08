@@ -23,16 +23,29 @@ export async function checkExampleProgramTokenTypes(
 }
 
 export async function checkExampleProgramTokens(
-  exampleProgram: string,
+  exampleProgramName: string,
   tokens: readonly (TokenType | (readonly [TokenType, string | { asymmetricMatch(other: unknown): boolean }]))[],
 ) {
-  const { errors, outputs } = await tokenizeExampleProgram(exampleProgram)
+  const { errors, outputs } = await tokenizeExampleProgram(exampleProgramName)
   expect(errors).toEqual([])
   expect(outputs.map((t) => [t.type, t.text])).toEqual(tokens.map((t) => Array.isArray(t) ? t : [t, expect.anything()]))
 }
 
-export async function tokenizeExampleProgram(exampleProgram: string) {
-  const source = await readExampleFile(exampleProgram)
+export async function tokenizeExampleProgram(exampleProgramName: string) {
+  const source = await readExampleFile(exampleProgramName)
+  return tokenizeSource(source)
+}
+
+export function checkSourceTokens(
+  source: string,
+  tokens: readonly (TokenType | (readonly [TokenType, string | { asymmetricMatch(other: unknown): boolean }]))[],
+) {
+  const { errors, outputs } = tokenizeSource(source)
+  expect(errors).toEqual([])
+  expect(outputs.map((t) => [t.type, t.text])).toEqual(tokens.map((t) => Array.isArray(t) ? t : [t, expect.anything()]))
+}
+
+export function tokenizeSource(source: string) {
   const errors: CompileError[] = []
   const tokenizer = makeTokenizer(source, errors)
   const outputs: Token[] = []
