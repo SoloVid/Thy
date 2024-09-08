@@ -10,25 +10,21 @@ export const testTokenizer = defineTestGroup("tokenizer ")
 
 const maxTestN = 1000
 
-/**
- * @deprecated Just use {@link checkExampleProgramTokens} instead
- */
-export async function checkExampleProgramTokenTypes(
-  exampleProgram: string,
-  tokenTypes: readonly TokenType[],
-) {
-  const { errors, outputs } = await tokenizeExampleProgram(exampleProgram)
-  expect(errors).toEqual([])
-  expect(outputs.map((t) => t.type)).toEqual(tokenTypes)
-}
-
 export async function checkExampleProgramTokens(
   exampleProgramName: string,
-  tokens: readonly (TokenType | (readonly [TokenType, string | { asymmetricMatch(other: unknown): boolean }]))[],
+  tokens: readonly (
+    | TokenType
+    | readonly [
+        TokenType,
+        string | { asymmetricMatch(other: unknown): boolean },
+      ]
+  )[],
 ) {
   const { errors, outputs } = await tokenizeExampleProgram(exampleProgramName)
   expect(errors).toEqual([])
-  expect(outputs.map((t) => [t.type, t.text])).toEqual(tokens.map((t) => Array.isArray(t) ? t : [t, expect.anything()]))
+  expect(outputs.map((t) => [t.type, t.text])).toEqual(
+    tokens.map((t) => (Array.isArray(t) ? t : [t, expect.anything()])),
+  )
 }
 
 export async function tokenizeExampleProgram(exampleProgramName: string) {
@@ -38,11 +34,19 @@ export async function tokenizeExampleProgram(exampleProgramName: string) {
 
 export function checkSourceTokens(
   source: string,
-  tokens: readonly (TokenType | (readonly [TokenType, string | { asymmetricMatch(other: unknown): boolean }]))[],
+  tokens: readonly (
+    | TokenType
+    | readonly [
+        TokenType,
+        string | { asymmetricMatch(other: unknown): boolean },
+      ]
+  )[],
 ) {
   const { errors, outputs } = tokenizeSource(source)
   expect(errors).toEqual([])
-  expect(outputs.map((t) => [t.type, t.text])).toEqual(tokens.map((t) => Array.isArray(t) ? t : [t, expect.anything()]))
+  expect(outputs.map((t) => [t.type, t.text])).toEqual(
+    tokens.map((t) => (Array.isArray(t) ? t : [t, expect.anything()])),
+  )
 }
 
 export function tokenizeSource(source: string) {

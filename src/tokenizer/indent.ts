@@ -1,5 +1,6 @@
+import assert from "../utils/assert"
 import type { TokenMatcher } from "./token-matcher"
-import { tEndBlock, tStartBlock } from "./token-type"
+import { tEndBlock, tErrorToken, tStartBlock } from "./token-type"
 import type { TokenizerState } from "./tokenizer-state"
 
 export interface IndentTokenizers {
@@ -66,9 +67,10 @@ export function makeIndentMatchers(): IndentTokenizers {
     }
 
     const lines = match[1].split("\n")
-    if (lines.length === 0) {
-      return null
-    }
+    assert(
+      lines.length !== 0,
+      "regex match should have returned at least one line",
+    )
     const lastLineIndentation = lines[lines.length - 1]
     const currIndentLevel = lastLineIndentation.length
     const prevIndentLevel = indentStack[indentStack.length - 1]
@@ -82,7 +84,15 @@ export function makeIndentMatchers(): IndentTokenizers {
 
     // Any outdent must match some previous indentation level.
     if (matchIndentIndex === -1) {
-      throw Error(`invalid outdent at offset: ${state.offset}`)
+      // const munchRegex = /[ \r\n]*\r?\n *[^ \r\n]+/y
+      // munchRegex.lastIndex = state.offset
+      // const munchMatch = munchRegex.exec(state.text)
+      outdentsOutstanding = 1
+      return {
+        type: tErrorToken,
+        text: "", // munchMatch?.[0] ?? "",
+        error: `invalid outdent at offset: ${state.offset} (line ${state.line + lines.length})`,
+      } as const
     }
 
     const numOutdents = indentStack.length - matchIndentIndex - 1

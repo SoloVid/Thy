@@ -1,3 +1,4 @@
+import { debug } from "./debug"
 import type { TokenMatcherResult } from "./token-matcher"
 import {
   tComment,
@@ -20,7 +21,7 @@ export function matchMultilineComment(
     return null
   }
 
-  const regex = /[A-Z]{3,}(?=[\r\n])/y
+  const regex = /[A-Z]{3,}(?=( .*)?\r?\n)/y
   regex.lastIndex = state.offset
   const openResult = regex.exec(state.text)
   if (openResult === null) {
@@ -30,13 +31,19 @@ export function matchMultilineComment(
   const tag = openResult[0]
   const indentWidth = state.currentIndentWidth
   const fullCommentRegex = new RegExp(
-    `(${tag}.*\\r?\\n)(((^ {${indentWidth}}.*)|(^ *))\\r?\\n)* {${indentWidth}}${tag}(?=[\\r\\n])`,
+    `(${tag})( .*)?\r?\n[\\S\\s]*?((^( {${indentWidth}})(${tag})$)|(.*$(?![\r\n])))`,
     "my",
   )
+  debug(() => ["matching:", fullCommentRegex])
   fullCommentRegex.lastIndex = state.offset
   const result = fullCommentRegex.exec(state.text)
   if (result === null) {
     // TODO: May want to consume the rest of the input here and emit error about unclosed multiline comment.
+    // I'm not actually sure this is possible to hit at present.
+    // Note: The current implementation is limited by the lowest common
+    // denominator that is TextMate grammars (VS Code syntax highlighting).
+    // It does notprovide a way to pick a different highlighting strategy
+    // for an unclosed multiline construct.
     return null
   }
 

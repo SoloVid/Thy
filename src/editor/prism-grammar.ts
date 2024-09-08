@@ -28,7 +28,8 @@ export const thyPrismGrammar: Grammar = {
   ],
   comment: [
     {
-      pattern: /^(\s*)([A-Z]{3,})(?:.|[\n\r])+?^(\1)(\2)$/gm,
+      pattern:
+        /^(\s*)([A-Z]{3,})( .*)?\r?\n[\S\s]*?((^(\1)(\2)$)|(.*$(?![\r\n])))/gm,
       greedy: true,
     },
     {

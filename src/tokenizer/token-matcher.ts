@@ -1,22 +1,25 @@
 import type { CompileError } from "../compile-error"
-import type { TokenType } from "./token-type"
+import type { tErrorToken, TokenType } from "./token-type"
 import type { Tokenizer } from "./tokenizer"
 import type { TokenizerState } from "./tokenizer-state"
 
 export const skipToken = Symbol("skipToken")
 
-export type TokenMatcherSingleResult = {
-  readonly type: TokenType | typeof skipToken
+export type TokenMatcherResultNotNull = {
+  readonly type: Exclude<TokenType, typeof tErrorToken> | typeof skipToken
   readonly text: string
+  readonly tokenizer?: Tokenizer
 }
 
-export type TokenMatcherMultiResult = TokenMatcherSingleResult & {
-  readonly tokenizer: Tokenizer
+export type TokenMatcherError = {
+  readonly type: typeof tErrorToken
+  readonly text: string
+  readonly error: string
 }
 
 export type TokenMatcherResult =
-  | TokenMatcherSingleResult
-  | TokenMatcherMultiResult
+  | TokenMatcherResultNotNull
+  | TokenMatcherError
   | null
 
 export type TokenMatcher = (

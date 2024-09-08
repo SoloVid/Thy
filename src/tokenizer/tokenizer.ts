@@ -1,8 +1,8 @@
 import { CompileError, tokenError } from "../compile-error"
 import { debug } from "./debug"
-import { skipToken, TokenMatcher } from "./token-matcher"
 import type { Token } from "./token"
-import { makeTokenHere, startTokenHere } from "./token-helper"
+import { makeTokenHere } from "./token-helper"
+import { skipToken, TokenMatcher } from "./token-matcher"
 import { tErrorToken } from "./token-type"
 import type { TokenizerState } from "./tokenizer-state"
 
@@ -24,17 +24,25 @@ export function makeGenericTokenizer(
   errors: CompileError[],
   isDone: () => boolean,
 ): Tokenizer {
-  const itsAnError = Symbol("itsAnError")
+  const cannotFindToken = Symbol("cannotFindToken")
 
   let nextToken: Token | null = null
   let delegatedTokenizer: Tokenizer | null = null
 
   function getNextValidToken(): Token | typeof endOfStream {
     let errorCharacters = 0
-    const errorPartialToken = startTokenHere(state, tErrorToken)
-    while (nextToken === null && !isDone()) {
+    let errorPartialToken: Omit<Token, "text"> | null = null
+    while (nextToken === null && (!isDone() || delegatedTokenizer)) {
       const t = trySources()
-      if (t === itsAnError) {
+      if (t === cannotFindToken) {
+        if (errorCharacters === 0) {
+          errorPartialToken = {
+            type: tErrorToken,
+            offset: state.offset,
+            line: state.line,
+            column: state.column,
+          }
+        }
         errorCharacters++
         state.advance(tErrorToken, 1)
       } else {
@@ -42,12 +50,12 @@ export function makeGenericTokenizer(
       }
     }
 
-    if (errorCharacters > 0) {
+    if (errorPartialToken !== null) {
       const t = {
         ...errorPartialToken,
         text: state.text.substring(
-            errorPartialToken.offset,
-            errorPartialToken.offset + errorCharacters,
+          errorPartialToken.offset,
+          errorPartialToken.offset + errorCharacters,
         ),
       }
       debug(() => ["error:", t])
@@ -64,7 +72,7 @@ export function makeGenericTokenizer(
     return endOfStream
   }
 
-  function trySources(): Token | null | typeof itsAnError {
+  function trySources(): Token | null | typeof cannotFindToken {
     if (delegatedTokenizer) {
       debug(() => ["delegating to nested tokenizer..."])
       const token = delegatedTokenizer.getNextToken()
@@ -74,6 +82,9 @@ export function makeGenericTokenizer(
         delegatedTokenizer = null
       }
     }
+    if (isDone()) {
+      return null
+    }
     debug(() => [
       `finding at ${state.offset} (${JSON.stringify(state.text.substring(state.offset, state.offset + 10))})`,
     ])
@@ -81,7 +92,22 @@ export function makeGenericTokenizer(
       const match = finder(state, errors)
       if (match !== null) {
         debug(() => ["token found:", match])
-        if ("tokenizer" in match) {
+        if (match.type === tErrorToken) {
+          debug(() => ["error:", match])
+          errors.push(
+            tokenError(
+              {
+                type: match.type,
+                offset: state.offset,
+                line: state.line,
+                column: state.column,
+                text: match.text,
+              },
+              match.error,
+            ),
+          )
+        }
+        if ("tokenizer" in match && match.tokenizer) {
           delegatedTokenizer = match.tokenizer
         }
         if (match.type === skipToken) {
@@ -91,14 +117,11 @@ export function makeGenericTokenizer(
         return makeTokenHere(state, match.type, match.text)
       }
     }
-    return itsAnError
+    return cannotFindToken
   }
 
   return {
     getNextToken() {
-      if (isDone()) {
-        return null
-      }
       const token = getNextValidToken()
       if (token === endOfStream) {
         return null

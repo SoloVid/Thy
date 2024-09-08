@@ -1,22 +1,30 @@
 import type { CompileError } from "../compile-error"
 import type { TokenMatcher } from "./token-matcher"
-import type { TokenType } from "./token-type"
+import type { tErrorToken, TokenType } from "./token-type"
 import { makeGenericTokenizer } from "./tokenizer"
 import type { TokenizerState } from "./tokenizer-state"
 
 export function makeNestedTokenizerMatcher(
-  firstTokenType: TokenType,
+  firstTokenType: Exclude<TokenType, typeof tErrorToken>,
   firstTokenRegex: RegExp,
   finders: readonly TokenMatcher[],
   isDone: (state: TokenizerState) => boolean,
 ): TokenMatcher {
-  return makeNestedDynamicTokenizerMatcher(firstTokenType, firstTokenRegex, () => finders, isDone)
+  return makeNestedDynamicTokenizerMatcher(
+    firstTokenType,
+    firstTokenRegex,
+    () => finders,
+    isDone,
+  )
 }
 
 export function makeNestedDynamicTokenizerMatcher(
-  firstTokenType: TokenType,
+  firstTokenType: Exclude<TokenType, typeof tErrorToken>,
   firstTokenRegex: RegExp,
-  makeFinders: (state: TokenizerState) => readonly TokenMatcher[],
+  makeFinders: (
+    state: TokenizerState,
+    firstTokenText: string,
+  ) => readonly TokenMatcher[],
   isDone: (state: TokenizerState) => boolean,
 ): TokenMatcher {
   const statefulFirstTokenRegex = new RegExp(firstTokenRegex, "y")
@@ -29,8 +37,11 @@ export function makeNestedDynamicTokenizerMatcher(
     return {
       type: firstTokenType,
       text: match[0],
-      tokenizer: makeGenericTokenizer(makeFinders(state), state, errors, () =>
-        isDone(state),
+      tokenizer: makeGenericTokenizer(
+        makeFinders(state, match[0]),
+        state,
+        errors,
+        () => isDone(state),
       ),
     }
   }

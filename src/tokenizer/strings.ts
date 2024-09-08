@@ -1,6 +1,9 @@
 import { debug } from "./debug"
 import { matchValueIdentifier } from "./identifier"
-import { makeNestedDynamicTokenizerMatcher, makeNestedTokenizerMatcher } from "./nested-tokenizer"
+import {
+  makeNestedDynamicTokenizerMatcher,
+  makeNestedTokenizerMatcher,
+} from "./nested-tokenizer"
 import { makeSingleRegexMatcher } from "./single-regex-matcher"
 import { skipToken, TokenMatcher } from "./token-matcher"
 import {
@@ -22,7 +25,10 @@ export const matchStringInterpolation = makeNestedTokenizerMatcher(
   (state) => state.lastTokenType === tEndStringInterpolation,
 )
 
-const matchStringText = makeSingleRegexMatcher(tStringText, /(?:\\.|[^".\r\n]|(?:\.(?![a-z][a-zA-Z0-9]*\.)))+/)
+const matchStringText = makeSingleRegexMatcher(
+  tStringText,
+  /(?:\\.|[^".\r\n]|(?:\.(?![a-z][a-zA-Z0-9]*\.)))+/,
+)
 const matchSimpleStringLiteralEnd = makeSingleRegexMatcher(tEndString, /"/)
 export const matchSimpleStringLiteral = makeNestedTokenizerMatcher(
   tStartString,
@@ -39,26 +45,52 @@ export const matchMultiLineStringLiteral = makeNestedDynamicTokenizerMatcher(
     // Find the next line where either there is more whitespace indent than
     // the line with """, or where there is anything in addition to whitespace,
     // whichever comes first.
-    const nextLineWithSignificantWhitespaceRegex = new RegExp(`^(?:(?:( {${parentIndent + 1},})[\r\n])|(?:( *)[^ \r\n]))`, "gm")
+    const nextLineWithSignificantWhitespaceRegex = new RegExp(
+      `^(?:(?:( {${parentIndent + 1},})[\r\n])|(?:( *)[^ \r\n]))`,
+      "gm",
+    )
     nextLineWithSignificantWhitespaceRegex.lastIndex = state.offset
-    const significantWhitespaceMatch = nextLineWithSignificantWhitespaceRegex.exec(state.text)
-    debug(() => ["match next line with significant whitespace:", significantWhitespaceMatch, nextLineWithSignificantWhitespaceRegex])
-    let textContentIndent = significantWhitespaceMatch === null ? parentIndent : (significantWhitespaceMatch[1] || significantWhitespaceMatch[2] || "").length
+    const significantWhitespaceMatch =
+      nextLineWithSignificantWhitespaceRegex.exec(state.text)
+    debug(() => [
+      "match next line with significant whitespace:",
+      significantWhitespaceMatch,
+      nextLineWithSignificantWhitespaceRegex,
+    ])
+    let textContentIndent =
+      significantWhitespaceMatch === null
+        ? parentIndent
+        : (significantWhitespaceMatch[1] || significantWhitespaceMatch[2] || "")
+            .length
     // Some logic falls apart if no indent is found.
     if (textContentIndent <= parentIndent) {
       textContentIndent = parentIndent + 1
     }
     debug(() => ["text content indent:", textContentIndent])
-    const matchContentNewLine = makeMultiLineStringNewLineContentMatcher(parentIndent, textContentIndent)
+    const matchContentNewLine = makeMultiLineStringNewLineContentMatcher(
+      parentIndent,
+      textContentIndent,
+    )
     // End of the multi-line string is some number of empty lines
     // (space-count at most equal to the text content indent)
     // followed by a line at a lower indent level.
-    const matchMultiLineStringLiteralEnd = makeSingleRegexMatcher(tEndString, new RegExp(`(?=(?:\r?\n {0,${textContentIndent}})*\r?\n {0,${parentIndent}}(?![ \r\n]))`))
-    if (textContentIndent > 0) {
-    const matchMultiLineStringPrefixWhitespace = makeSingleRegexMatcher(skipToken, new RegExp(`^ {1,${textContentIndent}}`))
-    return [matchMultiLineStringLiteralEnd, matchMultiLineStringPrefixWhitespace, matchStringInterpolation, matchStringText, matchContentNewLine]
-    }
-    return [matchMultiLineStringLiteralEnd, matchStringInterpolation, matchStringText, matchContentNewLine]
+    const matchMultiLineStringLiteralEnd = makeSingleRegexMatcher(
+      tEndString,
+      new RegExp(
+        `(?=(?:\r?\n {0,${textContentIndent}})*(?:(?:\r?\n {0,${parentIndent}}(?![ \r\n]))|$(?![\r\n])))`,
+      ),
+    )
+    const matchMultiLineStringPrefixWhitespace = makeSingleRegexMatcher(
+      skipToken,
+      new RegExp(`^ {1,${textContentIndent}}`),
+    )
+    return [
+      matchMultiLineStringLiteralEnd,
+      matchMultiLineStringPrefixWhitespace,
+      matchStringInterpolation,
+      matchStringText,
+      matchContentNewLine,
+    ]
   },
   (state) => state.lastTokenType === tEndString,
 )
@@ -71,11 +103,16 @@ export function makeMultiLineStringNewLineContentMatcher(
   // that either (A) is text content (has characters beyond text content indent)
   // or (B) represents a line of code after the multi-line string
   // (some indent no greater than parent indent with some non-whitespace character).
-  const newLineLookAheadToNextLineWithTextContentRegex = new RegExp(`\r?\n(?=[\\S\\s]*?^(?:( {${textContentIndent},}.)|(?:( {0,${parentIndent}}[^ \r\n]))))`, "my")
+  const newLineLookAheadToNextLineWithTextContentRegex = new RegExp(
+    `\r?\n(?=[\\S\\s]*?^(?:( {${textContentIndent},}.)|(?:( {0,${parentIndent}}[^ \r\n]))))`,
+    "my",
+  )
   return (state) => {
     newLineLookAheadToNextLineWithTextContentRegex.lastIndex = state.offset
     debug(() => ["matching:", newLineLookAheadToNextLineWithTextContentRegex])
-    const result = newLineLookAheadToNextLineWithTextContentRegex.exec(state.text)
+    const result = newLineLookAheadToNextLineWithTextContentRegex.exec(
+      state.text,
+    )
     if (result === null || !result[1]) {
       return null
     }
@@ -89,4 +126,3 @@ export function makeMultiLineStringNewLineContentMatcher(
     }
   }
 }
-

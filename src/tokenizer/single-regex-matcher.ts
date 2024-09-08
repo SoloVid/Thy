@@ -1,9 +1,9 @@
 import { debug } from "./debug"
 import type { skipToken, TokenMatcher } from "./token-matcher"
-import type { TokenType } from "./token-type"
+import type { tErrorToken, TokenType } from "./token-type"
 
 export function makeSingleRegexMatcher(
-  type: TokenType | typeof skipToken,
+  type: Exclude<TokenType, typeof tErrorToken> | typeof skipToken,
   regex: RegExp,
 ): TokenMatcher {
   const statefulRegex = new RegExp(regex, "my")

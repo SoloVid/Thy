@@ -22,7 +22,10 @@ import {
 } from "./keywords"
 import { matchNumber } from "./number"
 import type { TokenMatcher } from "./token-matcher"
-import { matchMultiLineStringLiteral, matchSimpleStringLiteral } from "./strings"
+import {
+  matchMultiLineStringLiteral,
+  matchSimpleStringLiteral,
+} from "./strings"
 import { makeTokenHere } from "./token-helper"
 import { tEndBlock, tStartBlock } from "./token-type"
 import { makeGenericTokenizer, Tokenizer } from "./tokenizer"

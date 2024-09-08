@@ -16,7 +16,7 @@
     "serve": "node -r esbuild-register src/editor/server.ts",
     "start": "node lib/index.js",
     "test": "uts -r esbuild-register src",
-    "test:coverage": "nyc npm run test",
+    "test:coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
     "test:watch": "watchlist --eager src -- npm run test"
   },
   "author": "Grant Dennison",
