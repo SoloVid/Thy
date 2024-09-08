@@ -84,13 +84,12 @@ export function makeIndentMatchers(): IndentTokenizers {
 
     // Any outdent must match some previous indentation level.
     if (matchIndentIndex === -1) {
-      // const munchRegex = /[ \r\n]*\r?\n *[^ \r\n]+/y
-      // munchRegex.lastIndex = state.offset
-      // const munchMatch = munchRegex.exec(state.text)
+      // If we're in this state, flag an error and try popping off a layer
+      // of indent to see if that gets us into a recovered state.
       outdentsOutstanding = 1
       return {
         type: tErrorToken,
-        text: "", // munchMatch?.[0] ?? "",
+        text: "",
         error: `invalid outdent at offset: ${state.offset} (line ${state.line + lines.length})`,
       } as const
     }

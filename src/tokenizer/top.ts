@@ -8,26 +8,26 @@ import {
 import { makeIndentMatchers } from "./indent"
 import {
   matchAwait,
-  matchVarDeclAssign,
+  matchConstDeclAssign,
   matchExport,
   matchGiven,
-  matchConstDeclAssign,
   matchLet,
+  matchNoDeclAssign,
   matchPrivate,
   matchReturn,
   matchStatementContinuation,
   matchThat,
-  matchNoDeclAssign,
   matchType,
+  matchVarDeclAssign,
 } from "./keywords"
 import { matchNumber } from "./number"
-import type { TokenMatcher } from "./token-matcher"
 import {
   matchMultiLineStringLiteral,
   matchSimpleStringLiteral,
 } from "./strings"
 import { makeTokenHere } from "./token-helper"
-import { tEndBlock, tStartBlock } from "./token-type"
+import type { TokenMatcher } from "./token-matcher"
+import { tEndBlock } from "./token-type"
 import { makeGenericTokenizer, Tokenizer } from "./tokenizer"
 import { makeTokenizerState } from "./tokenizer-state"
 import { matchStatementTerminator, matchWhitespace } from "./whitespace"
