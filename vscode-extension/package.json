@@ -20,7 +20,11 @@
         "extensions": [
           ".thy"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./images/thy-icon-min.svg",
+          "dark": "./images/thy-icon-min.svg"
+        }
       },
       {
         "id": "thy-injection"
