@@ -1,5 +1,5 @@
 import assert from "node:assert"
-import { test } from "under-the-sun"
+import { test } from "test-framework"
 import { InterpreterErrorWithContext } from "./interpreter-error"
 import { interpolateString, interpretThyMultilineString, parseString } from "./string"
 import { makeSimpleContext } from "./test-helper"

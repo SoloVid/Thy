@@ -1,5 +1,5 @@
 import assert from "assert"
-import { test } from "under-the-sun"
+import { test } from "test-framework"
 import { interpretThyBlock } from "./block"
 
 test("interpretThyBlock() can return a function that can pass a function to another", async () => {

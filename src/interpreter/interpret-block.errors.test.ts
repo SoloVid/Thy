@@ -1,5 +1,5 @@
 import assert from "assert"
-import { test } from "under-the-sun"
+import { test } from "test-framework"
 import { delay } from "../utils/delay"
 import { getErrorTraceLines } from "../utils/error-helper"
 import { interpretThyBlock } from "./block"

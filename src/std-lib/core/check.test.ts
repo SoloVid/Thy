@@ -1,5 +1,5 @@
 import assert from "assert"
-import { test } from "under-the-sun"
+import { test } from "test-framework"
 import { allBuiltin, ascBuiltin, descBuiltin, equalBuiltin, notBuiltin, someBuiltin } from "./check"
 
 function testCheckFunction<T>(f: (a: T, b?: T, c?: T, d?: T) => boolean, testPairs: [[T]|[T,T]|[T,T,T]|[T,T,T,T],boolean][]) {

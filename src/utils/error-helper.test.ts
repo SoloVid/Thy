@@ -1,5 +1,5 @@
 import assert from "assert"
-import { test } from "under-the-sun"
+import { test } from "test-framework"
 import { dissectErrorTraceAtBaseline, getErrorTraceLines, getErrorTraceLinesFromStack, replaceErrorTraceLine, transformErrorTrace } from "./error-helper"
 
 test("getErrorTraceLinesFromStack() returns only lines with file and location info (Windows Node 16)", async () => {

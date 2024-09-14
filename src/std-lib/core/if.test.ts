@@ -1,5 +1,5 @@
 import assert from "assert";
-import { test } from "under-the-sun";
+import { test } from "test-framework";
 import { ifBuiltin } from "./if";
 
 test("if() should return true case value if condition is met", async () => {

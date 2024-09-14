@@ -1,5 +1,5 @@
 import assert from "node:assert"
-import { test } from "under-the-sun"
+import { test } from "test-framework"
 import { collectFiles } from "./collect-files"
 import { testFileDir } from "../node-runtime/test-files"
 
