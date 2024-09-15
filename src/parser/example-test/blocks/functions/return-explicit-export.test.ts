@@ -1,82 +1,88 @@
 import { checkExampleProgramTree, testParser } from "../.."
 import { returnStyle } from "../../../../tree/block"
 
-testParser("should parse example program blocks/functions/return-explicit-export.thy", async () => {
-  await checkExampleProgramTree("blocks/functions/return-explicit-export.thy", {
-    "type": "block",
-    "ideas": [
+testParser(
+  "should parse example program blocks/functions/return-explicit-export.thy",
+  async () => {
+    await checkExampleProgramTree(
+      "blocks/functions/return-explicit-export.thy",
       {
-        "type": "assignment",
-        "modifier": {
-          "type": "Export",
-          "text": "export"
-        },
-        "variable": {
-          "type": "atom",
-          "token": {
-            "type": "ValueIdentifier",
-            "text": "a"
-          }
-        },
-        "operator": {
-          "type": "ConstantAssignment",
-          "text": "is"
-        },
-        "call": {
-          "type": "call",
-          "func": {
-            "type": "atom",
-            "token": {
-              "type": "ValueIdentifier",
-              "text": "def"
-            }
+        type: "block",
+        ideas: [
+          {
+            type: "assignment",
+            modifier: {
+              type: "Export",
+              text: "export",
+            },
+            variable: {
+              type: "atom",
+              token: {
+                type: "ValueIdentifier",
+                text: "a",
+              },
+            },
+            operator: {
+              type: "ConstantAssignment",
+              text: "is",
+            },
+            call: {
+              type: "call",
+              func: {
+                type: "atom",
+                token: {
+                  type: "ValueIdentifier",
+                  text: "def",
+                },
+              },
+              args: [
+                {
+                  type: "atom",
+                  token: {
+                    type: "StringLiteral",
+                    text: '"A"',
+                  },
+                },
+              ],
+            },
           },
-          "args": [
-            {
-              "type": "atom",
-              "token": {
-                "type": "StringLiteral",
-                "text": "\"A\""
-              }
-            }
-          ]
-        }
+          {
+            type: "assignment",
+            modifier: null,
+            variable: {
+              type: "atom",
+              token: {
+                type: "ValueIdentifier",
+                text: "b",
+              },
+            },
+            operator: {
+              type: "ConstantAssignment",
+              text: "is",
+            },
+            call: {
+              type: "call",
+              func: {
+                type: "atom",
+                token: {
+                  type: "ValueIdentifier",
+                  text: "def",
+                },
+              },
+              args: [
+                {
+                  type: "atom",
+                  token: {
+                    type: "NumberLiteral",
+                    text: "2",
+                  },
+                },
+              ],
+            },
+          },
+        ],
+        returnStyle: returnStyle.explicitExport,
       },
-      {
-        "type": "assignment",
-        "modifier": null,
-        "variable": {
-          "type": "atom",
-          "token": {
-            "type": "ValueIdentifier",
-            "text": "b"
-          }
-        },
-        "operator": {
-          "type": "ConstantAssignment",
-          "text": "is"
-        },
-        "call": {
-          "type": "call",
-          "func": {
-            "type": "atom",
-            "token": {
-              "type": "ValueIdentifier",
-              "text": "def"
-            }
-          },
-          "args": [
-            {
-              "type": "atom",
-              "token": {
-                "type": "NumberLiteral",
-                "text": "2"
-              }
-            }
-          ]
-        }
-      }
-    ],
-    "returnStyle": returnStyle.explicitExport
-  })
-})
+    )
+  },
+)

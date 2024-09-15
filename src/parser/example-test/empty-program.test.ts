@@ -5,7 +5,7 @@ testParser("should parse empty program", () => {
   checkProgramTree("", {
     type: "block",
     ideas: [],
-    returnStyle: returnStyle.implicitExport
+    returnStyle: returnStyle.implicitExport,
   })
 })
 
@@ -14,12 +14,12 @@ testParser("should parse program with only new lines", () => {
     type: "block",
     ideas: [
       {
-        type: "blank-line"
+        type: "blank-line",
       },
       {
-        type: "blank-line"
-      }
+        type: "blank-line",
+      },
     ],
-    returnStyle: returnStyle.implicitExport
+    returnStyle: returnStyle.implicitExport,
   })
 })

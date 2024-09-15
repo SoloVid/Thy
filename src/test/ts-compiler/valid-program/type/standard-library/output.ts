@@ -5,7 +5,9 @@ export const unknownFunc = (p: unknown) => {}
 export const voidFunc = (p: undefined) => {}
 
 export const BasicUnion = undefined as unknown as string | number
-export const UnionWithValue = undefined as unknown as string | typeof unknownFunc
+export const UnionWithValue = undefined as unknown as
+  | string
+  | typeof unknownFunc
 function _NonTrivialUnion_WrappedValue() {
   return <_A, _B>(_a: _A, _b: _B) => undefined as unknown as _A | _B
 }

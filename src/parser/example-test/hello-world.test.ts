@@ -10,8 +10,8 @@ testParser("should parse Hello World", async () => {
         type: "non-code",
         token: {
           type: "Comment",
-          text: "The next line prints \"himom\"",
-        }
+          text: 'The next line prints "himom"',
+        },
       },
       {
         type: "call",
@@ -19,20 +19,20 @@ testParser("should parse Hello World", async () => {
           type: "atom",
           token: {
             type: "ValueIdentifier",
-            text: "print"
-          }
+            text: "print",
+          },
         },
         args: [
           {
             type: "atom",
             token: {
               type: "StringLiteral",
-              text: `"himom"`
-            }
-          }
-        ]
-      }
+              text: `"himom"`,
+            },
+          },
+        ],
+      },
     ],
-    returnStyle: returnStyle.implicitExport
+    returnStyle: returnStyle.implicitExport,
   })
 })

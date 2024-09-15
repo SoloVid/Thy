@@ -14,7 +14,9 @@ function _A_Call() {
 }
 export const A = undefined as unknown as ReturnType<typeof _A_Call>
 
-export const funcWithTypes = <_T_Param extends typeof A>(p: typeof A): typeof A => {
+export const funcWithTypes = <_T_Param extends typeof A>(
+  p: typeof A,
+): typeof A => {
   const T = undefined as unknown as _T_Param
   return p
 }

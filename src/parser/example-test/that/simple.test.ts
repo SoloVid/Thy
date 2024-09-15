@@ -3,135 +3,135 @@ import { returnStyle } from "../../../tree/block"
 
 testParser("should parse example program that/simple.thy", async () => {
   await checkExampleProgramTree("that/simple.thy", {
-    "type": "block",
-    "ideas": [
+    type: "block",
+    ideas: [
       {
-        "type": "call",
-        "func": {
-          "type": "atom",
-          "token": {
-            "type": "ValueIdentifier",
-            "text": "if"
-          }
+        type: "call",
+        func: {
+          type: "atom",
+          token: {
+            type: "ValueIdentifier",
+            text: "if",
+          },
         },
-        "args": [
+        args: [
           {
-            "type": "call",
-            "func": {
-              "type": "property-access",
-              "base": {
-                "type": "atom",
-                "token": {
-                  "type": "ValueIdentifier",
-                  "text": "check"
-                }
+            type: "call",
+            func: {
+              type: "property-access",
+              base: {
+                type: "atom",
+                token: {
+                  type: "ValueIdentifier",
+                  text: "check",
+                },
               },
-              "memberAccessOperatorToken": {
-                "type": "MemberAccessOperator",
-                "text": "."
+              memberAccessOperatorToken: {
+                type: "MemberAccessOperator",
+                text: ".",
               },
-              "property": {
-                "type": "ValueIdentifier",
-                "text": "all"
-              }
+              property: {
+                type: "ValueIdentifier",
+                text: "all",
+              },
             },
-            "args": [
+            args: [
               {
-                "type": "call",
-                "func": {
-                  "type": "property-access",
-                  "base": {
-                    "type": "atom",
-                    "token": {
-                      "type": "ValueIdentifier",
-                      "text": "check"
-                    }
+                type: "call",
+                func: {
+                  type: "property-access",
+                  base: {
+                    type: "atom",
+                    token: {
+                      type: "ValueIdentifier",
+                      text: "check",
+                    },
                   },
-                  "memberAccessOperatorToken": {
-                    "type": "MemberAccessOperator",
-                    "text": "."
+                  memberAccessOperatorToken: {
+                    type: "MemberAccessOperator",
+                    text: ".",
                   },
-                  "property": {
-                    "type": "ValueIdentifier",
-                    "text": "equal"
-                  }
+                  property: {
+                    type: "ValueIdentifier",
+                    text: "equal",
+                  },
                 },
-                "args": [
+                args: [
                   {
-                    "type": "atom",
-                    "token": {
-                      "type": "ValueIdentifier",
-                      "text": "foo"
-                    }
+                    type: "atom",
+                    token: {
+                      type: "ValueIdentifier",
+                      text: "foo",
+                    },
                   },
                   {
-                    "type": "atom",
-                    "token": {
-                      "type": "StringLiteral",
-                      "text": "\"A\""
-                    }
-                  }
-                ]
+                    type: "atom",
+                    token: {
+                      type: "StringLiteral",
+                      text: '"A"',
+                    },
+                  },
+                ],
               },
               {
-                "type": "call",
-                "func": {
-                  "type": "property-access",
-                  "base": {
-                    "type": "atom",
-                    "token": {
-                      "type": "ValueIdentifier",
-                      "text": "check"
-                    }
+                type: "call",
+                func: {
+                  type: "property-access",
+                  base: {
+                    type: "atom",
+                    token: {
+                      type: "ValueIdentifier",
+                      text: "check",
+                    },
                   },
-                  "memberAccessOperatorToken": {
-                    "type": "MemberAccessOperator",
-                    "text": "."
+                  memberAccessOperatorToken: {
+                    type: "MemberAccessOperator",
+                    text: ".",
                   },
-                  "property": {
-                    "type": "ValueIdentifier",
-                    "text": "equal"
-                  }
+                  property: {
+                    type: "ValueIdentifier",
+                    text: "equal",
+                  },
                 },
-                "args": [
+                args: [
                   {
-                    "type": "atom",
-                    "token": {
-                      "type": "ValueIdentifier",
-                      "text": "bar"
-                    }
+                    type: "atom",
+                    token: {
+                      type: "ValueIdentifier",
+                      text: "bar",
+                    },
                   },
                   {
-                    "type": "atom",
-                    "token": {
-                      "type": "NumberLiteral",
-                      "text": "2"
-                    }
-                  }
-                ]
-              }
-            ]
+                    type: "atom",
+                    token: {
+                      type: "NumberLiteral",
+                      text: "2",
+                    },
+                  },
+                ],
+              },
+            ],
           },
           {
-            "type": "block",
-            "ideas": [
+            type: "block",
+            ideas: [
               {
-                "type": "call",
-                "func": {
-                  "type": "atom",
-                  "token": {
-                    "type": "ValueIdentifier",
-                    "text": "doSomething"
-                  }
+                type: "call",
+                func: {
+                  type: "atom",
+                  token: {
+                    type: "ValueIdentifier",
+                    text: "doSomething",
+                  },
                 },
-                "args": []
-              }
+                args: [],
+              },
             ],
-            "returnStyle": returnStyle.implicitExport
-          }
-        ]
-      }
+            returnStyle: returnStyle.implicitExport,
+          },
+        ],
+      },
     ],
-    "returnStyle": returnStyle.implicitExport
+    returnStyle: returnStyle.implicitExport,
   })
 })

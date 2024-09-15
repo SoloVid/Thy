@@ -3,62 +3,62 @@ import { returnStyle } from "../../../tree/block"
 
 testParser("should parse example program blocks/simple.thy", async () => {
   await checkExampleProgramTree("blocks/simple.thy", {
-    "type": "block",
-    "ideas": [
+    type: "block",
+    ideas: [
       {
-        "type": "call",
-        "func": {
-          "type": "atom",
-          "token": {
-            "text": "if"
-          }
+        type: "call",
+        func: {
+          type: "atom",
+          token: {
+            text: "if",
+          },
         },
-        "args": [
+        args: [
           {
-            "type": "atom",
-            "token": {
-              "text": "someCondition"
-            }
+            type: "atom",
+            token: {
+              text: "someCondition",
+            },
           },
           {
-            "type": "block",
-            "ideas": [
+            type: "block",
+            ideas: [
               {
-                "type": "call",
-                "func": {
-                  "type": "atom",
-                  "token": {
-                    "text": "doOneThing"
-                  }
+                type: "call",
+                func: {
+                  type: "atom",
+                  token: {
+                    text: "doOneThing",
+                  },
                 },
-                "args": [],
+                args: [],
               },
               {
-                "type": "call",
-                "func": {
-                  "type": "atom",
-                  "token": {
-                    "text": "doAnother"
-                  }
+                type: "call",
+                func: {
+                  type: "atom",
+                  token: {
+                    text: "doAnother",
+                  },
                 },
-                "args": [],
-              }
+                args: [],
+              },
             ],
-            "returnStyle": returnStyle.implicitExport,
-          }
+            returnStyle: returnStyle.implicitExport,
+          },
         ],
       },
       {
-        "type": "call",
-        "func": {
-          "type": "atom",
-          "token": {
-            "text": "keepDoingMoreStuff"
-          }
+        type: "call",
+        func: {
+          type: "atom",
+          token: {
+            text: "keepDoingMoreStuff",
+          },
         },
-        "args": [],
-      }
+        args: [],
+      },
     ],
-    "returnStyle": returnStyle.implicitExport,
+    returnStyle: returnStyle.implicitExport,
   })
 })

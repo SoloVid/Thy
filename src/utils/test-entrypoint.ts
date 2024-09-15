@@ -11,13 +11,19 @@ import { describe, it, suite, test as mochaTest } from "mocha"
 //   }
 // }
 
-export function test(description: string, exercise: () => void | PromiseLike<void>) {
+export function test(
+  description: string,
+  exercise: () => void | PromiseLike<void>,
+) {
   // mochaTest(description, exercise)
   it(description, exercise)
 }
 
 export function defineTestGroup(groupDescriptionPrefix: string) {
-  return function groupTest(description: string, exercise: () => void | PromiseLike<void>) {
+  return function groupTest(
+    description: string,
+    exercise: () => void | PromiseLike<void>,
+  ) {
     // suite(groupDescriptionPrefix)
     // mochaTest(description, exercise)
     describe(groupDescriptionPrefix, () => {
