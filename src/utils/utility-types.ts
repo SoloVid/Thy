@@ -13,3 +13,8 @@ export type DefaultNever<T, Default> = [T] extends [never] ? Default : T
 // https://gist.github.com/webstrand/b6c8a1bb019f156a3b2b0e553370b18d
 export type Expand<T> = T extends string | number | boolean | bigint | null | void | symbol | Function | Date ? T : { [K in keyof T]: T[K] }
 // export type Expand<T> = T extends unknown ? T extends Function ? T : { [K in keyof T]: Expand<T[K]> } : never
+
+// From https://stackoverflow.com/a/61132308/4639640
+export type DeepPartial<T> = T extends object ? {
+  [P in keyof T]?: DeepPartial<T[P]>;
+} : T;
