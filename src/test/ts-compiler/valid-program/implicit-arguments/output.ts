@@ -1,4 +1,4 @@
-const foo = (exercise: (args: { bar: (msg: string) => void }) => void) => {
+export const foo = (exercise: (args: { bar: (msg: string) => void }) => void) => {
   exercise({ bar: console.log })
 }
 
