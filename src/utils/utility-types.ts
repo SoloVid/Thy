@@ -28,3 +28,8 @@ export type Expand<T> = T extends
   ? T
   : { [K in keyof T]: T[K] }
 // export type Expand<T> = T extends unknown ? T extends Function ? T : { [K in keyof T]: Expand<T[K]> } : never
+
+// From https://stackoverflow.com/a/61132308/4639640
+export type DeepPartial<T> = T extends object ? {
+  [P in keyof T]?: DeepPartial<T[P]>;
+} : T;

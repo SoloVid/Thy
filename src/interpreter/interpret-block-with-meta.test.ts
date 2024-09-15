@@ -1,5 +1,5 @@
 import assert from "node:assert"
-import { test } from "under-the-sun"
+import { test } from "test-framework"
 import { interpretThyBlockWithMeta } from "./block"
 
 test("interpretThyBlockWithMeta() should properly process a block that explicitly returns", async () => {

@@ -1,0 +1,258 @@
+{
+  "type": "block",
+  "symbolTable": {
+    "localSymbols": {}
+  },
+  "ideas": [
+    {
+      "type": "call",
+      "func": {
+        "type": "atom",
+        "symbolTable": {
+          "localSymbols": {}
+        },
+        "token": {
+          "type": "ValueIdentifier",
+          "offset": 0,
+          "line": 0,
+          "column": 0,
+          "text": "if"
+        }
+      },
+      "typeArgs": [],
+      "args": [
+        {
+          "type": "atom",
+          "symbolTable": {
+            "localSymbols": {}
+          },
+          "token": {
+            "type": "ValueIdentifier",
+            "offset": 3,
+            "line": 0,
+            "column": 3,
+            "text": "condition1"
+          }
+        },
+        {
+          "type": "block",
+          "symbolTable": {
+            "localSymbols": {}
+          },
+          "ideas": [
+            {
+              "type": "call",
+              "func": {
+                "type": "atom",
+                "symbolTable": {
+                  "localSymbols": {}
+                },
+                "token": {
+                  "type": "ValueIdentifier",
+                  "offset": 17,
+                  "line": 1,
+                  "column": 2,
+                  "text": "if"
+                }
+              },
+              "typeArgs": [],
+              "args": [
+                {
+                  "type": "atom",
+                  "symbolTable": {
+                    "localSymbols": {}
+                  },
+                  "token": {
+                    "type": "ValueIdentifier",
+                    "offset": 20,
+                    "line": 1,
+                    "column": 5,
+                    "text": "condition2a"
+                  }
+                },
+                {
+                  "type": "block",
+                  "symbolTable": {
+                    "localSymbols": {}
+                  },
+                  "ideas": [
+                    {
+                      "type": "call",
+                      "func": {
+                        "type": "atom",
+                        "symbolTable": {
+                          "localSymbols": {}
+                        },
+                        "token": {
+                          "type": "ValueIdentifier",
+                          "offset": 37,
+                          "line": 2,
+                          "column": 4,
+                          "text": "if"
+                        }
+                      },
+                      "typeArgs": [],
+                      "args": [
+                        {
+                          "type": "atom",
+                          "symbolTable": {
+                            "localSymbols": {}
+                          },
+                          "token": {
+                            "type": "ValueIdentifier",
+                            "offset": 40,
+                            "line": 2,
+                            "column": 7,
+                            "text": "condition3"
+                          }
+                        },
+                        {
+                          "type": "block",
+                          "symbolTable": {
+                            "localSymbols": {}
+                          },
+                          "ideas": [
+                            {
+                              "type": "call",
+                              "func": {
+                                "type": "atom",
+                                "symbolTable": {
+                                  "localSymbols": {}
+                                },
+                                "token": {
+                                  "type": "ValueIdentifier",
+                                  "offset": 58,
+                                  "line": 3,
+                                  "column": 6,
+                                  "text": "do3"
+                                }
+                              },
+                              "typeArgs": [],
+                              "args": [],
+                              "firstToken": {
+                                "type": "ValueIdentifier",
+                                "offset": 58,
+                                "line": 3,
+                                "column": 6,
+                                "text": "do3"
+                              },
+                              "lastToken": {
+                                "type": "ValueIdentifier",
+                                "offset": 58,
+                                "line": 3,
+                                "column": 6,
+                                "text": "do3"
+                              }
+                            }
+                          ],
+                          "returnStyle": "implicitExport",
+                          "firstToken": {
+                            "type": "StartBlock",
+                            "offset": 50,
+                            "line": 2,
+                            "column": 17,
+                            "text": "
+      "
+                          },
+                          "lastToken": {
+                            "type": "EndBlock",
+                            "offset": 61,
+                            "line": 3,
+                            "column": 9,
+                            "text": ""
+                          }
+                        }
+                      ],
+                      "firstToken": {
+                        "type": "ValueIdentifier",
+                        "offset": 37,
+                        "line": 2,
+                        "column": 4,
+                        "text": "if"
+                      },
+                      "lastToken": {
+                        "type": "EndBlock",
+                        "offset": 61,
+                        "line": 3,
+                        "column": 9,
+                        "text": ""
+                      }
+                    }
+                  ],
+                  "returnStyle": "implicitExport",
+                  "firstToken": {
+                    "type": "StartBlock",
+                    "offset": 31,
+                    "line": 1,
+                    "column": 16,
+                    "text": "
+    "
+                  },
+                  "lastToken": {
+                    "type": "EndBlock",
+                    "offset": 61,
+                    "line": 3,
+                    "column": 9,
+                    "text": ""
+                  }
+                }
+              ],
+              "firstToken": {
+                "type": "ValueIdentifier",
+                "offset": 17,
+                "line": 1,
+                "column": 2,
+                "text": "if"
+              },
+              "lastToken": {
+                "type": "EndBlock",
+                "offset": 61,
+                "line": 3,
+                "column": 9,
+                "text": ""
+              }
+            },
+            {
+              "type": "call",
+              "func": {
+                "type": "atom",
+                "symbolTable": {
+                  "localSymbols": {}
+                },
+                "token": {
+                  "type": "ValueIdentifier",
+                  "offset": 65,
+                  "line": 4,
+                  "column": 2,
+                  "text": "if"
+                }
+              },
+              "typeArgs": [],
+              "args": [
+                {
+                  "type": "atom",
+                  "symbolTable": {
+                    "localSymbols": {}
+                  },
+                  "token": {
+                    "type": "ValueIdentifier",
+                    "offset": 68,
+                    "line": 4,
+                    "column": 5,
+                    "text": "condition2b"
+                  }
+                },
+                {
+                  "type": "block",
+                  "symbolTable": {
+                    "localSymbols": {}
+                  },
+                  "ideas": [
+                    {
+                      "type": "call",
+                      "func": {
+                        "type": "atom",
+                        "symbolTable": {
+                          "localSymbols": {}
+                        },
+                        "toke ... (length: 11028)

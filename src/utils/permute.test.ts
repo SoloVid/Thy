@@ -1,5 +1,5 @@
 import assert from "assert"
-import { test } from "under-the-sun"
+import { test } from "test-framework"
 import { permute } from "./permute"
 
 test("permute()", async () => {

@@ -1,5 +1,5 @@
 import { expect } from "expect"
-import { defineTestGroup } from "under-the-sun"
+import { defineTestGroup } from "test-framework"
 import { makeTokenizer } from "."
 import type { CompileError } from "../compile-error"
 import { readExampleFile } from "../example"

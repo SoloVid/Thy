@@ -1,5 +1,5 @@
 import assert from "assert"
-import { test } from "under-the-sun"
+import { test } from "test-framework"
 import { castBuiltin } from "./cast"
 
 test("cast() should return input value", async () => {

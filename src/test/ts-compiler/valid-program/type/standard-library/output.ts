@@ -1,11 +1,11 @@
-const booleanFunc = (p: boolean) => {}
-const numberFunc = (p: number) => {}
-const stringFunc = (p: string) => {}
-const unknownFunc = (p: unknown) => {}
-const voidFunc = (p: undefined) => {}
+export const booleanFunc = (p: boolean) => {}
+export const numberFunc = (p: number) => {}
+export const stringFunc = (p: string) => {}
+export const unknownFunc = (p: unknown) => {}
+export const voidFunc = (p: undefined) => {}
 
-const BasicUnion = undefined as unknown as string | number
-const UnionWithValue = undefined as unknown as string | typeof unknownFunc
+export const BasicUnion = undefined as unknown as string | number
+export const UnionWithValue = undefined as unknown as string | typeof unknownFunc
 function _NonTrivialUnion_WrappedValue() {
   return <_A, _B>(_a: _A, _b: _B) => undefined as unknown as _A | _B
 }
@@ -26,6 +26,6 @@ function _NonTrivialUnion_Call() {
     ...([] as unknown[] as _NonTrivialUnion_RestParams),
   )
 }
-const NonTrivialUnion = undefined as unknown as ReturnType<
+export const NonTrivialUnion = undefined as unknown as ReturnType<
   typeof _NonTrivialUnion_Call
 >

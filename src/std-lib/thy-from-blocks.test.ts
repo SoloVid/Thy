@@ -1,5 +1,5 @@
 import assert from "assert"
-import { defineTestGroup } from "under-the-sun"
+import { defineTestGroup } from "test-framework"
 import { assertType } from "../utils/assert"
 import { permute } from "../utils/permute"
 import type { DebugNever } from "../utils/utility-types"

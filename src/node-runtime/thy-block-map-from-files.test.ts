@@ -1,5 +1,5 @@
 import assert from "node:assert"
-import { defineTestGroup } from "under-the-sun"
+import { defineTestGroup } from "test-framework"
 import { testFileA, testFileB, testFileBar, testFileBaz } from "./test-files"
 import { makeThyBlockMapFromFiles } from "./thy-block-map-from-files"
 

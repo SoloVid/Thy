@@ -1,5 +1,5 @@
 import assert from "assert"
-import { defineTestGroup } from "under-the-sun"
+import { defineTestGroup } from "test-framework"
 import { core } from "../std-lib/core"
 import { testFileA, testFileB, testFileBar, testFileBaz } from "./test-files"
 import { makeThyFromFiles } from "./thy-from-files"

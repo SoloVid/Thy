@@ -1,5 +1,5 @@
 import assert from "node:assert"
-import { test } from "under-the-sun"
+import { test } from "test-framework"
 import { extractIndent, getFirstIndent } from "./indentation"
 
 test("extractIndent() should return line indent characters", async () => {

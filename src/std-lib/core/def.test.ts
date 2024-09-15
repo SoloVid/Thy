@@ -1,5 +1,5 @@
 import assert from "assert"
-import { test } from "under-the-sun"
+import { test } from "test-framework"
 import { defBuiltin } from "./def"
 
 test("def() should return input value", async () => {

@@ -1,4 +1,4 @@
-const condition = true
+export const condition = true
 if (condition) {
   console.log("yay" as const)
 }
@@ -9,7 +9,7 @@ if (condition) {
   console.log("no" as const)
 }
 
-const callback = () => {
+export const callback = () => {
   console.log("yay" as const)
 }
 
@@ -19,7 +19,7 @@ if (condition) {
 } else {
   callback()
 }
-const captured = condition ? callback() : callback()
+export const captured = condition ? callback() : callback()
 
 if (condition) {
   callback()

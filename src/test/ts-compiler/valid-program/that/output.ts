@@ -1,6 +1,6 @@
 console.log((1 + 1) / (1 * 1) === 1)
 
-const makeFunctionFunction = (a: number) => {
+export const makeFunctionFunction = (a: number) => {
   return (b: number) => {
     return (c: number) => {
       return a < b && b < c
@@ -9,4 +9,4 @@ const makeFunctionFunction = (a: number) => {
 }
 
 // Calling that: const result = makeFunctionFunction(1)(2)(3)
-const result = makeFunctionFunction(1 as const)(2 as const)(3 as const)
+export const result = makeFunctionFunction(1 as const)(2 as const)(3 as const)
