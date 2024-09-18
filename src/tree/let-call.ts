@@ -6,5 +6,5 @@ import type { TokenRange } from "./token-range"
 export interface LetCall extends TokenRange {
   type: "let-call"
   letToken: SaferToken<typeof tLet>
-  call: Call
+  call: Call | null
 }

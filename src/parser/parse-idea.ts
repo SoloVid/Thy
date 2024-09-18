@@ -50,6 +50,7 @@ export function parseIdea(state: ParserState): Idea {
 export function isIdeaAsync(idea: Idea) {
   return (
     idea.type === "await-call" ||
-    (idea.type === "assignment" && idea.call.type === "await-call")
+    (idea.type === "assignment" && idea.call.type === "await-call") ||
+    (idea.type === "let-call" && idea.call?.type === "await-call")
   )
 }
