@@ -16,7 +16,7 @@ testParser(
               text: "private",
             },
             variable: {
-              type: "atom",
+              type: "value-identifier",
               token: {
                 type: "ValueIdentifier",
                 text: "a",
@@ -27,9 +27,9 @@ testParser(
               text: "is",
             },
             call: {
-              type: "call",
+              type: "value-call",
               func: {
-                type: "atom",
+                type: "value-identifier",
                 token: {
                   type: "ValueIdentifier",
                   text: "def",
@@ -37,11 +37,7 @@ testParser(
               },
               args: [
                 {
-                  type: "atom",
-                  token: {
-                    type: "StringLiteral",
-                    text: '"A"',
-                  },
+                  type: "string-literal",
                 },
               ],
             },
@@ -50,7 +46,7 @@ testParser(
             type: "assignment",
             modifier: null,
             variable: {
-              type: "atom",
+              type: "value-identifier",
               token: {
                 type: "ValueIdentifier",
                 text: "b",
@@ -61,9 +57,9 @@ testParser(
               text: "is",
             },
             call: {
-              type: "call",
+              type: "value-call",
               func: {
-                type: "atom",
+                type: "value-identifier",
                 token: {
                   type: "ValueIdentifier",
                   text: "def",
@@ -71,7 +67,7 @@ testParser(
               },
               args: [
                 {
-                  type: "atom",
+                  type: "number-literal",
                   token: {
                     type: "NumberLiteral",
                     text: "2",
@@ -79,6 +75,9 @@ testParser(
                 },
               ],
             },
+          },
+          {
+            type: "blank-line",
           },
         ],
         returnStyle: returnStyle.implicitExport,

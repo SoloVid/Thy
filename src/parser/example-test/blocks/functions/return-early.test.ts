@@ -14,9 +14,9 @@ testParser(
             text: "let",
           },
           call: {
-            type: "call",
+            type: "value-call",
             func: {
-              type: "atom",
+              type: "value-identifier",
               token: {
                 type: "ValueIdentifier",
                 text: "if",
@@ -24,7 +24,7 @@ testParser(
             },
             args: [
               {
-                type: "atom",
+                type: "value-identifier",
                 token: {
                   type: "ValueIdentifier",
                   text: "someEarlyReturnCondition",
@@ -34,17 +34,17 @@ testParser(
                 type: "block",
                 ideas: [
                   {
-                    type: "call",
+                    type: "return",
                     func: {
-                      type: "atom",
+                      type: "return-atom",
                       token: {
-                        type: "ValueIdentifier",
+                        type: "Return",
                         text: "return",
                       },
                     },
                     args: [
                       {
-                        type: "atom",
+                        type: "value-identifier",
                         token: {
                           type: "ValueIdentifier",
                           text: "someEarlyValue",
@@ -59,30 +59,33 @@ testParser(
           },
         },
         {
-          type: "non-code",
+          type: "comment",
           token: {
             type: "Comment",
             text: "Do the heavy lifting logic down here.",
           },
         },
         {
-          type: "call",
+          type: "return",
           func: {
-            type: "atom",
+            type: "return-atom",
             token: {
-              type: "ValueIdentifier",
+              type: "Return",
               text: "return",
             },
           },
           args: [
             {
-              type: "atom",
+              type: "value-identifier",
               token: {
                 type: "ValueIdentifier",
                 text: "fullValue",
               },
             },
           ],
+        },
+        {
+          type: "blank-line",
         },
       ],
       returnStyle: returnStyle.explicitReturn,

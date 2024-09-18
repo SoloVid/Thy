@@ -6,16 +6,16 @@ testParser("should parse Hello World", async () => {
     type: "block",
     ideas: [
       {
-        type: "non-code",
+        type: "comment",
         token: {
           type: "Comment",
           text: 'The next line prints "himom"',
         },
       },
       {
-        type: "call",
+        type: "value-call",
         func: {
-          type: "atom",
+          type: "value-identifier",
           token: {
             type: "ValueIdentifier",
             text: "print",
@@ -23,13 +23,21 @@ testParser("should parse Hello World", async () => {
         },
         args: [
           {
-            type: "atom",
-            token: {
-              type: "StringLiteral",
-              text: `"himom"`,
-            },
+            type: "string-literal",
+            parts: [
+              {
+                type: "string-content",
+                token: {
+                  type: "StringText",
+                  text: `himom`,
+                },
+              },
+            ],
           },
         ],
+      },
+      {
+        type: "blank-line",
       },
     ],
     returnStyle: returnStyle.implicitExport,

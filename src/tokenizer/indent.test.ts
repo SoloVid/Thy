@@ -46,6 +46,49 @@ testTokenizer("should tokenize indented blocks", () => {
   ])
 })
 
+testTokenizer("should tokenize outdents before extraneous new lines", () => {
+  const source = `if condition1
+  if condition2a
+    if condition3
+      do3
+
+
+  if condition2b
+    do2b
+
+`
+  checkSourceTokens(source, [
+    [tValueIdentifier, "if"],
+    tValueIdentifier,
+    tStartBlock,
+    [tValueIdentifier, "if"],
+    tValueIdentifier,
+    tStartBlock,
+    [tValueIdentifier, "if"],
+    tValueIdentifier,
+    tStartBlock,
+    [tValueIdentifier, "do3"],
+    tStatementTerminator,
+    tEndBlock,
+    tStatementTerminator,
+    tEndBlock,
+    tStatementTerminator,
+    tStatementTerminator,
+    tStatementTerminator,
+    [tValueIdentifier, "if"],
+    tValueIdentifier,
+    tStartBlock,
+    [tValueIdentifier, "do2b"],
+    tStatementTerminator,
+    tEndBlock,
+    tStatementTerminator,
+    tEndBlock,
+    tStatementTerminator,
+    tStatementTerminator,
+    tStatementTerminator,
+  ])
+})
+
 testTokenizer("should error on bad outdent but gracefully recover", () => {
   const source = `if condition1
   if condition2
@@ -86,10 +129,10 @@ testTokenizer("should error on bad outdent but gracefully recover", () => {
     [tStartBlock, expect.anything()],
     [tValueIdentifier, "print5"],
     [tStatementTerminator, expect.anything()],
-    [tStatementTerminator, expect.anything()],
     [tEndBlock, expect.anything()],
     [tStatementTerminator, expect.anything()],
     [tEndBlock, expect.anything()],
+    [tStatementTerminator, expect.anything()],
     [tStatementTerminator, expect.anything()],
   ])
   expect(errors).toEqual([

@@ -10,37 +10,40 @@ testParser(
           type: "assignment",
           modifier: null,
           variable: {
-            type: "atom",
+            type: "value-identifier",
             token: { text: "x" },
           },
           operator: { text: "be" },
           call: {
-            type: "call",
+            type: "value-call",
           },
         },
         {
           type: "assignment",
           modifier: null,
           variable: {
-            type: "atom",
+            type: "value-identifier",
             token: { text: "x" },
           },
           operator: { text: "to" },
           call: {
-            type: "call",
+            type: "value-call",
           },
         },
         {
           type: "assignment",
           modifier: null,
           variable: {
-            type: "atom",
+            type: "value-identifier",
             token: { text: "x" },
           },
           operator: { text: "to" },
           call: {
-            type: "call",
+            type: "value-call",
           },
+        },
+        {
+          type: "blank-line",
         },
       ],
     })

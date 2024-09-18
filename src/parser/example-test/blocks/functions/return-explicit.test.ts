@@ -8,42 +8,45 @@ testParser(
       type: "block",
       ideas: [
         {
-          type: "non-code",
+          type: "comment",
           token: {
             type: "Comment",
           },
         },
         {
-          type: "non-code",
+          type: "comment",
           token: {
             type: "Comment",
           },
         },
         {
-          type: "non-code",
+          type: "comment",
           token: {
             type: "Comment",
           },
         },
         {
-          type: "call",
+          type: "return",
           func: {
-            type: "atom",
+            type: "return-atom",
             token: {
-              type: "ValueIdentifier",
+              type: "Return",
               text: "return",
             },
           },
           typeArgs: [],
           args: [
             {
-              type: "atom",
+              type: "number-literal",
               token: {
                 type: "NumberLiteral",
                 text: "4",
               },
             },
           ],
+        },
+        {
+          type: "blank-line",
         },
       ],
       returnStyle: returnStyle.explicitReturn,

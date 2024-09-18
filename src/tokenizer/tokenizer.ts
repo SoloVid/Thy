@@ -73,7 +73,7 @@ export function makeGenericTokenizer(
     if (delegatedTokenizer) {
       debug(() => ["delegating to nested tokenizer..."])
       const token = delegatedTokenizer.getNextToken()
-      if (token !== null) {
+      if (token.type !== tEndStream) {
         return token
       } else {
         delegatedTokenizer = null

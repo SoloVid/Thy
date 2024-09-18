@@ -6,16 +6,16 @@ testParser("should parse example program blocks/nested.thy", async () => {
     type: "block",
     ideas: [
       {
-        type: "call",
+        type: "value-call",
         func: {
-          type: "atom",
+          type: "value-identifier",
           token: {
             text: "if",
           },
         },
         args: [
           {
-            type: "atom",
+            type: "value-identifier",
             token: {
               text: "condition1",
             },
@@ -24,16 +24,16 @@ testParser("should parse example program blocks/nested.thy", async () => {
             type: "block",
             ideas: [
               {
-                type: "call",
+                type: "value-call",
                 func: {
-                  type: "atom",
+                  type: "value-identifier",
                   token: {
                     text: "if",
                   },
                 },
                 args: [
                   {
-                    type: "atom",
+                    type: "value-identifier",
                     token: {
                       text: "condition2a",
                     },
@@ -42,16 +42,16 @@ testParser("should parse example program blocks/nested.thy", async () => {
                     type: "block",
                     ideas: [
                       {
-                        type: "call",
+                        type: "value-call",
                         func: {
-                          type: "atom",
+                          type: "value-identifier",
                           token: {
                             text: "if",
                           },
                         },
                         args: [
                           {
-                            type: "atom",
+                            type: "value-identifier",
                             token: {
                               text: "condition3",
                             },
@@ -60,9 +60,9 @@ testParser("should parse example program blocks/nested.thy", async () => {
                             type: "block",
                             ideas: [
                               {
-                                type: "call",
+                                type: "value-call",
                                 func: {
-                                  type: "atom",
+                                  type: "value-identifier",
                                   token: {
                                     text: "do3",
                                   },
@@ -80,16 +80,16 @@ testParser("should parse example program blocks/nested.thy", async () => {
                 ],
               },
               {
-                type: "call",
+                type: "value-call",
                 func: {
-                  type: "atom",
+                  type: "value-identifier",
                   token: {
                     text: "if",
                   },
                 },
                 args: [
                   {
-                    type: "atom",
+                    type: "value-identifier",
                     token: {
                       text: "condition2b",
                     },
@@ -98,9 +98,9 @@ testParser("should parse example program blocks/nested.thy", async () => {
                     type: "block",
                     ideas: [
                       {
-                        type: "call",
+                        type: "value-call",
                         func: {
-                          type: "atom",
+                          type: "value-identifier",
                           token: {
                             text: "do2b",
                           },
@@ -116,6 +116,9 @@ testParser("should parse example program blocks/nested.thy", async () => {
             returnStyle: returnStyle.implicitExport,
           },
         ],
+      },
+      {
+        type: "blank-line",
       },
     ],
     returnStyle: returnStyle.implicitExport,

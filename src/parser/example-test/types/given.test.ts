@@ -9,7 +9,7 @@ testParser("should parse example program types/given.thy", async () => {
         type: "assignment",
         modifier: null,
         variable: {
-          type: "atom",
+          type: "value-identifier",
           token: {
             type: "ValueIdentifier",
             text: "doSomeMath",
@@ -20,9 +20,9 @@ testParser("should parse example program types/given.thy", async () => {
           text: "is",
         },
         call: {
-          type: "call",
+          type: "value-call",
           func: {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "def",
@@ -37,7 +37,7 @@ testParser("should parse example program types/given.thy", async () => {
                   type: "assignment",
                   modifier: null,
                   variable: {
-                    type: "atom",
+                    type: "value-identifier",
                     token: {
                       type: "ValueIdentifier",
                       text: "a",
@@ -48,17 +48,17 @@ testParser("should parse example program types/given.thy", async () => {
                     text: "is",
                   },
                   call: {
-                    type: "call",
+                    type: "given-call",
                     func: {
-                      type: "atom",
+                      type: "given-atom",
                       token: {
-                        type: "ValueIdentifier",
+                        type: "Given",
                         text: "given",
                       },
                     },
                     typeArgs: [
                       {
-                        type: "atom",
+                        type: "type-identifier",
                         token: {
                           type: "TypeIdentifier",
                           text: "Number",
@@ -72,7 +72,7 @@ testParser("should parse example program types/given.thy", async () => {
                   type: "assignment",
                   modifier: null,
                   variable: {
-                    type: "atom",
+                    type: "value-identifier",
                     token: {
                       type: "ValueIdentifier",
                       text: "b",
@@ -83,17 +83,17 @@ testParser("should parse example program types/given.thy", async () => {
                     text: "is",
                   },
                   call: {
-                    type: "call",
+                    type: "given-call",
                     func: {
-                      type: "atom",
+                      type: "given-atom",
                       token: {
-                        type: "ValueIdentifier",
+                        type: "Given",
                         text: "given",
                       },
                     },
                     typeArgs: [
                       {
-                        type: "atom",
+                        type: "type-identifier",
                         token: {
                           type: "TypeIdentifier",
                           text: "Number",
@@ -108,6 +108,9 @@ testParser("should parse example program types/given.thy", async () => {
             },
           ],
         },
+      },
+      {
+        type: "blank-line",
       },
     ],
     returnStyle: returnStyle.implicitExport,

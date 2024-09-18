@@ -4,7 +4,7 @@ import { makeTokenizer } from "."
 import type { CompileError } from "../compile-error"
 import { readExampleFile } from "../example"
 import type { Token } from "./token"
-import type { TokenType } from "./token-type"
+import { tEndStream, type TokenType } from "./token-type"
 
 export const testTokenizer = defineTestGroup("tokenizer ")
 
@@ -55,12 +55,12 @@ export function tokenizeSource(source: string) {
   const outputs: Token[] = []
   for (let i = 0; i < maxTestN; i++) {
     const nextToken = tokenizer.getNextToken()
-    if (nextToken === null) {
+    if (nextToken.type === tEndStream) {
       break
     }
     outputs.push(nextToken)
   }
-  expect(tokenizer.getNextToken()).toBeNull()
+  expect(tokenizer.getNextToken()).toMatchObject({ type: tEndStream })
   return {
     errors,
     outputs,

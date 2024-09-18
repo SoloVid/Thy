@@ -6,9 +6,9 @@ testParser("should parse example program numbers/literals.thy", async () => {
     type: "block",
     ideas: [
       {
-        type: "call",
+        type: "value-call",
         func: {
-          type: "atom",
+          type: "value-identifier",
           token: {
             type: "ValueIdentifier",
             text: "crunchSomeNumbers",
@@ -17,27 +17,30 @@ testParser("should parse example program numbers/literals.thy", async () => {
         typeArgs: [],
         args: [
           {
-            type: "atom",
+            type: "number-literal",
             token: {
               type: "NumberLiteral",
               text: "1",
             },
           },
           {
-            type: "atom",
+            type: "number-literal",
             token: {
               type: "NumberLiteral",
               text: "-3.14",
             },
           },
           {
-            type: "atom",
+            type: "number-literal",
             token: {
               type: "NumberLiteral",
               text: "9999999999.000000000001",
             },
           },
         ],
+      },
+      {
+        type: "blank-line",
       },
     ],
     returnStyle: returnStyle.implicitExport,

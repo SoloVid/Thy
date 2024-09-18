@@ -6,7 +6,7 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
     type: "block",
     ideas: [
       {
-        type: "non-code",
+        type: "comment",
         token: {
           type: "Comment",
           text: "The first parameter is `a`.",
@@ -16,7 +16,7 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
         type: "assignment",
         modifier: null,
         variable: {
-          type: "atom",
+          type: "value-identifier",
           token: {
             type: "ValueIdentifier",
             text: "a",
@@ -29,7 +29,7 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
         call: {
           type: "given-call",
           func: {
-            type: "atom",
+            type: "given-atom",
             token: {
               type: "Given",
               text: "given",
@@ -39,7 +39,7 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
         },
       },
       {
-        type: "non-code",
+        type: "comment",
         token: {
           type: "Comment",
           text: "The second parameter is `b`.",
@@ -49,7 +49,7 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
         type: "assignment",
         modifier: null,
         variable: {
-          type: "atom",
+          type: "value-identifier",
           token: {
             type: "ValueIdentifier",
             text: "b",
@@ -62,7 +62,7 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
         call: {
           type: "given-call",
           func: {
-            type: "atom",
+            type: "given-atom",
             token: {
               type: "Given",
               text: "given",
@@ -78,7 +78,7 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
         type: "assignment",
         modifier: null,
         variable: {
-          type: "atom",
+          type: "value-identifier",
           token: {
             type: "ValueIdentifier",
             text: "someValue",
@@ -89,9 +89,9 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
           text: "is",
         },
         call: {
-          type: "call",
+          type: "value-call",
           func: {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "doSomeStuff",
@@ -99,14 +99,14 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
           },
           args: [
             {
-              type: "atom",
+              type: "value-identifier",
               token: {
                 type: "ValueIdentifier",
                 text: "a",
               },
             },
             {
-              type: "atom",
+              type: "value-identifier",
               token: {
                 type: "ValueIdentifier",
                 text: "b",
@@ -119,9 +119,9 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
         type: "blank-line",
       },
       {
-        type: "return-call",
+        type: "return",
         func: {
-          type: "atom",
+          type: "return-atom",
           token: {
             type: "Return",
             text: "return",
@@ -130,13 +130,16 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
         typeArgs: [],
         args: [
           {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "someValue",
             },
           },
         ],
+      },
+      {
+        type: "blank-line",
       },
     ],
     returnStyle: returnStyle.explicitReturn,

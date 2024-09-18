@@ -6,16 +6,16 @@ testParser("should parse example program blocks/simple.thy", async () => {
     type: "block",
     ideas: [
       {
-        type: "call",
+        type: "value-call",
         func: {
-          type: "atom",
+          type: "value-identifier",
           token: {
             text: "if",
           },
         },
         args: [
           {
-            type: "atom",
+            type: "value-identifier",
             token: {
               text: "someCondition",
             },
@@ -24,9 +24,9 @@ testParser("should parse example program blocks/simple.thy", async () => {
             type: "block",
             ideas: [
               {
-                type: "call",
+                type: "value-call",
                 func: {
-                  type: "atom",
+                  type: "value-identifier",
                   token: {
                     text: "doOneThing",
                   },
@@ -34,9 +34,9 @@ testParser("should parse example program blocks/simple.thy", async () => {
                 args: [],
               },
               {
-                type: "call",
+                type: "value-call",
                 func: {
-                  type: "atom",
+                  type: "value-identifier",
                   token: {
                     text: "doAnother",
                   },
@@ -49,14 +49,17 @@ testParser("should parse example program blocks/simple.thy", async () => {
         ],
       },
       {
-        type: "call",
+        type: "value-call",
         func: {
-          type: "atom",
+          type: "value-identifier",
           token: {
             text: "keepDoingMoreStuff",
           },
         },
         args: [],
+      },
+      {
+        type: "blank-line",
       },
     ],
     returnStyle: returnStyle.implicitExport,

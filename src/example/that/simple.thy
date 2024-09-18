@@ -1,5 +1,5 @@
 check.equal foo "A"
 check.equal bar 2
-check.all beforeThat that
+check.all that that
 if that
   doSomething

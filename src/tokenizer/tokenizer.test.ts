@@ -5,6 +5,7 @@ import {
   tStartString,
   tStatementTerminator,
   tStringText,
+  tTypeIdentifier,
   tValueIdentifier,
 } from "./token-type"
 
@@ -20,3 +21,18 @@ testTokenizer("should tokenize Hello World", async () => {
     tStatementTerminator,
   ])
 })
+
+testTokenizer(
+  "should tokenize example program types/arguments.thy",
+  async () => {
+    await checkExampleProgramTokens("types/arguments.thy", [
+      tValueIdentifier,
+      tTypeIdentifier,
+      tTypeIdentifier,
+      tValueIdentifier,
+      tValueIdentifier,
+      tStatementTerminator,
+      tStatementTerminator,
+    ])
+  },
+)

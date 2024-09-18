@@ -11,7 +11,7 @@ testParser(
           type: "assignment",
           modifier: null,
           variable: {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "myValue",
@@ -22,22 +22,22 @@ testParser(
             text: "is",
           },
           call: {
-            type: "call",
+            type: "value-call",
             func: {
               type: "block",
               ideas: [
                 {
-                  type: "call",
+                  type: "return",
                   func: {
-                    type: "atom",
+                    type: "return-atom",
                     token: {
-                      type: "ValueIdentifier",
+                      type: "Return",
                       text: "return",
                     },
                   },
                   args: [
                     {
-                      type: "atom",
+                      type: "number-literal",
                       token: {
                         type: "NumberLiteral",
                         text: "5",
@@ -50,6 +50,9 @@ testParser(
             },
             args: [],
           },
+        },
+        {
+          type: "blank-line",
         },
       ],
       returnStyle: returnStyle.implicitExport,

@@ -2,8 +2,14 @@ import type { SaferToken } from "tokenizer/token"
 import type { Expression } from "tree"
 import type { CallableExpression, TypeExpression } from "tree/expression"
 import assert from "utils/assert"
-import { tAwait, tGiven } from "../tokenizer/token-type"
-import type { AwaitCall, Call, GivenCall, ValueCall } from "../tree/call"
+import { tAwait, tGiven, tReturn } from "../tokenizer/token-type"
+import type {
+  AwaitCall,
+  Call,
+  GivenCall,
+  Return,
+  ValueCall,
+} from "../tree/call"
 import { addNodeError, addTokenError, nodeError } from "./error"
 import { getFirstToken } from "./helper"
 import { parseCallArgs } from "./parse-call-arguments"
@@ -155,6 +161,56 @@ function parseGivenCall(state: ParserState): GivenCall {
     typeArgs: validTypeArgs,
     args: validArgs,
     firstToken: givenToken,
+    lastToken: args.lastToken,
+  }
+}
+
+export function parseReturn(state: ParserState): Return {
+  const returnToken = state.buffer.consumeToken() as SaferToken<typeof tReturn>
+  assert(
+    returnToken.type === tReturn,
+    `parseReturn() should only be called if next token is "return"`,
+  )
+  const args = parseCallArgs(state)
+  const validTypeArgs =
+    args.typeArgs.length > 0
+      ? ([args.typeArgs[0] as TypeExpression] as const)
+      : ([] as const)
+  for (let i = 1; i < args.typeArgs.length; i++) {
+    state.addError(
+      nodeError(
+        args.typeArgs[i],
+        `"return" should not receive more than one type argument`,
+      ),
+    )
+  }
+  const validArgs =
+    args.valueArgs.length > 0
+      ? ([args.valueArgs[0] as Expression] as const)
+      : ([
+          addTokenError(
+            state,
+            returnToken,
+            `"return" should receive exactly one argument`,
+          ),
+        ] as const)
+  for (let i = 1; i < args.valueArgs.length; i++) {
+    state.addError(
+      nodeError(
+        args.valueArgs[i],
+        `"return" should not receive more than one argument`,
+      ),
+    )
+  }
+  return {
+    type: "return",
+    func: {
+      type: "return-atom",
+      token: returnToken,
+    },
+    typeArgs: validTypeArgs,
+    args: validArgs,
+    firstToken: returnToken,
     lastToken: args.lastToken,
   }
 }

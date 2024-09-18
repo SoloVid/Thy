@@ -10,29 +10,29 @@ testParser(
         type: "block",
         ideas: [
           {
-            type: "call",
+            type: "return",
             func: {
-              type: "atom",
+              type: "return-atom",
               token: {
-                type: "ValueIdentifier",
+                type: "Return",
                 text: "return",
               },
             },
             args: [
               {
-                type: "call",
+                type: "await-call",
                 func: {
-                  type: "atom",
+                  type: "await-atom",
                   token: {
-                    type: "ValueIdentifier",
+                    type: "Await",
                     text: "await",
                   },
                 },
                 args: [
                   {
-                    type: "call",
+                    type: "value-call",
                     func: {
-                      type: "atom",
+                      type: "value-identifier",
                       token: {
                         type: "ValueIdentifier",
                         text: "doSomethingLong",
@@ -44,8 +44,12 @@ testParser(
               },
             ],
           },
+          {
+            type: "blank-line",
+          },
         ],
-        returnStyle: returnStyle.asyncReturn,
+        returnStyle: returnStyle.explicitReturn,
+        isAsync: true,
       },
     )
   },

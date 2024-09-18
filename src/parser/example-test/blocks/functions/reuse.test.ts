@@ -11,7 +11,7 @@ testParser(
           type: "assignment",
           modifier: null,
           variable: {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "myFunction",
@@ -22,9 +22,9 @@ testParser(
             text: "is",
           },
           call: {
-            type: "call",
+            type: "value-call",
             func: {
-              type: "atom",
+              type: "value-identifier",
               token: {
                 type: "ValueIdentifier",
                 text: "def",
@@ -38,7 +38,7 @@ testParser(
                     type: "assignment",
                     modifier: null,
                     variable: {
-                      type: "atom",
+                      type: "value-identifier",
                       token: {
                         type: "ValueIdentifier",
                         text: "a",
@@ -49,11 +49,11 @@ testParser(
                       text: "is",
                     },
                     call: {
-                      type: "call",
+                      type: "given-call",
                       func: {
-                        type: "atom",
+                        type: "given-atom",
                         token: {
-                          type: "ValueIdentifier",
+                          type: "Given",
                           text: "given",
                         },
                       },
@@ -64,7 +64,7 @@ testParser(
                     type: "assignment",
                     modifier: null,
                     variable: {
-                      type: "atom",
+                      type: "value-identifier",
                       token: {
                         type: "ValueIdentifier",
                         text: "b",
@@ -75,11 +75,11 @@ testParser(
                       text: "is",
                     },
                     call: {
-                      type: "call",
+                      type: "given-call",
                       func: {
-                        type: "atom",
+                        type: "given-atom",
                         token: {
-                          type: "ValueIdentifier",
+                          type: "Given",
                           text: "given",
                         },
                       },
@@ -90,7 +90,7 @@ testParser(
                     type: "assignment",
                     modifier: null,
                     variable: {
-                      type: "atom",
+                      type: "value-identifier",
                       token: {
                         type: "ValueIdentifier",
                         text: "someValue",
@@ -101,9 +101,9 @@ testParser(
                       text: "is",
                     },
                     call: {
-                      type: "call",
+                      type: "value-call",
                       func: {
-                        type: "atom",
+                        type: "value-identifier",
                         token: {
                           type: "ValueIdentifier",
                           text: "doSomeStuff",
@@ -111,14 +111,14 @@ testParser(
                       },
                       args: [
                         {
-                          type: "atom",
+                          type: "value-identifier",
                           token: {
                             type: "ValueIdentifier",
                             text: "a",
                           },
                         },
                         {
-                          type: "atom",
+                          type: "value-identifier",
                           token: {
                             type: "ValueIdentifier",
                             text: "b",
@@ -128,17 +128,17 @@ testParser(
                     },
                   },
                   {
-                    type: "call",
+                    type: "return",
                     func: {
-                      type: "atom",
+                      type: "return-atom",
                       token: {
-                        type: "ValueIdentifier",
+                        type: "Return",
                         text: "return",
                       },
                     },
                     args: [
                       {
-                        type: "atom",
+                        type: "value-identifier",
                         token: {
                           type: "ValueIdentifier",
                           text: "someValue",
@@ -156,16 +156,16 @@ testParser(
           type: "blank-line",
         },
         {
-          type: "non-code",
+          type: "comment",
           token: {
             type: "Comment",
             text: "And later...",
           },
         },
         {
-          type: "call",
+          type: "value-call",
           func: {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "myFunction",
@@ -173,14 +173,14 @@ testParser(
           },
           args: [
             {
-              type: "atom",
+              type: "number-literal",
               token: {
                 type: "NumberLiteral",
                 text: "1",
               },
             },
             {
-              type: "atom",
+              type: "number-literal",
               token: {
                 type: "NumberLiteral",
                 text: "2",
@@ -188,6 +188,7 @@ testParser(
             },
           ],
         },
+        { type: "blank-line" },
       ],
       returnStyle: returnStyle.implicitExport,
     })

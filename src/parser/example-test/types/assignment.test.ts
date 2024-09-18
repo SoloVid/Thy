@@ -13,7 +13,7 @@ testParser("should parse example program types/assignment.thy", async () => {
           text: "type",
         },
         variable: {
-          type: "atom",
+          type: "type-identifier",
           token: {
             type: "TypeIdentifier",
             text: "MyNewType",
@@ -24,9 +24,9 @@ testParser("should parse example program types/assignment.thy", async () => {
           text: "is",
         },
         call: {
-          type: "call",
+          type: "value-call",
           func: {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "calculateSomeValue",
@@ -35,21 +35,21 @@ testParser("should parse example program types/assignment.thy", async () => {
           typeArgs: [],
           args: [
             {
-              type: "atom",
+              type: "number-literal",
               token: {
                 type: "NumberLiteral",
                 text: "1",
               },
             },
             {
-              type: "atom",
+              type: "number-literal",
               token: {
                 type: "NumberLiteral",
                 text: "2",
               },
             },
             {
-              type: "atom",
+              type: "number-literal",
               token: {
                 type: "NumberLiteral",
                 text: "3",
@@ -66,7 +66,7 @@ testParser("should parse example program types/assignment.thy", async () => {
           text: "type",
         },
         variable: {
-          type: "atom",
+          type: "type-identifier",
           token: {
             type: "TypeIdentifier",
             text: "MyNewType2",
@@ -79,7 +79,7 @@ testParser("should parse example program types/assignment.thy", async () => {
         call: {
           type: "type-call",
           func: {
-            type: "atom",
+            type: "type-identifier",
             token: {
               type: "TypeIdentifier",
               text: "Union",
@@ -87,21 +87,16 @@ testParser("should parse example program types/assignment.thy", async () => {
           },
           args: [
             {
-              type: "atom",
-              token: {
-                type: "StringLiteral",
-                text: '"a"',
-              },
+              type: "string-literal",
             },
             {
-              type: "atom",
-              token: {
-                type: "StringLiteral",
-                text: '"b"',
-              },
+              type: "string-literal",
             },
           ],
         },
+      },
+      {
+        type: "blank-line",
       },
     ],
     returnStyle: "implicitExport",

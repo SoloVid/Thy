@@ -8,9 +8,9 @@ testParser(
       type: "block",
       ideas: [
         {
-          type: "call",
+          type: "value-call",
           func: {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "switch",
@@ -18,7 +18,7 @@ testParser(
           },
           args: [
             {
-              type: "atom",
+              type: "value-identifier",
               token: {
                 type: "ValueIdentifier",
                 text: "myInput",
@@ -28,9 +28,9 @@ testParser(
               type: "block",
               ideas: [
                 {
-                  type: "call",
+                  type: "value-call",
                   func: {
-                    type: "atom",
+                    type: "value-identifier",
                     token: {
                       type: "ValueIdentifier",
                       text: "case",
@@ -38,19 +38,15 @@ testParser(
                   },
                   args: [
                     {
-                      type: "atom",
-                      token: {
-                        type: "StringLiteral",
-                        text: '"foo"',
-                      },
+                      type: "string-literal",
                     },
                     {
                       type: "block",
                       ideas: [
                         {
-                          type: "call",
+                          type: "value-call",
                           func: {
-                            type: "atom",
+                            type: "value-identifier",
                             token: {
                               type: "ValueIdentifier",
                               text: "doSomething",
@@ -64,9 +60,9 @@ testParser(
                   ],
                 },
                 {
-                  type: "call",
+                  type: "value-call",
                   func: {
-                    type: "atom",
+                    type: "value-identifier",
                     token: {
                       type: "ValueIdentifier",
                       text: "case",
@@ -74,19 +70,15 @@ testParser(
                   },
                   args: [
                     {
-                      type: "atom",
-                      token: {
-                        type: "StringLiteral",
-                        text: '"bar"',
-                      },
+                      type: "string-literal",
                     },
                     {
                       type: "block",
                       ideas: [
                         {
-                          type: "call",
+                          type: "value-call",
                           func: {
-                            type: "atom",
+                            type: "value-identifier",
                             token: {
                               type: "ValueIdentifier",
                               text: "doSomethingElse",
@@ -100,9 +92,9 @@ testParser(
                   ],
                 },
                 {
-                  type: "call",
+                  type: "value-call",
                   func: {
-                    type: "atom",
+                    type: "value-identifier",
                     token: {
                       type: "ValueIdentifier",
                       text: "default",
@@ -113,9 +105,9 @@ testParser(
                       type: "block",
                       ideas: [
                         {
-                          type: "call",
+                          type: "value-call",
                           func: {
-                            type: "atom",
+                            type: "value-identifier",
                             token: {
                               type: "ValueIdentifier",
                               text: "freakOut",
@@ -133,6 +125,7 @@ testParser(
             },
           ],
         },
+        { type: "blank-line" },
       ],
       returnStyle: returnStyle.implicitExport,
     })

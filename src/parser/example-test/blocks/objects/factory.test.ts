@@ -11,7 +11,7 @@ testParser(
           type: "assignment",
           modifier: null,
           variable: {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "makeMyThing",
@@ -22,9 +22,9 @@ testParser(
             text: "is",
           },
           call: {
-            type: "call",
+            type: "value-call",
             func: {
-              type: "atom",
+              type: "value-identifier",
               token: {
                 type: "ValueIdentifier",
                 text: "def",
@@ -38,7 +38,7 @@ testParser(
                     type: "assignment",
                     modifier: null,
                     variable: {
-                      type: "atom",
+                      type: "value-identifier",
                       token: {
                         type: "ValueIdentifier",
                         text: "propA",
@@ -49,9 +49,9 @@ testParser(
                       text: "is",
                     },
                     call: {
-                      type: "call",
+                      type: "value-call",
                       func: {
-                        type: "atom",
+                        type: "value-identifier",
                         token: {
                           type: "ValueIdentifier",
                           text: "def",
@@ -59,11 +59,16 @@ testParser(
                       },
                       args: [
                         {
-                          type: "atom",
-                          token: {
-                            type: "StringLiteral",
-                            text: '"A"',
-                          },
+                          type: "string-literal",
+                          parts: [
+                            {
+                              type: "string-content",
+                              token: {
+                                type: "StringText",
+                                text: "A",
+                              },
+                            },
+                          ],
                         },
                       ],
                     },
@@ -72,7 +77,7 @@ testParser(
                     type: "assignment",
                     modifier: null,
                     variable: {
-                      type: "atom",
+                      type: "value-identifier",
                       token: {
                         type: "ValueIdentifier",
                         text: "propB",
@@ -83,9 +88,9 @@ testParser(
                       text: "is",
                     },
                     call: {
-                      type: "call",
+                      type: "value-call",
                       func: {
-                        type: "atom",
+                        type: "value-identifier",
                         token: {
                           type: "ValueIdentifier",
                           text: "calculateSomething",
@@ -98,7 +103,7 @@ testParser(
                     type: "assignment",
                     modifier: null,
                     variable: {
-                      type: "atom",
+                      type: "value-identifier",
                       token: {
                         type: "ValueIdentifier",
                         text: "useMyStuff",
@@ -109,9 +114,9 @@ testParser(
                       text: "is",
                     },
                     call: {
-                      type: "call",
+                      type: "value-call",
                       func: {
-                        type: "atom",
+                        type: "value-identifier",
                         token: {
                           type: "ValueIdentifier",
                           text: "def",
@@ -122,9 +127,9 @@ testParser(
                           type: "block",
                           ideas: [
                             {
-                              type: "call",
+                              type: "value-call",
                               func: {
-                                type: "atom",
+                                type: "value-identifier",
                                 token: {
                                   type: "ValueIdentifier",
                                   text: "doSomethingCool",
@@ -132,7 +137,7 @@ testParser(
                               },
                               args: [
                                 {
-                                  type: "atom",
+                                  type: "value-identifier",
                                   token: {
                                     type: "ValueIdentifier",
                                     text: "propA",
@@ -141,9 +146,9 @@ testParser(
                               ],
                             },
                             {
-                              type: "call",
+                              type: "value-call",
                               func: {
-                                type: "atom",
+                                type: "value-identifier",
                                 token: {
                                   type: "ValueIdentifier",
                                   text: "doSomethingElse",
@@ -151,7 +156,7 @@ testParser(
                               },
                               args: [
                                 {
-                                  type: "atom",
+                                  type: "value-identifier",
                                   token: {
                                     type: "ValueIdentifier",
                                     text: "propB",
@@ -178,7 +183,7 @@ testParser(
           type: "assignment",
           modifier: null,
           variable: {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "myThing1",
@@ -189,9 +194,9 @@ testParser(
             text: "is",
           },
           call: {
-            type: "call",
+            type: "value-call",
             func: {
-              type: "atom",
+              type: "value-identifier",
               token: {
                 type: "ValueIdentifier",
                 text: "makeMyThing",
@@ -204,7 +209,7 @@ testParser(
           type: "assignment",
           modifier: null,
           variable: {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "myThing2",
@@ -215,9 +220,9 @@ testParser(
             text: "is",
           },
           call: {
-            type: "call",
+            type: "value-call",
             func: {
-              type: "atom",
+              type: "value-identifier",
               token: {
                 type: "ValueIdentifier",
                 text: "makeMyThing",
@@ -230,9 +235,9 @@ testParser(
           type: "blank-line",
         },
         {
-          type: "call",
+          type: "value-call",
           func: {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "print",
@@ -240,46 +245,57 @@ testParser(
           },
           args: [
             {
-              type: "property-access",
+              type: "value-property-access",
               base: {
-                type: "atom",
+                type: "value-identifier",
                 token: {
                   type: "ValueIdentifier",
                   text: "myThing1",
                 },
               },
-              memberAccessOperatorToken: {
-                type: "MemberAccessOperator",
-                text: ".",
-              },
-              property: {
-                type: "ValueIdentifier",
-                text: "propA",
-              },
+              propertyAccesses: [
+                {
+                  memberAccessOperatorToken: {
+                    type: "MemberAccessOperator",
+                    text: ".",
+                  },
+                  propertyToken: {
+                    type: "ValueIdentifier",
+                    text: "propA",
+                  },
+                },
+              ],
             },
           ],
         },
         {
-          type: "call",
+          type: "value-call",
           func: {
-            type: "property-access",
+            type: "value-property-access",
             base: {
-              type: "atom",
+              type: "value-identifier",
               token: {
                 type: "ValueIdentifier",
                 text: "myThing1",
               },
             },
-            memberAccessOperatorToken: {
-              type: "MemberAccessOperator",
-              text: ".",
-            },
-            property: {
-              type: "ValueIdentifier",
-              text: "useMyStuff",
-            },
+            propertyAccesses: [
+              {
+                memberAccessOperatorToken: {
+                  type: "MemberAccessOperator",
+                  text: ".",
+                },
+                propertyToken: {
+                  type: "ValueIdentifier",
+                  text: "useMyStuff",
+                },
+              },
+            ],
           },
           args: [],
+        },
+        {
+          type: "blank-line",
         },
       ],
       returnStyle: returnStyle.implicitExport,

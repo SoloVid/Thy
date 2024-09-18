@@ -121,7 +121,10 @@ export function makeMultiLineStringNewLineContentMatcher(
       // part of the multi-line string opener, not content.
       // We don't just consume the new-line as part of the start string token
       // because it is needed for the statement terminator matcher.
-      type: state.lastTokenType === tStartString ? skipToken : tStringText,
+      type:
+        state.lastTokenType === tStartString && !state.lastTokenSkipped
+          ? skipToken
+          : tStringText,
       text: result[0],
     }
   }

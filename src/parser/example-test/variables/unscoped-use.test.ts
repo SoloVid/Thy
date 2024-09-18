@@ -7,17 +7,20 @@ testParser(
       type: "block",
       ideas: [
         {
-          type: "call",
+          type: "value-call",
           func: {
-            type: "atom",
+            type: "value-identifier",
             token: {
               text: "foo",
             },
           },
           args: [
-            { type: "atom", token: { text: "a" } },
-            { type: "atom", token: { text: "b" } },
+            { type: "value-identifier", token: { text: "a" } },
+            { type: "value-identifier", token: { text: "b" } },
           ],
+        },
+        {
+          type: "blank-line",
         },
       ],
     })

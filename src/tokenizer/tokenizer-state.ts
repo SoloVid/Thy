@@ -10,6 +10,7 @@ export type TokenizerState = {
   readonly line: number
   readonly column: number
   readonly lastTokenType: TokenType | null
+  readonly lastTokenSkipped: boolean
   readonly hasMoreText: () => boolean
   readonly currentIndentWidth: number
 }
@@ -44,7 +45,12 @@ export function makeTokenizerState(source: string): TokenizerState {
   const me = {
     text: source,
     advance: (lastTokenType: TokenType | null, characters: number) => {
-      me.lastTokenType = lastTokenType
+      if (lastTokenType !== null) {
+        me.lastTokenType = lastTokenType
+        me.lastTokenSkipped = false
+      } else {
+        me.lastTokenSkipped = true
+      }
       me.offset += characters
       while (
         me.line + 1 < lineOffsets.length &&
@@ -59,6 +65,7 @@ export function makeTokenizerState(source: string): TokenizerState {
     line: 0,
     column: 0,
     lastTokenType: null as TokenType | null,
+    lastTokenSkipped: false,
     hasMoreText: () => me.offset < source.length,
     currentIndentWidth: calculateIndentWidth(0),
     lineOffsets: lineOffsets,

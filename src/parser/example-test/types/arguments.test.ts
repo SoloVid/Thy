@@ -6,9 +6,9 @@ testParser("should parse example program types/arguments.thy", async () => {
     type: "block",
     ideas: [
       {
-        type: "call",
+        type: "value-call",
         func: {
-          type: "atom",
+          type: "value-identifier",
           token: {
             type: "ValueIdentifier",
             text: "callSomeFunction",
@@ -16,14 +16,14 @@ testParser("should parse example program types/arguments.thy", async () => {
         },
         typeArgs: [
           {
-            type: "atom",
+            type: "type-identifier",
             token: {
               type: "TypeIdentifier",
               text: "TypeArg1",
             },
           },
           {
-            type: "atom",
+            type: "type-identifier",
             token: {
               type: "TypeIdentifier",
               text: "TypeArg2",
@@ -32,14 +32,14 @@ testParser("should parse example program types/arguments.thy", async () => {
         ],
         args: [
           {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "valueArg1",
             },
           },
           {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "valueArg2",
@@ -47,6 +47,7 @@ testParser("should parse example program types/arguments.thy", async () => {
           },
         ],
       },
+      { type: "blank-line" },
     ],
     returnStyle: returnStyle.implicitExport,
   })

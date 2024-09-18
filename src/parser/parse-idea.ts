@@ -4,6 +4,7 @@ import {
   tExport,
   tLet,
   tPrivate,
+  tReturn,
   tStatementTerminator,
   tType,
 } from "../tokenizer/token-type"
@@ -12,6 +13,7 @@ import {
   parseAssignmentOrCall,
   parseModifiedAssignment,
 } from "./parse-assignment-or-call"
+import { parseReturn } from "./parse-call"
 import { parseComment } from "./parse-comment"
 import { parseLetCall } from "./parse-let-call"
 import { parseTypeAssignment } from "./parse-type-assignment"
@@ -37,6 +39,9 @@ export function parseIdea(state: ParserState): Idea {
   }
   if (nextToken.type === tLet) {
     return parseLetCall(state)
+  }
+  if (nextToken.type === tReturn) {
+    return parseReturn(state)
   }
 
   return parseAssignmentOrCall(state, null)

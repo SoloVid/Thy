@@ -1,4 +1,5 @@
 import assert from "../utils/assert"
+import { debug } from "./debug"
 import { skipToken, TokenMatcher } from "./token-matcher"
 import {
   tEndBlock,
@@ -76,8 +77,9 @@ export function makeIndentMatchers(): IndentTokenizers {
     lastOutdentOffset = state.offset
 
     // const regex = /(?<=\n)( *(?=[^ \r\n]))/y
-    const regex = /\r?\n([ \r\n]*(?=[^ \r\n]))/y
+    const regex = /\r?\n([ \r\n]*(?=[^ \r\n]|$))/y
     regex.lastIndex = state.offset
+    debug(() => ["matching:", regex])
     const match = regex.exec(state.text)
     if (match === null) {
       return null

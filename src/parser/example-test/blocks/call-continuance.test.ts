@@ -8,9 +8,9 @@ testParser(
       type: "block",
       ideas: [
         {
-          type: "call",
+          type: "value-call",
           func: {
-            type: "atom",
+            type: "value-identifier",
             token: {
               type: "ValueIdentifier",
               text: "if",
@@ -18,7 +18,7 @@ testParser(
           },
           args: [
             {
-              type: "atom",
+              type: "value-identifier",
               token: {
                 type: "ValueIdentifier",
                 text: "someCondition",
@@ -28,9 +28,9 @@ testParser(
               type: "block",
               ideas: [
                 {
-                  type: "call",
+                  type: "value-call",
                   func: {
-                    type: "atom",
+                    type: "value-identifier",
                     token: {
                       type: "ValueIdentifier",
                       text: "doIfTrue",
@@ -43,7 +43,7 @@ testParser(
               returnStyle: returnStyle.implicitExport,
             },
             {
-              type: "atom",
+              type: "value-identifier",
               token: {
                 type: "ValueIdentifier",
                 text: "else",
@@ -53,9 +53,9 @@ testParser(
               type: "block",
               ideas: [
                 {
-                  type: "call",
+                  type: "value-call",
                   func: {
-                    type: "atom",
+                    type: "value-identifier",
                     token: {
                       type: "ValueIdentifier",
                       text: "doIfFalse",
@@ -67,6 +67,9 @@ testParser(
               returnStyle: returnStyle.implicitExport,
             },
           ],
+        },
+        {
+          type: "blank-line",
         },
       ],
       returnStyle: returnStyle.implicitExport,

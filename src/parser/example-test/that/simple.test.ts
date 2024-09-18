@@ -6,103 +6,124 @@ testParser("should parse example program that/simple.thy", async () => {
     type: "block",
     ideas: [
       {
-        type: "call",
+        type: "value-call",
         func: {
-          type: "atom",
+          type: "value-identifier",
           token: {
             type: "ValueIdentifier",
             text: "if",
           },
         },
+        typeArgs: [],
         args: [
           {
-            type: "call",
+            type: "value-call",
             func: {
-              type: "property-access",
+              type: "value-property-access",
               base: {
-                type: "atom",
+                type: "value-identifier",
                 token: {
                   type: "ValueIdentifier",
                   text: "check",
                 },
               },
-              memberAccessOperatorToken: {
-                type: "MemberAccessOperator",
-                text: ".",
-              },
-              property: {
-                type: "ValueIdentifier",
-                text: "all",
-              },
+              propertyAccesses: [
+                {
+                  memberAccessOperatorToken: {
+                    type: "MemberAccessOperator",
+                    text: ".",
+                  },
+                  propertyToken: {
+                    type: "ValueIdentifier",
+                    text: "all",
+                  },
+                },
+              ],
             },
+            typeArgs: [],
             args: [
               {
-                type: "call",
+                type: "value-call",
                 func: {
-                  type: "property-access",
+                  type: "value-property-access",
                   base: {
-                    type: "atom",
+                    type: "value-identifier",
                     token: {
                       type: "ValueIdentifier",
                       text: "check",
                     },
                   },
-                  memberAccessOperatorToken: {
-                    type: "MemberAccessOperator",
-                    text: ".",
-                  },
-                  property: {
-                    type: "ValueIdentifier",
-                    text: "equal",
-                  },
+                  propertyAccesses: [
+                    {
+                      memberAccessOperatorToken: {
+                        type: "MemberAccessOperator",
+                        text: ".",
+                      },
+                      propertyToken: {
+                        type: "ValueIdentifier",
+                        text: "equal",
+                      },
+                    },
+                  ],
                 },
+                typeArgs: [],
                 args: [
                   {
-                    type: "atom",
+                    type: "value-identifier",
                     token: {
                       type: "ValueIdentifier",
                       text: "foo",
                     },
                   },
                   {
-                    type: "atom",
-                    token: {
-                      type: "StringLiteral",
-                      text: '"A"',
-                    },
+                    type: "string-literal",
+                    parts: [
+                      {
+                        type: "string-content",
+                        token: {
+                          type: "StringText",
+                          text: "A",
+                        },
+                      },
+                    ],
                   },
                 ],
               },
               {
-                type: "call",
+                type: "value-call",
                 func: {
-                  type: "property-access",
+                  type: "value-property-access",
                   base: {
-                    type: "atom",
+                    type: "value-identifier",
                     token: {
                       type: "ValueIdentifier",
                       text: "check",
                     },
                   },
-                  memberAccessOperatorToken: {
-                    type: "MemberAccessOperator",
-                    text: ".",
-                  },
-                  property: {
-                    type: "ValueIdentifier",
-                    text: "equal",
-                  },
+                  propertyAccesses: [
+                    {
+                      memberAccessOperatorToken: {
+                        type: "MemberAccessOperator",
+                        text: ".",
+                      },
+                      propertyToken: {
+                        type: "ValueIdentifier",
+                        text: "equal",
+                      },
+                    },
+                  ],
                 },
+                typeArgs: [],
                 args: [
                   {
-                    type: "atom",
+                    type: "value-identifier",
                     token: {
                       type: "ValueIdentifier",
                       text: "bar",
                     },
                   },
                   {
-                    type: "atom",
+                    type: "number-literal",
                     token: {
                       type: "NumberLiteral",
                       text: "2",
@@ -116,22 +137,28 @@ testParser("should parse example program that/simple.thy", async () => {
             type: "block",
             ideas: [
               {
-                type: "call",
+                type: "value-call",
                 func: {
-                  type: "atom",
+                  type: "value-identifier",
                   token: {
                     type: "ValueIdentifier",
                     text: "doSomething",
                   },
                 },
+                typeArgs: [],
                 args: [],
               },
             ],
-            returnStyle: returnStyle.implicitExport,
+            returnStyle: "implicitExport",
+            isAsync: false,
           },
         ],
       },
+      {
+        type: "blank-line",
+      },
     ],
-    returnStyle: returnStyle.implicitExport,
+    returnStyle: "implicitExport",
+    isAsync: false,
   })
 })

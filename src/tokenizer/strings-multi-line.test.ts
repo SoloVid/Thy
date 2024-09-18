@@ -310,8 +310,8 @@ testTokenizer(
       [tStringText, "himom"],
       tEndString,
       tStatementTerminator,
-      tStatementTerminator,
       tEndBlock,
+      tStatementTerminator,
       tStatementTerminator,
     ])
   },
@@ -336,8 +336,8 @@ testTokenizer(
       tStatementTerminator,
       tValueIdentifier,
       tStatementTerminator,
-      tStatementTerminator,
       tEndBlock,
+      tStatementTerminator,
       tStatementTerminator,
     ])
   },
@@ -393,8 +393,8 @@ testTokenizer(
       [tStringText, "himom"],
       tEndString,
       tStatementTerminator,
-      tStatementTerminator,
       tEndBlock,
+      tStatementTerminator,
       tStatementTerminator,
     ])
   },
@@ -424,8 +424,8 @@ and else
       tStartBlock,
       [tValueIdentifier, "print"],
       tStatementTerminator,
-      tStatementTerminator,
       tEndBlock,
+      tStatementTerminator,
       tStatementTerminator,
     ])
   },

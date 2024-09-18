@@ -6,7 +6,7 @@ import { Block, ReturnStyle, returnStyle } from "../tree/block"
 import { evaluateReturnStyle } from "./evaluate-return-style"
 import { isIdeaAsync, parseIdea } from "./parse-idea"
 import type { ParserContext, ParserState } from "./parser-state"
-import { makeThatTracker } from "./that-tracker"
+import { makeThatIdeaTracker } from "./that-idea-tracker"
 import { getLastToken } from "./helper"
 
 export function parseBlock(state: ParserState): Block {
@@ -22,17 +22,15 @@ export function parseBlock(state: ParserState): Block {
 }
 
 export function parseBlockInner(state: ParserState): Block {
-  const ideas: Idea[] = []
-
   const parentContext = state.context
 
   let blockReturnStyle: ReturnStyle = returnStyle.implicitExport
   let isAsync = false
-  const thatTracker = makeThatTracker(state.addError)
+  const thatIdeaTracker = makeThatIdeaTracker(state.addError)
 
   const context: ParserContext = {
     symbolTable: parentContext.symbolTable.makeChild(),
-    takeThat: thatTracker.takeThat,
+    takeThat: thatIdeaTracker.takeThat,
   }
   state.context = context
 
@@ -43,19 +41,18 @@ export function parseBlockInner(state: ParserState): Block {
       const idea = parseIdea(state)
 
       nextToken = state.buffer.peekToken()
-      if (idea.type !== "blank-line" || nextToken.type !== tEndStream) {
-        ideas.push(idea)
-      }
+      // if (idea.type !== "blank-line" || nextToken.type !== tEndStream) {
+      thatIdeaTracker.shareLatestIdea(idea)
+      // }
 
       if (idea !== null && isIdeaAsync(idea)) {
         isAsync = true
       }
 
       blockReturnStyle = evaluateReturnStyle(state, blockReturnStyle, idea)
-
-      thatTracker.shareLatestIdea(idea)
     }
 
+    const ideas = thatIdeaTracker.ideas
     const lastToken =
       ideas.length > 0 ? getLastToken(ideas[ideas.length - 1]) : firstToken
     return {
