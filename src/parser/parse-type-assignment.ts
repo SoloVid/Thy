@@ -1,24 +1,19 @@
+import type { SaferToken } from "tokenizer/token"
+import type { TypeIdentifier } from "tree"
+import type { ErrorValue } from "tree/error"
 import assert from "utils/assert"
-import { tokenError } from "../compile-error"
 import {
   tConstDeclAssign,
-  tExport,
   tNoDeclAssign,
-  tPrivate,
   tType,
   tTypeIdentifier,
   tVarDeclAssign,
 } from "../tokenizer/token-type"
-import { getEndOfPropertyAccess2 } from "../tree/property-access"
 import type { TypeAssignment } from "../tree/type-assignment"
-import { applyToSymbolTable } from "./parse-assignment"
-import { parseCall } from "./parse-call"
-import type { ParserState } from "./parser-state"
-import { TypeIdentifier } from "tree"
-import { ErrorValue } from "tree/error"
 import { addTokenError } from "./error"
-import { SaferToken } from "tokenizer/token"
+import { applyToSymbolTable } from "./parse-assignment"
 import { parseTypeCallOrValueCall } from "./parse-type-call"
+import type { ParserState } from "./parser-state"
 
 export function parseTypeAssignment(
   state: ParserState,
