@@ -19,6 +19,7 @@ import {
   matchStatementContinuation,
   matchThat,
   matchType,
+  matchTypeGiven,
   matchVarDeclAssign,
 } from "./keywords"
 import { matchNumber } from "./number"
@@ -28,7 +29,7 @@ import {
 } from "./strings"
 import { makeTokenHere } from "./token-helper"
 import type { TokenMatcher } from "./token-matcher"
-import { tEndBlock, tStatementTerminator } from "./token-type"
+import { tEndBlock, tEndStream, tStatementTerminator } from "./token-type"
 import { makeGenericTokenizer, Tokenizer } from "./tokenizer"
 import { makeTokenizerState } from "./tokenizer-state"
 import { matchStatementTerminator, matchWhitespace } from "./whitespace"
@@ -66,6 +67,7 @@ export function makeTopTokenizer(
     matchGiven,
     matchReturn,
     matchThat,
+    matchTypeGiven,
 
     // Variable expressions
     matchNumber,
@@ -89,7 +91,7 @@ export function makeTopTokenizer(
   return {
     getNextToken() {
       let token = innerTokenizer.getNextToken()
-      if (token === null) {
+      if (token.type === tEndStream) {
         if (closingTerminators === null) {
           closingTerminators = indentation.currentIndentLevels + 1
           debug(() => [
@@ -108,7 +110,6 @@ export function makeTopTokenizer(
           closingEndBlocks--
           return makeTokenHere(state, tEndBlock, "")
         }
-        return null
       }
       return token
     },

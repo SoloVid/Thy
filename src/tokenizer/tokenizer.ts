@@ -3,14 +3,11 @@ import { debug } from "./debug"
 import type { Token } from "./token"
 import { makeTokenHere } from "./token-helper"
 import { skipToken, TokenMatcher } from "./token-matcher"
-import { tErrorToken } from "./token-type"
+import { tEndStream, tErrorToken } from "./token-type"
 import type { TokenizerState } from "./tokenizer-state"
 
-export const endOfStream = Symbol("endOfStream")
-
 export interface Tokenizer {
-  /** Returns null at end of stream. */
-  getNextToken(): Token | null
+  getNextToken(): Token
 }
 
 export type TokenizerFactory = (
@@ -29,7 +26,7 @@ export function makeGenericTokenizer(
   let nextToken: Token | null = null
   let delegatedTokenizer: Tokenizer | null = null
 
-  function getNextValidToken(): Token | typeof endOfStream {
+  function getNextValidToken(): Token {
     let errorCharacters = 0
     let errorPartialToken: Omit<Token, "text"> | null = null
     while (nextToken === null && (!isDone() || delegatedTokenizer)) {
@@ -69,7 +66,7 @@ export function makeGenericTokenizer(
       return t
     }
 
-    return endOfStream
+    return makeTokenHere(state, tEndStream, "")
   }
 
   function trySources(): Token | null | typeof cannotFindToken {
@@ -122,11 +119,7 @@ export function makeGenericTokenizer(
 
   return {
     getNextToken() {
-      const token = getNextValidToken()
-      if (token === endOfStream) {
-        return null
-      }
-      return token
+      return getNextValidToken()
     },
   }
 }

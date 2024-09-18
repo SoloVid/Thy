@@ -2,8 +2,9 @@ import type { CompileError } from "../compile-error"
 import type { Tokenizer } from "../tokenizer/tokenizer"
 import type { Block } from "../tree/block"
 import { makeSymbolTable } from "../tree/symbol-table"
-import { parseBlock } from "./parse-block"
-import { ParserState, thatNotFound } from "./parser-state"
+import { addNodeError } from "./error"
+import { parseBlockInner } from "./parse-block"
+import type { ParserState } from "./parser-state"
 import { makeTokenBuffer } from "./token-buffer"
 
 export interface ParserOutput {
@@ -17,8 +18,12 @@ export function parse(tokenizer: Tokenizer): ParserOutput {
     buffer: makeTokenBuffer(tokenizer),
     context: {
       symbolTable: makeSymbolTable(),
-      takeThat: () => thatNotFound,
-      takeBeforeThat: () => thatNotFound,
+      takeThat: (thatNode) =>
+        addNodeError(
+          state,
+          thatNode,
+          `"that" should not be taken at the top level`,
+        ),
     },
 
     addError(e) {
@@ -26,7 +31,7 @@ export function parse(tokenizer: Tokenizer): ParserOutput {
     },
   }
   return {
-    top: parseBlock(state),
+    top: parseBlockInner(state),
     errors: errors,
   }
 }

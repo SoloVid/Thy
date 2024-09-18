@@ -1,4 +1,3 @@
-import { readExampleFile } from "src/example"
 import { checkExampleProgramTree, testParser } from "."
 import { returnStyle } from "../../tree/block"
 

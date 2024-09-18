@@ -1,4 +1,5 @@
-import type { Token } from "../tokenizer/token"
+import type { SaferToken } from "../tokenizer/token"
+import type { tTypeIdentifier, tValueIdentifier } from "../tokenizer/token-type"
 
 export interface ReadSymbolTable {
   readonly localSymbols: Readonly<Map<string, SymbolInfo>>
@@ -9,12 +10,15 @@ export interface SymbolTable extends ReadSymbolTable {
   /** Scan local table and child tables to see if symbol already used. */
   isSymbolNameTakenHereOrInChild(name: string): boolean
 
-  addSymbol(token: Token<string>, isConstant: boolean): void
+  addSymbol(
+    token: SaferToken<typeof tValueIdentifier | typeof tTypeIdentifier>,
+    isConstant: boolean,
+  ): void
   makeChild(): SymbolTable
 }
 
 export interface SymbolInfo {
-  readonly token: Token<string>
+  readonly token: SaferToken<typeof tValueIdentifier | typeof tTypeIdentifier>
   readonly isConstant: boolean
 }
 

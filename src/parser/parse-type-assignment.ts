@@ -1,63 +1,75 @@
+import assert from "utils/assert"
 import { tokenError } from "../compile-error"
 import {
   tConstDeclAssign,
   tExport,
+  tNoDeclAssign,
   tPrivate,
+  tType,
   tTypeIdentifier,
+  tVarDeclAssign,
 } from "../tokenizer/token-type"
 import { getEndOfPropertyAccess2 } from "../tree/property-access"
 import type { TypeAssignment } from "../tree/type-assignment"
 import { applyToSymbolTable } from "./parse-assignment"
 import { parseCall } from "./parse-call"
 import type { ParserState } from "./parser-state"
+import { TypeIdentifier } from "tree"
+import { ErrorValue } from "tree/error"
+import { addTokenError } from "./error"
+import { SaferToken } from "tokenizer/token"
+import { parseTypeCallOrValueCall } from "./parse-type-call"
 
-export function parseTypeAssignment(state: ParserState): TypeAssignment {
-  // TODO: Validate token
-  // Consume 'type'
-  const typeToken = state.buffer.consumeToken()
-  const firstToken = state.buffer.peekToken()
-  const modifier = [tExport, tPrivate].includes(firstToken.type)
-    ? state.buffer.consumeToken()
-    : null
-  const variable = state.buffer.consumeToken()
-  applyToSymbolTable(state, variable, true)
-  // TODO: Validate some token types etc.
-
-  const operator = state.buffer.consumeToken()
-  if (operator.type !== tConstDeclAssign) {
-    state.addError(tokenError(operator, `Types cannot be mutably assigned`))
+export function parseTypeAssignment(
+  state: ParserState,
+  modifierToken: TypeAssignment["modifier"],
+): TypeAssignment {
+  const typeToken = state.buffer.consumeToken() as SaferToken<typeof tType>
+  assert(
+    typeToken.type === tType,
+    `parseTypeAssignment() should only be called if next token is ${tType}`,
+  )
+  const unsafeVariable = state.buffer.consumeToken()
+  const variable: TypeIdentifier | ErrorValue =
+    unsafeVariable.type === tTypeIdentifier
+      ? {
+          type: "type-identifier",
+          token: unsafeVariable as SaferToken<typeof tTypeIdentifier>,
+        }
+      : addTokenError(state, unsafeVariable, `Expected type identifier`)
+  if (variable.type === "type-identifier") {
+    applyToSymbolTable(state, variable.token, true)
   }
 
-  // TODO: Handle case of missing call.
+  const operator = parseTypeAssignmentOperatorToken(state)
 
-  // TODO: This is a bit of abusing parseCall().
-  // I think sharing the code is a good idea, but I think we have some wrong semantics going on.
-  const vanillaCall = parseCall(state)
-  const accessToken = getEndOfPropertyAccess2(vanillaCall.func)
-  const isTypeCall =
-    accessToken === null ? false : accessToken.type === tTypeIdentifier
-  const call = !isTypeCall
-    ? vanillaCall
-    : {
-        type: "type-call" as const,
-        func: vanillaCall.func,
-        args: [...vanillaCall.typeArgs, ...vanillaCall.args],
-        firstToken: vanillaCall.firstToken,
-        lastToken: vanillaCall.lastToken,
-      }
+  // TODO: Handle case of missing call.
+  const call = parseTypeCallOrValueCall(state)
 
   return {
     type: "type-assignment",
-    modifier,
+    modifier: modifierToken,
     typeToken,
-    variable: {
-      type: "atom",
-      token: variable,
-      symbolTable: state.context.symbolTable,
-    },
+    variable,
     operator,
     call,
-    firstToken: variable,
+    firstToken: typeToken,
     lastToken: call.lastToken,
   }
+}
+
+function parseTypeAssignmentOperatorToken(
+  state: ParserState,
+): TypeAssignment["operator"] {
+  const operator = state.buffer.consumeToken()
+  if ([tVarDeclAssign, tNoDeclAssign].includes(operator.type)) {
+    return addTokenError(state, operator, `Types cannot be mutably assigned`)
+  } else if (operator.type !== tConstDeclAssign) {
+    return addTokenError(
+      state,
+      operator,
+      `Unexpected token where "is" expected`,
+    )
+  }
+  return operator as SaferToken<typeof tConstDeclAssign>
 }

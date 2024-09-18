@@ -1,23 +1,45 @@
-import type { Token } from "../tokenizer/token"
+import type { SaferToken } from "../tokenizer/token"
 import type {
   tConstDeclAssign,
   tExport,
   tNoDeclAssign,
   tPrivate,
-  tValueIdentifier,
   tVarDeclAssign,
 } from "../tokenizer/token-type"
-import type { Atom } from "./atom"
-import type { Call } from "./call"
-import type { PropertyAccess } from "./property-access"
+import type { ValueIdentifier } from "./atom"
+import type { AwaitCall, GivenCall, ValueCall } from "./call"
+import type { ErrorValue } from "./error"
+import type { ValuePropertyAccess } from "./property-access"
 import type { TokenRange } from "./token-range"
 
 export interface Assignment extends TokenRange {
   type: "assignment"
-  modifier: Token<typeof tExport | typeof tPrivate> | null
-  variable: Atom | PropertyAccess<Call, typeof tValueIdentifier>
-  operator: Token<
+  modifier: SaferToken<typeof tExport | typeof tPrivate> | null
+  variable: ErrorValue | ValueIdentifier | ValuePropertyAccess
+  operator: SaferToken<
     typeof tConstDeclAssign | typeof tVarDeclAssign | typeof tNoDeclAssign
   >
-  call: Call
+  call: ValueCall | AwaitCall | GivenCall
 }
+
+// export interface ScopedAssignment extends BaseAssignment {
+//   modifier: null
+//   variable:
+//     | ErrorValue
+//     | ValuePropertyAccess
+//   operator: SaferToken<
+//     typeof tNoDeclAssign
+//   >
+// }
+
+// export interface UnscopedAssignment extends BaseAssignment {
+//   modifier: SaferToken<typeof tExport | typeof tPrivate> | null
+//   variable:
+//   |ErrorValue
+//     | ValueIdentifier
+//   operator: SaferToken<
+//     typeof tConstDeclAssign | typeof tVarDeclAssign | typeof tNoDeclAssign
+//   >
+// }
+
+// export type Assignment = UnscopedAssignment | ScopedAssignment

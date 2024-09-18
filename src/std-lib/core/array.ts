@@ -13,7 +13,7 @@ export type ArrayInitArgs<T> = {
  * Create a mutable [array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array).
  *
  * @example
- * Create an array `myArr` with three elements: `1`, `2`, and `3`.
+ * Create a mutable array `myArr` with three elements: `1`, `2`, and `3`.
  * ```thy
  * myArr is array
  *   push 1

@@ -1,69 +1,71 @@
-import { tokenError } from "../compile-error"
-import type { Token } from "../tokenizer/token"
+import assert from "utils/assert"
 import {
-  tEndBlock,
   tStatementContinuation,
   tStatementTerminator,
-  tTypeIdentifier,
 } from "../tokenizer/token-type"
 import type { Call } from "../tree/call"
-import { parseArguable } from "./parse-arguable"
+import { addNodeError } from "./error"
+import {
+  IndeterminateExpression,
+  IndeterminateTypeExpression,
+  parseIndeterminateValueOrTypeExpression,
+} from "./parse-expression"
 import type { ParserState } from "./parser-state"
+import { collapseThats } from "./that"
+import { TokenRange } from "tree"
+import { getLastToken } from "./helper"
 
-export interface Args {
+export interface Args extends TokenRange {
   typeArgs: Call["typeArgs"]
-  args: Call["args"]
+  valueArgs: Call["args"]
 }
 
 export function parseCallArgs(state: ParserState): Args {
-  const typeArgs: Call["typeArgs"] = []
-  const args: Call["args"] = []
+  const firstToken = state.buffer.peekToken()
+  const typeArgs: IndeterminateTypeExpression[] = []
+  const args: IndeterminateExpression[] = []
 
-  let thatTaken: Token | null = null
-  let beforeThatTaken: Token | null = null
-
-  let nextToken = state.buffer.peekToken()
+  let lastToken = firstToken
   let typeArgumentsEnded = false
-  let moreArguments = ![tStatementTerminator, tEndBlock].includes(
-    nextToken.type,
-  )
-  while (moreArguments) {
-    const arg = parseArguable(state)
-
-    const argLastToken = arg.type === "atom" ? arg.token : arg.lastToken
+  while (state.buffer.peekToken().type !== tStatementTerminator) {
+    const arg = parseIndeterminateValueOrTypeExpression(state)
+    lastToken = getLastToken(arg)
 
     if (
-      !typeArgumentsEnded &&
-      (arg.type === "atom" || arg.type === "property-access") &&
-      argLastToken.type === tTypeIdentifier
+      arg.type !== "type-identifier" &&
+      arg.type !== "indeterminate-type-property-access"
     ) {
-      typeArgs.push(arg)
-    } else {
       typeArgumentsEnded = true
       args.push(arg)
-    }
-
-    nextToken = state.buffer.peekToken()
-    if (arg.type === "block") {
-      const continuation = nextToken.type === tStatementContinuation
-      moreArguments = continuation
-      if (continuation) {
-        state.buffer.consumeToken()
-      }
-      // TODO: What if we get statement/block end right after continuation token?
     } else {
-      moreArguments = ![tStatementTerminator, tEndBlock].includes(
-        nextToken.type,
-      )
+      if (!typeArgumentsEnded) {
+        typeArgs.push(arg)
+      } else {
+        args.push(
+          addNodeError(
+            state,
+            arg,
+            `Unexpected type argument in value argument list`,
+          ),
+        )
+      }
+    }
+
+    while (state.buffer.peekToken().type === tStatementContinuation) {
+      state.buffer.consumeToken()
     }
   }
 
-  if (beforeThatTaken !== null && thatTaken === null) {
-    state.addError(tokenError(beforeThatTaken, `beforeThat used without that`))
-  }
+  const terminator = state.buffer.consumeToken()
+  assert(
+    terminator.type === tStatementTerminator,
+    "The only token that should have broken the loop is a statement terminator",
+  )
 
   return {
-    typeArgs,
-    args,
+    typeArgs: collapseThats(state, typeArgs),
+    valueArgs: collapseThats(state, args),
+    firstToken: firstToken,
+    lastToken: lastToken,
   }
 }

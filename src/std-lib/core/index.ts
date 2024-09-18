@@ -40,7 +40,7 @@ import { throwBuiltin, tryBuiltin } from "./throw-try-catch"
 
 export const core = {
   array: arrayBuiltin,
-  arrayMutable: mutableArrayBuiltin,
+  list: mutableArrayBuiltin,
   get: getBuiltin,
   set: setBuiltin,
   cast: castBuiltin,

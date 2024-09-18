@@ -13,14 +13,13 @@
     "sourceMap": true,
     "rootDir": "src",
     "outDir": "lib",
-    "importsNotUsedAsValues": "error",
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "react": ["./node_modules/preact/compat"],
-      "react-dom": ["./node_modules/preact/compat"],
-      "test-framework": ["./src/utils/test-entrypoint"]
+      "react": ["../node_modules/preact/compat"],
+      "react-dom": ["../node_modules/preact/compat"],
+      "test-framework": ["./utils/test-entrypoint"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]

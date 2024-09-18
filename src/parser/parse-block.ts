@@ -1,247 +1,73 @@
 import assert from "assert"
-import { tokenError } from "../compile-error"
+import { Idea } from "tree"
 import type { Token } from "../tokenizer/token"
-import {
-  tComment,
-  tConstDeclAssign,
-  tEndBlock,
-  tExport,
-  tNoDeclAssign,
-  tPrivate,
-  tStartBlock,
-  tStatementTerminator,
-  tType,
-  tVarDeclAssign,
-  tLet,
-} from "../tokenizer/token-type"
+import { tEndBlock, tEndStream, tStartBlock } from "../tokenizer/token-type"
 import { Block, ReturnStyle, returnStyle } from "../tree/block"
-import { parseAssignment } from "./parse-assignment"
-import { parseCall } from "./parse-call"
-import { parseTypeAssignment } from "./parse-type-assignment"
-import { parseTypeCall } from "./parse-type-call"
-import { parseLetCall } from "./parse-let-call"
-import {
-  ParserContext,
-  ParserState,
-  thatAlreadyUsed,
-  thatNotFound,
-} from "./parser-state"
-
-export const returnKeyword = "return"
-export const allowReturnKeyword = "let"
-export const throwKeyword = "throw"
-export const awaitKeyword = "await"
+import { evaluateReturnStyle } from "./evaluate-return-style"
+import { isIdeaAsync, parseIdea } from "./parse-idea"
+import type { ParserContext, ParserState } from "./parser-state"
+import { makeThatTracker } from "./that-tracker"
+import { getLastToken } from "./helper"
 
 export function parseBlock(state: ParserState): Block {
-  const ideas: Block["ideas"] = []
+  const firstToken = state.buffer.consumeToken()
+  assert(firstToken.type === tStartBlock)
+
+  const result = parseBlockInner(state)
+
+  const lastToken = state.buffer.consumeToken()
+  assert(lastToken.type === tEndBlock)
+
+  return result
+}
+
+export function parseBlockInner(state: ParserState): Block {
+  const ideas: Idea[] = []
 
   const parentContext = state.context
 
-  const thatStack = {
-    thatTaken: null as Token | null,
-    indexThat: null as null | number,
-    beforeThatTaken: null as Token | null,
-    indexBeforeThat: null as null | number,
-  }
-
   let blockReturnStyle: ReturnStyle = returnStyle.implicitExport
+  let isAsync = false
+  const thatTracker = makeThatTracker(state.addError)
 
   const context: ParserContext = {
     symbolTable: parentContext.symbolTable.makeChild(),
-    takeThat(thatToken) {
-      if (thatStack.thatTaken !== null) {
-        return thatAlreadyUsed
-      }
-      const i = thatStack.indexThat
-      if (i === null) {
-        return thatNotFound
-      }
-      thatStack.thatTaken = thatToken
-      thatStack.indexThat = null
-      const idea = ideas.splice(i, 1)[0]
-      assert(idea.type === "call")
-      return idea
-    },
-    takeBeforeThat(beforeThatToken) {
-      if (thatStack.beforeThatTaken !== null) {
-        return thatAlreadyUsed
-      }
-      const i = thatStack.indexBeforeThat
-      if (i === null) {
-        return thatNotFound
-      }
-      thatStack.beforeThatTaken = beforeThatToken
-      thatStack.indexBeforeThat = null
-      const idea = ideas.splice(i, 1)[0]
-      if (thatStack.indexThat !== null) {
-        thatStack.indexThat--
-      }
-      assert(idea.type === "call")
-      return idea
-    },
+    takeThat: thatTracker.takeThat,
   }
   state.context = context
 
   try {
-    const firstToken = state.buffer.consumeToken()
-    assert(firstToken.type === tStartBlock)
+    const firstToken = state.buffer.peekToken()
+    let nextToken: Token = firstToken
+    while (nextToken.type !== tEndBlock && nextToken.type !== tEndStream) {
+      const idea = parseIdea(state)
 
-    let nextToken = state.buffer.peekToken()
-    while (nextToken.type !== tEndBlock) {
-      const idea = parseLine(state, nextToken)
-
-      // Figure return style from most recent line.
-      // TODO: Handle all cases of return style. let/let is one not covered.
-      // TODO: Do we really care about the return style here?
-      if (idea.type === "call" && idea.func.type === "atom") {
-        if (idea.func.token.text === awaitKeyword) {
-          if (blockReturnStyle === returnStyle.explicitExport) {
-            state.addError(
-              tokenError(
-                idea.func.token,
-                `await is incompatible with export-style return`,
-              ),
-            )
-          }
-          blockReturnStyle = returnStyle.asyncReturn
-        } else if (idea.func.token.text === returnKeyword) {
-          if (blockReturnStyle === returnStyle.explicitExport) {
-            state.addError(
-              tokenError(
-                idea.func.token,
-                `Explicit return is incompatible with export-style return`,
-              ),
-            )
-          }
-          if (blockReturnStyle !== returnStyle.asyncReturn) {
-            blockReturnStyle = returnStyle.explicitReturn
-          }
-        }
-      } else if (idea.type === "assignment") {
-        if (idea.modifier?.text === "export") {
-          if (blockReturnStyle === returnStyle.explicitReturn) {
-            state.addError(
-              tokenError(
-                idea.modifier,
-                `export is incompatible with explicit return`,
-              ),
-            )
-          } else if (blockReturnStyle === returnStyle.asyncReturn) {
-            state.addError(
-              tokenError(idea.modifier, `export is incompatible with await`),
-            )
-          } else {
-            blockReturnStyle = returnStyle.explicitExport
-          }
-        }
-        if (
-          idea.call.func.type === "atom" &&
-          idea.call.func.token.text === awaitKeyword
-        ) {
-          if (blockReturnStyle === returnStyle.explicitExport) {
-            state.addError(
-              tokenError(
-                idea.call.func.token,
-                `await is incompatible with export-style return`,
-              ),
-            )
-          }
-          blockReturnStyle = returnStyle.asyncReturn
-        }
-      }
-
-      if (idea.type !== "blank-line" && idea.type !== "non-code") {
-        if (
-          thatStack.beforeThatTaken !== null &&
-          thatStack.thatTaken === null
-        ) {
-          state.addError(
-            tokenError(
-              thatStack.beforeThatTaken,
-              `beforeThat used without that`,
-            ),
-          )
-        }
-        thatStack.thatTaken = null
-        thatStack.beforeThatTaken = null
-
-        if (idea.type === "call") {
-          thatStack.indexBeforeThat = thatStack.indexThat
-          thatStack.indexThat = ideas.length
-        } else {
-          thatStack.indexBeforeThat = null
-          thatStack.indexThat = null
-        }
-      }
-
-      ideas.push(idea)
       nextToken = state.buffer.peekToken()
+      if (idea.type !== "blank-line" || nextToken.type !== tEndStream) {
+        ideas.push(idea)
+      }
+
+      if (idea !== null && isIdeaAsync(idea)) {
+        isAsync = true
+      }
+
+      blockReturnStyle = evaluateReturnStyle(state, blockReturnStyle, idea)
+
+      thatTracker.shareLatestIdea(idea)
     }
 
-    const lastToken = state.buffer.consumeToken()
-    assert(lastToken.type === tEndBlock)
-
+    const lastToken =
+      ideas.length > 0 ? getLastToken(ideas[ideas.length - 1]) : firstToken
     return {
       type: "block",
       symbolTable: context.symbolTable,
       ideas: ideas,
       returnStyle: blockReturnStyle,
+      isAsync: isAsync,
       firstToken: firstToken,
       lastToken: lastToken,
     }
   } finally {
     state.context = parentContext
-  }
-}
-
-function parseLine(
-  state: ParserState,
-  nextToken: Token,
-): Block["ideas"][number] {
-  if (nextToken.type === tComment) {
-    const idea = {
-      type: "non-code",
-      symbolTable: state.context.symbolTable,
-      token: state.buffer.consumeToken(),
-    } as const
-    const nextToken2 = state.buffer.peekToken()
-    if (nextToken2.type === tStatementTerminator) {
-      state.buffer.consumeToken()
-    }
-    return idea
-  } else if (nextToken.type === tStatementTerminator) {
-    state.buffer.consumeToken()
-    return { type: "blank-line" }
-  } else if ([tExport, tPrivate].includes(nextToken.type)) {
-    const afterToken = state.buffer.peekToken(1)
-    if (afterToken.type === tType) {
-      return parseTypeAssignment(state)
-    } else {
-      return parseAssignment(state)
-    }
-  } else if (nextToken.type === tType) {
-    const afterToken = state.buffer.peekToken(1)
-    if (afterToken.type === tEndBlock) {
-      // TODO: Handle end of block immediately after `type`.
-    }
-    const possiblyOperatorToken = state.buffer.peekToken(2)
-    if (possiblyOperatorToken.type === tConstDeclAssign) {
-      return parseTypeAssignment(state)
-    } else {
-      return parseTypeCall(state)
-    }
-  } else if (nextToken.type === tLet) {
-    return parseLetCall(state)
-  } else {
-    const afterToken = state.buffer.peekToken(1)
-    if (
-      [tConstDeclAssign, tVarDeclAssign, tNoDeclAssign].includes(
-        afterToken.type,
-      )
-    ) {
-      return parseAssignment(state)
-    } else {
-      return parseCall(state)
-    }
   }
 }

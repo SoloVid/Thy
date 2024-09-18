@@ -1,15 +1,17 @@
-import type { tTypeIdentifier, tValueIdentifier } from "../tokenizer/token-type"
-import type { Atom } from "./atom"
+import { NumberLiteral, TypeIdentifier, ValueIdentifier } from "./atom"
 import type { Block } from "./block"
-import type { Call } from "./call"
-import type { PropertyAccess } from "./property-access"
+import { Call } from "./call"
+import { ErrorValue } from "./error"
+import { TypePropertyAccess, ValuePropertyAccess } from "./property-access"
+import { StringLiteral } from "./string"
 
-export type Expression =
-  | Atom
+export type CallableExpression =
   | Block
   | Call
-  | PropertyAccess<Call, typeof tValueIdentifier>
+  | ErrorValue
+  | ValueIdentifier
+  | ValuePropertyAccess
 
-export type TypeExpression =
-  | Atom<typeof tTypeIdentifier>
-  | PropertyAccess<Call, typeof tTypeIdentifier>
+export type Expression = CallableExpression | NumberLiteral | StringLiteral
+
+export type TypeExpression = TypeIdentifier | TypePropertyAccess

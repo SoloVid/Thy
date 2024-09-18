@@ -27,11 +27,11 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
           text: "is",
         },
         call: {
-          type: "call",
+          type: "given-call",
           func: {
             type: "atom",
             token: {
-              type: "ValueIdentifier",
+              type: "Given",
               text: "given",
             },
           },
@@ -60,11 +60,11 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
           text: "is",
         },
         call: {
-          type: "call",
+          type: "given-call",
           func: {
             type: "atom",
             token: {
-              type: "ValueIdentifier",
+              type: "Given",
               text: "given",
             },
           },
@@ -119,11 +119,11 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
         type: "blank-line",
       },
       {
-        type: "call",
+        type: "return-call",
         func: {
           type: "atom",
           token: {
-            type: "ValueIdentifier",
+            type: "Return",
             text: "return",
           },
         },

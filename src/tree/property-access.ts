@@ -1,32 +1,37 @@
-import type { Token } from "../tokenizer/token"
+import type { SaferToken } from "../tokenizer/token"
 import type {
   tMemberAccessOperator,
+  TokenType,
   tTypeIdentifier,
   tValueIdentifier,
 } from "../tokenizer/token-type"
-import type { Atom } from "./atom"
-import type { Call } from "./call"
+import type { TypeIdentifier, ValueIdentifier } from "./atom"
+import { Call } from "./call"
+import { ErrorValue } from "./error"
 import type { Expression } from "./expression"
 import type { TokenRange } from "./token-range"
 
-type TypeOrValue = typeof tTypeIdentifier | typeof tValueIdentifier
+export interface ValuePropertyAccess extends TokenRange {
+  type: "value-property-access"
+  base: Call | ValueIdentifier | ErrorValue
+  propertyAccesses: readonly {
+    memberAccessOperatorToken: SaferToken<typeof tMemberAccessOperator>
+    propertyToken: SaferToken<typeof tValueIdentifier>
+  }[]
+}
 
-export interface PropertyAccess<
-  CallPossibleAsBaseOrNever extends Call = Call,
-  T extends TypeOrValue = TypeOrValue,
-> extends TokenRange {
-  type: "property-access"
-  base:
-    | Atom
-    | Call
-    | PropertyAccess<CallPossibleAsBaseOrNever, typeof tValueIdentifier>
-  memberAccessOperatorToken: Token<typeof tMemberAccessOperator>
-  property: Token<T>
+export interface TypePropertyAccess extends TokenRange {
+  type: "type-property-access"
+  base: Call | TypeIdentifier | ValueIdentifier | ErrorValue
+  propertyAccesses: readonly {
+    memberAccessOperatorToken: SaferToken<typeof tMemberAccessOperator>
+    propertyToken: SaferToken<typeof tTypeIdentifier | typeof tValueIdentifier>
+  }[]
 }
 
 export function getFundamentalBase(
-  propertyAccess: Atom | Call | PropertyAccess,
-): Atom | Call {
+  propertyAccess: Atom<typeof tValueIdentifier> | GenericCall | PropertyAccess,
+): Atom<typeof tValueIdentifier> | GenericCall {
   if (propertyAccess.type === "property-access") {
     return getFundamentalBase(propertyAccess.base)
   }
@@ -34,9 +39,16 @@ export function getFundamentalBase(
 }
 
 export function getEndOfPropertyAccess(
-  propertyAccess: Atom | Call | PropertyAccess,
-): Token | null {
-  if (propertyAccess.type === "call") {
+  propertyAccess:
+    | Atom<typeof tValueIdentifier | typeof tTypeIdentifier>
+    | GenericCall
+    | PropertyAccess,
+): SaferToken<typeof tValueIdentifier | typeof tTypeIdentifier> | null {
+  if (
+    propertyAccess.type === "call" ||
+    propertyAccess.type === "await-call" ||
+    propertyAccess.type === "given-call"
+  ) {
     return null
   }
   if (propertyAccess.type === "property-access") {
@@ -45,7 +57,9 @@ export function getEndOfPropertyAccess(
   return propertyAccess.token
 }
 
-export function getEndOfPropertyAccess2(expression: Expression): Token | null {
+export function getEndOfPropertyAccess2<T extends TokenType = never>(
+  expression: Expression,
+): SaferToken<T> | null {
   if (expression.type === "property-access") {
     return expression.property
   }

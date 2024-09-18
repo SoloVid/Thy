@@ -1,172 +1,223 @@
-import assert from "assert"
+import { ErrorValue } from "tree/error"
 import { tokenError } from "../compile-error"
-import type { Token } from "../tokenizer/token"
+import type { SaferToken, Token } from "../tokenizer/token"
 import {
   tMemberAccessOperator,
+  tThat,
   tTypeIdentifier,
   tValueIdentifier,
 } from "../tokenizer/token-type"
-import type { Atom, Call, PropertyAccess, TokenRange } from "../tree"
-import { ParserState, thatAlreadyUsed, thatNotFound } from "./parser-state"
+import type {
+  TypeIdentifier,
+  ValueIdentifier,
+  ValuePropertyAccess,
+} from "../tree"
+import { addNodeError, addTokenError } from "./error"
+import type { ParserState } from "./parser-state"
+import {
+  IndeterminateTypePropertyAccess,
+  IndeterminateValuePropertyAccess,
+  TempThatNode,
+  UnsafeIndeterminateValuePropertyAccess,
+} from "./that"
 
-type PossibleReturn = Atom | PropertyAccess
+export type IndeterminateNamedValueExpression =
+  | ValueIdentifier
+  | IndeterminateValuePropertyAccess
+  | TempThatNode
+  | ErrorValue
 
-export function parseNamedExpression(state: ParserState): PossibleReturn {
-  const pureIdentifier = parseNamedExpressionVanilla(state)
-  return translateThat(state, pureIdentifier)
+export function parseIndeterminateNamedValueExpression(
+  state: ParserState,
+): IndeterminateNamedValueExpression {
+  const expression = parseAnyIndeterminateNamedExpression(state)
+  if (
+    expression.type === "type-identifier" ||
+    expression.type === "indeterminate-type-property-access"
+  ) {
+    return addNodeError(state, expression, `Unexpected type expression`)
+  }
+  return expression
 }
 
-interface NamedExpression extends TokenRange {
-  atoms: Atom[]
-  memberAccessOperatorTokens: Token<typeof tMemberAccessOperator>[]
-  rawTokens: Token[]
+export function parseIndeterminateAssignableNamedValueExpression(
+  state: ParserState,
+): ValueIdentifier | IndeterminateValuePropertyAccess | ErrorValue {
+  const expression = parseIndeterminateNamedValueExpression(state)
+  if (expression.type === "that") {
+    return addNodeError(state, expression, `Cannot assign to that`)
+  }
+  return expression
 }
 
-function parseNamedExpressionVanilla(state: ParserState): NamedExpression {
-  const rawTokens: Token[] = []
-  const firstToken = state.buffer.consumeToken()
-  rawTokens.push(firstToken)
-  // TODO: Errors instead of asserts.
-  assert(
-    firstToken.type === tTypeIdentifier || firstToken.type === tValueIdentifier,
-  )
+type IdentifierToken = Token<typeof tTypeIdentifier | typeof tValueIdentifier>
 
-  const significantTokens: Token[] = [firstToken]
+function makeNamedNode(
+  token: SaferToken<
+    typeof tThat | typeof tTypeIdentifier | typeof tValueIdentifier
+  >,
+): TempThatNode | TypeIdentifier | ValueIdentifier {
+  if (token.type === tThat) {
+    return {
+      type: "that",
+      token: token as SaferToken<typeof tThat>,
+    }
+  }
+  if (token.type === tValueIdentifier) {
+    return {
+      type: "value-identifier",
+      token: token as SaferToken<typeof tValueIdentifier>,
+    }
+  }
+  return {
+    type: "type-identifier",
+    token: token as SaferToken<typeof tTypeIdentifier>,
+  }
+}
+
+export function parseAnyIndeterminateNamedExpression(
+  state: ParserState,
+):
+  | TempThatNode
+  | TypeIdentifier
+  | IndeterminateTypePropertyAccess
+  | ValueIdentifier
+  | IndeterminateValuePropertyAccess
+  | ErrorValue {
+  let baseToken = state.buffer.consumeToken() as SaferToken<
+    typeof tThat | typeof tTypeIdentifier | typeof tValueIdentifier
+  >
+  if (
+    baseToken.type !== tThat &&
+    baseToken.type !== tTypeIdentifier &&
+    baseToken.type !== tValueIdentifier
+  ) {
+    return addTokenError(
+      state,
+      baseToken,
+      `Expected named expression, got ${baseToken.type}: ${baseToken.text}`,
+    )
+  }
+  // assert(baseToken.type === tThat || baseToken.type == tTypeIdentifier || baseToken.type === tValueIdentifier, `parseAnyNamedExpression() should only be called when next token is "that" or an identifier (got ${baseToken.type}: ${baseToken.text})`)
+
+  const propertiesAccessed: SaferToken<
+    typeof tTypeIdentifier | typeof tValueIdentifier
+  >[] = []
   const memberAccessOperatorTokens: Token<typeof tMemberAccessOperator>[] = []
   let nextToken = state.buffer.peekToken()
   while (nextToken.type === tMemberAccessOperator) {
-    const maoToken = state.buffer.consumeToken()
-    // TODO: check first?
+    const maoToken = state.buffer.consumeToken() as Token<
+      typeof tMemberAccessOperator
+    >
     memberAccessOperatorTokens.push(maoToken)
-    rawTokens.push(maoToken)
     const nextNameToken = state.buffer.peekToken()
     if (![tTypeIdentifier, tValueIdentifier].includes(nextNameToken.type)) {
-      state.addError(tokenError(maoToken, `Dangling member access operator`))
-      // TODO: break loop without `break`
+      state.addError(
+        tokenError(
+          maoToken,
+          `Dangling member access operator (next token ${nextNameToken.type}: ${nextNameToken.text})`,
+        ),
+      )
       break
     } else {
-      const lastNameToken = state.buffer.consumeToken()
-      significantTokens.push(lastNameToken)
-      rawTokens.push(lastNameToken)
+      const nextIdentifierToken = state.buffer.consumeToken() as IdentifierToken
+      propertiesAccessed.push(nextIdentifierToken)
       nextToken = state.buffer.peekToken()
     }
   }
 
-  for (const s of significantTokens.slice(0, significantTokens.length - 1)) {
+  if (propertiesAccessed.length === 0) {
+    return makeNamedNode(baseToken)
+  }
+
+  const finalToken = propertiesAccessed[propertiesAccessed.length - 1]
+
+  if (finalToken.type === tTypeIdentifier) {
+    return {
+      type: "indeterminate-type-property-access",
+      base: makeNamedNode(baseToken),
+      propertyAccesses: propertiesAccessed.map((p, i) => ({
+        memberAccessOperatorToken: memberAccessOperatorTokens[i],
+        propertyToken: p,
+      })),
+      firstToken: baseToken,
+      lastToken: finalToken,
+    }
+  }
+
+  const unsafeValuePropertyAccess: UnsafeIndeterminateValuePropertyAccess = {
+    base: makeNamedNode(baseToken) as TempThatNode | ValueIdentifier,
+    propertyAccesses: propertiesAccessed.map((p, i) => ({
+      memberAccessOperatorToken: memberAccessOperatorTokens[i],
+      propertyToken: p as SaferToken<typeof tValueIdentifier>,
+    })),
+    firstToken: baseToken,
+    lastToken: finalToken,
+  }
+  return validateValuePropertyAccess(state, unsafeValuePropertyAccess)
+}
+
+function validateValuePropertyAccess(
+  state: ParserState,
+  node: UnsafeIndeterminateValuePropertyAccess,
+): IndeterminateValuePropertyAccess | ValueIdentifier {
+  let validSoFar = true
+  type ValidValuePropertyAccess =
+    ValuePropertyAccess["propertyAccesses"][number]
+  const finalPropertyAccess = node.propertyAccesses[
+    node.propertyAccesses.length - 1
+  ] as ValidValuePropertyAccess
+  const validIntermediatePropertyAccesses: ValidValuePropertyAccess[] = []
+  for (let i = node.propertyAccesses.length - 2; i >= 0; i--) {
+    const pa = node.propertyAccesses[i]
+    const s = pa.propertyToken
     if (s.type !== tValueIdentifier) {
       state.addError(
         tokenError(
           s,
-          `"${s.text}" is used as a value for scoping when it is not`,
+          `"${s.text}" is a type and cannot be dereferenced (.) for a value`,
         ),
       )
+      validSoFar = false
+    } else if (validSoFar) {
+      validIntermediatePropertyAccesses.unshift(pa as ValidValuePropertyAccess)
     }
   }
-
+  if (node.base.type === "type-identifier") {
+    state.addError(
+      tokenError(
+        node.base.token,
+        `"${node.base.token.text}" is a type and cannot be dereferenced (.) for a value`,
+      ),
+    )
+    if (validIntermediatePropertyAccesses.length === 0) {
+      return {
+        type: "value-identifier",
+        token: finalPropertyAccess.propertyToken,
+      }
+    }
+    return {
+      type: "indeterminate-value-property-access",
+      base: {
+        type: "value-identifier",
+        token: validIntermediatePropertyAccesses[0].propertyToken,
+      },
+      propertyAccesses: [
+        ...validIntermediatePropertyAccesses.slice(1),
+        finalPropertyAccess,
+      ],
+      firstToken: node.firstToken,
+      lastToken: node.lastToken,
+    }
+  }
   return {
-    atoms: significantTokens.map((t) => ({
-      type: "atom",
-      symbolTable: state.context.symbolTable,
-      token: t,
-    })),
-    memberAccessOperatorTokens: memberAccessOperatorTokens,
-    rawTokens: rawTokens,
-    firstToken: firstToken,
-    lastToken: significantTokens[significantTokens.length - 1],
+    type: "indeterminate-value-property-access",
+    base: node.base,
+    propertyAccesses: [
+      ...validIntermediatePropertyAccesses,
+      finalPropertyAccess,
+    ],
+    firstToken: node.firstToken,
+    lastToken: node.lastToken,
   }
-}
-
-function translateThat(
-  state: ParserState,
-  node: NamedExpression,
-): PossibleReturn {
-  assert(node.atoms.length >= 1)
-
-  type PropertyPair = readonly [Token<typeof tMemberAccessOperator>, Atom]
-  let transformedAtoms: [Call | Atom, ...PropertyPair[]] = [
-    node.atoms[0],
-    ...node.atoms
-      .slice(1)
-      .map((a, i) => [node.memberAccessOperatorTokens[i], a] as const),
-  ]
-
-  function getThatCall(thatToken: Token): Call | Atom {
-    const thatCall = state.context.takeThat(thatToken)
-    if (thatCall === thatNotFound) {
-      state.addError(
-        tokenError(thatToken, `No preceding call is eligible to satisfy that`),
-      )
-      return {
-        type: "atom",
-        symbolTable: state.context.symbolTable,
-        token: thatToken,
-      }
-    } else if (thatCall === thatAlreadyUsed) {
-      state.addError(tokenError(thatToken, `that already used`))
-      return {
-        type: "atom",
-        symbolTable: state.context.symbolTable,
-        token: thatToken,
-      }
-    } else {
-      return thatCall
-    }
-  }
-
-  function getBeforeThatCall(beforeThatToken: Token): Call | Atom {
-    const beforeThatCall = state.context.takeBeforeThat(beforeThatToken)
-    if (beforeThatCall === thatNotFound) {
-      state.addError(
-        tokenError(
-          beforeThatToken,
-          `No preceding call is eligible to satisfy beforeThat`,
-        ),
-      )
-      return {
-        type: "atom",
-        symbolTable: state.context.symbolTable,
-        token: beforeThatToken,
-      }
-    } else if (beforeThatCall === thatAlreadyUsed) {
-      state.addError(tokenError(beforeThatToken, `beforeThat already used`))
-      return {
-        type: "atom",
-        symbolTable: state.context.symbolTable,
-        token: beforeThatToken,
-      }
-    } else {
-      return beforeThatCall
-    }
-  }
-
-  for (const a of node.atoms.slice(1)) {
-    if (a.token.text === "that") {
-      state.addError(tokenError(a.token, "that cannot be scoped"))
-    }
-    if (a.token.text === "beforeThat") {
-      state.addError(tokenError(a.token, "beforeThat cannot be scoped"))
-    }
-  }
-
-  if (node.atoms[0].token.text === "that") {
-    const thatCall = getThatCall(node.atoms[0].token)
-    transformedAtoms[0] = thatCall
-  }
-  if (node.atoms[0].token.text === "beforeThat") {
-    const beforeThatCall = getBeforeThatCall(node.atoms[0].token)
-    transformedAtoms[0] = beforeThatCall
-  }
-
-  const justTrailingAtoms = transformedAtoms.slice(1) as readonly PropertyPair[]
-  return justTrailingAtoms.reduce((output, part, i) => {
-    const propertyAccess: PropertyAccess = {
-      type: "property-access",
-      base: output,
-      memberAccessOperatorToken: part[0],
-      property: part[1].token,
-      firstToken: output.type === "atom" ? output.token : output.firstToken,
-      lastToken: part[1].token,
-    }
-    return propertyAccess
-  }, transformedAtoms[0] as PossibleReturn)
 }

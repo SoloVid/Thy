@@ -1,5 +1,7 @@
 export const tErrorToken = "ErrorToken"
 
+export const tEndStream = "EndStream"
+
 export const tEndBlock = "EndBlock"
 export const tStartBlock = "StartBlock"
 export const tStatementContinuation = "StatementContinuation"
@@ -20,6 +22,7 @@ export const tAwait = "Await"
 export const tGiven = "Given"
 export const tReturn = "Return"
 export const tThat = "That"
+export const tTypeGiven = "TypeGiven"
 
 export const tMemberAccessOperator = "MemberAccessOperator"
 
@@ -36,6 +39,7 @@ export const tValueIdentifier = "ValueIdentifier"
 
 export type TokenType =
   | typeof tErrorToken
+  | typeof tEndStream
   | typeof tEndBlock
   | typeof tStartBlock
   | typeof tStatementContinuation
@@ -52,6 +56,7 @@ export type TokenType =
   | typeof tGiven
   | typeof tReturn
   | typeof tThat
+  | typeof tTypeGiven
   | typeof tMemberAccessOperator
   | typeof tStartString
   | typeof tEndString

@@ -11,6 +11,7 @@ import {
   tStatementContinuation,
   tThat,
   tType,
+  tTypeGiven,
   tVarDeclAssign,
 } from "./token-type"
 
@@ -37,3 +38,4 @@ export const matchAwait = makeSingleRegexMatcher(tAwait, /\bawait\b/)
 export const matchGiven = makeSingleRegexMatcher(tGiven, /\bgiven\b/)
 export const matchReturn = makeSingleRegexMatcher(tReturn, /\breturn\b/)
 export const matchThat = makeSingleRegexMatcher(tThat, /\bthat\b/)
+export const matchTypeGiven = makeSingleRegexMatcher(tTypeGiven, /\bGiven\b/)

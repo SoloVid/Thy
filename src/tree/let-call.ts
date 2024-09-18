@@ -1,10 +1,10 @@
-import type { Token } from "../tokenizer/token"
+import type { SaferToken } from "../tokenizer/token"
 import type { tLet } from "../tokenizer/token-type"
 import type { Call } from "./call"
 import type { TokenRange } from "./token-range"
 
 export interface LetCall extends TokenRange {
   type: "let-call"
-  letToken: Token<typeof tLet>
+  letToken: SaferToken<typeof tLet>
   call: Call
 }
