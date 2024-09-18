@@ -1,58 +1,86 @@
 import { expect } from "expect"
 import {
-  tEndStream,
   tMemberAccessOperator,
-  TokenType,
+  tNumberLiteral,
+  tThat,
   tTypeIdentifier,
   tValueIdentifier,
 } from "tokenizer/token-type"
-import type { CompileError } from "../compile-error"
-import type { Token } from "../tokenizer/token"
-import type { Tokenizer } from "../tokenizer/tokenizer"
 import { getNodeStructure, testParser } from "./example-test"
-import type { ParserContext, ParserState } from "./parser-state"
-import { makeTokenBuffer } from "./token-buffer"
-import { parseAnyIndeterminateNamedExpression } from "./parse-named-expression"
+import {
+  parseAnyIndeterminateNamedExpression,
+  parseIndeterminateNamedValueExpression,
+} from "./parse-named-expression"
+import { makeParserTestFixture } from "./test-helper"
 
-function makeMockTokenizer(
-  tokens: readonly (TokenType | Partial<Token>)[],
-): Tokenizer {
-  let i = 0
-  return {
-    getNextToken() {
-      if (i >= tokens.length) {
-        return { type: tEndStream } as Token
-      }
-      const t = tokens[i++]
-      if (typeof t === "string") {
-        return { type: t } as Token
-      }
-      return t as Token
-    },
-  }
-}
+testParser(
+  "parseIndeterminateNamedValueExpression() should parse value",
+  () => {
+    const { errors, state } = makeParserTestFixture([tValueIdentifier])
+    const result = parseIndeterminateNamedValueExpression(state)
+    expect(errors).toEqual([])
+    expect(getNodeStructure(result)).toEqual({
+      type: "value-identifier",
+      token: { type: "ValueIdentifier" },
+    })
+  },
+)
 
-function makeParserTestFixture(
-  tokens: readonly (TokenType | Partial<Token>)[],
-) {
-  const errors: CompileError[] = []
-  const state: ParserState = {
-    buffer: makeTokenBuffer(makeMockTokenizer(tokens)),
-    context: {
-      // symbolTable: makeSymbolTable(),
-      // takeThat: () => thatNotFound,
-      // takeBeforeThat: () => thatNotFound,
-    } as ParserContext,
+testParser("parseIndeterminateNamedValueExpression() should parse that", () => {
+  const { errors, state } = makeParserTestFixture([tThat])
+  const result = parseIndeterminateNamedValueExpression(state)
+  expect(errors).toEqual([])
+  expect(getNodeStructure(result)).toEqual({
+    type: "that",
+    token: { type: "That" },
+  })
+})
 
-    addError(e) {
-      errors.push(e)
-    },
-  }
-  return {
-    errors,
-    state,
-  }
-}
+testParser(
+  "parseIndeterminateNamedValueExpression() should error if a type is processed",
+  () => {
+    const expectedErrorToken = {
+      type: tTypeIdentifier,
+      text: "UnexpectedType",
+    } as const
+    const { errors, state } = makeParserTestFixture([expectedErrorToken])
+    const result = parseIndeterminateNamedValueExpression(state)
+    expect(errors).toEqual([
+      {
+        message: expect.stringContaining("Unexpected type expression"),
+        start: expectedErrorToken,
+        end: expectedErrorToken,
+      },
+    ])
+    expect(getNodeStructure(result)).toEqual({
+      type: "error-value",
+      token: expectedErrorToken,
+    })
+  },
+)
+
+testParser(
+  "parseAnyIndeterminateNamedExpression() should error if an unexpected token comes up first",
+  () => {
+    const expectedErrorToken = {
+      type: tNumberLiteral,
+      text: "1234",
+    } as const
+    const { errors, state } = makeParserTestFixture([expectedErrorToken])
+    const result = parseAnyIndeterminateNamedExpression(state)
+    expect(errors).toEqual([
+      {
+        message: expect.stringContaining("Expected named expression"),
+        start: expectedErrorToken,
+        end: expectedErrorToken,
+      },
+    ])
+    expect(getNodeStructure(result)).toEqual({
+      type: "error-value",
+      token: expectedErrorToken,
+    })
+  },
+)
 
 testParser(
   "parseAnyIndeterminateNamedExpression() should parse unscoped value identifier",
@@ -61,8 +89,8 @@ testParser(
     const result = parseAnyIndeterminateNamedExpression(state)
     expect(errors).toEqual([])
     expect(getNodeStructure(result)).toEqual({
-      token: { type: "ValueIdentifier" },
       type: "value-identifier",
+      token: { type: "ValueIdentifier" },
     })
   },
 )
@@ -74,8 +102,8 @@ testParser(
     const result = parseAnyIndeterminateNamedExpression(state)
     expect(errors).toEqual([])
     expect(getNodeStructure(result)).toEqual({
-      token: { type: "TypeIdentifier" },
       type: "type-identifier",
+      token: { type: "TypeIdentifier" },
     })
   },
 )
@@ -185,7 +213,7 @@ testParser(
 )
 
 testParser(
-  "parseAnyIndeterminateNamedExpression() should error if type is base of scoped identifier",
+  "parseAnyIndeterminateNamedExpression() should error if type is base of scoped value identifier",
   () => {
     const expectedErrorToken = {
       type: tTypeIdentifier,
@@ -208,6 +236,63 @@ testParser(
     expect(getNodeStructure(result)).toEqual({
       token: { type: "ValueIdentifier" },
       type: "value-identifier",
+    })
+  },
+)
+
+testParser(
+  "parseAnyIndeterminateNamedExpression() should error if type is somewhere in chain of scoped value identifier",
+  () => {
+    const expectedErrorToken = {
+      type: tTypeIdentifier,
+      text: "TypeWhereItDoesNotBelong",
+    } as const
+    const { errors, state } = makeParserTestFixture([
+      tValueIdentifier,
+      tMemberAccessOperator,
+      tValueIdentifier,
+      tMemberAccessOperator,
+      expectedErrorToken,
+      tMemberAccessOperator,
+      tValueIdentifier,
+      tMemberAccessOperator,
+      tValueIdentifier,
+    ])
+    const result = parseAnyIndeterminateNamedExpression(state)
+    expect(errors).toEqual([
+      {
+        message:
+          '"TypeWhereItDoesNotBelong" is a type and cannot be dereferenced (.) for a value',
+        start: expectedErrorToken,
+        end: expectedErrorToken,
+      },
+    ])
+    expect(getNodeStructure(result)).toEqual({
+      type: "indeterminate-value-property-access",
+      base: {
+        type: "value-identifier",
+        token: {
+          type: "ValueIdentifier",
+        },
+      },
+      propertyAccesses: [
+        {
+          memberAccessOperatorToken: {
+            type: "MemberAccessOperator",
+          },
+          propertyToken: {
+            type: "ValueIdentifier",
+          },
+        },
+        {
+          memberAccessOperatorToken: {
+            type: "MemberAccessOperator",
+          },
+          propertyToken: {
+            type: "ValueIdentifier",
+          },
+        },
+      ],
     })
   },
 )

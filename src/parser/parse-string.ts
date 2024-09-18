@@ -60,8 +60,6 @@ export function parseStringInterpolation(
   state: ParserState,
   firstToken: SaferToken<typeof tStartStringInterpolation>,
 ): StringInterpolation {
-  // const firstToken = state.buffer.consumeToken()
-  // assert(firstToken.type === tStartStringInterpolation, `parseStringInterpolation() should only be called if next token is ${tStartStringInterpolation}`)
   const interpolationValue = state.buffer.consumeToken()
   const value: ValueIdentifier | ErrorValue =
     interpolationValue.type === tValueIdentifier

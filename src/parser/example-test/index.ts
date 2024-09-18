@@ -10,6 +10,10 @@ export const testParser = defineTestGroup("parser ")
 
 const maxTestN = 1000
 
+export function debugNodeStructure(node: unknown) {
+  console.log(JSON.stringify(getNodeStructure(node), null, 2))
+}
+
 export function getNodeStructure(node: unknown) {
   return JSON.parse(
     JSON.stringify(

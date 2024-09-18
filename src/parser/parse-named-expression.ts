@@ -40,16 +40,6 @@ export function parseIndeterminateNamedValueExpression(
   return expression
 }
 
-export function parseIndeterminateAssignableNamedValueExpression(
-  state: ParserState,
-): ValueIdentifier | IndeterminateValuePropertyAccess | ErrorValue {
-  const expression = parseIndeterminateNamedValueExpression(state)
-  if (expression.type === "that") {
-    return addNodeError(state, expression, `Cannot assign to that`)
-  }
-  return expression
-}
-
 type IdentifierToken = Token<typeof tTypeIdentifier | typeof tValueIdentifier>
 
 function makeNamedNode(
@@ -167,6 +157,7 @@ function validateValuePropertyAccess(
   const finalPropertyAccess = node.propertyAccesses[
     node.propertyAccesses.length - 1
   ] as ValidValuePropertyAccess
+  let baseSoFar = finalPropertyAccess
   const validIntermediatePropertyAccesses: ValidValuePropertyAccess[] = []
   for (let i = node.propertyAccesses.length - 2; i >= 0; i--) {
     const pa = node.propertyAccesses[i]
@@ -180,7 +171,8 @@ function validateValuePropertyAccess(
       )
       validSoFar = false
     } else if (validSoFar) {
-      validIntermediatePropertyAccesses.unshift(pa as ValidValuePropertyAccess)
+      baseSoFar = pa as ValidValuePropertyAccess
+      validIntermediatePropertyAccesses.unshift(baseSoFar)
     }
   }
   if (node.base.type === "type-identifier") {
@@ -190,31 +182,29 @@ function validateValuePropertyAccess(
         `"${node.base.token.text}" is a type and cannot be dereferenced (.) for a value`,
       ),
     )
-    if (validIntermediatePropertyAccesses.length === 0) {
-      return {
-        type: "value-identifier",
-        token: finalPropertyAccess.propertyToken,
-      }
-    }
+  } else {
+    baseSoFar = {
+      memberAccessOperatorToken: null,
+      propertyToken: node.base.token,
+    } as unknown as ValidValuePropertyAccess
+    validIntermediatePropertyAccesses.unshift(baseSoFar)
+  }
+
+  if (validIntermediatePropertyAccesses.length === 0) {
     return {
-      type: "indeterminate-value-property-access",
-      base: {
-        type: "value-identifier",
-        token: validIntermediatePropertyAccesses[0].propertyToken,
-      },
-      propertyAccesses: [
-        ...validIntermediatePropertyAccesses.slice(1),
-        finalPropertyAccess,
-      ],
-      firstToken: node.firstToken,
-      lastToken: node.lastToken,
+      type: "value-identifier",
+      token: finalPropertyAccess.propertyToken,
     }
   }
+
   return {
     type: "indeterminate-value-property-access",
-    base: node.base,
+    base: {
+      type: "value-identifier",
+      token: validIntermediatePropertyAccesses[0].propertyToken,
+    },
     propertyAccesses: [
-      ...validIntermediatePropertyAccesses,
+      ...validIntermediatePropertyAccesses.slice(1),
       finalPropertyAccess,
     ],
     firstToken: node.firstToken,
