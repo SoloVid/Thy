@@ -1,18 +1,18 @@
-import { tEndStream } from "tokenizer/token-type"
+import { tEndStream, TokenType } from "tokenizer/token-type"
 import assert from "utils/assert"
-import type { Token } from "../tokenizer/token"
+import type { SaferToken, Token } from "../tokenizer/token"
 import type { Tokenizer } from "../tokenizer/tokenizer"
 
 export interface TokenBuffer {
   hasNextToken(): boolean
-  peekToken(howManyAhead?: number): Token
-  consumeToken(): Token
-  getPreviousToken(): Token
+  peekToken(howManyAhead?: number): SaferToken<TokenType>
+  consumeToken(): SaferToken<TokenType>
+  getPreviousToken(): SaferToken<TokenType>
 }
 
 export function makeTokenBuffer(tokenizer: Tokenizer): TokenBuffer {
-  const upNext: Token[] = []
-  let previousToken: Token | null = null
+  const upNext: SaferToken<TokenType>[] = []
+  let previousToken: SaferToken<TokenType> | null = null
 
   function ensureUpcomingTokenCache(howMany: number) {
     while (upNext.length < howMany) {

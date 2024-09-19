@@ -2,6 +2,7 @@ import { tokenError } from "compile-error"
 import type { Idea } from "tree"
 import { ReturnStyle, returnStyle } from "../tree/block"
 import type { ParserState } from "./parser-state"
+import { isAssignment } from "tree/assignment"
 
 export function evaluateReturnStyle(
   state: ParserState,
@@ -27,7 +28,7 @@ export function evaluateReturnStyle(
       }
     }
     return returnStyle.explicitReturn
-  } else if (idea.type === "assignment") {
+  } else if (isAssignment(idea)) {
     if (idea.modifier?.text === "export") {
       if (existingReturnStyle === returnStyle.explicitReturn) {
         state.addError(

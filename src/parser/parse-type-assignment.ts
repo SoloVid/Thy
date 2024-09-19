@@ -1,4 +1,3 @@
-import type { SaferToken } from "tokenizer/token"
 import type { TypeIdentifier } from "tree"
 import type { ErrorValue } from "tree/error"
 import assert from "utils/assert"
@@ -19,7 +18,7 @@ export function parseTypeAssignment(
   state: ParserState,
   modifierToken: TypeAssignment["modifier"],
 ): TypeAssignment {
-  const typeToken = state.buffer.consumeToken() as SaferToken<typeof tType>
+  const typeToken = state.buffer.consumeToken()
   assert(
     typeToken.type === tType,
     `parseTypeAssignment() should only be called if next token is ${tType}`,
@@ -29,7 +28,7 @@ export function parseTypeAssignment(
     unsafeVariable.type === tTypeIdentifier
       ? {
           type: "type-identifier",
-          token: unsafeVariable as SaferToken<typeof tTypeIdentifier>,
+          token: unsafeVariable,
         }
       : addTokenError(state, unsafeVariable, `Expected type identifier`)
   if (variable.type === "type-identifier") {
@@ -66,5 +65,5 @@ function parseTypeAssignmentOperatorToken(
       `Unexpected token where "is" expected`,
     )
   }
-  return operator as SaferToken<typeof tConstDeclAssign>
+  return operator
 }

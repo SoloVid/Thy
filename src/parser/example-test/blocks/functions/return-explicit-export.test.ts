@@ -10,7 +10,7 @@ testParser(
         type: "block",
         ideas: [
           {
-            type: "assignment",
+            type: "constant-declaration",
             modifier: {
               type: "Export",
               text: "export",
@@ -43,7 +43,7 @@ testParser(
             },
           },
           {
-            type: "assignment",
+            type: "constant-declaration",
             modifier: null,
             variable: {
               type: "value-identifier",

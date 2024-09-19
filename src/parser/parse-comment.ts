@@ -1,5 +1,4 @@
 import { tokenError } from "compile-error"
-import type { SaferToken } from "tokenizer/token"
 import { tComment, tStatementTerminator } from "tokenizer/token-type"
 import type { Comment } from "tree"
 import assert from "utils/assert"
@@ -19,7 +18,6 @@ export function parseComment(state: ParserState): Comment {
   }
   return {
     type: "comment",
-    // symbolTable: state.context.symbolTable,
-    token: commentToken as SaferToken<typeof tComment>,
+    token: commentToken,
   }
 }

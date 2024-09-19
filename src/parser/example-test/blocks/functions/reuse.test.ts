@@ -8,7 +8,7 @@ testParser(
       type: "block",
       ideas: [
         {
-          type: "assignment",
+          type: "constant-declaration",
           modifier: null,
           variable: {
             type: "value-identifier",
@@ -35,7 +35,7 @@ testParser(
                 type: "block",
                 ideas: [
                   {
-                    type: "assignment",
+                    type: "constant-declaration",
                     modifier: null,
                     variable: {
                       type: "value-identifier",
@@ -61,7 +61,7 @@ testParser(
                     },
                   },
                   {
-                    type: "assignment",
+                    type: "constant-declaration",
                     modifier: null,
                     variable: {
                       type: "value-identifier",
@@ -87,7 +87,7 @@ testParser(
                     },
                   },
                   {
-                    type: "assignment",
+                    type: "constant-declaration",
                     modifier: null,
                     variable: {
                       type: "value-identifier",

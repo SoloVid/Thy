@@ -9,7 +9,13 @@ import {
   tVarDeclAssign,
 } from "../tokenizer/token-type"
 import { ValueIdentifier } from "../tree"
-import type { Assignment } from "../tree/assignment"
+import type {
+  Assignment,
+  ConstantDeclaration,
+  PropertyAssignment,
+  VariableDeclaration,
+  VariableReassignment,
+} from "../tree/assignment"
 import { addNodeError, addTokenError } from "./error"
 import { getFirstToken } from "./helper"
 import { parseCall } from "./parse-call"
@@ -20,21 +26,91 @@ import {
   TempThatNode,
 } from "./that"
 
-export function parseAssignmentGivenTargetAndOperator(
+export type PossibleAssignmentTarget =
+  | ValueIdentifier
+  | IndeterminateValuePropertyAccess
+  | TempThatNode
+  | ErrorValue
+
+export function parseConstantDeclarationGivenTargetAndOperator(
   state: ParserState,
-  modifier: Assignment["modifier"],
-  target:
-    | ValueIdentifier
-    | IndeterminateValuePropertyAccess
-    | TempThatNode
-    | ErrorValue,
-  operator: Assignment["operator"],
-): Assignment {
+  modifier: ConstantDeclaration["modifier"],
+  target: PossibleAssignmentTarget,
+  operator: ConstantDeclaration["operator"],
+): ConstantDeclaration {
   const call = parseCall(state)
-  const variable = validateVariable(state, modifier, target, operator)
   return {
-    type: "assignment",
+    type: "constant-declaration",
     modifier,
+    variable: validateDeclarable(state, target, operator),
+    operator,
+    call,
+    firstToken: getFirstToken(target),
+    lastToken: call.lastToken,
+  }
+}
+
+export function parseVariableDeclarationGivenTargetAndOperator(
+  state: ParserState,
+  modifier: VariableDeclaration["modifier"],
+  target: PossibleAssignmentTarget,
+  operator: VariableDeclaration["operator"],
+): VariableDeclaration {
+  const call = parseCall(state)
+  return {
+    type: "variable-declaration",
+    modifier,
+    variable: validateDeclarable(state, target, operator),
+    operator,
+    call,
+    firstToken: getFirstToken(target),
+    lastToken: call.lastToken,
+  }
+}
+
+function validateDeclarable(
+  state: ParserState,
+  target: PossibleAssignmentTarget,
+  operator: Assignment["operator"],
+): ValueIdentifier | ErrorValue {
+  void collapseThat(state, target)
+
+  if (target.type === "that") {
+    return addNodeError(state, target, `Cannot assign to that`)
+  }
+
+  if (target.type === "indeterminate-value-property-access") {
+    addTokenError(
+      state,
+      operator,
+      `Property assignments cannot be declared. Did you mean to use "to"?`,
+    )
+    return {
+      type: "error-value",
+      firstToken: target.firstToken,
+      lastToken: target.lastToken,
+    }
+  }
+
+  checkSymbolTable(state, target, operator)
+
+  return target
+}
+
+export function parseVariableReassignmentGivenTargetAndOperator(
+  state: ParserState,
+  target: Exclude<PossibleAssignmentTarget, IndeterminateValuePropertyAccess>,
+  operator: VariableReassignment["operator"],
+): VariableReassignment {
+  const call = parseCall(state)
+  const variable =
+    target.type === "that"
+      ? addNodeError(state, target, `Cannot assign to that`)
+      : target
+  checkSymbolTable(state, variable, operator)
+  return {
+    type: "variable-reassignment",
+    modifier: null,
     variable: variable,
     operator,
     call,
@@ -43,52 +119,38 @@ export function parseAssignmentGivenTargetAndOperator(
   }
 }
 
-export function validateVariable(
+export function parsePropertyAssignmentGivenTargetAndOperator(
   state: ParserState,
-  modifier: Assignment["modifier"],
-  variable:
-    | ValueIdentifier
-    | IndeterminateValuePropertyAccess
-    | TempThatNode
-    | ErrorValue,
+  target: IndeterminateValuePropertyAccess,
+  operator: PropertyAssignment["operator"],
+): PropertyAssignment {
+  const call = parseCall(state)
+  return {
+    type: "property-assignment",
+    modifier: null,
+    variable: collapseThat(state, target),
+    operator,
+    call,
+    firstToken: getFirstToken(target),
+    lastToken: call.lastToken,
+  }
+}
+
+export function checkSymbolTable(
+  state: ParserState,
+  variable: ErrorValue | ValueIdentifier,
   operator: SaferToken<
     typeof tConstDeclAssign | typeof tVarDeclAssign | typeof tNoDeclAssign
   >,
-): Assignment["variable"] {
+) {
   if (variable.type === "error-value") {
-    return variable
-  }
-
-  if (variable.type === "that") {
-    void collapseThat(state, variable)
-    return addNodeError(state, variable, `Cannot assign to that`)
-  }
-
-  if (variable.type === "indeterminate-value-property-access") {
-    if (modifier !== null) {
-      addTokenError(
-        state,
-        modifier,
-        `Property assignments cannot be exported or made private`,
-      )
-    }
-    if (operator.type !== tNoDeclAssign) {
-      addTokenError(
-        state,
-        operator,
-        `Property assignments cannot be declared. Did you mean to use "to"?`,
-      )
-    }
-    return collapseThat(state, variable)
+    return
   }
 
   const baseVar = variable.token
   const varName = baseVar.text
   const symbolInfo = state.context.symbolTable.getSymbolInfo(varName)
   if (operator.type === tNoDeclAssign) {
-    if (modifier !== null) {
-      addTokenError(state, modifier, `Modifier invalid with "to"`)
-    }
     if (symbolInfo === null) {
       // If we don't have the symbol info, the only valid possibility is that the variable is an implicit parameter.
       // Implicit parameters are readonly, but if they're accessing a member they may be able to assign it.

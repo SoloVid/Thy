@@ -1,4 +1,3 @@
-import type { SaferToken } from "tokenizer/token"
 import type { Block, TypeIdentifier, ValueIdentifier } from "tree"
 import type { NumberLiteral } from "tree/atom"
 import type { ErrorValue } from "tree/error"
@@ -39,9 +38,10 @@ export function parseLiteralExpressionOrFallback<T>(
     return parseBlock(state)
   }
   if (nextToken.type === tNumberLiteral) {
+    state.buffer.consumeToken()
     return {
       type: "number-literal",
-      token: state.buffer.consumeToken() as SaferToken<typeof tNumberLiteral>,
+      token: nextToken,
     } as const
   }
   if (nextToken.type === tStartString) {

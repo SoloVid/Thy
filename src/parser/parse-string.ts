@@ -1,10 +1,4 @@
-import type {
-  StringInterpolation,
-  StringLiteral,
-  StringPart,
-} from "tree/string"
-import type { ParserState } from "./parser-state"
-import assert from "utils/assert"
+import { SaferToken } from "tokenizer/token"
 import {
   tEndString,
   tEndStringInterpolation,
@@ -15,8 +9,14 @@ import {
 } from "tokenizer/token-type"
 import { ValueIdentifier } from "tree"
 import { ErrorValue } from "tree/error"
-import { SaferToken } from "tokenizer/token"
+import type {
+  StringInterpolation,
+  StringLiteral,
+  StringPart,
+} from "tree/string"
+import assert from "utils/assert"
 import { addTokenError } from "./error"
+import type { ParserState } from "./parser-state"
 
 export function parseStringLiteral(state: ParserState): StringLiteral {
   const firstToken = state.buffer.consumeToken()
@@ -30,15 +30,10 @@ export function parseStringLiteral(state: ParserState): StringLiteral {
     if (nextToken.type === tStringText) {
       parts.push({
         type: "string-content",
-        token: nextToken as SaferToken<typeof tStringText>,
+        token: nextToken,
       })
     } else if (nextToken.type === tStartStringInterpolation) {
-      parts.push(
-        parseStringInterpolation(
-          state,
-          nextToken as SaferToken<typeof tStartStringInterpolation>,
-        ),
-      )
+      parts.push(parseStringInterpolation(state, nextToken))
     } else {
       addTokenError(state, nextToken, `Unexpected token in string`)
     }
@@ -65,7 +60,7 @@ export function parseStringInterpolation(
     interpolationValue.type === tValueIdentifier
       ? {
           type: "value-identifier",
-          token: interpolationValue as SaferToken<typeof tValueIdentifier>,
+          token: interpolationValue,
         }
       : addTokenError(
           state,

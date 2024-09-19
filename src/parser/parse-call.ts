@@ -76,7 +76,7 @@ function ensureFuncCallable(
 }
 
 function parseAwaitCall(state: ParserState): AwaitCall {
-  const awaitToken = state.buffer.consumeToken() as SaferToken<typeof tAwait>
+  const awaitToken = state.buffer.consumeToken()
   assert(
     awaitToken.type === tAwait,
     `parseAwaitCall() should only be called if next token is "await"`,
@@ -122,7 +122,7 @@ function parseAwaitCall(state: ParserState): AwaitCall {
 }
 
 function parseGivenCall(state: ParserState): GivenCall {
-  const givenToken = state.buffer.consumeToken() as SaferToken<typeof tGiven>
+  const givenToken = state.buffer.consumeToken()
   assert(
     givenToken.type === tGiven,
     `parseGivenCall() should only be called if next token is "given"`,
@@ -166,7 +166,7 @@ function parseGivenCall(state: ParserState): GivenCall {
 }
 
 export function parseReturn(state: ParserState): Return {
-  const returnToken = state.buffer.consumeToken() as SaferToken<typeof tReturn>
+  const returnToken = state.buffer.consumeToken()
   assert(
     returnToken.type === tReturn,
     `parseReturn() should only be called if next token is "return"`,

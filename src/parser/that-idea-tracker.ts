@@ -1,5 +1,6 @@
 import { tokenError } from "compile-error"
-import type { Call, Idea } from "tree"
+import type { Idea } from "tree"
+import { isAssignment } from "tree/assignment"
 import type { ParserState } from "./parser-state"
 import type { TempThatNode } from "./that"
 
@@ -42,18 +43,12 @@ export function makeThatIdeaTracker(addError: ParserState["addError"]) {
       ideas.push(idea)
       nextThatIdeaIndex = ideas.length - 1
       if (
-        idea.type === "assignment" ||
+        isAssignment(idea) ||
         idea.type === "let-call" ||
         idea.type === "return" ||
         idea.type === "type-assignment"
       ) {
         ideaIndexOffLimits = ideas.length - 1
-        // } else if (
-        //   idea.type === "await-call" ||
-        //   idea.type === "given-call" ||
-        //   idea.type === "value-call"
-        // ) {
-        //   ideasAvailableForThat.push(idea)
       }
     },
   }

@@ -1,3 +1,4 @@
+import { isAssignment } from "tree/assignment"
 import assert from "utils/assert"
 import {
   tConstDeclAssign,
@@ -7,35 +8,35 @@ import {
   tType,
   tVarDeclAssign,
 } from "../tokenizer/token-type"
-import type { Assignment, TypeAssignment } from "../tree"
+import type { Assignment } from "../tree"
 import { addTokenError } from "./error"
-import { parseAssignmentGivenTargetAndOperator } from "./parse-assignment"
+import {
+  parseConstantDeclarationGivenTargetAndOperator,
+  parsePropertyAssignmentGivenTargetAndOperator,
+  parseVariableDeclarationGivenTargetAndOperator,
+  parseVariableReassignmentGivenTargetAndOperator,
+} from "./parse-assignment"
 import {
   parseSpecialCallOrFallback,
   parseValueCallGivenTarget,
 } from "./parse-call"
 import { parseIndeterminateNamedValueExpression } from "./parse-named-expression"
-import type { ParserState } from "./parser-state"
 import { parseTypeAssignment } from "./parse-type-assignment"
+import type { ParserState } from "./parser-state"
 
 /**
  * Parse an assignment idea beginning with export or private.
  */
 export function parseModifiedAssignment(state: ParserState) {
-  const modifierToken = state.buffer.consumeToken() as Exclude<
-    Assignment["modifier"],
-    null
-  >
+  const modifierToken = state.buffer.consumeToken()
   assert(
-    [tExport, tPrivate].includes(modifierToken.type),
+    !!modifierToken &&
+      (modifierToken.type === tExport || modifierToken.type === tPrivate),
     "parseModifiedAssignment() should only be called when next token is a modifier",
   )
   const afterToken = state.buffer.peekToken(1)
   if (afterToken.type === tType) {
-    return parseTypeAssignment(
-      state,
-      modifierToken as TypeAssignment["modifier"],
-    )
+    return parseTypeAssignment(state, modifierToken)
   } else {
     return parseAssignmentOrCall(state, modifierToken)
   }
@@ -48,7 +49,7 @@ export function parseAssignmentOrCall(
   const callOrAssignment = parseSpecialCallOrFallback(state, (s) =>
     parseAssignmentOrValueCall(s, modifier),
   )
-  if (modifier !== null && callOrAssignment.type !== "assignment") {
+  if (modifier !== null && !isAssignment(callOrAssignment)) {
     addTokenError(state, modifier, `Modifier invalid preceding call site`)
   }
   return callOrAssignment
@@ -60,17 +61,40 @@ export function parseAssignmentOrValueCall(
 ) {
   const assignedOrCalled = parseIndeterminateNamedValueExpression(state)
   const possiblyAssignmentOperator = state.buffer.peekToken()
-  if (
-    [tConstDeclAssign, tVarDeclAssign, tNoDeclAssign].includes(
-      possiblyAssignmentOperator.type,
-    )
-  ) {
-    const operator = state.buffer.consumeToken() as Assignment["operator"]
-    return parseAssignmentGivenTargetAndOperator(
+  if (possiblyAssignmentOperator.type === tConstDeclAssign) {
+    state.buffer.consumeToken()
+    return parseConstantDeclarationGivenTargetAndOperator(
       state,
       modifier,
       assignedOrCalled,
-      operator,
+      possiblyAssignmentOperator,
+    )
+  }
+  if (possiblyAssignmentOperator.type === tVarDeclAssign) {
+    state.buffer.consumeToken()
+    return parseVariableDeclarationGivenTargetAndOperator(
+      state,
+      modifier,
+      assignedOrCalled,
+      possiblyAssignmentOperator,
+    )
+  }
+  if (possiblyAssignmentOperator.type === tNoDeclAssign) {
+    state.buffer.consumeToken()
+    if (modifier !== null) {
+      addTokenError(state, modifier, `Modifier invalid with "to"`)
+    }
+    if (assignedOrCalled.type === "indeterminate-value-property-access") {
+      return parsePropertyAssignmentGivenTargetAndOperator(
+        state,
+        assignedOrCalled,
+        possiblyAssignmentOperator,
+      )
+    }
+    return parseVariableReassignmentGivenTargetAndOperator(
+      state,
+      assignedOrCalled,
+      possiblyAssignmentOperator,
     )
   }
   return parseValueCallGivenTarget(state, assignedOrCalled)

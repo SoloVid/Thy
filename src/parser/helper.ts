@@ -1,4 +1,4 @@
-import type { TokenRange, TreeNode } from "tree"
+import type { TreeNode } from "tree"
 import { ErrorableTreeNode } from "./error"
 
 export function getFirstToken(node: TreeNode | ErrorableTreeNode) {

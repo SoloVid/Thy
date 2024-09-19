@@ -9,7 +9,7 @@ import type { TypeIdentifier } from "./atom"
 import type { Call } from "./call"
 import type { ErrorValue } from "./error"
 import type { TokenRange } from "./token-range"
-import type { TypeCall } from "./type-call"
+import type { TypeCall, TypeGivenCall } from "./type-call"
 
 export interface TypeAssignment extends TokenRange {
   type: "type-assignment"
@@ -17,5 +17,5 @@ export interface TypeAssignment extends TokenRange {
   typeToken: SaferToken<typeof tType>
   variable: TypeIdentifier | ErrorValue
   operator: SaferToken<typeof tConstDeclAssign> | ErrorValue
-  call: TypeCall | Call
+  call: TypeCall | TypeGivenCall | Call
 }

@@ -3,7 +3,6 @@ import { tLet, tStatementTerminator } from "../tokenizer/token-type"
 import type { LetCall } from "../tree/let-call"
 import { parseCall } from "./parse-call"
 import type { ParserState } from "./parser-state"
-import type { SaferToken } from "tokenizer/token"
 
 export function parseLetCall(state: ParserState): LetCall {
   const letToken = state.buffer.consumeToken()
@@ -16,7 +15,7 @@ export function parseLetCall(state: ParserState): LetCall {
     state.buffer.consumeToken()
     return {
       type: "let-call",
-      letToken: letToken as SaferToken<typeof tLet>,
+      letToken: letToken,
       call: null,
       firstToken: letToken,
       lastToken: letToken,
@@ -25,7 +24,7 @@ export function parseLetCall(state: ParserState): LetCall {
   const call = parseCall(state)
   return {
     type: "let-call",
-    letToken: letToken as SaferToken<typeof tLet>,
+    letToken: letToken,
     call,
     firstToken: letToken,
     lastToken: call.lastToken,

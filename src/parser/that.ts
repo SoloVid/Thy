@@ -5,7 +5,6 @@ import type {
   ValueIdentifier,
   ValuePropertyAccess,
 } from "tree"
-import type { ErrorValue } from "tree/error"
 import type { TypeExpression } from "tree/expression"
 import type { SaferToken } from "../tokenizer/token"
 import type { tThat } from "../tokenizer/token-type"
@@ -56,7 +55,6 @@ type Determined<T extends Indeterminate> = T extends
         ? ValuePropertyAccess
         : never
   : T
-// type Determined<T extends Indeterminate> = (T extends (IndeterminateExpression | TempThatNode) ? (Expression | ErrorValue) : never) | (T extends IndeterminateTypeExpression ? TypeExpression : never)
 
 export function collapseThats<T extends Indeterminate>(
   state: ParserState,

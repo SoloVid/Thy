@@ -12,8 +12,10 @@ export interface ParserOutput {
   errors: CompileError[]
 }
 
-export function parse(tokenizer: Tokenizer): ParserOutput {
-  const errors: CompileError[] = []
+export function parse(
+  tokenizer: Tokenizer,
+  errors: CompileError[] = [],
+): ParserOutput {
   const state: ParserState = {
     buffer: makeTokenBuffer(tokenizer),
     context: {

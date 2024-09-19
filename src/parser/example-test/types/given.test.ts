@@ -6,7 +6,7 @@ testParser("should parse example program types/given.thy", async () => {
     type: "block",
     ideas: [
       {
-        type: "assignment",
+        type: "constant-declaration",
         modifier: null,
         variable: {
           type: "value-identifier",
@@ -34,7 +34,7 @@ testParser("should parse example program types/given.thy", async () => {
               type: "block",
               ideas: [
                 {
-                  type: "assignment",
+                  type: "constant-declaration",
                   modifier: null,
                   variable: {
                     type: "value-identifier",
@@ -69,7 +69,7 @@ testParser("should parse example program types/given.thy", async () => {
                   },
                 },
                 {
-                  type: "assignment",
+                  type: "constant-declaration",
                   modifier: null,
                   variable: {
                     type: "value-identifier",

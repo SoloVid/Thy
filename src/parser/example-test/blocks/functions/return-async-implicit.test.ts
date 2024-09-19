@@ -10,7 +10,7 @@ testParser(
         type: "block",
         ideas: [
           {
-            type: "assignment",
+            type: "constant-declaration",
             modifier: null,
             call: {
               type: "value-call",

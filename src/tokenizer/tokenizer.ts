@@ -54,7 +54,7 @@ export function makeGenericTokenizer(
           errorPartialToken.offset,
           errorPartialToken.offset + errorCharacters,
         ),
-      }
+      } as Token
       debug(() => ["error:", t])
       errors.push(tokenError(t, "Unexpected token"))
       return t

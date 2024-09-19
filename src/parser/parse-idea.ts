@@ -1,4 +1,4 @@
-import type { SaferToken } from "../tokenizer/token"
+import { isAssignment } from "tree/assignment"
 import {
   tComment,
   tExport,
@@ -28,7 +28,7 @@ export function parseIdea(state: ParserState): Idea {
     state.buffer.consumeToken()
     return {
       type: "blank-line",
-      token: nextToken as SaferToken<typeof tStatementTerminator>,
+      token: nextToken,
     }
   }
   if ([tExport, tPrivate].includes(nextToken.type)) {
@@ -50,7 +50,7 @@ export function parseIdea(state: ParserState): Idea {
 export function isIdeaAsync(idea: Idea) {
   return (
     idea.type === "await-call" ||
-    (idea.type === "assignment" && idea.call.type === "await-call") ||
+    (isAssignment(idea) && idea.call.type === "await-call") ||
     (idea.type === "let-call" && idea.call?.type === "await-call")
   )
 }

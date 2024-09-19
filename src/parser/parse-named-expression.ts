@@ -42,27 +42,35 @@ export function parseIndeterminateNamedValueExpression(
 
 type IdentifierToken = Token<typeof tTypeIdentifier | typeof tValueIdentifier>
 
-function makeNamedNode(
-  token: SaferToken<
-    typeof tThat | typeof tTypeIdentifier | typeof tValueIdentifier
-  >,
-): TempThatNode | TypeIdentifier | ValueIdentifier {
+type NamedNode<
+  T extends typeof tThat | typeof tTypeIdentifier | typeof tValueIdentifier,
+> = T extends typeof tThat
+  ? TempThatNode
+  : T extends typeof tTypeIdentifier
+    ? TypeIdentifier
+    : T extends typeof tValueIdentifier
+      ? ValueIdentifier
+      : never
+
+function makeNamedNode<
+  T extends typeof tThat | typeof tTypeIdentifier | typeof tValueIdentifier,
+>(token: SaferToken<T>): NamedNode<T> {
   if (token.type === tThat) {
     return {
       type: "that",
-      token: token as SaferToken<typeof tThat>,
-    }
+      token: token,
+    } as NamedNode<T>
   }
   if (token.type === tValueIdentifier) {
     return {
       type: "value-identifier",
-      token: token as SaferToken<typeof tValueIdentifier>,
-    }
+      token: token,
+    } as NamedNode<T>
   }
   return {
     type: "type-identifier",
-    token: token as SaferToken<typeof tTypeIdentifier>,
-  }
+    token: token,
+  } as NamedNode<T>
 }
 
 export function parseAnyIndeterminateNamedExpression(
@@ -74,9 +82,7 @@ export function parseAnyIndeterminateNamedExpression(
   | ValueIdentifier
   | IndeterminateValuePropertyAccess
   | ErrorValue {
-  let baseToken = state.buffer.consumeToken() as SaferToken<
-    typeof tThat | typeof tTypeIdentifier | typeof tValueIdentifier
-  >
+  let baseToken = state.buffer.consumeToken()
   if (
     baseToken.type !== tThat &&
     baseToken.type !== tTypeIdentifier &&
@@ -96,12 +102,14 @@ export function parseAnyIndeterminateNamedExpression(
   const memberAccessOperatorTokens: Token<typeof tMemberAccessOperator>[] = []
   let nextToken = state.buffer.peekToken()
   while (nextToken.type === tMemberAccessOperator) {
-    const maoToken = state.buffer.consumeToken() as Token<
-      typeof tMemberAccessOperator
-    >
+    const maoToken = nextToken
+    state.buffer.consumeToken()
     memberAccessOperatorTokens.push(maoToken)
     const nextNameToken = state.buffer.peekToken()
-    if (![tTypeIdentifier, tValueIdentifier].includes(nextNameToken.type)) {
+    if (
+      nextNameToken.type !== tTypeIdentifier &&
+      nextNameToken.type !== tValueIdentifier
+    ) {
       state.addError(
         tokenError(
           maoToken,
@@ -110,7 +118,8 @@ export function parseAnyIndeterminateNamedExpression(
       )
       break
     } else {
-      const nextIdentifierToken = state.buffer.consumeToken() as IdentifierToken
+      const nextIdentifierToken = nextNameToken
+      state.buffer.consumeToken()
       propertiesAccessed.push(nextIdentifierToken)
       nextToken = state.buffer.peekToken()
     }
@@ -136,10 +145,10 @@ export function parseAnyIndeterminateNamedExpression(
   }
 
   const unsafeValuePropertyAccess: UnsafeIndeterminateValuePropertyAccess = {
-    base: makeNamedNode(baseToken) as TempThatNode | ValueIdentifier,
+    base: makeNamedNode(baseToken),
     propertyAccesses: propertiesAccessed.map((p, i) => ({
       memberAccessOperatorToken: memberAccessOperatorTokens[i],
-      propertyToken: p as SaferToken<typeof tValueIdentifier>,
+      propertyToken: p,
     })),
     firstToken: baseToken,
     lastToken: finalToken,

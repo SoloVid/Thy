@@ -7,7 +7,7 @@ testParser(
       type: "block",
       ideas: [
         {
-          type: "assignment",
+          type: "variable-declaration",
           modifier: null,
           variable: {
             type: "value-identifier",
@@ -19,7 +19,7 @@ testParser(
           },
         },
         {
-          type: "assignment",
+          type: "variable-reassignment",
           modifier: null,
           variable: {
             type: "value-identifier",
@@ -31,7 +31,7 @@ testParser(
           },
         },
         {
-          type: "assignment",
+          type: "variable-reassignment",
           modifier: null,
           variable: {
             type: "value-identifier",

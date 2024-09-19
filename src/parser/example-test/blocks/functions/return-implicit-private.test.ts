@@ -10,7 +10,7 @@ testParser(
         type: "block",
         ideas: [
           {
-            type: "assignment",
+            type: "constant-declaration",
             modifier: {
               type: "Private",
               text: "private",
@@ -43,7 +43,7 @@ testParser(
             },
           },
           {
-            type: "assignment",
+            type: "constant-declaration",
             modifier: null,
             variable: {
               type: "value-identifier",
