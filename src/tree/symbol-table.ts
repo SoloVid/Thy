@@ -1,4 +1,4 @@
-import type { SaferToken } from "../tokenizer/token"
+import type { Token } from "../tokenizer/token"
 import type { tTypeIdentifier, tValueIdentifier } from "../tokenizer/token-type"
 
 export interface ReadSymbolTable {
@@ -11,14 +11,14 @@ export interface SymbolTable extends ReadSymbolTable {
   isSymbolNameTakenHereOrInChild(name: string): boolean
 
   addSymbol(
-    token: SaferToken<typeof tValueIdentifier | typeof tTypeIdentifier>,
+    token: Token<typeof tValueIdentifier | typeof tTypeIdentifier>,
     isConstant: boolean,
   ): void
   makeChild(): SymbolTable
 }
 
 export interface SymbolInfo {
-  readonly token: SaferToken<typeof tValueIdentifier | typeof tTypeIdentifier>
+  readonly token: Token<typeof tValueIdentifier | typeof tTypeIdentifier>
   readonly isConstant: boolean
 }
 

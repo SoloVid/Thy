@@ -1,6 +1,5 @@
-import { ErrorValue } from "tree/error"
 import { tokenError } from "../compile-error"
-import type { SaferToken } from "../tokenizer/token"
+import type { Token } from "../tokenizer/token"
 import {
   tConstDeclAssign,
   tNoDeclAssign,
@@ -16,7 +15,7 @@ import type {
   VariableDeclaration,
   VariableReassignment,
 } from "../tree/assignment"
-import { addNodeError, addTokenError } from "./error"
+import { addNodeError, addTokenError, badParse, BadParse } from "./error"
 import { getFirstToken } from "./helper"
 import { parseCall } from "./parse-call"
 import type { ParserState } from "./parser-state"
@@ -30,19 +29,21 @@ export type PossibleAssignmentTarget =
   | ValueIdentifier
   | IndeterminateValuePropertyAccess
   | TempThatNode
-  | ErrorValue
 
 export function parseConstantDeclarationGivenTargetAndOperator(
   state: ParserState,
   modifier: ConstantDeclaration["modifier"],
   target: PossibleAssignmentTarget,
   operator: ConstantDeclaration["operator"],
-): ConstantDeclaration {
+): ConstantDeclaration | BadParse {
   const call = parseCall(state)
+  if (call === badParse) return badParse
+  const variable = validateDeclarable(state, target, operator)
+  if (variable === badParse) return badParse
   return {
     type: "constant-declaration",
     modifier,
-    variable: validateDeclarable(state, target, operator),
+    variable,
     operator,
     call,
     firstToken: getFirstToken(target),
@@ -55,12 +56,15 @@ export function parseVariableDeclarationGivenTargetAndOperator(
   modifier: VariableDeclaration["modifier"],
   target: PossibleAssignmentTarget,
   operator: VariableDeclaration["operator"],
-): VariableDeclaration {
+): VariableDeclaration | BadParse {
   const call = parseCall(state)
+  if (call === badParse) return badParse
+  const variable = validateDeclarable(state, target, operator)
+  if (variable === badParse) return badParse
   return {
     type: "variable-declaration",
     modifier,
-    variable: validateDeclarable(state, target, operator),
+    variable,
     operator,
     call,
     firstToken: getFirstToken(target),
@@ -72,11 +76,12 @@ function validateDeclarable(
   state: ParserState,
   target: PossibleAssignmentTarget,
   operator: Assignment["operator"],
-): ValueIdentifier | ErrorValue {
+): ValueIdentifier | BadParse {
   void collapseThat(state, target)
 
   if (target.type === "that") {
-    return addNodeError(state, target, `Cannot assign to that`)
+    addNodeError(state, target, `Cannot assign to that`)
+    return badParse
   }
 
   if (target.type === "indeterminate-value-property-access") {
@@ -85,11 +90,7 @@ function validateDeclarable(
       operator,
       `Property assignments cannot be declared. Did you mean to use "to"?`,
     )
-    return {
-      type: "error-value",
-      firstToken: target.firstToken,
-      lastToken: target.lastToken,
-    }
+    return badParse
   }
 
   checkSymbolTable(state, target, operator)
@@ -101,17 +102,18 @@ export function parseVariableReassignmentGivenTargetAndOperator(
   state: ParserState,
   target: Exclude<PossibleAssignmentTarget, IndeterminateValuePropertyAccess>,
   operator: VariableReassignment["operator"],
-): VariableReassignment {
+): VariableReassignment | BadParse {
   const call = parseCall(state)
-  const variable =
-    target.type === "that"
-      ? addNodeError(state, target, `Cannot assign to that`)
-      : target
-  checkSymbolTable(state, variable, operator)
+  if (call === badParse) return badParse
+  if (target.type === "that") {
+    addNodeError(state, target, `Cannot assign to that`)
+    return badParse
+  }
+  checkSymbolTable(state, target, operator)
   return {
     type: "variable-reassignment",
     modifier: null,
-    variable: variable,
+    variable: target,
     operator,
     call,
     firstToken: getFirstToken(target),
@@ -123,12 +125,15 @@ export function parsePropertyAssignmentGivenTargetAndOperator(
   state: ParserState,
   target: IndeterminateValuePropertyAccess,
   operator: PropertyAssignment["operator"],
-): PropertyAssignment {
+): PropertyAssignment | BadParse {
   const call = parseCall(state)
+  if (call === badParse) return badParse
+  const variable = collapseThat(state, target)
+  if (variable === badParse) return badParse
   return {
     type: "property-assignment",
     modifier: null,
-    variable: collapseThat(state, target),
+    variable,
     operator,
     call,
     firstToken: getFirstToken(target),
@@ -138,15 +143,11 @@ export function parsePropertyAssignmentGivenTargetAndOperator(
 
 export function checkSymbolTable(
   state: ParserState,
-  variable: ErrorValue | ValueIdentifier,
-  operator: SaferToken<
+  variable: ValueIdentifier,
+  operator: Token<
     typeof tConstDeclAssign | typeof tVarDeclAssign | typeof tNoDeclAssign
   >,
 ) {
-  if (variable.type === "error-value") {
-    return
-  }
-
   const baseVar = variable.token
   const varName = baseVar.text
   const symbolInfo = state.context.symbolTable.getSymbolInfo(varName)
@@ -185,7 +186,7 @@ export function checkSymbolTable(
 
 export function applyToSymbolTable(
   state: ParserState,
-  variable: SaferToken<typeof tValueIdentifier | typeof tTypeIdentifier>,
+  variable: Token<typeof tValueIdentifier | typeof tTypeIdentifier>,
   isConstant: boolean,
 ): void {
   if (state.context.symbolTable.getSymbolInfo(variable.text) !== null) {

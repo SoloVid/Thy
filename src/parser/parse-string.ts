@@ -1,4 +1,4 @@
-import { SaferToken } from "tokenizer/token"
+import { Token } from "tokenizer/token"
 import {
   tEndString,
   tEndStringInterpolation,
@@ -8,17 +8,18 @@ import {
   tValueIdentifier,
 } from "tokenizer/token-type"
 import { ValueIdentifier } from "tree"
-import { ErrorValue } from "tree/error"
 import type {
   StringInterpolation,
   StringLiteral,
   StringPart,
 } from "tree/string"
 import assert from "utils/assert"
-import { addTokenError } from "./error"
+import { addTokenError, badParse, BadParse } from "./error"
 import type { ParserState } from "./parser-state"
 
-export function parseStringLiteral(state: ParserState): StringLiteral {
+export function parseStringLiteral(
+  state: ParserState,
+): StringLiteral | BadParse {
   const firstToken = state.buffer.consumeToken()
   assert(
     firstToken.type === tStartString,
@@ -33,7 +34,9 @@ export function parseStringLiteral(state: ParserState): StringLiteral {
         token: nextToken,
       })
     } else if (nextToken.type === tStartStringInterpolation) {
-      parts.push(parseStringInterpolation(state, nextToken))
+      const part = parseStringInterpolation(state, nextToken)
+      if (part === badParse) return badParse
+      parts.push(part)
     } else {
       addTokenError(state, nextToken, `Unexpected token in string`)
     }
@@ -53,20 +56,21 @@ export function parseStringLiteral(state: ParserState): StringLiteral {
 
 export function parseStringInterpolation(
   state: ParserState,
-  firstToken: SaferToken<typeof tStartStringInterpolation>,
-): StringInterpolation {
+  firstToken: Token<typeof tStartStringInterpolation>,
+): StringInterpolation | BadParse {
   const interpolationValue = state.buffer.consumeToken()
-  const value: ValueIdentifier | ErrorValue =
-    interpolationValue.type === tValueIdentifier
-      ? {
-          type: "value-identifier",
-          token: interpolationValue,
-        }
-      : addTokenError(
-          state,
-          interpolationValue,
-          `Unexpected token in string interpolation (expected unscoped variable)`,
-        )
+  if (interpolationValue.type !== tValueIdentifier) {
+    addTokenError(
+      state,
+      interpolationValue,
+      `Unexpected token in string interpolation (expected unscoped variable)`,
+    )
+    return badParse
+  }
+  const value: ValueIdentifier = {
+    type: "value-identifier",
+    token: interpolationValue,
+  }
   while (state.buffer.peekToken().type !== tEndStringInterpolation) {
     const nextToken = state.buffer.consumeToken()
     addTokenError(

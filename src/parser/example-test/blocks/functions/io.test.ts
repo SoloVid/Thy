@@ -23,7 +23,7 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
           },
         },
         operator: {
-          type: "ConstantAssignment",
+          type: "ConstDeclAssign",
           text: "is",
         },
         call: {
@@ -56,7 +56,7 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
           },
         },
         operator: {
-          type: "ConstantAssignment",
+          type: "ConstDeclAssign",
           text: "is",
         },
         call: {
@@ -85,7 +85,7 @@ testParser("should parse example program blocks/functions/io.thy", async () => {
           },
         },
         operator: {
-          type: "ConstantAssignment",
+          type: "ConstDeclAssign",
           text: "is",
         },
         call: {

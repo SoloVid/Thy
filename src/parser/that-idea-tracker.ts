@@ -1,6 +1,7 @@
 import { tokenError } from "compile-error"
 import type { Idea } from "tree"
 import { isAssignment } from "tree/assignment"
+import { badParse, BadParse } from "./error"
 import type { ParserState } from "./parser-state"
 import type { TempThatNode } from "./that"
 
@@ -31,15 +32,15 @@ export function makeThatIdeaTracker(addError: ParserState["addError"]) {
           `No preceding non-captured call available to substitute for that`,
         ),
       )
-      return {
-        type: "error-value",
-        token: node.token,
-      } as const
+      return badParse
     },
     shareLatestIdea: (idea: Idea) => {
       if (nextThatIdeaIndex < ideas.length - 1) {
         ideaIndexOffLimits = ideas.length - 1
       }
+      // if (idea === badParse) {
+      //   return
+      // }
       ideas.push(idea)
       nextThatIdeaIndex = ideas.length - 1
       if (

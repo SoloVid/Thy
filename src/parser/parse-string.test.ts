@@ -2,26 +2,16 @@ import { expect } from "expect"
 import {
   tEndString,
   tEndStringInterpolation,
-  tMemberAccessOperator,
-  tNumberLiteral,
   tStartString,
   tStartStringInterpolation,
   tStringText,
-  tThat,
   tTypeIdentifier,
   tValueIdentifier,
 } from "tokenizer/token-type"
-import {
-  debugNodeStructure,
-  getNodeStructure,
-  testParser,
-} from "./example-test"
-import {
-  parseAnyIndeterminateNamedExpression,
-  parseIndeterminateNamedValueExpression,
-} from "./parse-named-expression"
-import { makeParserTestFixture } from "./test-helper"
+import { badParse } from "./error"
+import { getNodeStructure, testParser } from "./example-test"
 import { parseStringInterpolation, parseStringLiteral } from "./parse-string"
+import { makeParserTestFixture } from "./test-helper"
 
 testParser("parseStringLiteral() should parse basic string", () => {
   const { errors, state } = makeParserTestFixture([
@@ -204,13 +194,7 @@ testParser(
         end: expectedErrorToken,
       },
     ])
-    expect(getNodeStructure(result)).toEqual({
-      type: "string-interpolation",
-      value: {
-        type: "error-value",
-        token: expectedErrorToken,
-      },
-    })
+    expect(result).toBe(badParse)
   },
 )
 

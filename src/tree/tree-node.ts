@@ -10,11 +10,10 @@ import type {
 } from "./atom"
 import type { Block } from "./block"
 import type { Call, Return } from "./call"
-import { ErrorValue } from "./error"
 import type { BlankLine, Comment } from "./idea"
 import type { LetCall } from "./let-call"
 import type { TypePropertyAccess, ValuePropertyAccess } from "./property-access"
-import { StringLiteral } from "./string"
+import type { StringInterpolation, StringLiteral } from "./string"
 import type { TypeAssignment } from "./type-assignment"
 import type { TypeCall } from "./type-call"
 
@@ -27,6 +26,7 @@ export type TreeNode =
   | Return
   | NumberLiteral
   | StringLiteral
+  | StringInterpolation
   | ValuePropertyAccess
   | TypePropertyAccess
   | TypeAssignment
@@ -38,4 +38,3 @@ export type TreeNode =
   | TypeGivenAtom
   | TypeIdentifier
   | ValueIdentifier
-  | ErrorValue

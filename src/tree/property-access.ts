@@ -1,4 +1,4 @@
-import type { SaferToken } from "../tokenizer/token"
+import type { Token } from "../tokenizer/token"
 import type {
   tMemberAccessOperator,
   tTypeIdentifier,
@@ -6,23 +6,24 @@ import type {
 } from "../tokenizer/token-type"
 import type { TypeIdentifier, ValueIdentifier } from "./atom"
 import { Call } from "./call"
-import { ErrorValue } from "./error"
 import type { TokenRange } from "./token-range"
 
 export interface ValuePropertyAccess extends TokenRange {
-  type: "value-property-access"
-  base: Call | ValueIdentifier | ErrorValue
-  propertyAccesses: readonly {
-    memberAccessOperatorToken: SaferToken<typeof tMemberAccessOperator>
-    propertyToken: SaferToken<typeof tValueIdentifier>
+  readonly type: "value-property-access"
+  readonly base: Call | ValueIdentifier
+  readonly propertyAccesses: readonly {
+    readonly memberAccessOperatorToken: Token<typeof tMemberAccessOperator>
+    readonly propertyToken: Token<typeof tValueIdentifier>
   }[]
 }
 
 export interface TypePropertyAccess extends TokenRange {
-  type: "type-property-access"
-  base: Call | TypeIdentifier | ValueIdentifier | ErrorValue
-  propertyAccesses: readonly {
-    memberAccessOperatorToken: SaferToken<typeof tMemberAccessOperator>
-    propertyToken: SaferToken<typeof tTypeIdentifier | typeof tValueIdentifier>
+  readonly type: "type-property-access"
+  readonly base: Call | TypeIdentifier | ValueIdentifier
+  readonly propertyAccesses: readonly {
+    readonly memberAccessOperatorToken: Token<typeof tMemberAccessOperator>
+    readonly propertyToken: Token<
+      typeof tTypeIdentifier | typeof tValueIdentifier
+    >
   }[]
 }

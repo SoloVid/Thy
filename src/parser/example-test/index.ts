@@ -5,16 +5,29 @@ import type { CompileError } from "../../compile-error"
 import { readExampleFile } from "../../example"
 import { makeTokenizer } from "../../tokenizer"
 import { parse } from "../parser"
+import { TreeNode } from "tree"
+import { badParse, BadParse, ErrorableTreeNode } from "parser/error"
 
 export const testParser = defineTestGroup("parser ")
 
 const maxTestN = 1000
 
-export function debugNodeStructure(node: unknown) {
+export function debugNodeStructure(
+  node: TreeNode | ErrorableTreeNode | BadParse,
+) {
+  if (node == badParse) {
+    console.log("<badParse>")
+    return
+  }
   console.log(JSON.stringify(getNodeStructure(node), null, 2))
 }
 
-export function getNodeStructure(node: unknown) {
+export function getNodeStructure(
+  node: TreeNode | ErrorableTreeNode | BadParse,
+) {
+  if (node == badParse) {
+    return badParse
+  }
   return JSON.parse(
     JSON.stringify(
       node,

@@ -18,7 +18,7 @@ testParser(
             },
           },
           operator: {
-            type: "ConstantAssignment",
+            type: "ConstDeclAssign",
             text: "is",
           },
           call: {

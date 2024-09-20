@@ -9,7 +9,7 @@ import {
   tVarDeclAssign,
 } from "../tokenizer/token-type"
 import type { Assignment } from "../tree"
-import { addTokenError } from "./error"
+import { addTokenError, badParse } from "./error"
 import {
   parseConstantDeclarationGivenTargetAndOperator,
   parsePropertyAssignmentGivenTargetAndOperator,
@@ -60,6 +60,7 @@ export function parseAssignmentOrValueCall(
   modifier: Assignment["modifier"] | null,
 ) {
   const assignedOrCalled = parseIndeterminateNamedValueExpression(state)
+  if (assignedOrCalled === badParse) return badParse
   const possiblyAssignmentOperator = state.buffer.peekToken()
   if (possiblyAssignmentOperator.type === tConstDeclAssign) {
     state.buffer.consumeToken()

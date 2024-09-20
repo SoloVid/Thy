@@ -1,3 +1,4 @@
+import { Token } from "tokenizer/token"
 import {
   tStatementContinuation,
   tStatementTerminator,
@@ -6,6 +7,7 @@ import {
 import { TokenRange } from "tree"
 import assert from "utils/assert"
 import type { TypeCall, TypeGivenCall } from "../tree/type-call"
+import { BadParse, badParse, nodeError } from "./error"
 import { getFirstToken, getLastToken } from "./helper"
 import {
   parseSpecialCallOrFallback,
@@ -18,8 +20,6 @@ import {
 } from "./parse-expression"
 import type { ParserState } from "./parser-state"
 import { collapseThat, collapseThats } from "./that"
-import { SaferToken } from "tokenizer/token"
-import { nodeError } from "./error"
 
 export function parseTypeCallOrValueCall(state: ParserState) {
   return parseSpecialCallOrFallback(state, () => {
@@ -28,6 +28,7 @@ export function parseTypeCallOrValueCall(state: ParserState) {
       return parseTypeGivenCall(state)
     }
     const func = parseIndeterminateValueOrTypeExpression(state)
+    if (func === badParse) return badParse
     if (
       func.type === "indeterminate-type-property-access" ||
       func.type === "type-identifier"
@@ -41,11 +42,14 @@ export function parseTypeCallOrValueCall(state: ParserState) {
 export function parseTypeCallGivenTarget(
   state: ParserState,
   target: IndeterminateTypeExpression,
-): TypeCall {
+): TypeCall | BadParse {
   const args = parseTypeCallArgs(state)
+  if (args === badParse) return badParse
+  const func = collapseThat(state, target)
+  if (func === badParse) return badParse
   return {
     type: "type-call" as const,
-    func: collapseThat(state, target),
+    func,
     args: args.args,
     firstToken: getFirstToken(target),
     lastToken: args.lastToken,
@@ -56,16 +60,20 @@ interface Args extends TokenRange {
   args: TypeCall["args"]
 }
 
-export function parseTypeCallArgs(state: ParserState): Args {
+export function parseTypeCallArgs(state: ParserState): Args | BadParse {
   const firstToken = state.buffer.peekToken()
-  const args: (IndeterminateExpression | IndeterminateTypeExpression)[] = []
+  const indeterminateArgs: (
+    | IndeterminateExpression
+    | IndeterminateTypeExpression
+  )[] = []
 
   let lastToken = firstToken
   while (state.buffer.peekToken().type !== tStatementTerminator) {
     const arg = parseIndeterminateValueOrTypeExpression(state)
+    if (arg === badParse) return badParse
     lastToken = getLastToken(arg)
 
-    args.push(arg)
+    indeterminateArgs.push(arg)
 
     while (state.buffer.peekToken().type === tStatementContinuation) {
       state.buffer.consumeToken()
@@ -78,22 +86,24 @@ export function parseTypeCallArgs(state: ParserState): Args {
     "The only token that should have broken the loop is a statement terminator",
   )
 
+  const args = collapseThats(state, indeterminateArgs)
+  if (args === badParse) return badParse
+
   return {
-    args: collapseThats(state, args),
+    args,
     firstToken: firstToken,
     lastToken: lastToken,
   }
 }
 
-function parseTypeGivenCall(state: ParserState): TypeGivenCall {
-  const givenToken = state.buffer.consumeToken() as SaferToken<
-    typeof tTypeGiven
-  >
+function parseTypeGivenCall(state: ParserState): TypeGivenCall | BadParse {
+  const givenToken = state.buffer.consumeToken() as Token<typeof tTypeGiven>
   assert(
     givenToken.type === tTypeGiven,
     `parseTypeGivenCall() should only be called if next token is "Given"`,
   )
   const args = parseTypeCallArgs(state)
+  if (args === badParse) return badParse
   for (let i = 2; i < args.args.length; i++) {
     state.addError(
       nodeError(

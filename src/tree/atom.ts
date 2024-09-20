@@ -8,46 +8,38 @@ import type {
   tTypeIdentifier,
   tValueIdentifier,
 } from "../tokenizer/token-type"
-// import type { ReadSymbolTable } from "./symbol-table"
 
 export interface NumberLiteral {
-  type: "number-literal"
-  token: Token<typeof tNumberLiteral>
-  // symbolTable: ReadSymbolTable
+  readonly type: "number-literal"
+  readonly token: Token<typeof tNumberLiteral>
 }
 
 export interface TypeIdentifier {
-  type: "type-identifier"
-  token: Token<typeof tTypeIdentifier>
-  // symbolTable: ReadSymbolTable
+  readonly type: "type-identifier"
+  readonly token: Token<typeof tTypeIdentifier>
 }
 
 export interface ValueIdentifier {
-  type: "value-identifier"
-  token: Token<typeof tValueIdentifier>
-  // symbolTable: ReadSymbolTable
+  readonly type: "value-identifier"
+  readonly token: Token<typeof tValueIdentifier>
 }
 
 export interface AwaitAtom {
-  type: "await-atom"
-  token: Token<typeof tAwait>
-  // symbolTable: ReadSymbolTable
+  readonly type: "await-atom"
+  readonly token: Token<typeof tAwait>
 }
 
 export interface GivenAtom {
-  type: "given-atom"
-  token: Token<typeof tGiven>
-  // symbolTable: ReadSymbolTable
+  readonly type: "given-atom"
+  readonly token: Token<typeof tGiven>
 }
 
 export interface ReturnAtom {
-  type: "return-atom"
-  token: Token<typeof tReturn>
-  // symbolTable: ReadSymbolTable
+  readonly type: "return-atom"
+  readonly token: Token<typeof tReturn>
 }
 
 export interface TypeGivenAtom {
-  type: "type-given-atom"
-  token: Token<typeof tTypeGiven>
-  // symbolTable: ReadSymbolTable
+  readonly type: "type-given-atom"
+  readonly token: Token<typeof tTypeGiven>
 }

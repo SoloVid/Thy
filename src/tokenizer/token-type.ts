@@ -9,7 +9,7 @@ export const tStatementTerminator = "StatementTerminator"
 export const tComment = "Comment"
 
 // Keywords
-export const tConstDeclAssign = "ConstantAssignment"
+export const tConstDeclAssign = "ConstDeclAssign"
 export const tVarDeclAssign = "VarDeclAssign"
 export const tNoDeclAssign = "NoDeclAssign"
 export const tExport = "Export"

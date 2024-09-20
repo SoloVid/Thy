@@ -16,7 +16,7 @@ testParser("should parse example program types/given.thy", async () => {
           },
         },
         operator: {
-          type: "ConstantAssignment",
+          type: "ConstDeclAssign",
           text: "is",
         },
         call: {
@@ -44,7 +44,7 @@ testParser("should parse example program types/given.thy", async () => {
                     },
                   },
                   operator: {
-                    type: "ConstantAssignment",
+                    type: "ConstDeclAssign",
                     text: "is",
                   },
                   call: {
@@ -79,7 +79,7 @@ testParser("should parse example program types/given.thy", async () => {
                     },
                   },
                   operator: {
-                    type: "ConstantAssignment",
+                    type: "ConstDeclAssign",
                     text: "is",
                   },
                   call: {

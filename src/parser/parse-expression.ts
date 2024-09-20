@@ -1,12 +1,12 @@
 import type { Block, TypeIdentifier, ValueIdentifier } from "tree"
 import type { NumberLiteral } from "tree/atom"
-import type { ErrorValue } from "tree/error"
 import type { StringLiteral } from "tree/string"
 import {
   tNumberLiteral,
   tStartBlock,
   tStartString,
 } from "../tokenizer/token-type"
+import { BadParse } from "./error"
 import { parseBlock } from "./parse-block"
 import {
   parseAnyIndeterminateNamedExpression,
@@ -22,7 +22,6 @@ import {
 
 export type IndeterminateExpression =
   | Block
-  | ErrorValue
   | NumberLiteral
   | StringLiteral
   | TempThatNode
@@ -52,7 +51,7 @@ export function parseLiteralExpressionOrFallback<T>(
 
 export function parseIndeterminateValueExpression(
   state: ParserState,
-): IndeterminateExpression {
+): IndeterminateExpression | BadParse {
   return parseLiteralExpressionOrFallback(
     state,
     parseIndeterminateNamedValueExpression,
@@ -65,7 +64,7 @@ export type IndeterminateTypeExpression =
 
 export function parseIndeterminateValueOrTypeExpression(
   state: ParserState,
-): IndeterminateExpression | IndeterminateTypeExpression {
+): IndeterminateExpression | IndeterminateTypeExpression | BadParse {
   return parseLiteralExpressionOrFallback(
     state,
     parseAnyIndeterminateNamedExpression,

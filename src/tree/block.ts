@@ -15,9 +15,9 @@ export const returnStylePrecedence = [
 ]
 
 export interface Block extends TokenRange {
-  type: "block"
-  symbolTable: SymbolTable
-  ideas: readonly Idea[]
-  returnStyle: ReturnStyle
-  isAsync: boolean
+  readonly type: "block"
+  readonly symbolTable: SymbolTable
+  readonly ideas: readonly Idea[]
+  readonly returnStyle: ReturnStyle
+  readonly isAsync: boolean
 }

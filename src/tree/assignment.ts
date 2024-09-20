@@ -1,4 +1,4 @@
-import type { SaferToken } from "../tokenizer/token"
+import type { Token } from "../tokenizer/token"
 import {
   tConstDeclAssign,
   tExport,
@@ -8,7 +8,6 @@ import {
 } from "../tokenizer/token-type"
 import type { ValueIdentifier } from "./atom"
 import type { AwaitCall, GivenCall, ValueCall } from "./call"
-import type { ErrorValue } from "./error"
 import type { ValuePropertyAccess } from "./property-access"
 import type { TokenRange } from "./token-range"
 
@@ -40,33 +39,33 @@ export function isDeclaration(node: unknown): node is Declaration {
 }
 
 export interface ConstantDeclaration extends TokenRange {
-  type: "constant-declaration"
-  modifier: SaferToken<typeof tExport | typeof tPrivate> | null
-  variable: ErrorValue | ValueIdentifier
-  operator: SaferToken<typeof tConstDeclAssign>
-  call: ValueCall | AwaitCall | GivenCall
+  readonly type: "constant-declaration"
+  readonly modifier: Token<typeof tExport | typeof tPrivate> | null
+  readonly variable: ValueIdentifier
+  readonly operator: Token<typeof tConstDeclAssign>
+  readonly call: ValueCall | AwaitCall | GivenCall
 }
 
 export interface VariableDeclaration extends TokenRange {
-  type: "variable-declaration"
-  modifier: SaferToken<typeof tExport | typeof tPrivate> | null
-  variable: ErrorValue | ValueIdentifier
-  operator: SaferToken<typeof tVarDeclAssign>
-  call: ValueCall | AwaitCall | GivenCall
+  readonly type: "variable-declaration"
+  readonly modifier: Token<typeof tExport | typeof tPrivate> | null
+  readonly variable: ValueIdentifier
+  readonly operator: Token<typeof tVarDeclAssign>
+  readonly call: ValueCall | AwaitCall | GivenCall
 }
 
 export interface PropertyAssignment extends TokenRange {
-  type: "property-assignment"
-  modifier: null
-  variable: ErrorValue | ValuePropertyAccess
-  operator: SaferToken<typeof tNoDeclAssign>
-  call: ValueCall | AwaitCall | GivenCall
+  readonly type: "property-assignment"
+  readonly modifier: null
+  readonly variable: ValuePropertyAccess
+  readonly operator: Token<typeof tNoDeclAssign>
+  readonly call: ValueCall | AwaitCall | GivenCall
 }
 
 export interface VariableReassignment extends TokenRange {
-  type: "variable-reassignment"
-  modifier: null
-  variable: ErrorValue | ValueIdentifier
-  operator: SaferToken<typeof tNoDeclAssign>
-  call: ValueCall | AwaitCall | GivenCall
+  readonly type: "variable-reassignment"
+  readonly modifier: null
+  readonly variable: ValueIdentifier
+  readonly operator: Token<typeof tNoDeclAssign>
+  readonly call: ValueCall | AwaitCall | GivenCall
 }

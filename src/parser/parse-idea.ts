@@ -1,6 +1,7 @@
 import { isAssignment } from "tree/assignment"
 import {
   tComment,
+  tEndStream,
   tExport,
   tLet,
   tPrivate,
@@ -9,6 +10,7 @@ import {
   tType,
 } from "../tokenizer/token-type"
 import type { Idea } from "../tree"
+import { badParse, BadParse } from "./error"
 import {
   parseAssignmentOrCall,
   parseModifiedAssignment,
@@ -20,6 +22,27 @@ import { parseTypeAssignment } from "./parse-type-assignment"
 import type { ParserState } from "./parser-state"
 
 export function parseIdea(state: ParserState): Idea {
+  const result = parseIdeaUntilBadParse(state)
+  if (result !== badParse) {
+    return result
+  }
+
+  let previousToken = state.buffer.getPreviousToken()
+  // Munch all the tokens up to the next statement terminator.
+  while (![tStatementTerminator, tEndStream].includes(previousToken.type)) {
+    previousToken = state.buffer.consumeToken()
+  }
+  return {
+    type: "comment",
+    token: {
+      ...previousToken,
+      type: tComment,
+      text: `Error parsing this line (this comment is replacing the line)`,
+    },
+  }
+}
+
+function parseIdeaUntilBadParse(state: ParserState): Idea | BadParse {
   const nextToken = state.buffer.peekToken()
   if (nextToken.type === tComment) {
     return parseComment(state)

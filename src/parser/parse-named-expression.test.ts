@@ -12,6 +12,7 @@ import {
   parseIndeterminateNamedValueExpression,
 } from "./parse-named-expression"
 import { makeParserTestFixture } from "./test-helper"
+import { badParse } from "./error"
 
 testParser(
   "parseIndeterminateNamedValueExpression() should parse value",
@@ -52,10 +53,7 @@ testParser(
         end: expectedErrorToken,
       },
     ])
-    expect(getNodeStructure(result)).toEqual({
-      type: "error-value",
-      token: expectedErrorToken,
-    })
+    expect(result).toBe(badParse)
   },
 )
 
@@ -75,10 +73,7 @@ testParser(
         end: expectedErrorToken,
       },
     ])
-    expect(getNodeStructure(result)).toEqual({
-      type: "error-value",
-      token: expectedErrorToken,
-    })
+    expect(result).toBe(badParse)
   },
 )
 

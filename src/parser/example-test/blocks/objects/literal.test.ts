@@ -18,7 +18,7 @@ testParser(
             },
           },
           operator: {
-            type: "ConstantAssignment",
+            type: "ConstDeclAssign",
             text: "is",
           },
           call: {
@@ -37,7 +37,7 @@ testParser(
                     },
                   },
                   operator: {
-                    type: "ConstantAssignment",
+                    type: "ConstDeclAssign",
                     text: "is",
                   },
                   call: {
@@ -76,7 +76,7 @@ testParser(
                     },
                   },
                   operator: {
-                    type: "ConstantAssignment",
+                    type: "ConstDeclAssign",
                     text: "is",
                   },
                   call: {

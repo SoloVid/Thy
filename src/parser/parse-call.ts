@@ -1,4 +1,3 @@
-import type { SaferToken } from "tokenizer/token"
 import type { Expression } from "tree"
 import type { CallableExpression, TypeExpression } from "tree/expression"
 import assert from "utils/assert"
@@ -10,7 +9,13 @@ import type {
   Return,
   ValueCall,
 } from "../tree/call"
-import { addNodeError, addTokenError, nodeError } from "./error"
+import {
+  addNodeError,
+  addTokenError,
+  badParse,
+  BadParse,
+  nodeError,
+} from "./error"
 import { getFirstToken } from "./helper"
 import { parseCallArgs } from "./parse-call-arguments"
 import {
@@ -36,25 +41,31 @@ export function parseSpecialCallOrFallback<T>(
   return fallback(state)
 }
 
-export function parseCall(state: ParserState): Call {
+export function parseCall(state: ParserState): Call | BadParse {
   return parseSpecialCallOrFallback(state, parseValueCall)
 }
 
-export function parseValueCall(state: ParserState): ValueCall {
+export function parseValueCall(state: ParserState): ValueCall | BadParse {
   const indeterminateFunc = parseIndeterminateValueExpression(state)
+  if (indeterminateFunc === badParse) return badParse
   return parseValueCallGivenTarget(state, indeterminateFunc)
 }
 
 export function parseValueCallGivenTarget(
   state: ParserState,
   target: IndeterminateExpression,
-): ValueCall {
+): ValueCall | BadParse {
   const args = parseCallArgs(state)
-  const func = collapseThat(state, target)
+  if (args === badParse) return badParse
+
+  const maybeCallableFunc = collapseThat(state, target)
+  if (maybeCallableFunc === badParse) return badParse
+  const func = ensureFuncCallable(state, maybeCallableFunc)
+  if (func === badParse) return badParse
 
   return {
     type: "value-call",
-    func: ensureFuncCallable(state, func),
+    func: func,
     typeArgs: args.typeArgs,
     args: args.valueArgs,
     firstToken: getFirstToken(target),
@@ -65,23 +76,26 @@ export function parseValueCallGivenTarget(
 function ensureFuncCallable(
   state: ParserState,
   expression: Expression,
-): CallableExpression {
+): CallableExpression | BadParse {
   if (expression.type === "number-literal") {
-    return addNodeError(state, expression, "Number literals cannot be called")
+    addNodeError(state, expression, "Number literals cannot be called")
+    return badParse
   }
   if (expression.type === "string-literal") {
-    return addNodeError(state, expression, "String literals cannot be called")
+    addNodeError(state, expression, "String literals cannot be called")
+    return badParse
   }
   return expression
 }
 
-function parseAwaitCall(state: ParserState): AwaitCall {
+function parseAwaitCall(state: ParserState): AwaitCall | BadParse {
   const awaitToken = state.buffer.consumeToken()
   assert(
     awaitToken.type === tAwait,
     `parseAwaitCall() should only be called if next token is "await"`,
   )
   const args = parseCallArgs(state)
+  if (args === badParse) return badParse
   for (let i = 0; i < args.typeArgs.length; i++) {
     state.addError(
       nodeError(
@@ -90,16 +104,15 @@ function parseAwaitCall(state: ParserState): AwaitCall {
       ),
     )
   }
-  const validArgs =
-    args.valueArgs.length > 0
-      ? ([args.valueArgs[0] as Expression] as const)
-      : ([
-          addTokenError(
-            state,
-            awaitToken,
-            `"await" call should receive exactly one argument`,
-          ),
-        ] as const)
+  if (args.valueArgs.length === 0) {
+    addTokenError(
+      state,
+      awaitToken,
+      `"await" call should receive exactly one argument`,
+    )
+    return badParse
+  }
+  const validArgs = [args.valueArgs[0] as Expression] as const
   for (let i = 1; i < args.valueArgs.length; i++) {
     state.addError(
       nodeError(
@@ -121,13 +134,14 @@ function parseAwaitCall(state: ParserState): AwaitCall {
   }
 }
 
-function parseGivenCall(state: ParserState): GivenCall {
+function parseGivenCall(state: ParserState): GivenCall | BadParse {
   const givenToken = state.buffer.consumeToken()
   assert(
     givenToken.type === tGiven,
     `parseGivenCall() should only be called if next token is "given"`,
   )
   const args = parseCallArgs(state)
+  if (args === badParse) return badParse
   const validTypeArgs =
     args.typeArgs.length > 0
       ? ([args.typeArgs[0] as TypeExpression] as const)
@@ -165,13 +179,14 @@ function parseGivenCall(state: ParserState): GivenCall {
   }
 }
 
-export function parseReturn(state: ParserState): Return {
+export function parseReturn(state: ParserState): Return | BadParse {
   const returnToken = state.buffer.consumeToken()
   assert(
     returnToken.type === tReturn,
     `parseReturn() should only be called if next token is "return"`,
   )
   const args = parseCallArgs(state)
+  if (args === badParse) return badParse
   const validTypeArgs =
     args.typeArgs.length > 0
       ? ([args.typeArgs[0] as TypeExpression] as const)
@@ -184,16 +199,15 @@ export function parseReturn(state: ParserState): Return {
       ),
     )
   }
-  const validArgs =
-    args.valueArgs.length > 0
-      ? ([args.valueArgs[0] as Expression] as const)
-      : ([
-          addTokenError(
-            state,
-            returnToken,
-            `"return" should receive exactly one argument`,
-          ),
-        ] as const)
+  if (args.valueArgs.length === 0) {
+    addTokenError(
+      state,
+      returnToken,
+      `"return" should receive exactly one argument`,
+    )
+    return badParse
+  }
+  const validArgs = [args.valueArgs[0] as Expression] as const
   for (let i = 1; i < args.valueArgs.length; i++) {
     state.addError(
       nodeError(

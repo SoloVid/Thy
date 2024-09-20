@@ -1,13 +1,13 @@
 import assert from "assert"
-import { Idea } from "tree"
 import type { Token } from "../tokenizer/token"
 import { tEndBlock, tEndStream, tStartBlock } from "../tokenizer/token-type"
 import { Block, ReturnStyle, returnStyle } from "../tree/block"
+import { badParse } from "./error"
 import { evaluateReturnStyle } from "./evaluate-return-style"
+import { getLastToken } from "./helper"
 import { isIdeaAsync, parseIdea } from "./parse-idea"
 import type { ParserContext, ParserState } from "./parser-state"
 import { makeThatIdeaTracker } from "./that-idea-tracker"
-import { getLastToken } from "./helper"
 
 export function parseBlock(state: ParserState): Block {
   const firstToken = state.buffer.consumeToken()
@@ -39,17 +39,14 @@ export function parseBlockInner(state: ParserState): Block {
     let nextToken: Token = firstToken
     while (nextToken.type !== tEndBlock && nextToken.type !== tEndStream) {
       const idea = parseIdea(state)
-
-      nextToken = state.buffer.peekToken()
-      // if (idea.type !== "blank-line" || nextToken.type !== tEndStream) {
       thatIdeaTracker.shareLatestIdea(idea)
+
+      // if (idea !== badParse) {
+      blockReturnStyle = evaluateReturnStyle(state, blockReturnStyle, idea)
+      isAsync = isAsync || isIdeaAsync(idea)
       // }
 
-      if (idea !== null && isIdeaAsync(idea)) {
-        isAsync = true
-      }
-
-      blockReturnStyle = evaluateReturnStyle(state, blockReturnStyle, idea)
+      nextToken = state.buffer.peekToken()
     }
 
     const ideas = thatIdeaTracker.ideas

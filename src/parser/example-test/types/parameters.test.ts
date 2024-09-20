@@ -16,7 +16,7 @@ testParser("should parse example program types/parameters.thy", async () => {
           },
         },
         operator: {
-          type: "ConstantAssignment",
+          type: "ConstDeclAssign",
           text: "is",
         },
         call: {
@@ -48,7 +48,7 @@ testParser("should parse example program types/parameters.thy", async () => {
                     },
                   },
                   operator: {
-                    type: "ConstantAssignment",
+                    type: "ConstDeclAssign",
                     text: "is",
                   },
                   call: {
@@ -86,7 +86,7 @@ testParser("should parse example program types/parameters.thy", async () => {
                     },
                   },
                   operator: {
-                    type: "ConstantAssignment",
+                    type: "ConstDeclAssign",
                     text: "is",
                   },
                   call: {
@@ -120,7 +120,7 @@ testParser("should parse example program types/parameters.thy", async () => {
                     },
                   },
                   operator: {
-                    type: "ConstantAssignment",
+                    type: "ConstDeclAssign",
                     text: "is",
                   },
                   call: {
@@ -147,7 +147,7 @@ testParser("should parse example program types/parameters.thy", async () => {
                     },
                   },
                   operator: {
-                    type: "ConstantAssignment",
+                    type: "ConstDeclAssign",
                     text: "is",
                   },
                   call: {

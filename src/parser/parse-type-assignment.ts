@@ -1,5 +1,4 @@
 import type { TypeIdentifier } from "tree"
-import type { ErrorValue } from "tree/error"
 import assert from "utils/assert"
 import {
   tConstDeclAssign,
@@ -9,7 +8,7 @@ import {
   tVarDeclAssign,
 } from "../tokenizer/token-type"
 import type { TypeAssignment } from "../tree/type-assignment"
-import { addTokenError } from "./error"
+import { addTokenError, badParse, BadParse } from "./error"
 import { applyToSymbolTable } from "./parse-assignment"
 import { parseTypeCallOrValueCall } from "./parse-type-call"
 import type { ParserState } from "./parser-state"
@@ -17,28 +16,30 @@ import type { ParserState } from "./parser-state"
 export function parseTypeAssignment(
   state: ParserState,
   modifierToken: TypeAssignment["modifier"],
-): TypeAssignment {
+): TypeAssignment | BadParse {
   const typeToken = state.buffer.consumeToken()
   assert(
     typeToken.type === tType,
     `parseTypeAssignment() should only be called if next token is ${tType}`,
   )
   const unsafeVariable = state.buffer.consumeToken()
-  const variable: TypeIdentifier | ErrorValue =
-    unsafeVariable.type === tTypeIdentifier
-      ? {
-          type: "type-identifier",
-          token: unsafeVariable,
-        }
-      : addTokenError(state, unsafeVariable, `Expected type identifier`)
-  if (variable.type === "type-identifier") {
-    applyToSymbolTable(state, variable.token, true)
+  if (unsafeVariable.type !== tTypeIdentifier) {
+    addTokenError(state, unsafeVariable, `Expected type identifier`)
+    return badParse
   }
 
+  const variable: TypeIdentifier = {
+    type: "type-identifier",
+    token: unsafeVariable,
+  }
+  applyToSymbolTable(state, variable.token, true)
+
   const operator = parseTypeAssignmentOperatorToken(state)
+  if (operator === badParse) return badParse
 
   // TODO: Handle case of missing call.
   const call = parseTypeCallOrValueCall(state)
+  if (call === badParse) return badParse
 
   return {
     type: "type-assignment",
@@ -54,16 +55,14 @@ export function parseTypeAssignment(
 
 function parseTypeAssignmentOperatorToken(
   state: ParserState,
-): TypeAssignment["operator"] {
+): TypeAssignment["operator"] | BadParse {
   const operator = state.buffer.consumeToken()
   if ([tVarDeclAssign, tNoDeclAssign].includes(operator.type)) {
-    return addTokenError(state, operator, `Types cannot be mutably assigned`)
+    addTokenError(state, operator, `Types cannot be mutably assigned`)
+    return badParse
   } else if (operator.type !== tConstDeclAssign) {
-    return addTokenError(
-      state,
-      operator,
-      `Unexpected token where "is" expected`,
-    )
+    addTokenError(state, operator, `Unexpected token where "is" expected`)
+    return badParse
   }
   return operator
 }

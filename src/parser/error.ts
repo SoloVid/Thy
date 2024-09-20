@@ -1,11 +1,12 @@
-import { Token } from "tokenizer/token"
-import { ParserState } from "./parser-state"
 import { CompileError, tokenError, tokenRangeError } from "compile-error"
-import { NumberLiteral } from "tree/atom"
-import { ErrorValue } from "tree/error"
+import { Token } from "tokenizer/token"
 import { BlankLine, TokenRange, TreeNode } from "tree"
 import { IndeterminateExpression } from "./parse-expression"
+import { ParserState } from "./parser-state"
 import { IndeterminateTypePropertyAccess } from "./that"
+
+export const badParse = Symbol("badParse")
+export type BadParse = typeof badParse
 
 export type ErrorableTreeNode =
   | Exclude<TreeNode, BlankLine | Comment>
@@ -16,36 +17,28 @@ export function addTokenError(
   state: ParserState,
   token: Token,
   message: string,
-): ErrorValue {
+) {
   state.addError(tokenError(token, message))
-  return {
-    type: "error-value",
-    token: token,
-  }
 }
 
 export function addTokenRangeError(
   state: ParserState,
   tokenRange: TokenRange,
   message: string,
-): ErrorValue {
+) {
   state.addError(tokenRangeError(tokenRange, message))
-  return {
-    type: "error-value",
-    firstToken: tokenRange.firstToken,
-    lastToken: tokenRange.lastToken,
-  }
 }
 
 export function addNodeError(
   state: ParserState,
   node: ErrorableTreeNode,
   message: string,
-): ErrorValue {
+) {
   if ("token" in node) {
-    return addTokenError(state, node.token, message)
+    addTokenError(state, node.token, message)
+    return
   }
-  return addTokenRangeError(state, node, message)
+  addTokenRangeError(state, node, message)
 }
 
 export function nodeError(

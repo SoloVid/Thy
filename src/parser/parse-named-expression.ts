@@ -1,6 +1,5 @@
-import { ErrorValue } from "tree/error"
 import { tokenError } from "../compile-error"
-import type { SaferToken, Token } from "../tokenizer/token"
+import type { Token } from "../tokenizer/token"
 import {
   tMemberAccessOperator,
   tThat,
@@ -12,7 +11,7 @@ import type {
   ValueIdentifier,
   ValuePropertyAccess,
 } from "../tree"
-import { addNodeError, addTokenError } from "./error"
+import { addNodeError, addTokenError, badParse, BadParse } from "./error"
 import type { ParserState } from "./parser-state"
 import {
   IndeterminateTypePropertyAccess,
@@ -25,22 +24,21 @@ export type IndeterminateNamedValueExpression =
   | ValueIdentifier
   | IndeterminateValuePropertyAccess
   | TempThatNode
-  | ErrorValue
 
 export function parseIndeterminateNamedValueExpression(
   state: ParserState,
-): IndeterminateNamedValueExpression {
+): IndeterminateNamedValueExpression | BadParse {
   const expression = parseAnyIndeterminateNamedExpression(state)
+  if (expression === badParse) return badParse
   if (
     expression.type === "type-identifier" ||
     expression.type === "indeterminate-type-property-access"
   ) {
-    return addNodeError(state, expression, `Unexpected type expression`)
+    addNodeError(state, expression, `Unexpected type expression`)
+    return badParse
   }
   return expression
 }
-
-type IdentifierToken = Token<typeof tTypeIdentifier | typeof tValueIdentifier>
 
 type NamedNode<
   T extends typeof tThat | typeof tTypeIdentifier | typeof tValueIdentifier,
@@ -54,7 +52,7 @@ type NamedNode<
 
 function makeNamedNode<
   T extends typeof tThat | typeof tTypeIdentifier | typeof tValueIdentifier,
->(token: SaferToken<T>): NamedNode<T> {
+>(token: Token<T>): NamedNode<T> {
   if (token.type === tThat) {
     return {
       type: "that",
@@ -81,22 +79,22 @@ export function parseAnyIndeterminateNamedExpression(
   | IndeterminateTypePropertyAccess
   | ValueIdentifier
   | IndeterminateValuePropertyAccess
-  | ErrorValue {
+  | BadParse {
   let baseToken = state.buffer.consumeToken()
   if (
     baseToken.type !== tThat &&
     baseToken.type !== tTypeIdentifier &&
     baseToken.type !== tValueIdentifier
   ) {
-    return addTokenError(
+    addTokenError(
       state,
       baseToken,
       `Expected named expression, got ${baseToken.type}: ${baseToken.text}`,
     )
+    return badParse
   }
-  // assert(baseToken.type === tThat || baseToken.type == tTypeIdentifier || baseToken.type === tValueIdentifier, `parseAnyNamedExpression() should only be called when next token is "that" or an identifier (got ${baseToken.type}: ${baseToken.text})`)
 
-  const propertiesAccessed: SaferToken<
+  const propertiesAccessed: Token<
     typeof tTypeIdentifier | typeof tValueIdentifier
   >[] = []
   const memberAccessOperatorTokens: Token<typeof tMemberAccessOperator>[] = []
