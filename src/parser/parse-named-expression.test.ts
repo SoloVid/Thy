@@ -116,9 +116,9 @@ testParser(
     expect(getNodeStructure(result)).toEqual({
       type: "indeterminate-value-property-access",
       base: { type: "value-identifier", token: { type: "ValueIdentifier" } },
-      "baseToken": {
-        "type": "ValueIdentifier",
-      },          
+      baseToken: {
+        type: "ValueIdentifier",
+      },
       propertyAccesses: [
         {
           memberAccessOperatorToken: { type: "MemberAccessOperator" },
@@ -144,9 +144,9 @@ testParser(
     expect(getNodeStructure(result)).toEqual({
       type: "indeterminate-value-property-access",
       base: { type: "value-identifier", token: { type: "ValueIdentifier" } },
-      "baseToken": {
-        "type": "ValueIdentifier",
-      },          
+      baseToken: {
+        type: "ValueIdentifier",
+      },
       propertyAccesses: [
         {
           memberAccessOperatorToken: { type: "MemberAccessOperator" },
@@ -174,9 +174,9 @@ testParser(
     expect(getNodeStructure(result)).toEqual({
       type: "indeterminate-type-property-access",
       base: { type: "value-identifier", token: { type: "ValueIdentifier" } },
-      "baseToken": {
-        "type": "ValueIdentifier",
-      },          
+      baseToken: {
+        type: "ValueIdentifier",
+      },
       propertyAccesses: [
         {
           memberAccessOperatorToken: { type: "MemberAccessOperator" },
@@ -202,10 +202,10 @@ testParser(
     expect(getNodeStructure(result)).toEqual({
       type: "indeterminate-type-property-access",
       base: { type: "value-identifier", token: { type: "ValueIdentifier" } },
-      "baseToken": {
-        "type": "ValueIdentifier",
-      },          
-          propertyAccesses: [
+      baseToken: {
+        type: "ValueIdentifier",
+      },
+      propertyAccesses: [
         {
           memberAccessOperatorToken: { type: "MemberAccessOperator" },
           propertyToken: { type: "ValueIdentifier" },
@@ -282,9 +282,9 @@ testParser(
           type: "ValueIdentifier",
         },
       },
-      "baseToken": {
-        "type": "ValueIdentifier",
-      },          
+      baseToken: {
+        type: "ValueIdentifier",
+      },
       propertyAccesses: [
         {
           memberAccessOperatorToken: {

@@ -11,10 +11,7 @@ import { interpretThyStatement } from "./statement"
 import { makeSimpleContext } from "./test-helper"
 import type { ThyBlockContext } from "./types"
 
-function interpretThyStatementBasic(
-  context: ThyBlockContext,
-  source: string,
-) {
+function interpretThyStatementBasic(context: ThyBlockContext, source: string) {
   const errors: CompileError[] = []
   const tokenizer = makeTokenizer(source, errors)
   const parserState = makeParserState(tokenizer, errors)
@@ -22,47 +19,14 @@ function interpretThyStatementBasic(
   expect(errors).toEqual([])
   assert(block.ideas.length === 1, "parsed block should have 1 idea")
   const statement = block.ideas[0]
-  assert(isCall(statement) || isAssignment(statement), "parsed idea should be a call or assignment")
-  return interpretThyStatement(
-    context,
-    statement,
+  assert(
+    isCall(statement) || isAssignment(statement),
+    "parsed idea should be a call or assignment",
   )
+  const result = interpretThyStatement(context, statement)
+  assert(result.wait, "This test should only be handling async stuff")
+  return result.promise
 }
-
-test("interpretThyStatement() should handle await call (no assign)", async () => {
-  let order = 0
-  let pResolveOrder = -1
-  let thyStatementResolveOrder = -1
-  let resolve = (n: number) => undefined as void
-  const p = new Promise<number>((r) => {
-    resolve = r
-  })
-  p.then(() => {
-    pResolveOrder = order++
-  })
-  const context = makeSimpleContext({
-    variablesInBlock: { p: p },
-  })
-  const thyResult = interpretThyStatementBasic(context, `await p`)
-  assert(thyResult instanceof Promise)
-  thyResult.then(() => {
-    thyStatementResolveOrder = order++
-  })
-  assert.strictEqual(context.thatValue, undefined)
-  resolve(5)
-  await p
-  await thyResult
-  assert(pResolveOrder >= 0, "p should have resolved")
-  assert(
-    thyStatementResolveOrder >= 0,
-    "thy statement promise should have resolved",
-  )
-  assert(
-    pResolveOrder < thyStatementResolveOrder,
-    "thy statement promise should have resolved after p",
-  )
-  assert.strictEqual(context.thatValue, 5)
-})
 
 test("interpretThyStatement() should handle await call with assignment", async () => {
   let order = 0

@@ -13,12 +13,12 @@ testParser(
             type: "constant-declaration",
             modifier: null,
             variable: {
-                       "token": {
-                         "text": "a",
-                         "type": "ValueIdentifier",
-                       },
-                       "type": "value-identifier",
-                     },
+              token: {
+                text: "a",
+                type: "ValueIdentifier",
+              },
+              type: "value-identifier",
+            },
             call: {
               type: "value-call",
               func: {

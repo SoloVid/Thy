@@ -46,8 +46,7 @@ function testRejectValue(value: unknown) {
     variablesInBlock: { a: value },
   })
   assert.throws(
-    () =>
-      interpretString(context, "check .a."),
+    () => interpretString(context, "check .a."),
     (e) => {
       assert(e instanceof Error)
       assert.match(e.message, /a is not a string or number/)
@@ -85,8 +84,7 @@ test("interpretThyString() should reject function value for interpolation", asyn
 test("interpretThyString() should reject undefined variable", async () => {
   const context = makeSimpleContext()
   assert.throws(
-    () =>
-      interpretString(context, "check .a."),
+    () => interpretString(context, "check .a."),
     (e) => {
       assert(e instanceof Error)
       assert.match(e.message, /a not found/)
@@ -101,18 +99,12 @@ test("interpretThyString() should interpolate values from closure", async () => 
   const context = makeSimpleContext({
     closure: { a: "1" },
   })
-  assert.strictEqual(
-    interpretString(context, "check .a."),
-    "check 1",
-  )
+  assert.strictEqual(interpretString(context, "check .a."), "check 1")
 })
 
 test("interpretThyString() should interpolate values from implicit arguments", async () => {
   const context = makeSimpleContext({
     implicitArguments: { a: "1" },
   })
-  assert.strictEqual(
-    interpretString(context, "check .a."),
-    "check 1",
-  )
+  assert.strictEqual(interpretString(context, "check .a."), "check 1")
 })

@@ -206,7 +206,8 @@ function validateValuePropertyAccess(
     }
   }
 
-  const baseToken: Token<typeof tValueIdentifier | typeof tThat> = validIntermediatePropertyAccesses[0].propertyToken
+  const baseToken: Token<typeof tValueIdentifier | typeof tThat> =
+    validIntermediatePropertyAccesses[0].propertyToken
   return {
     type: "indeterminate-value-property-access",
     // TODO: Can we type this more safely?

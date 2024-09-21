@@ -12,10 +12,7 @@ import { interpretThyStatement } from "./statement"
 import { makeSimpleContext } from "./test-helper"
 import type { ThyBlockContext } from "./types"
 
-function interpretThyStatementBasic(
-  context: ThyBlockContext,
-  source: string,
-) {
+function interpretThyStatementBasic(context: ThyBlockContext, source: string) {
   const errors: CompileError[] = []
   const tokenizer = makeTokenizer(source, errors)
   const parserState = makeParserState(tokenizer, errors)
@@ -23,11 +20,13 @@ function interpretThyStatementBasic(
   expect(errors).toEqual([])
   assert(block.ideas.length === 1, "parsed block should have 1 idea")
   const statement = block.ideas[0]
-  assert(isCall(statement) || isAssignment(statement), "parsed idea should be a call or assignment")
-  return interpretThyStatement(
-    context,
-    statement,
+  assert(
+    isCall(statement) || isAssignment(statement),
+    "parsed idea should be a call or assignment",
   )
+  const raw = interpretThyStatement(context, statement)
+  assert(!raw.wait, "This test case should not be handling async")
+  return raw.value
 }
 
 test("interpretThyStatement() should call function", async () => {
@@ -70,8 +69,7 @@ test("interpretThyStatement() should reject attempt to shadow variable from clos
     closure: { a: 1 },
   })
   assert.throws(
-    () =>
-      interpretThyStatementBasic(context, `a be f`),
+    () => interpretThyStatementBasic(context, `a be f`),
     (e) => {
       assert(e instanceof Error)
       assert.match(e.message, /a cannot be shadowed/)

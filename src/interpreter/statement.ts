@@ -1,36 +1,72 @@
 import { Assignment, isDeclaration } from "tree/assignment"
 import { Call, isCall } from "tree/call"
-import { isIdeaAsync } from "tree/idea"
-import assert from "utils/assert"
+import { forwardWait, MayWait, notWait, yesWait } from "./async-helper"
 import { interpretThyCall } from "./call"
 import { interpretThyValuePropertyAccessExceptLeaf } from "./expression"
-import {
-  makeInterpreterNodeError
-} from "./interpreter-error"
+import { makeInterpreterNodeError } from "./interpreter-error"
 import { ThyBlockContext } from "./types"
+import { RuntimeObject, yesIThinkThisIsRuntimeObject } from "./dynamic-type"
 
 export function interpretThyStatement(
   context: ThyBlockContext,
   idea: Call | Assignment,
-): void | PromiseLike<void> {
-  if (isIdeaAsync(idea)) {
-    throw new Error("TODO: Implement async in interpreter")
-  }
-
+): MayWait<void> {
   if (isCall(idea)) {
-    assert(idea.type !== "await-call", "It should be impossible for idea to be await-call here")
-    interpretThyCall(context, idea)
-    return
+    return forwardWait(interpretThyCall(context, idea), () => undefined)
   }
 
-  assert(idea.call.type !== "await-call", "It should be impossible for idea to be async here")
-  const newValue = interpretThyCall(context, idea.call)
+  const assignmentDetailsResult = getAssignmentDetails(context, idea)
+  if (assignmentDetailsResult.wait) {
+    return yesWait(async () => {
+      return interpretThyAssignmentAsync(
+        context,
+        idea,
+        await assignmentDetailsResult.promise,
+      )
+    })
+  }
+  const assignmentDetails = assignmentDetailsResult.value
+  const callResult = interpretThyCall(context, idea.call)
+  return forwardWait(callResult, (newValue) => {
+    if (assignmentDetails) {
+      assignmentDetails.variableMap[assignmentDetails.variableName] = newValue
+    }
+  })
+}
 
+async function interpretThyAssignmentAsync(
+  context: ThyBlockContext,
+  idea: Assignment,
+  assignmentDetails: AssignmentDetails,
+) {
+  const callResult = interpretThyCall(context, idea.call)
+  const newValue = callResult.wait ? await callResult.promise : callResult.value
+  if (assignmentDetails) {
+    assignmentDetails.variableMap[assignmentDetails.variableName] = newValue
+  }
+}
+
+type AssignmentDetails = {
+  variableMap: RuntimeObject
+  variableName: string
+} | null
+
+function getAssignmentDetails(
+  context: ThyBlockContext,
+  idea: Call | Assignment,
+): MayWait<AssignmentDetails> {
+  if (isCall(idea)) {
+    return notWait(null)
+  }
   if (idea.variable.type === "value-property-access") {
-    const {base, lastAccess} = interpretThyValuePropertyAccessExceptLeaf(context, idea.variable)
-    const baseAsRecord = (base as Record<string, unknown>)
-    baseAsRecord[lastAccess] = newValue
-    return
+    const accessResult = interpretThyValuePropertyAccessExceptLeaf(
+      context,
+      idea.variable,
+    )
+    return forwardWait(accessResult, ({ base, lastAccess }) => ({
+      variableMap: yesIThinkThisIsRuntimeObject(base),
+      variableName: lastAccess,
+    }))
   }
 
   const variableName = idea.variable.token.text
@@ -43,18 +79,14 @@ export function interpretThyStatement(
       `${variableName} is an implicit argument and cannot be overwritten`,
     )
   }
-  if (
-    variableName in context.closure &&
-    isDeclaration(idea)
-  ) {
+  if (variableName in context.closure && isDeclaration(idea)) {
     throw makeInterpreterNodeError(
       idea.variable,
       `${variableName} cannot be shadowed. Since it is declared in an upper scope, it cannot be redefined.`,
     )
   }
   if (variableName in context.closure) {
-    context.closure[variableName] = newValue
-    return
+    return notWait({ variableMap: context.closure, variableName })
   }
-  context.variablesInBlock[variableName] = newValue
+  return notWait({ variableMap: context.variablesInBlock, variableName })
 }

@@ -1,39 +1,35 @@
 import { makeSymbolTable } from "tree/symbol-table"
 import type { ThyBlockContext } from "./types"
-import { tTypeIdentifier, tValueIdentifier } from "tokenizer/token-type"
-import { Token } from "tokenizer/token"
+import { RuntimeValue } from "./dynamic-type"
 
-type TestContextOptions = Partial<ThyBlockContext> & {
-  closureVariableIsImmutable?: Record<string, boolean>
+type TestContextOptions = {
+  readonly argsToUse: unknown[]
+  readonly givenUsed: boolean
+  readonly implicitArguments: Readonly<Record<string, unknown>>
+  readonly implicitArgumentFirstUsed: null | string
+  readonly isAsync: boolean
+  readonly closure: Record<string, unknown>
+  readonly variablesInBlock: Record<string, unknown>
 }
 
 export const makeSimpleContext = (
-  o: TestContextOptions = {},
+  o: Partial<TestContextOptions> = {},
 ): ThyBlockContext => {
-  const parentSymbolTable = makeSymbolTable()
-  if (o.closure) {
-    for (const key of Object.keys(o.closure)) {
-      parentSymbolTable.addSymbol({
-        type: tValueIdentifier,
-        text: key
-      } as Token<typeof tValueIdentifier | typeof tTypeIdentifier>, o.closureVariableIsImmutable?.[key] ?? false,
-    "bare")
-      // console.log(`added symbol ${key}`)
-      // console.log(parentSymbolTable.getSymbolInfo(key))
-    }
-  }
-  const symbolTable = parentSymbolTable.makeChild()
-  // console.log(symbolTable)
-  // console.log(symbolTable.getSymbolInfo("x"))
   return {
-  argsToUse: [],
-  givenUsed: false,
-  implicitArguments: {},
-  implicitArgumentFirstUsed: null,
-  symbolTable,
-  variablesInBlock: {},
-  closure: {},
-  sourceFile: "<test thy source>",
-  ...o,
-}
+    argsToUse: (o.argsToUse ?? []) as RuntimeValue[],
+    givenUsed: o.givenUsed ?? false,
+    implicitArguments: (o.implicitArguments ?? {}) as Record<
+      string,
+      RuntimeValue
+    >,
+    implicitArgumentFirstUsed: o.implicitArgumentFirstUsed ?? null,
+    isAsync: o.isAsync ?? false,
+    symbolTable: makeSymbolTable(),
+    variablesInBlock: (o.variablesInBlock ?? {}) as Record<
+      string,
+      RuntimeValue
+    >,
+    closure: (o.closure ?? {}) as Record<string, RuntimeValue>,
+    sourceFile: "<test thy source>",
+  }
 }

@@ -1,40 +1,57 @@
-import type { Block, Expression, ValueIdentifier, ValuePropertyAccess } from "tree"
+import type {
+  Block,
+  Expression,
+  ValueIdentifier,
+  ValuePropertyAccess,
+} from "tree"
 import { isCall } from "tree/call"
 import assert from "../utils/assert"
+import { forwardWait, MayWait, NotWait, notWait } from "./async-helper"
 import { interpretThyBlockNode } from "./block"
 import { interpretThyCall } from "./call"
+import {
+  RuntimeFunction,
+  RuntimeValue,
+  yesIThinkThisIsRuntimeObject,
+  yesThisValueIsForRuntime,
+} from "./dynamic-type"
 import { makeInterpreterNodeError } from "./interpreter-error"
-import type { ThyBlockContext } from "./types"
 import { interpretThyString } from "./string"
+import type { ThyBlockContext } from "./types"
 
-type InterpretedExpression = {
-  target: unknown
-  thisValue?: unknown
+export type InterpretedExpression = {
+  target: RuntimeValue
+  thisValue?: RuntimeValue
 }
 
-const ie = (value: unknown): InterpretedExpression => ({ target: value })
+const ie = (target: RuntimeValue): NotWait<InterpretedExpression> => ({
+  wait: false,
+  value: { target: target },
+})
 
 export function interpretThyExpression(
   context: ThyBlockContext,
   thyExpression: Expression,
-): InterpretedExpression {
+): MayWait<InterpretedExpression> {
   if (thyExpression.type === "block") {
     return ie(resolveBlock(context, thyExpression))
   }
   if (thyExpression.type === "number-literal") {
-    return ie(parseFloat(thyExpression.token.text))
+    return ie(yesThisValueIsForRuntime(parseFloat(thyExpression.token.text)))
   }
   if (thyExpression.type === "string-literal") {
-    return ie(interpretThyString(context, thyExpression))
+    return ie(
+      yesThisValueIsForRuntime(interpretThyString(context, thyExpression)),
+    )
   }
   if (isCall(thyExpression)) {
-    assert(thyExpression.type !== "await-call", "TODO: await-call not yet implemented")
-    return ie(interpretThyCall(context, thyExpression))
+    const callResult = interpretThyCall(context, thyExpression)
+    return forwardWait(callResult, (r) => ({ target: r }))
   }
-  return interpretThyIdentifier(context, thyExpression)
+  return interpretThyNamedExpression(context, thyExpression)
 }
 
-function resolveBlock(context: ThyBlockContext, block: Block) {
+function resolveBlock(context: ThyBlockContext, block: Block): RuntimeValue {
   function initialize() {
     const childClosure: ThyBlockContext["closure"] = {}
     for (const key of Object.keys(context.implicitArguments)) {
@@ -44,22 +61,22 @@ function resolveBlock(context: ThyBlockContext, block: Block) {
           return context.implicitArguments[key]
         },
         set(value) {
-          throw new Error(`${key} is an implicit argument and cannot be overwritten`)
+          throw new Error(
+            `${key} is an implicit argument and cannot be overwritten`,
+          )
         },
       })
     }
     for (const key of Object.keys(context.variablesInBlock)) {
-      const isImmutable = context.symbolTable.getSymbolInfo(key)?.isConstant ?? false
+      const isImmutable =
+        context.symbolTable.getSymbolInfo(key)?.isConstant ?? false
       Object.defineProperty(childClosure, key, {
         enumerable: true,
         get() {
           return context.variablesInBlock[key]
         },
         set(value) {
-          assert(
-            !isImmutable,
-            `${key} is immutable and cannot be reassigned`,
-          )
+          assert(!isImmutable, `${key} is immutable and cannot be reassigned`)
           context.variablesInBlock[key] = value
         },
       })
@@ -87,32 +104,62 @@ function resolveBlock(context: ThyBlockContext, block: Block) {
   // the full list of variables in childClosure is not known
   // until the parent block has finished evaluating.
 
-  let cached: null | ((...args: readonly unknown[]) => unknown) = null
-  return (...args: readonly unknown[]): unknown => {
+  let cached: null | RuntimeFunction = null
+  const toReturn: RuntimeFunction = (...args) => {
     if (cached === null) {
       cached = initialize()
     }
     return cached(...args)
   }
+  return yesThisValueIsForRuntime(toReturn)
 }
 
-export function interpretThyIdentifier(
+export function interpretThyValueIdentifier(
+  context: ThyBlockContext,
+  thyExpression: ValueIdentifier,
+): NotWait<InterpretedExpression> {
+  const value = getVariableFromContext(context, thyExpression)
+  return notWait({ target: value, thisValue: undefined })
+}
+
+export function interpretThyNamedExpression(
   context: ThyBlockContext,
   thyExpression: ValueIdentifier | ValuePropertyAccess,
-): InterpretedExpression {
+): MayWait<InterpretedExpression> {
   if (thyExpression.type === "value-identifier") {
-    const value = getVariableFromContext(context, thyExpression)
-    return { target: value, thisValue: undefined }
+    return interpretThyValueIdentifier(context, thyExpression)
   }
-  const mostlyAccessed = interpretThyValuePropertyAccessExceptLeaf(context, thyExpression)
-  return { target: (mostlyAccessed.base as Record<string, unknown>)[mostlyAccessed.lastAccess], thisValue: mostlyAccessed.base }
+  const mostlyAccessedResult = interpretThyValuePropertyAccessExceptLeaf(
+    context,
+    thyExpression,
+  )
+  return forwardWait(mostlyAccessedResult, (mostlyAccessed) => ({
+    thisValue: mostlyAccessed.base,
+    target: yesIThinkThisIsRuntimeObject(mostlyAccessed.base)[
+      mostlyAccessed.lastAccess
+    ],
+  }))
 }
 
 export function interpretThyValuePropertyAccessExceptLeaf(
   context: ThyBlockContext,
   thyExpression: ValuePropertyAccess,
-) {
-  const baseValue = interpretThyExpression(context, thyExpression.base).target
+): MayWait<MostlyAccessed> {
+  const baseValueResult = interpretThyExpression(context, thyExpression.base)
+  return forwardWait(baseValueResult, (value) =>
+    interpretThyValuePropertyAccessExceptLeafSync(thyExpression, value.target),
+  )
+}
+
+type MostlyAccessed = {
+  base: RuntimeValue
+  lastAccess: string
+}
+
+export function interpretThyValuePropertyAccessExceptLeafSync(
+  thyExpression: ValuePropertyAccess,
+  baseValue: RuntimeValue,
+): MostlyAccessed {
   let priorAccess = thyExpression.baseToken.text
   let finalValue = baseValue
   for (let i = 0; i < thyExpression.propertyAccesses.length - 1; i++) {
@@ -124,10 +171,12 @@ export function interpretThyValuePropertyAccessExceptLeaf(
         `Cannot access ${access} on ${priorAccess} because ${priorAccess} has no value`,
       )
     }
-    finalValue = (finalValue as Record<string, unknown>)[access]
+    finalValue = yesIThinkThisIsRuntimeObject(finalValue)[access]
     priorAccess = access
   }
-  const lastAccess = thyExpression.propertyAccesses[thyExpression.propertyAccesses.length - 1].propertyToken.text
+  const lastAccess =
+    thyExpression.propertyAccesses[thyExpression.propertyAccesses.length - 1]
+      .propertyToken.text
   if (finalValue === undefined) {
     throw makeInterpreterNodeError(
       thyExpression,
@@ -140,7 +189,7 @@ export function interpretThyValuePropertyAccessExceptLeaf(
 function getVariableFromContext(
   context: ThyBlockContext,
   valueIdentifier: ValueIdentifier,
-) {
+): RuntimeValue {
   const variable = valueIdentifier.token.text
   if (
     !context.givenUsed &&
@@ -168,5 +217,8 @@ function getVariableFromContext(
       `Implicit arguments cannot be used (referenced ${variable}) after \`given\``,
     )
   }
-  throw makeInterpreterNodeError(valueIdentifier, `Variable ${variable} not found`)
+  throw makeInterpreterNodeError(
+    valueIdentifier,
+    `Variable ${variable} not found`,
+  )
 }

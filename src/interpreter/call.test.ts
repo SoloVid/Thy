@@ -11,10 +11,7 @@ import { InterpreterErrorWithContext } from "./interpreter-error"
 import { makeSimpleContext } from "./test-helper"
 import type { ThyBlockContext } from "./types"
 
-function interpretThyCallBasic(
-  context: ThyBlockContext,
-  source: string,
-) {
+function interpretThyCallBasic(context: ThyBlockContext, source: string) {
   const errors: CompileError[] = []
   const tokenizer = makeTokenizer(source, errors)
   const parserState = makeParserState(tokenizer, errors)
@@ -23,10 +20,9 @@ function interpretThyCallBasic(
   assert(block.ideas.length === 1, "parsed block should have 1 idea")
   const call = block.ideas[0]
   assert(isCall(call), "parsed idea should be a call")
-  return interpretThyCall(
-    context,
-    call,
-  )
+  const raw = interpretThyCall(context, call)
+  assert(!raw.wait, "This test should not be processing async stuff")
+  return raw.value
 }
 
 test("interpretThyCall() should call a function", async () => {

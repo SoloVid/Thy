@@ -57,7 +57,10 @@ export function parseBlockInner(state: ParserState): Block {
       isAsync: isAsync,
       ideas: ideas,
       returnStyle: blockReturnStyle,
-      exportedSymbols: getExportedSymbols(blockReturnStyle, context.symbolTable),
+      exportedSymbols: getExportedSymbols(
+        blockReturnStyle,
+        context.symbolTable,
+      ),
       firstToken: firstToken,
       lastToken: lastToken,
     }
@@ -66,12 +69,19 @@ export function parseBlockInner(state: ParserState): Block {
   }
 }
 
-function getExportedSymbols(blockReturnStyle: ReturnStyle, symbolTable: SymbolTable): Block["exportedSymbols"] {
+function getExportedSymbols(
+  blockReturnStyle: ReturnStyle,
+  symbolTable: SymbolTable,
+): Block["exportedSymbols"] {
   if (blockReturnStyle === returnStyle.explicitReturn) {
     return []
   }
   if (blockReturnStyle === returnStyle.explicitExport) {
-    return [...symbolTable.localSymbols.entries()].filter(([name, info]) => info.visibility === "export").map(([name, info]) => name)
+    return [...symbolTable.localSymbols.entries()]
+      .filter(([name, info]) => info.visibility === "export")
+      .map(([name, info]) => name)
   }
-  return [...symbolTable.localSymbols.entries()].filter(([name, info]) => info.visibility === "bare").map(([name, info]) => name)
+  return [...symbolTable.localSymbols.entries()]
+    .filter(([name, info]) => info.visibility === "bare")
+    .map(([name, info]) => name)
 }

@@ -1,9 +1,12 @@
-import { CompileError } from "compile-error";
-import { SourcePosition } from "tokenizer/token";
+import { CompileError } from "compile-error"
+import { SourcePosition } from "tokenizer/token"
 import { TreeNode } from "tree"
 
 export function makeInterpreterNodeError(node: TreeNode, message: string) {
-  return new InterpreterErrorWithContext(new Error(message), "firstToken" in node ? node.firstToken : node.token)
+  return new InterpreterErrorWithContext(
+    new Error(message),
+    "firstToken" in node ? node.firstToken : node.token,
+  )
 }
 
 export function makeInterpreterCompileError(error: CompileError) {

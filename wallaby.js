@@ -1,5 +1,5 @@
 const path = require("path")
-process.env.WALLABY = 'true';
+process.env.WALLABY = "true"
 module.exports = function () {
   return {
     files: ["src/**/*.js", "src/**/*.thy", "src/**/*.ts", "!src/**/*.test.ts"],
@@ -8,7 +8,7 @@ module.exports = function () {
       type: "node",
       params: {
         runner: "-r " + path.join(__dirname, "./wallaby-paths.js"),
-        env: "WALLABY=true"
+        env: "WALLABY=true",
       },
     },
     testFramework: "mocha",

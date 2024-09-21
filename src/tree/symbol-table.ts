@@ -14,7 +14,7 @@ export interface SymbolTable extends ReadSymbolTable {
   addSymbol(
     token: Token<typeof tValueIdentifier | typeof tTypeIdentifier>,
     isConstant: boolean,
-    visibility: SymbolVisibility
+    visibility: SymbolVisibility,
   ): void
   makeChild(): SymbolTable
 }

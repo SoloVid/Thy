@@ -72,7 +72,9 @@ test("interpretThyBlock() should return a function that can return undefined (wh
 })
 
 test("interpretThyBlock() should return object of exported variables", async () => {
-  const interpreted = interpretThyBlockSource(`export a is f\nb is f\nexport c be f`)
+  const interpreted = interpretThyBlockSource(
+    `export a is f\nb is f\nexport c be f`,
+  )
   const f = () => 5
   assert.deepStrictEqual(interpreted({ f }), { a: 5, c: 5 })
 })
@@ -181,7 +183,7 @@ test("interpretThyBlock() replaces `that` with preceding value when used as base
 makeThing
 return that.a
 `)
-  const result = interpreted({ makeThing: () => ({ a: 5 })})
+  const result = interpreted({ makeThing: () => ({ a: 5 }) })
   assert.strictEqual(result, 5)
 })
 

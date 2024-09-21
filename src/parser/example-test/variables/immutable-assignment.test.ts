@@ -39,8 +39,7 @@ testParser(
       },
       [
         {
-          message:
-            "\"x\" is declared elsewhere and cannot be re-declared",
+          message: '"x" is declared elsewhere and cannot be re-declared',
           start: {
             text: "x",
           },

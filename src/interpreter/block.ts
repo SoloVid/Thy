@@ -1,27 +1,30 @@
 import { CompileError } from "compile-error"
 import { parse } from "parser/parser"
 import { makeTokenizer } from "tokenizer"
-import { tExport } from "tokenizer/token-type"
 import { Block, Idea } from "tree"
-import { isDeclaration } from "tree/assignment"
+import { returnStyle } from "tree/block"
+import assert from "utils/assert"
 import {
   dissectErrorTraceAtCloserBaseline,
   replaceErrorTraceLine,
   transformErrorTrace,
 } from "../utils/error-helper"
+import { forwardWait, MayWait, notWait } from "./async-helper"
 import { interpretThyCall } from "./call"
+import {
+  RuntimeFunction,
+  RuntimeObject,
+  RuntimeValue,
+  yesIThinkThisIsRuntimeObject,
+  yesThisValueIsForRuntime,
+} from "./dynamic-type"
 import { interpretThyExpression } from "./expression"
 import {
   InterpreterErrorWithContext,
   makeInterpreterCompileError,
-  makeInterpreterNodeError,
 } from "./interpreter-error"
 import { interpretThyStatement } from "./statement"
-import {
-  ThyBlockContext
-} from "./types"
-import { returnStyle } from "tree/block"
-import assert from "utils/assert"
+import { ThyBlockContext } from "./types"
 
 type BlockOptions = {
   closure: ThyBlockContext["closure"]
@@ -30,46 +33,49 @@ type BlockOptions = {
   additionalTraceLinesToHide?: number
 }
 
-type UnknownFunction = (...args: readonly unknown[]) => unknown
-type InterpretedBlockWithMeta = {
-  interpreted: UnknownFunction
+export type ApiUnknownFunction = (...args: readonly unknown[]) => unknown
+type ApiInterpretedBlockWithMeta = {
+  interpreted: ApiUnknownFunction
 }
 
 export function interpretThyBlockSource(
   thySource: string,
   options: Partial<BlockOptions> = {},
-): UnknownFunction {
+): ApiUnknownFunction {
   return interpretThyBlockSourceWithMeta(thySource, options).interpreted
 }
 
 export function interpretThyBlockSourceWithMeta(
   thySource: string,
   options: Partial<BlockOptions> = {},
-): InterpretedBlockWithMeta {
+): ApiInterpretedBlockWithMeta {
   const errors: CompileError[] = []
   const tokenizer = makeTokenizer(thySource, errors)
   const { top } = parse(tokenizer, errors)
   if (errors.length > 0) {
-    throw makeInterpreterCompileError(
-      errors[0],
-    )
+    throw makeInterpreterCompileError(errors[0])
   }
   return interpretThyBlockNodeWithMeta(top, {
     closure: options.closure ?? {},
     functionName: options.functionName,
     sourceFile: options.sourceFile ?? "inline-thy-code",
     additionalTraceLinesToHide: options.additionalTraceLinesToHide ?? 0,
-  })
+  }) as ApiInterpretedBlockWithMeta
 }
 
 export function interpretThyBlockNode(
   block: Block,
   options: BlockOptions,
-): UnknownFunction {
-  return interpretThyBlockNodeWithMeta(block, options).interpreted
+): RuntimeFunction {
+  return interpretThyBlockNodeWithMeta(block, options)
+    .interpreted as RuntimeFunction
 }
 
-function makeHelper(block: Block, options: BlockOptions, args: readonly unknown[]) {
+function makeHelper(
+  block: Block,
+  options: BlockOptions,
+  args: readonly RuntimeValue[],
+) {
   // I don't fully understand the -1 here, but somehow we want a different number of lines masked in the top-level case vs. thy-internal cases.
   const additionalTraceLinesToHide = options.additionalTraceLinesToHide ?? -1
 
@@ -78,44 +84,54 @@ function makeHelper(block: Block, options: BlockOptions, args: readonly unknown[
     givenUsed: false,
     implicitArguments:
       args.length > 0 && typeof args[0] === "object" && !!args[0]
-        ? (args[0] as Record<string, unknown>)
+        ? yesIThinkThisIsRuntimeObject(args[0])
         : {},
     implicitArgumentFirstUsed: null,
+    isAsync: block.isAsync,
     symbolTable: block.symbolTable,
     closure: options.closure,
     variablesInBlock: {},
     sourceFile: options.sourceFile,
   }
-  function evaluateStatement(
-    idea: Idea,
-  ): [shouldReturn: boolean, value: unknown] {
-    if (idea.type === "blank-line" || idea.type === "comment" || idea.type === "type-assignment") {
-      return [false, undefined]
+
+  type IdeaResult = [shouldReturn: boolean, value: RuntimeValue | undefined]
+  function evaluateStatement(idea: Idea): MayWait<IdeaResult> {
+    if (
+      idea.type === "blank-line" ||
+      idea.type === "comment" ||
+      idea.type === "type-assignment"
+    ) {
+      return notWait([false, undefined])
     }
     if (idea.type === "return") {
-      return [true, interpretThyExpression(context, idea.args[0]).target]
+      return forwardWait(
+        interpretThyExpression(context, idea.args[0]),
+        (ie) => [true, ie.target],
+      )
     }
     if (idea.type === "let-call") {
       if (idea.call === null) {
-        return [false, undefined]
+        return notWait([false, undefined])
       }
-      assert(idea.call.type !== "await-call", "TODO: await-call not yet implemented")
-      const returnValue = interpretThyCall(context, idea.call)
-      if (returnValue !== undefined) {
-        return [true, returnValue]
-      }
-      return [false, undefined]
+      return forwardWait(interpretThyCall(context, idea.call), (returnValue) =>
+        returnValue === undefined ? [false, undefined] : [true, returnValue],
+      )
     }
-    return [false, interpretThyStatement(context, idea)]
+    return forwardWait(interpretThyStatement(context, idea), () => [
+      false,
+      undefined,
+    ])
   }
 
   function formulateResult() {
-    const exportSource =
-      block.exportedSymbols
-    if (block.exportedSymbols.length === 0 || block.returnStyle === returnStyle.explicitReturn) {
+    const exportSource = block.exportedSymbols
+    if (
+      block.exportedSymbols.length === 0 ||
+      block.returnStyle === returnStyle.explicitReturn
+    ) {
       return undefined
     }
-    const implicitReturn: Record<string, unknown> = {}
+    const implicitReturn: RuntimeObject = {}
     for (const variableName of exportSource) {
       Object.defineProperty(implicitReturn, variableName, {
         enumerable: true,
@@ -132,7 +148,7 @@ function makeHelper(block: Block, options: BlockOptions, args: readonly unknown[
         },
       })
     }
-    return implicitReturn
+    return yesThisValueIsForRuntime(implicitReturn)
   }
 
   return {
@@ -146,7 +162,11 @@ function makeHelper(block: Block, options: BlockOptions, args: readonly unknown[
 export function interpretThyBlockNodeWithMeta(
   block: Block,
   options: BlockOptions,
-): InterpretedBlockWithMeta {
+): {
+  interpreted: (
+    ...args: readonly RuntimeValue[]
+  ) => RuntimeValue | undefined | PromiseLike<RuntimeValue | undefined>
+} {
   const functionName = options.functionName ?? "<anonymous>"
 
   if (block.isAsync) {
@@ -161,28 +181,25 @@ function interpretThyAsyncBlock(
   block: Block,
   options: BlockOptions,
 ) {
-  const objWithBlockFunction = {
-    [functionName]: async (...args: readonly unknown[]) => {
+  const objWithBlockFunction: {
+    [functionName: string]: (
+      ...args: readonly RuntimeValue[]
+    ) => PromiseLike<RuntimeValue | undefined>
+  } = {
+    [functionName]: async (...args) => {
+      // Note: I moved this up out of the loop. Not sure if that is going to break stuff.
+      // For async stack traces, the trace is a bit different before and after a true await.
+      const errorHere = new Error()
+
       const helper = makeHelper(block, options, args)
       for (const idea of block.ideas) {
-        if (idea.type === "let-call" && idea.call && idea.call.type === "await-call") {
-          const returnValue = await interpretThyExpression(helper.context, idea.call.args[0]).target
-          if (returnValue !== undefined) {
-            return returnValue
-          }
-          continue
-        }
-
-        // For async stack traces, the trace is a bit different before and after a true await.
-        const errorHere = new Error()
         try {
-          const [shouldReturn, value] = helper.evaluateStatement(idea)
+          const statementResult = helper.evaluateStatement(idea)
+          const [shouldReturn, value] = statementResult.wait
+            ? await statementResult.promise
+            : statementResult.value
           if (shouldReturn) {
             return value
-          } else {
-            if (value instanceof Promise) {
-              await value
-            }
           }
         } catch (e) {
           throwTransformedError(
@@ -194,6 +211,7 @@ function interpretThyAsyncBlock(
           )
         }
       }
+
       return helper.formulateResult()
     },
   }
@@ -207,12 +225,21 @@ function interpretThySyncBlock(
   block: Block,
   options: BlockOptions,
 ) {
-  const objWithBlockFunction = {
-    [functionName]: (...args: readonly unknown[]) => {
+  const objWithBlockFunction: {
+    [functionName: string]: (
+      ...args: readonly RuntimeValue[]
+    ) => RuntimeValue | undefined
+  } = {
+    [functionName]: (...args) => {
       const helper = makeHelper(block, options, args)
       try {
         for (const idea of block.ideas) {
-          const [shouldReturn, value] = helper.evaluateStatement(idea)
+          const statementResult = helper.evaluateStatement(idea)
+          assert(
+            !statementResult.wait,
+            "It should be impossible for await to come up in non-async block",
+          )
+          const [shouldReturn, value] = statementResult.value
           if (shouldReturn) {
             return value
           }

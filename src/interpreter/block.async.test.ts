@@ -49,12 +49,34 @@ test("interpretThyBlock() can return an async function that can forgo early retu
   assert.strictEqual(awaitedResult, 1)
 })
 
-test("interpretThyBlock() can return an async function that rejects `let await` with no arguments", async () => {
-  const interpreted = interpretThyBlockSource(`let await`)
-  await assert.rejects(async () => interpreted({}), /`await` takes 1 argument/)
-})
-
-test("interpretThyBlock() can return an async function that rejects `let await` with too many arguments", async () => {
-  const interpreted = interpretThyBlockSource(`let await 1 2`)
-  await assert.rejects(async () => interpreted({}), /`await` takes 1 argument/)
+test("interpretThyBlock() can return an async function that can handle await call (no assign) in that", async () => {
+  let order = 0
+  let pResolveOrder = -1
+  let thyStatementResolveOrder = -1
+  let resolve = (n: number) => undefined as void
+  const p = new Promise<number>((r) => {
+    resolve = r
+  })
+  p.then(() => {
+    pResolveOrder = order++
+  })
+  const interpreted = interpretThyBlockSource(`await p\nreturn that`)
+  const thyResult = interpreted({ p })
+  assert(thyResult instanceof Promise)
+  thyResult.then(() => {
+    thyStatementResolveOrder = order++
+  })
+  resolve(5)
+  await p
+  const valueResult = await thyResult
+  assert(pResolveOrder >= 0, "p should have resolved")
+  assert(
+    thyStatementResolveOrder >= 0,
+    "thy statement promise should have resolved",
+  )
+  assert(
+    pResolveOrder < thyStatementResolveOrder,
+    "thy statement promise should have resolved after p",
+  )
+  assert.strictEqual(valueResult, 5)
 })

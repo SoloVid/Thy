@@ -75,7 +75,7 @@ export function parseValueCallGivenTarget(
 }
 
 function getValueCallFuncToken(
-  target: IndeterminateExpression
+  target: IndeterminateExpression,
 ): ValueCall["funcToken"] {
   if (target.type === "value-identifier") {
     return target.token
@@ -84,7 +84,8 @@ function getValueCallFuncToken(
     return target.token
   }
   if (target.type === "indeterminate-value-property-access") {
-    return target.propertyAccesses[target.propertyAccesses.length - 1].propertyToken
+    return target.propertyAccesses[target.propertyAccesses.length - 1]
+      .propertyToken
   }
   return null
 }

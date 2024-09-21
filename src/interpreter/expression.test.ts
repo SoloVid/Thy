@@ -16,10 +16,7 @@ const testLocation = {
   column: 4,
 }
 
-function interpretThyExpressionBasic(
-  context: ThyBlockContext,
-  source: string,
-) {
+function interpretThyExpressionBasic(context: ThyBlockContext, source: string) {
   const errors: CompileError[] = []
   const tokenizer = makeTokenizer(`Comment\ndef ${source}`, errors)
   const parserState = makeParserState(tokenizer, errors)
@@ -29,10 +26,9 @@ function interpretThyExpressionBasic(
   const call = block.ideas[1]
   assert(isCall(call), "parsed idea should be a call")
   assert(call.args.length === 1, "parsed call should have 1 argument")
-  return interpretThyExpression(
-    context,
-    call.args[0],
-  )
+  const maybeAsync = interpretThyExpression(context, call.args[0])
+  assert(!maybeAsync.wait, "This test case shouldn't be handling async")
+  return maybeAsync.value
 }
 
 test("interpretThyExpression() can return number", async () => {
@@ -189,7 +185,8 @@ test("interpretThyExpression() barfs if member access is attempted on undefined 
 
 test("interpretThyExpression() interprets array as block", async () => {
   const context = makeSimpleContext()
-  const f = interpretThyExpressionBasic(context, "\n  return 5").target
+  const f = interpretThyExpressionBasic(context, "\n  return 5")
+    .target as unknown
   assert(typeof f === "function", "Expression should be a function")
   assert.strictEqual(f(), 5)
 })
@@ -198,7 +195,8 @@ test("interpretThyExpression() allows block to access variables from this scope'
   const context = makeSimpleContext({
     closure: { x: 5 },
   })
-  const f = interpretThyExpressionBasic(context, "\n  return x").target
+  const f = interpretThyExpressionBasic(context, "\n  return x")
+    .target as unknown
   assert(typeof f === "function", "Expression should be a function")
   assert.strictEqual(f(), 5)
 })
@@ -207,7 +205,8 @@ test("interpretThyExpression() allows block to access variables from this scope'
   const context = makeSimpleContext({
     implicitArguments: { x: 5 },
   })
-  const f = interpretThyExpressionBasic(context, "\n  return x").target
+  const f = interpretThyExpressionBasic(context, "\n  return x")
+    .target as unknown
   assert(typeof f === "function", "Expression should be a function")
   assert.strictEqual(f(), 5)
 })
@@ -216,7 +215,8 @@ test("interpretThyExpression() allows block to access variables from this scope'
   const context = makeSimpleContext({
     variablesInBlock: { x: 5 },
   })
-  const f = interpretThyExpressionBasic(context, "\n  return x").target
+  const f = interpretThyExpressionBasic(context, "\n  return x")
+    .target as unknown
   assert(typeof f === "function", "Expression should be a function")
   assert.strictEqual(f(), 5)
 })

@@ -176,7 +176,12 @@ export function checkSymbolTable(
     operator.type === tVarDeclAssign
   ) {
     if (symbolInfo === null) {
-      applyToSymbolTable(state, modifier, baseVar, operator.type === tConstDeclAssign)
+      applyToSymbolTable(
+        state,
+        modifier,
+        baseVar,
+        operator.type === tConstDeclAssign,
+      )
     } else {
       addTokenError(
         state,
@@ -211,5 +216,13 @@ export function applyToSymbolTable(
       ),
     )
   }
-  state.context.symbolTable.addSymbol(variable, isConstant, modifier === null ? "bare" : modifier.type === tExport ? "export" : "private")
+  state.context.symbolTable.addSymbol(
+    variable,
+    isConstant,
+    modifier === null
+      ? "bare"
+      : modifier.type === tExport
+        ? "export"
+        : "private",
+  )
 }

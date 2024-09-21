@@ -1,19 +1,45 @@
-import { AwaitAtom, Expression } from "tree"
-import { interpretThyExpression } from "./expression"
-import {
-  InterpreterErrorWithContext
-} from "./interpreter-error"
-import { ThyBlockContext } from "./types"
+export type MayWait<T> = YesWait<T> | NotWait<T>
+export type YesWait<T> = {
+  readonly wait: true
+  readonly promise: PromiseLike<T>
+}
+export type NotWait<T> = {
+  readonly wait: false
+  readonly value: T
+}
 
-export function doAwaitStuff(context: ThyBlockContext, awaitAtom: AwaitAtom, expression: Expression) {
-  return (async () => {
-    // For async stack traces, the trace is a bit different before and after a true await.
-    const errorHere = new Error("errorHere")
-    try {
-      return await interpretThyExpression(context, expression)
-        .target
-    } catch (e) {
-      throw new InterpreterErrorWithContext(e, awaitAtom.token, 0, errorHere, 1)
+export function yesWait<T>(waitForIt: () => PromiseLike<T>): YesWait<T> {
+  const promise = Promise.resolve(waitForIt())
+  // This can keep the JS runtime from breaking if someone forgets to catch.
+  // promise.then(() => {
+  //   // Do nothing.
+  // }, e => {
+  //   console.log("Avoid that death trap")
+  //   console.error(e)
+  // })
+  return {
+    wait: true,
+    promise,
+  }
+}
+export function notWait<T>(value: T): NotWait<T> {
+  return {
+    wait: false,
+    value,
+  }
+}
+export function forwardWait<T, U>(
+  source: MayWait<T>,
+  process: (value: T) => U,
+): MayWait<U> {
+  if (!source.wait) {
+    return {
+      wait: false,
+      value: process(source.value),
     }
-  })()
+  }
+  return {
+    wait: true,
+    promise: source.promise.then(process),
+  }
 }

@@ -1,4 +1,7 @@
-import { test as utsTest, defineTestGroup as utsDefineTestGroup } from "under-the-sun"
+import {
+  test as utsTest,
+  defineTestGroup as utsDefineTestGroup,
+} from "under-the-sun"
 
 // function test(
 //   description: string,
@@ -32,4 +35,6 @@ function mochaDefineTestGroup(groupDescriptionPrefix: string) {
 const useMocha = !!process?.env?.MOCHA || !!process?.env?.WALLABY
 
 export const test = useMocha ? mochaTest : utsTest
-export const defineTestGroup = useMocha ? mochaDefineTestGroup : utsDefineTestGroup
+export const defineTestGroup = useMocha
+  ? mochaDefineTestGroup
+  : utsDefineTestGroup

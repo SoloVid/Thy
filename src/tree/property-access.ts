@@ -22,7 +22,9 @@ export interface ValuePropertyAccess extends TokenRange {
 export interface TypePropertyAccess extends TokenRange {
   readonly type: "type-property-access"
   readonly base: Call | TypeIdentifier | ValueIdentifier
-  readonly baseToken: Token<typeof tTypeIdentifier | typeof tValueIdentifier | typeof tThat>
+  readonly baseToken: Token<
+    typeof tTypeIdentifier | typeof tValueIdentifier | typeof tThat
+  >
   readonly propertyAccesses: readonly {
     readonly memberAccessOperatorToken: Token<typeof tMemberAccessOperator>
     readonly propertyToken: Token<

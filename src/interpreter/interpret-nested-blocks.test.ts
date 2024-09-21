@@ -18,7 +18,9 @@ test("interpretThyBlock() can return a function that can pass a function to anot
 })
 
 test("interpretThyBlock() can return a function that can pass a multiline string to a function", async () => {
-  const interpreted = interpretThyBlockSource(`f """\n  yo\n  sup\n\nf """\n  again`)
+  const interpreted = interpretThyBlockSource(
+    `f """\n  yo\n  sup\n\nf """\n  again`,
+  )
   let calledWith: unknown[] = []
   const f = (arg: unknown) => calledWith.push(arg)
   interpreted({ f })
@@ -51,6 +53,6 @@ test("interpretThyBlock() track local (single scope) mutable variables", async (
   const interpreted = interpretThyBlockSource(
     `x be def 5\nx to inc x\nx to inc x\nreturn x`,
   )
-  const result = interpreted({ def: defBuiltin, inc: (n: number) => n + 1, })
+  const result = interpreted({ def: defBuiltin, inc: (n: number) => n + 1 })
   assert.strictEqual(result, 7)
 })
