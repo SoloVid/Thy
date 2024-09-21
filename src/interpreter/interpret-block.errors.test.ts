@@ -45,6 +45,9 @@ test("interpretThyBlock() should provide Thy stack trace when error is thrown sy
 nonWallabyTest(
   "interpretThyBlock() should provide Thy stack trace when error is thrown asynchronously",
   async () => {
+    // Make sure async stack traces are homogenous.
+    await delay(10)
+
     const interpreted = interpretThyBlockSource(`f is given\nf\nawait that`, {
       functionName: "interpreted",
       sourceFile: "provided-source.thy",
@@ -53,9 +56,6 @@ nonWallabyTest(
       await delay(10)
       throw new Error("f bad")
     }
-
-    // Make sure async stack traces are homogenous.
-    await delay(10)
 
     const errorHere = new Error()
 
