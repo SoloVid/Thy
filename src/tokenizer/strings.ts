@@ -52,11 +52,11 @@ export const matchMultiLineStringLiteral = makeNestedDynamicTokenizerMatcher(
     nextLineWithSignificantWhitespaceRegex.lastIndex = state.offset
     const significantWhitespaceMatch =
       nextLineWithSignificantWhitespaceRegex.exec(state.text)
-    debug(() => [
+    debug(
       "match next line with significant whitespace:",
       significantWhitespaceMatch,
       nextLineWithSignificantWhitespaceRegex,
-    ])
+    )
     let textContentIndent =
       significantWhitespaceMatch === null
         ? parentIndent
@@ -66,7 +66,7 @@ export const matchMultiLineStringLiteral = makeNestedDynamicTokenizerMatcher(
     if (textContentIndent <= parentIndent) {
       textContentIndent = parentIndent + 1
     }
-    debug(() => ["text content indent:", textContentIndent])
+    debug("text content indent:", textContentIndent)
     const matchContentNewLine = makeMultiLineStringNewLineContentMatcher(
       parentIndent,
       textContentIndent,
@@ -109,7 +109,7 @@ export function makeMultiLineStringNewLineContentMatcher(
   )
   return (state) => {
     newLineLookAheadToNextLineWithTextContentRegex.lastIndex = state.offset
-    debug(() => ["matching:", newLineLookAheadToNextLineWithTextContentRegex])
+    debug("matching:", newLineLookAheadToNextLineWithTextContentRegex)
     const result = newLineLookAheadToNextLineWithTextContentRegex.exec(
       state.text,
     )

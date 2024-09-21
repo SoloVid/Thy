@@ -1,7 +1,7 @@
-const debugOn = false
+export const debugOn = false
 
-export function debug(getArgs: () => readonly unknown[]) {
+export function debug(...args: readonly unknown[]) {
   if (debugOn) {
-    console.log(...getArgs())
+    console.log(...args)
   }
 }

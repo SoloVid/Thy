@@ -34,7 +34,7 @@ export function matchMultilineComment(
     `(${tag})( .*)?\r?\n[\\S\\s]*?((^( {${indentWidth}})(${tag})$)|(.*$(?![\r\n])))`,
     "my",
   )
-  debug(() => ["matching:", fullCommentRegex])
+  debug("matching:", fullCommentRegex)
   fullCommentRegex.lastIndex = state.offset
   const result = fullCommentRegex.exec(state.text)
   if (result === null) {

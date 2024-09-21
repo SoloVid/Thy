@@ -79,7 +79,7 @@ export function makeIndentMatchers(): IndentTokenizers {
     // const regex = /(?<=\n)( *(?=[^ \r\n]))/y
     const regex = /\r?\n([ \r\n]*(?=[^ \r\n]|$))/y
     regex.lastIndex = state.offset
-    debug(() => ["matching:", regex])
+    debug("matching:", regex)
     const match = regex.exec(state.text)
     if (match === null) {
       return null

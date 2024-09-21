@@ -94,13 +94,11 @@ export function makeTopTokenizer(
       if (token.type === tEndStream) {
         if (closingTerminators === null) {
           closingTerminators = indentation.currentIndentLevels + 1
-          debug(() => [
-            `statement terminators to close with: ${closingTerminators}`,
-          ])
+          debug(`statement terminators to close with:`, closingTerminators)
         }
         if (closingEndBlocks === null) {
           closingEndBlocks = indentation.currentIndentLevels
-          debug(() => [`end blocks to close with: ${closingEndBlocks}`])
+          debug(`end blocks to close with:`, closingEndBlocks)
         }
         if (closingTerminators > 0 && closingTerminators > closingEndBlocks) {
           closingTerminators--

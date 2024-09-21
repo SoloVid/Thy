@@ -1,3 +1,4 @@
+import { debug, debugOn } from "./debug"
 import type { TokenType } from "./token-type"
 
 export type TokenizerState = {
@@ -71,4 +72,12 @@ export function makeTokenizerState(source: string): TokenizerState {
     lineOffsets: lineOffsets,
   }
   return me
+}
+
+export function debugState(state: TokenizerState) {
+  if (debugOn) {
+    debug(
+      `finding at ${state.offset} (${JSON.stringify(state.text.substring(state.offset, state.offset + 10))})`,
+    )
+  }
 }

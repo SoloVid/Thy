@@ -1,10 +1,10 @@
 import { CompileError, tokenError } from "../compile-error"
-import { debug } from "./debug"
+import { debug, debugDefer } from "./debug"
 import type { Token } from "./token"
 import { makeTokenHere } from "./token-helper"
 import { skipToken, TokenMatcher } from "./token-matcher"
 import { tEndStream, tErrorToken } from "./token-type"
-import type { TokenizerState } from "./tokenizer-state"
+import { debugState, type TokenizerState } from "./tokenizer-state"
 
 export interface Tokenizer {
   getNextToken(): Token
@@ -55,7 +55,7 @@ export function makeGenericTokenizer(
           errorPartialToken.offset + errorCharacters,
         ),
       } as Token
-      debug(() => ["error:", t])
+      debug("error:", t)
       errors.push(tokenError(t, "Unexpected token"))
       return t
     }
@@ -71,7 +71,7 @@ export function makeGenericTokenizer(
 
   function trySources(): Token | null | typeof cannotFindToken {
     if (delegatedTokenizer) {
-      debug(() => ["delegating to nested tokenizer..."])
+      debug("delegating to nested tokenizer...")
       const token = delegatedTokenizer.getNextToken()
       if (token.type !== tEndStream) {
         return token
@@ -82,15 +82,13 @@ export function makeGenericTokenizer(
     if (isDone()) {
       return null
     }
-    debug(() => [
-      `finding at ${state.offset} (${JSON.stringify(state.text.substring(state.offset, state.offset + 10))})`,
-    ])
+    debugState(state)
     for (const finder of finders) {
       const match = finder(state, errors)
       if (match !== null) {
-        debug(() => ["token found:", match])
+        debug("token found:", match)
         if ("error" in match) {
-          debug(() => ["error:", match])
+          debug("error:", match)
           errors.push(
             tokenError(
               {

@@ -47,7 +47,6 @@ testTokenizer("should correctly track token locations", async () => {
     "blocks/objects/factory.thy",
   )
   expect(errors).toEqual([])
-  console.log(JSON.stringify(outputs))
   const outputsWithNoFinnickyWhitespace = JSON.parse(
     JSON.stringify(outputs, (key, value) =>
       key === "text" && /^[ \r\n]*$/.test(value) ? undefined : value,
