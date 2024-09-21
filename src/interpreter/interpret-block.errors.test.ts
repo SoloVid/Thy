@@ -4,7 +4,17 @@ import { delay } from "../utils/delay"
 import { getErrorTraceLines } from "../utils/error-helper"
 import { interpretThyBlockSource } from "./block"
 
-test("interpretThyBlock() should provide Thy stack trace when error is thrown", () => {
+// Wallaby messes with stack traces in ways that make some of these tests fail.
+function nonWallabyTest(
+  description: string,
+  exercise: () => void | PromiseLike<void>,
+) {
+  if (!process?.env?.WALLABY) {
+    test(description, exercise)
+  }
+}
+
+test("interpretThyBlock() should provide Thy stack trace when error is thrown synchronously", () => {
   const interpreted = interpretThyBlockSource(`f is given\nf`, {
     functionName: "interpreted",
     sourceFile: "provided-source.thy",
@@ -26,121 +36,117 @@ test("interpretThyBlock() should provide Thy stack trace when error is thrown", 
   assert(actualError instanceof Error)
 
   assertErrorTraceLineMatch(actualError, 0, /\bfoo\b/)
-  assertErrorTraceLineMatch(
-    actualError,
-    0,
-    /\binterpret-block.errors.test.ts\b/,
-  )
+  assertErrorTraceLineMatch(actualError, 0, /\binterpret-block.errors.test\b/)
   assertErrorTraceLineMatch(actualError, 1, /\binterpreted\b/)
   assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:2:1\b/)
   assertErrorTraceLinesMatch(actualError, 2, errorHere, 0)
 })
 
-test("interpretThyBlock() should provide Thy stack trace when error is thrown asynchronously", async () => {
-  const interpreted = interpretThyBlockSource(`f is given\nf\nawait that`, {
-    functionName: "interpreted",
-    sourceFile: "provided-source.thy",
-  })
-  async function foo() {
+nonWallabyTest(
+  "interpretThyBlock() should provide Thy stack trace when error is thrown asynchronously",
+  async () => {
+    const interpreted = interpretThyBlockSource(`f is given\nf\nawait that`, {
+      functionName: "interpreted",
+      sourceFile: "provided-source.thy",
+    })
+    async function foo() {
+      await delay(10)
+      throw new Error("f bad")
+    }
+
+    // Make sure async stack traces are homogenous.
     await delay(10)
-    throw new Error("f bad")
-  }
 
-  // Make sure async stack traces are homogenous.
-  await delay(10)
+    const errorHere = new Error()
 
-  const errorHere = new Error()
+    let actualError: unknown = null
+    try {
+      await interpreted(foo)
+    } catch (e) {
+      actualError = e
+    }
 
-  let actualError: unknown = null
-  try {
-    await interpreted(foo)
-  } catch (e) {
-    actualError = e
-  }
+    assert.notStrictEqual(actualError, null, "Error should be thrown")
+    assert(actualError instanceof Error)
 
-  assert.notStrictEqual(actualError, null, "Error should be thrown")
-  assert(actualError instanceof Error)
+    assertErrorTraceLineMatch(actualError, 0, /\bfoo\b/)
+    assertErrorTraceLineMatch(actualError, 0, /\binterpret-block.errors.test\b/)
+    assertErrorTraceLineMatch(actualError, 1, /\binterpreted\b/)
+    assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:3:1\b/)
+    assertErrorTraceLinesMatch(actualError, 2, errorHere, 0)
+  },
+)
 
-  assertErrorTraceLineMatch(actualError, 0, /\bfoo\b/)
-  assertErrorTraceLineMatch(
-    actualError,
-    0,
-    /\binterpret-block.errors.test.ts\b/,
-  )
-  assertErrorTraceLineMatch(actualError, 1, /\binterpreted\b/)
-  assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:3:1\b/)
-  assertErrorTraceLinesMatch(actualError, 2, errorHere, 0)
-})
+nonWallabyTest(
+  "interpretThyBlock() should provide Thy stack trace when error is thrown synchronously from async code",
+  async () => {
+    const interpreted = interpretThyBlockSource(`f is given\nf\nawait that`, {
+      functionName: "interpreted",
+      sourceFile: "provided-source.thy",
+    })
+    async function foo() {
+      throw new Error("f bad")
+    }
 
-test("interpretThyBlock() should provide Thy stack trace when error is thrown synchronously from async code", async () => {
-  const interpreted = interpretThyBlockSource(`f is given\nf\nawait that`, {
-    functionName: "interpreted",
-    sourceFile: "provided-source.thy",
-  })
-  async function foo() {
-    throw new Error("f bad")
-  }
+    // Make sure async stack traces are homogenous.
+    await delay(10)
 
-  // Make sure async stack traces are homogenous.
-  await delay(10)
+    const errorHere = new Error()
 
-  const errorHere = new Error()
+    let actualError: unknown = null
+    try {
+      await interpreted(foo)
+    } catch (e) {
+      actualError = e
+    }
 
-  let actualError: unknown = null
-  try {
-    await interpreted(foo)
-  } catch (e) {
-    actualError = e
-  }
+    assert.notStrictEqual(actualError, null, "Error should be thrown")
+    assert(actualError instanceof Error)
 
-  assert.notStrictEqual(actualError, null, "Error should be thrown")
-  assert(actualError instanceof Error)
+    assertErrorTraceLineMatch(actualError, 0, /\bfoo\b/)
+    assertErrorTraceLineMatch(actualError, 0, /\binterpret-block.errors.test\b/)
+    assertErrorTraceLineMatch(actualError, 1, /\binterpreted\b/)
+    assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:3:1\b/)
+    assertErrorTraceLinesMatch(actualError, 2, errorHere, 0)
+  },
+)
 
-  assertErrorTraceLineMatch(actualError, 0, /\bfoo\b/)
-  assertErrorTraceLineMatch(
-    actualError,
-    0,
-    /\binterpret-block.errors.test.ts\b/,
-  )
-  assertErrorTraceLineMatch(actualError, 1, /\binterpreted\b/)
-  assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:3:1\b/)
-  assertErrorTraceLinesMatch(actualError, 2, errorHere, 0)
-})
+nonWallabyTest(
+  "interpretThyBlock() should provide Thy stack trace when error is thrown synchronously from async code",
+  async () => {
+    const interpreted = interpretThyBlockSource(
+      `f is given\nf\ng is await that`,
+      {
+        functionName: "interpreted",
+        sourceFile: "provided-source.thy",
+      },
+    )
+    async function foo() {
+      throw new Error("f bad")
+    }
 
-test("interpretThyBlock() should provide Thy stack trace when error is thrown synchronously from async code", async () => {
-  const interpreted = interpretThyBlockSource(`f is given\nf\ng is await that`, {
-    functionName: "interpreted",
-    sourceFile: "provided-source.thy",
-  })
-  async function foo() {
-    throw new Error("f bad")
-  }
+    // Make sure async stack traces are homogenous.
+    await delay(10)
 
-  // Make sure async stack traces are homogenous.
-  await delay(10)
+    const errorHere = new Error()
 
-  const errorHere = new Error()
+    let actualError: unknown = null
+    try {
+      await interpreted(foo)
+    } catch (e) {
+      actualError = e
+    }
 
-  let actualError: unknown = null
-  try {
-    await interpreted(foo)
-  } catch (e) {
-    actualError = e
-  }
+    assert.notStrictEqual(actualError, null, "Error should be thrown")
+    assert(actualError instanceof Error)
 
-  assert.notStrictEqual(actualError, null, "Error should be thrown")
-  assert(actualError instanceof Error)
-
-  assertErrorTraceLineMatch(actualError, 0, /\bfoo\b/)
-  assertErrorTraceLineMatch(
-    actualError,
-    0,
-    /\binterpret-block.errors.test.ts\b/,
-  )
-  assertErrorTraceLineMatch(actualError, 1, /\binterpreted\b/)
-  assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:3:6\b/)
-  assertErrorTraceLinesMatch(actualError, 2, errorHere, 0)
-})
+    assertErrorTraceLineMatch(actualError, 0, /\bfoo\b/)
+    assertErrorTraceLineMatch(actualError, 0, /\binterpret-block.errors.test\b/)
+    assertErrorTraceLineMatch(actualError, 1, /\binterpreted\b/)
+    assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:3:6\b/)
+    assertErrorTraceLinesMatch(actualError, 2, errorHere, 0)
+  },
+)
 
 test("interpretThyBlock() should properly transform nested Thy Error stack trace", () => {
   const interpreted = interpretThyBlockSource(
@@ -187,24 +193,12 @@ thy1
   assert(actualError instanceof Error)
 
   assertErrorTraceLineMatch(actualError, 0, /\bts3\b/)
-  assertErrorTraceLineMatch(
-    actualError,
-    0,
-    /\binterpret-block.errors.test.ts\b/,
-  )
+  assertErrorTraceLineMatch(actualError, 0, /\binterpret-block.errors.test\b/)
   assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:10:3\b/)
   assertErrorTraceLineMatch(actualError, 2, /\bts2\b/)
-  assertErrorTraceLineMatch(
-    actualError,
-    2,
-    /\binterpret-block.errors.test.ts\b/,
-  )
+  assertErrorTraceLineMatch(actualError, 2, /\binterpret-block.errors.test\b/)
   assertErrorTraceLineMatch(actualError, 3, /\bts1\b/)
-  assertErrorTraceLineMatch(
-    actualError,
-    3,
-    /\binterpret-block.errors.test.ts\b/,
-  )
+  assertErrorTraceLineMatch(actualError, 3, /\binterpret-block.errors.test\b/)
   assertErrorTraceLineMatch(actualError, 4, /\bprovided-source.thy:8:3\b/)
   assertErrorTraceLineMatch(actualError, 5, /\bprovided-source.thy:6:3\b/)
   assertErrorTraceLineMatch(actualError, 6, /\binterpreted\b/)
@@ -259,12 +253,19 @@ function assertErrorTraceLineMatch(
   const traceLines = traceLinesString.split("\n")
   assert(
     traceLines.length > line,
-    `Error trace should be more than ${line} lines. Got:\n${traceLinesString}\n<end trace>`,
+    `Error trace should be more than ${line} lines.
+<begin full trace>
+${traceLinesString}
+<end full trace>`,
   )
   assert.match(
     traceLines[line],
     pattern,
-    `Error trace line ${line + 1} did not match pattern ${pattern.toString()}\n${traceLinesString}\n<end trace>`,
+    `Error trace line ${line + 1} did not match pattern ${pattern.toString()}
+Got: ${JSON.stringify(traceLines[line])}
+<begin full trace>
+${traceLinesString}
+<end full trace>`,
   )
 }
 
@@ -278,7 +279,10 @@ function assertErrorTraceLinesMatch(
   const traceLines = traceLinesString.split("\n")
   assert(
     traceLines.length > actualErrorLineIndex,
-    `Error trace should be more than ${actualErrorLineIndex} lines. Got:\n${traceLinesString}\n<end trace>`,
+    `Error trace should be more than ${actualErrorLineIndex} lines.
+<begin full trace>
+${traceLinesString}
+<end full trace>`,
   )
   const actualLine = traceLines[actualErrorLineIndex].replace(
     /:\d+:\d+/,
@@ -298,7 +302,18 @@ function assertErrorTraceLinesMatch(
   assert.strictEqual(
     actualLine,
     expectedLine,
-    `Line ${actualErrorLineIndex + 1} of actual error should match line ${expectedErrorLineIndex + 1} of expected error\nActual:\n${traceLinesString}\nExpected:\n${expectedTraceLinesString}\n<end trace>`,
+    `Line ${actualErrorLineIndex + 1} of actual error should match line ${expectedErrorLineIndex + 1} of expected error
+Actual: ${JSON.stringify(actualLine)}
+Expected: ${JSON.stringify(expectedLine)}
+
+Actual full trace:
+<begin full trace>
+${traceLinesString}
+<end full trace>
+Expected full trace:
+<begin full trace>
+${expectedTraceLinesString}
+<end full trace>`,
   )
 }
 
@@ -327,11 +342,7 @@ test("interpretThyBlock() Thy stack trace counts empty lines and comment lines",
   assert(actualError instanceof Error)
 
   assertErrorTraceLineMatch(actualError, 0, /\bfoo\b/)
-  assertErrorTraceLineMatch(
-    actualError,
-    0,
-    /\binterpret-block.errors.test.ts\b/,
-  )
+  assertErrorTraceLineMatch(actualError, 0, /\binterpret-block.errors.test\b/)
   assertErrorTraceLineMatch(actualError, 1, /\binterpreted\b/)
   assertErrorTraceLineMatch(actualError, 1, /\bprovided-source.thy:4:1\b/)
   assertErrorTraceLinesMatch(actualError, 2, errorHere, 0)

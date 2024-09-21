@@ -1,17 +1,13 @@
 import { getFirstToken } from "parser/helper"
 import { AwaitCall, Call, GivenCall, TreeNode, ValueCall } from "tree"
+import { forwardWait, MayWait, notWait, yesWait, YesWait } from "./async-helper"
+import { RuntimeValue, yesIThinkThisIsRuntimeFunction } from "./dynamic-type"
 import { InterpretedExpression, interpretThyExpression } from "./expression"
 import {
   InterpreterErrorWithContext,
   makeInterpreterNodeError,
 } from "./interpreter-error"
 import { ThyBlockContext } from "./types"
-import { forwardWait, MayWait, notWait, yesWait, YesWait } from "./async-helper"
-import {
-  RuntimeFunction,
-  RuntimeValue,
-  yesIThinkThisIsRuntimeFunction,
-} from "./dynamic-type"
 
 export function interpretThyCall(
   context: ThyBlockContext,
@@ -92,11 +88,21 @@ function interpretThyAwaitCall(
   call: AwaitCall,
 ): YesWait<RuntimeValue> {
   return yesWait(async () => {
-    const eResult = interpretThyExpression(context, call.args[0])
-    const value = await Promise.resolve(
-      eResult.wait ? eResult.promise : eResult.value,
-    )
-    return value.target
+    // For async stack traces, the trace is a bit different before and after a true await.
+    const errorHere = new Error("error for stack in interpretThyAwaitCall()")
+    try {
+      const eResult = interpretThyExpression(context, call.args[0])
+      const resolvedExpression = eResult.wait
+        ? await eResult.promise
+        : eResult.value
+      const resolvedExpressionValue = resolvedExpression.target as
+        | RuntimeValue
+        | PromiseLike<RuntimeValue>
+      const awaitedValue = await resolvedExpressionValue
+      return awaitedValue
+    } catch (e) {
+      throw new InterpreterErrorWithContext(e, call.func.token, 0, errorHere, 2)
+    }
   })
 }
 

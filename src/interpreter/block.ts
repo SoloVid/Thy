@@ -281,7 +281,7 @@ function throwTransformedError(
       errorCloseToCall.altCloseError,
       errorCloseToCall.altAdditionalDepthToShave,
     )
-    // console.log(errorDissectedAtCall)
+    // console.log("errorDissectedAtCall", errorDissectedAtCall)
     const errorDissectedHere = dissectErrorTraceAtCloserBaseline(
       e,
       errorHere,
@@ -289,7 +289,7 @@ function throwTransformedError(
       altErrorHere,
       additionalTraceLinesToHide,
     )
-    // console.log(errorDissectedHere)
+    // console.log("errorDissectedHere", errorDissectedHere)
     const errorTraceLocation = errorCloseToCall.sourceLocation
 
     throw transformErrorTrace(e, () => {

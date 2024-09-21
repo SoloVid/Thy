@@ -100,7 +100,7 @@ testTokenizer("should correctly track token locations", async () => {
     },
     { type: "ConstDeclAssign", offset: 84, line: 3, column: 13, text: "is" },
     { type: "ValueIdentifier", offset: 87, line: 3, column: 16, text: "def" },
-    { type: "StartBlock", offset: 90, line: 3, column: 19, },
+    { type: "StartBlock", offset: 90, line: 3, column: 19 },
     {
       type: "ValueIdentifier",
       offset: 96,
@@ -135,9 +135,9 @@ testTokenizer("should correctly track token locations", async () => {
       column: 20,
       text: "propB",
     },
-    { type: "StatementTerminator", offset: 144, line: 5, column: 25,  },
+    { type: "StatementTerminator", offset: 144, line: 5, column: 25 },
     { type: "EndBlock", offset: 144, line: 5, column: 25 },
-    { type: "StatementTerminator", offset: 144, line: 5, column: 25,  },
+    { type: "StatementTerminator", offset: 144, line: 5, column: 25 },
     { type: "EndBlock", offset: 144, line: 5, column: 25 },
     {
       type: "StatementTerminator",
@@ -199,7 +199,13 @@ testTokenizer("should correctly track token locations", async () => {
       line: 9,
       column: 0,
     },
-    { type: "ValueIdentifier", offset: 200, line: 10, column: 0, text: "print" },
+    {
+      type: "ValueIdentifier",
+      offset: 200,
+      line: 10,
+      column: 0,
+      text: "print",
+    },
     {
       type: "ValueIdentifier",
       offset: 206,
