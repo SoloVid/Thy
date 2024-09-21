@@ -1,5 +1,5 @@
 import type { Idea } from "./idea"
-import type { SymbolTable } from "./symbol-table"
+import type { ReadSymbolTable } from "./symbol-table"
 import type { TokenRange } from "./token-range"
 
 export const returnStyle = {
@@ -16,8 +16,9 @@ export const returnStylePrecedence = [
 
 export interface Block extends TokenRange {
   readonly type: "block"
-  readonly symbolTable: SymbolTable
+  readonly symbolTable: ReadSymbolTable
+  readonly isAsync: boolean
   readonly ideas: readonly Idea[]
   readonly returnStyle: ReturnStyle
-  readonly isAsync: boolean
+  readonly exportedSymbols: readonly string[]
 }

@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises"
-import { interpretThyBlock } from "../interpreter/block"
+import { interpretThyBlockSource } from "../interpreter/block"
 import { makeThyFromBlocks } from "../std-lib/thy-from-blocks"
 import { saferPromiseAll } from "../utils/safer-promise-all"
 import { makeThyBlockMapFromFiles } from "./thy-block-map-from-files"
@@ -21,7 +21,7 @@ export async function makeThyFromFiles({
       const contents = await readFile(f, "utf-8")
       return {
         file: f,
-        block: interpretThyBlock(contents, {
+        block: interpretThyBlockSource(contents, {
           closure: args,
           sourceFile: f,
         }),

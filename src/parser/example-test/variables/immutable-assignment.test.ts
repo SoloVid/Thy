@@ -40,7 +40,7 @@ testParser(
       [
         {
           message:
-            "Scoped variable is declared elsewhere and cannot be re-declared",
+            "\"x\" is declared elsewhere and cannot be re-declared",
           start: {
             text: "x",
           },

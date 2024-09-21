@@ -49,6 +49,9 @@ export function parseAssignmentOrCall(
   const callOrAssignment = parseSpecialCallOrFallback(state, (s) =>
     parseAssignmentOrValueCall(s, modifier),
   )
+  if (callOrAssignment === badParse) {
+    return badParse
+  }
   if (modifier !== null && !isAssignment(callOrAssignment)) {
     addTokenError(state, modifier, `Modifier invalid preceding call site`)
   }

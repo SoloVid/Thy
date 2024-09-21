@@ -93,6 +93,7 @@ export function collapseThat<T extends Indeterminate>(
     const mapped: TypePropertyAccess = {
       type: "type-property-access",
       base,
+      baseToken: input.baseToken,
       propertyAccesses: input.propertyAccesses,
       firstToken: input.firstToken,
       lastToken: input.lastToken,
@@ -108,6 +109,7 @@ export function collapseThat<T extends Indeterminate>(
     const mapped: ValuePropertyAccess = {
       type: "value-property-access",
       base,
+      baseToken: input.baseToken,
       propertyAccesses: input.propertyAccesses,
       firstToken: input.firstToken,
       lastToken: input.lastToken,

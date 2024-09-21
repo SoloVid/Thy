@@ -135,7 +135,7 @@ export function dissectErrorTraceAtCloserBaseline(
 
 export function replaceErrorTraceLine(
   traceLines: string,
-  lineIndex: number,
+  line: number,
   transform: (
     functionName: string,
     file: string,
@@ -146,7 +146,7 @@ export function replaceErrorTraceLine(
   return traceLines
     .split("\n")
     .map((l, i) => {
-      if (i !== lineIndex) {
+      if (i !== line) {
         return l
       }
       if (firefoxTraceLinePattern.test(l)) {

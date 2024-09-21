@@ -1,53 +1,32 @@
+import type { CompileError } from "compile-error"
+import { expect } from "expect"
 import assert from "node:assert"
+import { badParse } from "parser/error"
+import { parseStringLiteral } from "parser/parse-string"
+import { makeParserState } from "parser/parser-state"
 import { test } from "test-framework"
+import { makeTokenizer } from "tokenizer"
 import { InterpreterErrorWithContext } from "./interpreter-error"
-import {
-  interpolateString,
-  interpretThyMultilineString,
-  parseString,
-} from "./string"
+import { interpretThyString } from "./string"
 import { makeSimpleContext } from "./test-helper"
+import type { ThyBlockContext } from "./types"
 
-const simpleAtom = {
-  text: "",
-  lineIndex: -1,
-  columnIndex: -1,
+function interpretString(context: ThyBlockContext, source: string) {
+  const errors: CompileError[] = []
+  const tokenizer = makeTokenizer(`"${source}"`, errors)
+  const parserState = makeParserState(tokenizer, errors)
+  const output = parseStringLiteral(parserState)
+  expect(errors).toEqual([])
+  assert(output !== badParse, `Parser should not have errored`)
+  return interpretThyString(context, output)
 }
-
-test("interpretThyMultilineString() should return string with stripped insignificant whitespace", async () => {
-  const input = {
-    indent: "    ",
-    lines: [
-      "",
-      "  ",
-      "    ",
-      "     ",
-      "    something",
-      "",
-      "     ",
-      "    ",
-      "",
-    ],
-  }
-  const output = interpretThyMultilineString(input)
-  assert.strictEqual(output, `"\\n\\n\\n \\nsomething\\n\\n "`)
-})
-
-test("interpretThyMultilineString() should escape quotes", async () => {
-  const input = {
-    indent: "    ",
-    lines: [`say "hi"!`],
-  }
-  const output = interpretThyMultilineString(input)
-  assert.strictEqual(output, `"say \\"hi\\"!"`)
-})
 
 test("interpolateString() should interpolate string values", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { a: "1", b: "2" },
   })
   assert.strictEqual(
-    interpolateString(context, "check .a. .b. and .b..a.", simpleAtom),
+    interpretString(context, "check .a. .b. and .b..a."),
     "check 1 2 and 21",
   )
 })
@@ -57,7 +36,7 @@ test("interpolateString() should interpolate number values", async () => {
     variablesInBlock: { a: 1, b: 2.3 },
   })
   assert.strictEqual(
-    interpolateString(context, "check .a. .b. and .b..a.", simpleAtom),
+    interpretString(context, "check .a. .b. and .b..a."),
     "check 1 2.3 and 2.31",
   )
 })
@@ -68,133 +47,72 @@ function testRejectValue(value: unknown) {
   })
   assert.throws(
     () =>
-      interpolateString(context, "check .a.", {
-        text: "placeholder",
-        lineIndex: 1,
-        columnIndex: 2,
-      }),
+      interpretString(context, "check .a."),
     (e) => {
       assert(e instanceof Error)
       assert.match(e.message, /a is not a string or number/)
       assert(e instanceof InterpreterErrorWithContext)
-      assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
+      assert.deepStrictEqual(e.sourceLocation, { line: 0, column: 8 })
       return true
     },
   )
 }
 
-test("interpolateString() should reject boolean value for interpolation", async () => {
+test("interpretThyString() should reject boolean value for interpolation", async () => {
   testRejectValue(true)
 })
 
-test("interpolateString() should reject null value for interpolation", async () => {
+test("interpretThyString() should reject null value for interpolation", async () => {
   testRejectValue(null)
 })
 
-test("interpolateString() should reject undefined value for interpolation", async () => {
+test("interpretThyString() should reject undefined value for interpolation", async () => {
   testRejectValue(undefined)
 })
 
-test("interpolateString() should reject object value for interpolation", async () => {
+test("interpretThyString() should reject object value for interpolation", async () => {
   testRejectValue({})
 })
 
-test("interpolateString() should reject array value for interpolation", async () => {
+test("interpretThyString() should reject array value for interpolation", async () => {
   testRejectValue([])
 })
 
-test("interpolateString() should reject function value for interpolation", async () => {
+test("interpretThyString() should reject function value for interpolation", async () => {
   testRejectValue(() => null)
 })
 
-test("interpolateString() should reject undefined variable", async () => {
+test("interpretThyString() should reject undefined variable", async () => {
   const context = makeSimpleContext()
   assert.throws(
     () =>
-      interpolateString(context, "check .a.", {
-        text: "placeholder",
-        lineIndex: 1,
-        columnIndex: 2,
-      }),
+      interpretString(context, "check .a."),
     (e) => {
       assert(e instanceof Error)
       assert.match(e.message, /a not found/)
       assert(e instanceof InterpreterErrorWithContext)
-      assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
+      assert.deepStrictEqual(e.sourceLocation, { line: 0, column: 8 })
       return true
     },
   )
 })
 
-test("interpolateString() should interpolate values from closure", async () => {
+test("interpretThyString() should interpolate values from closure", async () => {
   const context = makeSimpleContext({
     closure: { a: "1" },
   })
   assert.strictEqual(
-    interpolateString(context, "check .a.", simpleAtom),
+    interpretString(context, "check .a."),
     "check 1",
   )
 })
 
-test("interpolateString() should interpolate values from implicit arguments", async () => {
+test("interpretThyString() should interpolate values from implicit arguments", async () => {
   const context = makeSimpleContext({
     implicitArguments: { a: "1" },
   })
   assert.strictEqual(
-    interpolateString(context, "check .a.", simpleAtom),
+    interpretString(context, "check .a."),
     "check 1",
   )
-})
-
-test("interpolateString() should not mess with normal periods", async () => {
-  const context = makeSimpleContext()
-  assert.strictEqual(
-    interpolateString(context, "There once. Was a thing.", simpleAtom),
-    "There once. Was a thing.",
-  )
-})
-
-test("interpolateString() should allow escaping periods", async () => {
-  const context = makeSimpleContext()
-  assert.strictEqual(
-    interpolateString(context, "check \\.a\\.", simpleAtom),
-    "check .a.",
-  )
-})
-
-// test("parseString() should respect escaped backslash before period", async () => {
-//   const context = makeSimpleContext({
-//     variablesInBlock: { a: "1" },
-//   })
-//   assert.strictEqual(interpolateString(context, "\\\\.a.", simpleAtom), "\\1")
-// })
-
-test("parseString() should allow empty string", async () => {
-  assert.strictEqual(parseString(`""`, simpleAtom), "")
-})
-
-test("parseString() should behave similar to JSON.parse()", async () => {
-  assert.strictEqual(parseString(`"a\\"\\n"`, simpleAtom), `a"\n`)
-})
-
-test("parseString() should reject bad string literal", async () => {
-  assert.throws(
-    () =>
-      parseString(`"unterminated`, {
-        text: "placeholder",
-        lineIndex: 1,
-        columnIndex: 2,
-      }),
-    (e) => {
-      assert(e instanceof Error)
-      assert.match(e.message, /Invalid string literal/)
-      assert(e instanceof InterpreterErrorWithContext)
-      assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
-      return true
-    },
-  )
-})
-
-test("parseString() should leave period escape", async () => {
-  assert.strictEqual(parseString(`". \\. \\\\\\."`, simpleAtom), `. \\. \\\\.`)
 })

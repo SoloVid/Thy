@@ -37,8 +37,8 @@ export function makeTokenizerState(source: string): TokenizerState {
     },
   ).offsets
 
-  function calculateIndentWidth(lineIndex: number) {
-    statefulIndentRegex.lastIndex = lineOffsets[lineIndex]
+  function calculateIndentWidth(line: number) {
+    statefulIndentRegex.lastIndex = lineOffsets[line]
     return (statefulIndentRegex.exec(source)?.[0] ?? "").length
   }
 
@@ -57,9 +57,9 @@ export function makeTokenizerState(source: string): TokenizerState {
         lineOffsets[me.line + 1] < me.offset
       ) {
         me.line++
-        me.column = me.offset - lineOffsets[me.line]
-        me.currentIndentWidth = calculateIndentWidth(me.line)
       }
+      me.column = me.offset - lineOffsets[me.line]
+      me.currentIndentWidth = calculateIndentWidth(me.line)
     },
     offset: 0,
     line: 0,

@@ -2,6 +2,7 @@ import { tokenError } from "../compile-error"
 import type { Token } from "../tokenizer/token"
 import {
   tConstDeclAssign,
+  tExport,
   tNoDeclAssign,
   tTypeIdentifier,
   tValueIdentifier,
@@ -11,6 +12,7 @@ import { ValueIdentifier } from "../tree"
 import type {
   Assignment,
   ConstantDeclaration,
+  Declaration,
   PropertyAssignment,
   VariableDeclaration,
   VariableReassignment,
@@ -38,7 +40,7 @@ export function parseConstantDeclarationGivenTargetAndOperator(
 ): ConstantDeclaration | BadParse {
   const call = parseCall(state)
   if (call === badParse) return badParse
-  const variable = validateDeclarable(state, target, operator)
+  const variable = validateDeclarable(state, modifier, target, operator)
   if (variable === badParse) return badParse
   return {
     type: "constant-declaration",
@@ -59,7 +61,7 @@ export function parseVariableDeclarationGivenTargetAndOperator(
 ): VariableDeclaration | BadParse {
   const call = parseCall(state)
   if (call === badParse) return badParse
-  const variable = validateDeclarable(state, target, operator)
+  const variable = validateDeclarable(state, modifier, target, operator)
   if (variable === badParse) return badParse
   return {
     type: "variable-declaration",
@@ -74,8 +76,9 @@ export function parseVariableDeclarationGivenTargetAndOperator(
 
 function validateDeclarable(
   state: ParserState,
+  modifier: Declaration["modifier"],
   target: PossibleAssignmentTarget,
-  operator: Assignment["operator"],
+  operator: Declaration["operator"],
 ): ValueIdentifier | BadParse {
   void collapseThat(state, target)
 
@@ -93,7 +96,7 @@ function validateDeclarable(
     return badParse
   }
 
-  checkSymbolTable(state, target, operator)
+  checkSymbolTable(state, modifier, target, operator)
 
   return target
 }
@@ -109,7 +112,7 @@ export function parseVariableReassignmentGivenTargetAndOperator(
     addNodeError(state, target, `Cannot assign to that`)
     return badParse
   }
-  checkSymbolTable(state, target, operator)
+  checkSymbolTable(state, null, target, operator)
   return {
     type: "variable-reassignment",
     modifier: null,
@@ -143,6 +146,7 @@ export function parsePropertyAssignmentGivenTargetAndOperator(
 
 export function checkSymbolTable(
   state: ParserState,
+  modifier: Assignment["modifier"],
   variable: ValueIdentifier,
   operator: Token<
     typeof tConstDeclAssign | typeof tVarDeclAssign | typeof tNoDeclAssign
@@ -172,12 +176,12 @@ export function checkSymbolTable(
     operator.type === tVarDeclAssign
   ) {
     if (symbolInfo === null) {
-      applyToSymbolTable(state, baseVar, operator.type === tConstDeclAssign)
+      applyToSymbolTable(state, modifier, baseVar, operator.type === tConstDeclAssign)
     } else {
       addTokenError(
         state,
         baseVar,
-        `Scoped variable is declared elsewhere and cannot be re-declared`,
+        `"${varName}" is declared elsewhere and cannot be re-declared`,
       )
     }
   }
@@ -186,6 +190,7 @@ export function checkSymbolTable(
 
 export function applyToSymbolTable(
   state: ParserState,
+  modifier: Assignment["modifier"],
   variable: Token<typeof tValueIdentifier | typeof tTypeIdentifier>,
   isConstant: boolean,
 ): void {
@@ -206,5 +211,5 @@ export function applyToSymbolTable(
       ),
     )
   }
-  state.context.symbolTable.addSymbol(variable, isConstant)
+  state.context.symbolTable.addSymbol(variable, isConstant, modifier === null ? "bare" : modifier.type === tExport ? "export" : "private")
 }

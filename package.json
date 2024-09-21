@@ -15,8 +15,9 @@
     "interpret": "node -r esbuild-register src/interpreter/cli.ts",
     "serve": "node -r esbuild-register src/editor/server.ts",
     "start": "node lib/index.js",
-    "test1": "mocha -r esbuild-register",
-    "test": "uts -r esbuild-register src",
+    "test:mocha": "mocha -r esbuild-register",
+    "test:uts": "uts -r esbuild-register src",
+    "test": "npm run -s test:uts",
     "test:coverage": "nyc --reporter=lcov --reporter=text-summary npm run test",
     "test:watch": "watchlist --eager src -- npm run test:coverage"
   },
@@ -56,8 +57,5 @@
     "typescript": "~5.6",
     "under-the-sun": "^2.1.1",
     "watchlist": "^0.3.1"
-  },
-  "mocha": {
-    "spec": "src/**/*.test.ts"
   }
 }

@@ -1,4 +1,3 @@
-import { isAssignment } from "tree/assignment"
 import {
   tComment,
   tEndStream,
@@ -68,12 +67,4 @@ function parseIdeaUntilBadParse(state: ParserState): Idea | BadParse {
   }
 
   return parseAssignmentOrCall(state, null)
-}
-
-export function isIdeaAsync(idea: Idea) {
-  return (
-    idea.type === "await-call" ||
-    (isAssignment(idea) && idea.call.type === "await-call") ||
-    (idea.type === "let-call" && idea.call?.type === "await-call")
-  )
 }

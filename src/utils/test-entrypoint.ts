@@ -1,29 +1,10 @@
-import { test as utsTest } from "under-the-sun"
+import { test as utsTest, defineTestGroup as utsDefineTestGroup } from "under-the-sun"
 
-export function test(
-  description: string,
-  exercise: () => void | PromiseLike<void>,
-) {
-  utsTest(description, exercise)
-}
-
-export function defineTestGroup(groupDescriptionPrefix: string) {
-  return function groupTest(
-    description: string,
-    exercise: () => void | PromiseLike<void>,
-  ) {
-    test(groupDescriptionPrefix + description, exercise)
-  }
-}
-
-// import { describe, it, suite, test as mochaTest } from "mocha"
-
-// export function test(
+// function test(
 //   description: string,
 //   exercise: () => void | PromiseLike<void>,
 // ) {
-//   // mochaTest(description, exercise)
-//   it(description, exercise)
+//   utsTest(description, exercise)
 // }
 
 // export function defineTestGroup(groupDescriptionPrefix: string) {
@@ -31,10 +12,24 @@ export function defineTestGroup(groupDescriptionPrefix: string) {
 //     description: string,
 //     exercise: () => void | PromiseLike<void>,
 //   ) {
-//     // suite(groupDescriptionPrefix)
-//     // mochaTest(description, exercise)
-//     describe(groupDescriptionPrefix, () => {
-//       it(description, exercise)
-//     })
+//     test(groupDescriptionPrefix + description, exercise)
 //   }
 // }
+
+import { describe, it as mochaTest } from "mocha"
+
+function mochaDefineTestGroup(groupDescriptionPrefix: string) {
+  return function groupTest(
+    description: string,
+    exercise: () => void | PromiseLike<void>,
+  ) {
+    describe(groupDescriptionPrefix, () => {
+      mochaTest(description, exercise)
+    })
+  }
+}
+
+const useMocha = !!process?.env?.MOCHA || !!process?.env?.WALLABY
+
+export const test = useMocha ? mochaTest : utsTest
+export const defineTestGroup = useMocha ? mochaDefineTestGroup : utsDefineTestGroup

@@ -7,12 +7,14 @@ export interface ReadSymbolTable {
 }
 
 export interface SymbolTable extends ReadSymbolTable {
+  readonly localSymbols: Readonly<Map<string, ExtendedSymbolInfo>>
   /** Scan local table and child tables to see if symbol already used. */
   isSymbolNameTakenHereOrInChild(name: string): boolean
 
   addSymbol(
     token: Token<typeof tValueIdentifier | typeof tTypeIdentifier>,
     isConstant: boolean,
+    visibility: SymbolVisibility
   ): void
   makeChild(): SymbolTable
 }
@@ -22,8 +24,13 @@ export interface SymbolInfo {
   readonly isConstant: boolean
 }
 
+type SymbolVisibility = "bare" | "export" | "private"
+export interface ExtendedSymbolInfo extends SymbolInfo {
+  readonly visibility: SymbolVisibility
+}
+
 export function makeSymbolTable(parent?: SymbolTable): SymbolTable {
-  const localSymbols = new Map<string, SymbolInfo>()
+  const localSymbols = new Map<string, ExtendedSymbolInfo>()
 
   const childTables: SymbolTable[] = []
 
@@ -49,8 +56,8 @@ export function makeSymbolTable(parent?: SymbolTable): SymbolTable {
       }
       return false
     },
-    addSymbol(token, isConstant) {
-      localSymbols.set(token.text, { token, isConstant })
+    addSymbol(token, isConstant, visibility) {
+      localSymbols.set(token.text, { token, isConstant, visibility })
     },
     makeChild() {
       const child = makeSymbolTable(me)

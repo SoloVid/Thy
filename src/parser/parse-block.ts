@@ -1,11 +1,12 @@
 import assert from "assert"
+import { isIdeaAsync } from "tree/idea"
+import { SymbolTable } from "tree/symbol-table"
 import type { Token } from "../tokenizer/token"
 import { tEndBlock, tEndStream, tStartBlock } from "../tokenizer/token-type"
 import { Block, ReturnStyle, returnStyle } from "../tree/block"
-import { badParse } from "./error"
 import { evaluateReturnStyle } from "./evaluate-return-style"
 import { getLastToken } from "./helper"
-import { isIdeaAsync, parseIdea } from "./parse-idea"
+import { parseIdea } from "./parse-idea"
 import type { ParserContext, ParserState } from "./parser-state"
 import { makeThatIdeaTracker } from "./that-idea-tracker"
 
@@ -41,10 +42,8 @@ export function parseBlockInner(state: ParserState): Block {
       const idea = parseIdea(state)
       thatIdeaTracker.shareLatestIdea(idea)
 
-      // if (idea !== badParse) {
       blockReturnStyle = evaluateReturnStyle(state, blockReturnStyle, idea)
       isAsync = isAsync || isIdeaAsync(idea)
-      // }
 
       nextToken = state.buffer.peekToken()
     }
@@ -55,13 +54,24 @@ export function parseBlockInner(state: ParserState): Block {
     return {
       type: "block",
       symbolTable: context.symbolTable,
+      isAsync: isAsync,
       ideas: ideas,
       returnStyle: blockReturnStyle,
-      isAsync: isAsync,
+      exportedSymbols: getExportedSymbols(blockReturnStyle, context.symbolTable),
       firstToken: firstToken,
       lastToken: lastToken,
     }
   } finally {
     state.context = parentContext
   }
+}
+
+function getExportedSymbols(blockReturnStyle: ReturnStyle, symbolTable: SymbolTable): Block["exportedSymbols"] {
+  if (blockReturnStyle === returnStyle.explicitReturn) {
+    return []
+  }
+  if (blockReturnStyle === returnStyle.explicitExport) {
+    return [...symbolTable.localSymbols.entries()].filter(([name, info]) => info.visibility === "export").map(([name, info]) => name)
+  }
+  return [...symbolTable.localSymbols.entries()].filter(([name, info]) => info.visibility === "bare").map(([name, info]) => name)
 }

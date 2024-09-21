@@ -78,6 +78,7 @@ testParser(
           },
         ],
         returnStyle: returnStyle.implicitExport,
+        exportedSymbols: ["a", "b"],
       },
     )
   },

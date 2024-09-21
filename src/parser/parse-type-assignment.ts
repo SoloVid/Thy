@@ -32,7 +32,7 @@ export function parseTypeAssignment(
     type: "type-identifier",
     token: unsafeVariable,
   }
-  applyToSymbolTable(state, variable.token, true)
+  applyToSymbolTable(state, modifierToken, variable.token, true)
 
   const operator = parseTypeAssignmentOperatorToken(state)
   if (operator === badParse) return badParse

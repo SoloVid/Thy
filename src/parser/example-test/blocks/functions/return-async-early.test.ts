@@ -42,6 +42,7 @@ testParser(
       ],
       returnStyle: returnStyle.explicitReturn,
       isAsync: true,
+      exportedSymbols: [],
     })
   },
 )

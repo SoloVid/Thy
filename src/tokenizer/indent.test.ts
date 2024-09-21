@@ -138,7 +138,7 @@ testTokenizer("should error on bad outdent but gracefully recover", () => {
   expect(errors).toEqual([
     expect.objectContaining({
       start: {
-        column: 6,
+        column: 12,
         line: 2,
         offset: 42,
         text: "",
@@ -148,7 +148,7 @@ testTokenizer("should error on bad outdent but gracefully recover", () => {
     }),
     expect.objectContaining({
       start: {
-        column: 6,
+        column: 12,
         line: 5,
         offset: 67,
         text: "",

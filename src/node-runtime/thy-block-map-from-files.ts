@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises"
-import { interpretThyBlockWithMeta } from "../interpreter/block"
+import { interpretThyBlockSourceWithMeta } from "../interpreter/block"
 import { saferPromiseAll } from "../utils/safer-promise-all"
 
 export async function makeThyBlockMapFromFiles(
@@ -8,7 +8,7 @@ export async function makeThyBlockMapFromFiles(
   const exportsList = await saferPromiseAll(
     files.map(async (f) => {
       const contents = await readFile(f, "utf-8")
-      const { returns } = interpretThyBlockWithMeta(contents)
+      const { returns } = interpretThyBlockSourceWithMeta(contents)
       return returns.style === "exports"
         ? returns.exports.reduce(
             (soFar, field) => ({

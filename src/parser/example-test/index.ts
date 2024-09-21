@@ -88,6 +88,5 @@ export function checkProgramTree(
 export function parseSource(source: string) {
   const errors: CompileError[] = []
   const tokenizer = makeTokenizer(source, errors)
-  const output = parse(tokenizer)
-  return output
+  return parse(tokenizer, errors)
 }

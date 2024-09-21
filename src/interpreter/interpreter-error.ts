@@ -1,15 +1,21 @@
-import type { Atom, AtomSingle } from "./types"
+import { CompileError } from "compile-error";
+import { SourcePosition } from "tokenizer/token";
+import { TreeNode } from "tree"
 
-export function makeInterpreterError(atom: Atom, message: string) {
-  return new InterpreterErrorWithContext(new Error(message), atom)
+export function makeInterpreterNodeError(node: TreeNode, message: string) {
+  return new InterpreterErrorWithContext(new Error(message), "firstToken" in node ? node.firstToken : node.token)
+}
+
+export function makeInterpreterCompileError(error: CompileError) {
+  return new InterpreterErrorWithContext(new Error(error.message), error.start)
 }
 
 export class InterpreterErrorWithContext extends Error {
   readonly cause: unknown
-  readonly sourceLocation: { lineIndex: number; columnIndex: number }
+  readonly sourceLocation: { line: number; column: number }
   constructor(
     cause: unknown,
-    atom: Atom,
+    sourcePosition: SourcePosition,
     public readonly additionalDepthToShave: number = 0,
     public readonly altCloseError?: Error,
     public readonly altAdditionalDepthToShave: number = 0,
@@ -17,8 +23,8 @@ export class InterpreterErrorWithContext extends Error {
     super(cause instanceof Error ? cause.message : undefined)
     this.cause = cause
     this.sourceLocation = {
-      lineIndex: atom.lineIndex,
-      columnIndex: (atom as AtomSingle).columnIndex ?? 0,
+      line: sourcePosition.line,
+      column: sourcePosition.column ?? 0,
     }
   }
 }

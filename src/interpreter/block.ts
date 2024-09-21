@@ -1,3 +1,9 @@
+import { CompileError } from "compile-error"
+import { parse } from "parser/parser"
+import { makeTokenizer } from "tokenizer"
+import { tExport } from "tokenizer/token-type"
+import { Block, Idea } from "tree"
+import { isDeclaration } from "tree/assignment"
 import {
   dissectErrorTraceAtCloserBaseline,
   replaceErrorTraceLine,
@@ -7,289 +13,206 @@ import { interpretThyCall } from "./call"
 import { interpretThyExpression } from "./expression"
 import {
   InterpreterErrorWithContext,
-  makeInterpreterError,
+  makeInterpreterCompileError,
+  makeInterpreterNodeError,
 } from "./interpreter-error"
-import { splitThyStatements } from "./split-statements"
-import { interpretThyStatement, parseThyStatement } from "./statement"
+import { interpretThyStatement } from "./statement"
 import {
-  isAtomLiterally,
-  isSimpleAtom,
-  Statement,
-  ThyBlockContext,
+  ThyBlockContext
 } from "./types"
+import { returnStyle } from "tree/block"
+import assert from "utils/assert"
 
 type BlockOptions = {
   closure: ThyBlockContext["closure"]
-  closureVariableIsImmutable: ThyBlockContext["closureVariableIsImmutable"]
   functionName?: string
   sourceFile: ThyBlockContext["sourceFile"]
-  startingLineIndex: number
   additionalTraceLinesToHide?: number
 }
 
 type UnknownFunction = (...args: readonly unknown[]) => unknown
-type InterpretedBlockReturnStyleReturnMetadata = {
-  style: "return"
-}
-type InterpretedBlockExportsStyleReturnMetadata = {
-  style: "exports"
-  exports: readonly string[]
-}
-type InterpretedBlockReturnMeta =
-  | InterpretedBlockReturnStyleReturnMetadata
-  | InterpretedBlockExportsStyleReturnMetadata
 type InterpretedBlockWithMeta = {
   interpreted: UnknownFunction
-  returns: InterpretedBlockReturnMeta
 }
 
-export function interpretThyBlock(
+export function interpretThyBlockSource(
   thySource: string,
   options: Partial<BlockOptions> = {},
 ): UnknownFunction {
-  return interpretThyBlockWithMeta(thySource, options).interpreted
+  return interpretThyBlockSourceWithMeta(thySource, options).interpreted
 }
 
-export function interpretThyBlockWithMeta(
+export function interpretThyBlockSourceWithMeta(
   thySource: string,
   options: Partial<BlockOptions> = {},
 ): InterpretedBlockWithMeta {
-  const lines = thySource.split(/\r\n|\n/)
-  return interpretThyBlockLinesWithMeta(lines, {
+  const errors: CompileError[] = []
+  const tokenizer = makeTokenizer(thySource, errors)
+  const { top } = parse(tokenizer, errors)
+  if (errors.length > 0) {
+    throw makeInterpreterCompileError(
+      errors[0],
+    )
+  }
+  return interpretThyBlockNodeWithMeta(top, {
     closure: options.closure ?? {},
-    closureVariableIsImmutable: options.closureVariableIsImmutable ?? {},
     functionName: options.functionName,
     sourceFile: options.sourceFile ?? "inline-thy-code",
-    startingLineIndex: options.startingLineIndex ?? 0,
     additionalTraceLinesToHide: options.additionalTraceLinesToHide ?? 0,
   })
 }
 
-export function interpretThyBlockLines(
-  thySourceLines: readonly string[],
+export function interpretThyBlockNode(
+  block: Block,
   options: BlockOptions,
 ): UnknownFunction {
-  return interpretThyBlockLinesWithMeta(thySourceLines, options).interpreted
+  return interpretThyBlockNodeWithMeta(block, options).interpreted
 }
 
-export function interpretThyBlockLinesWithMeta(
-  thySourceLines: readonly string[],
-  options: BlockOptions,
-): InterpretedBlockWithMeta {
+function makeHelper(block: Block, options: BlockOptions, args: readonly unknown[]) {
   // I don't fully understand the -1 here, but somehow we want a different number of lines masked in the top-level case vs. thy-internal cases.
   const additionalTraceLinesToHide = options.additionalTraceLinesToHide ?? -1
-  const statements = splitThyStatements(
-    thySourceLines,
-    options.startingLineIndex,
-  )
-  const isAsync = statements.some((s) =>
-    s.some((a) => isAtomLiterally(a, "await")),
-  )
-  let exportUsed = false
-  let letUsed = false
-  let returnUsed = false
-  const explicitExports: string[] = []
-  const bareVariables: string[] = []
-  for (const statement of statements) {
-    if (isAtomLiterally(statement[0], "export")) {
-      if (letUsed) {
-        throw makeInterpreterError(
-          statement[0],
-          `\`export\` cannot be used after \`let\``,
-        )
-      }
-      exportUsed = true
-    }
-    if (isAtomLiterally(statement[0], "let")) {
-      if (exportUsed) {
-        throw makeInterpreterError(
-          statement[0],
-          `\`let\` cannot be used after \`export\``,
-        )
-      }
-      letUsed = true
-    }
-    if (isAtomLiterally(statement[0], "return")) {
-      if (exportUsed) {
-        throw makeInterpreterError(
-          statement[0],
-          `\`return\` cannot be used after \`export\``,
-        )
-      }
-      returnUsed = true
-    }
-    const parsed = parseThyStatement(statement)
-    if (parsed.assignment) {
-      if (isAtomLiterally(parsed.assignment.varModifierPart, "export")) {
-        explicitExports.push(parsed.assignment.varPart.text)
-      } else if (!parsed.assignment.varModifierPart) {
-        bareVariables.push(parsed.assignment.varPart.text)
-      }
-    }
+
+  const context: ThyBlockContext = {
+    argsToUse: [...args],
+    givenUsed: false,
+    implicitArguments:
+      args.length > 0 && typeof args[0] === "object" && !!args[0]
+        ? (args[0] as Record<string, unknown>)
+        : {},
+    implicitArgumentFirstUsed: null,
+    symbolTable: block.symbolTable,
+    closure: options.closure,
+    variablesInBlock: {},
+    sourceFile: options.sourceFile,
   }
-  const returns: InterpretedBlockReturnMeta =
-    letUsed || returnUsed
-      ? { style: "return" }
-      : {
-          style: "exports",
-          exports: explicitExports.length > 0 ? explicitExports : bareVariables,
-        }
-
-  function makeHelper(args: readonly unknown[]) {
-    const context: ThyBlockContext = {
-      argsToUse: [...args],
-      givenUsed: false,
-      implicitArguments:
-        args.length > 0 && typeof args[0] === "object" && !!args[0]
-          ? (args[0] as Record<string, unknown>)
-          : {},
-      implicitArgumentFirstUsed: null,
-      variablesInBlock: {},
-      variableIsImmutable: {},
-      bareVariables: [],
-      exportedVariables: [],
-      closure: options.closure,
-      closureVariableIsImmutable: options.closureVariableIsImmutable,
-      thatValue: undefined,
-      beforeThatValue: undefined,
-      sourceFile: options.sourceFile,
+  function evaluateStatement(
+    idea: Idea,
+  ): [shouldReturn: boolean, value: unknown] {
+    if (idea.type === "blank-line" || idea.type === "comment" || idea.type === "type-assignment") {
+      return [false, undefined]
     }
-
-    function evaluateStatement(
-      statement: Statement,
-    ): [shouldReturn: boolean, value: unknown] {
-      const parts = statement
-      if (parts.length > 0) {
-        if (isAtomLiterally(parts[0], "return")) {
-          if (parts.length === 1) {
-            throw makeInterpreterError(
-              parts[0],
-              `\`return\` takes exactly one parameter`,
-            )
-          }
-          if (parts.length > 2) {
-            throw makeInterpreterError(
-              parts[2],
-              `\`return\` takes exactly one parameter`,
-            )
-          }
-          return [true, interpretThyExpression(context, parts[1]).target]
-        }
-        if (isAtomLiterally(parts[0], "let")) {
-          if (parts.length <= 1) {
-            return [false, undefined]
-          }
-          const [letKeyword, ...theRest] = parts
-          const returnValue = interpretThyCall(context, theRest)
-          if (returnValue !== undefined) {
-            return [true, returnValue]
-          }
-          return [false, undefined]
-        }
-
-        return [false, interpretThyStatement(context, parts)]
+    if (idea.type === "return") {
+      return [true, interpretThyExpression(context, idea.args[0]).target]
+    }
+    if (idea.type === "let-call") {
+      if (idea.call === null) {
+        return [false, undefined]
+      }
+      assert(idea.call.type !== "await-call", "TODO: await-call not yet implemented")
+      const returnValue = interpretThyCall(context, idea.call)
+      if (returnValue !== undefined) {
+        return [true, returnValue]
       }
       return [false, undefined]
     }
+    return [false, interpretThyStatement(context, idea)]
+  }
 
-    function formulateResult() {
-      const exportSource =
-        context.exportedVariables.length > 0
-          ? context.exportedVariables
-          : context.bareVariables
-      if (!letUsed && exportSource.length > 0) {
-        const implicitReturn: Record<string, unknown> = {}
-        for (const variableName of exportSource) {
-          Object.defineProperty(implicitReturn, variableName, {
-            enumerable: true,
-            get() {
-              return context.variablesInBlock[variableName]
-            },
-            set(newValue) {
-              if (context.variableIsImmutable[variableName]) {
-                throw new Error(
-                  `${variableName} is immutable and cannot be overwritten`,
-                )
-              }
-              context.variablesInBlock[variableName] = newValue
-            },
-          })
-        }
-        return implicitReturn
-      }
+  function formulateResult() {
+    const exportSource =
+      block.exportedSymbols
+    if (block.exportedSymbols.length === 0 || block.returnStyle === returnStyle.explicitReturn) {
       return undefined
     }
-
-    return {
-      context,
-      evaluateStatement,
-      formulateResult,
-    }
-  }
-
-  const functionName = options.functionName ?? "<anonymous>"
-
-  if (isAsync) {
-    const objWithBlockFunction = {
-      [functionName]: async (...args: readonly unknown[]) => {
-        const helper = makeHelper(args)
-        for (const statement of statements) {
-          if (
-            isAtomLiterally(statement[0], "let") &&
-            isAtomLiterally(statement[1], "await")
-          ) {
-            if (statement.length !== 3) {
-              throw makeInterpreterError(
-                statement[1],
-                `\`await\` takes 1 argument; got ${statement.length - 1}`,
-              )
-            }
-            const returnValue = await interpretThyExpression(
-              helper.context,
-              statement[2],
-            ).target
-            if (returnValue !== undefined) {
-              return returnValue
-            }
-            continue
-          }
-
-          // For async stack traces, the trace is a bit different before and after a true await.
-          const errorHere = new Error()
-          try {
-            const [shouldReturn, value] = helper.evaluateStatement(statement)
-            if (shouldReturn) {
-              return value
-            } else {
-              if (value instanceof Promise) {
-                await value
-              }
-            }
-          } catch (e) {
-            throwTransformedError(
-              e,
-              functionName,
-              options.sourceFile,
-              additionalTraceLinesToHide,
-              errorHere,
+    const implicitReturn: Record<string, unknown> = {}
+    for (const variableName of exportSource) {
+      Object.defineProperty(implicitReturn, variableName, {
+        enumerable: true,
+        get() {
+          return context.variablesInBlock[variableName]
+        },
+        set(newValue) {
+          if (block.symbolTable.getSymbolInfo(variableName)?.isConstant) {
+            throw new Error(
+              `${variableName} is immutable and cannot be overwritten`,
             )
           }
-        }
-        return helper.formulateResult()
-      },
+          context.variablesInBlock[variableName] = newValue
+        },
+      })
     }
-    return {
-      interpreted: objWithBlockFunction[functionName],
-      returns,
-    }
+    return implicitReturn
   }
 
+  return {
+    additionalTraceLinesToHide,
+    context,
+    evaluateStatement,
+    formulateResult,
+  }
+}
+
+export function interpretThyBlockNodeWithMeta(
+  block: Block,
+  options: BlockOptions,
+): InterpretedBlockWithMeta {
+  const functionName = options.functionName ?? "<anonymous>"
+
+  if (block.isAsync) {
+    return interpretThyAsyncBlock(functionName, block, options)
+  }
+
+  return interpretThySyncBlock(functionName, block, options)
+}
+
+function interpretThyAsyncBlock(
+  functionName: string,
+  block: Block,
+  options: BlockOptions,
+) {
+  const objWithBlockFunction = {
+    [functionName]: async (...args: readonly unknown[]) => {
+      const helper = makeHelper(block, options, args)
+      for (const idea of block.ideas) {
+        if (idea.type === "let-call" && idea.call && idea.call.type === "await-call") {
+          const returnValue = await interpretThyExpression(helper.context, idea.call.args[0]).target
+          if (returnValue !== undefined) {
+            return returnValue
+          }
+          continue
+        }
+
+        // For async stack traces, the trace is a bit different before and after a true await.
+        const errorHere = new Error()
+        try {
+          const [shouldReturn, value] = helper.evaluateStatement(idea)
+          if (shouldReturn) {
+            return value
+          } else {
+            if (value instanceof Promise) {
+              await value
+            }
+          }
+        } catch (e) {
+          throwTransformedError(
+            e,
+            functionName,
+            options.sourceFile,
+            helper.additionalTraceLinesToHide,
+            errorHere,
+          )
+        }
+      }
+      return helper.formulateResult()
+    },
+  }
+  return {
+    interpreted: objWithBlockFunction[functionName],
+  }
+}
+
+function interpretThySyncBlock(
+  functionName: string,
+  block: Block,
+  options: BlockOptions,
+) {
   const objWithBlockFunction = {
     [functionName]: (...args: readonly unknown[]) => {
-      const helper = makeHelper(args)
+      const helper = makeHelper(block, options, args)
       try {
-        for (const statement of statements) {
-          const [shouldReturn, value] = helper.evaluateStatement(statement)
+        for (const idea of block.ideas) {
+          const [shouldReturn, value] = helper.evaluateStatement(idea)
           if (shouldReturn) {
             return value
           }
@@ -299,7 +222,7 @@ export function interpretThyBlockLinesWithMeta(
           e,
           functionName,
           options.sourceFile,
-          additionalTraceLinesToHide,
+          helper.additionalTraceLinesToHide,
         )
       }
       return helper.formulateResult()
@@ -307,7 +230,6 @@ export function interpretThyBlockLinesWithMeta(
   }
   return {
     interpreted: objWithBlockFunction[functionName],
-    returns,
   }
 }
 
@@ -349,8 +271,8 @@ function throwTransformedError(
         replaceErrorTraceLine(errorDissectedHere.pivot, 0, () => [
           functionName,
           sourceFile,
-          errorTraceLocation.lineIndex + 1,
-          errorTraceLocation.columnIndex + 1,
+          errorTraceLocation.line + 1,
+          errorTraceLocation.column + 1,
         ]),
         errorDissectedHere.shared,
       ].join("\n")

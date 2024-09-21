@@ -1,7 +1,7 @@
 import type { Token } from "tokenizer/token"
 import type { tComment, tStatementTerminator } from "tokenizer/token-type"
-import type { Assignment } from "./assignment"
-import type { Call, Return } from "./call"
+import { isAssignment, type Assignment } from "./assignment"
+import type { AwaitCall, Call, Return } from "./call"
 import type { LetCall } from "./let-call"
 import type { TypeAssignment } from "./type-assignment"
 
@@ -23,3 +23,11 @@ export type Idea =
   | Assignment
   | TypeAssignment
   | LetCall
+
+export function isIdeaAsync(idea: Idea) {
+  return (
+    idea.type === "await-call" ||
+    (isAssignment(idea) && idea.call.type === "await-call") ||
+    (idea.type === "let-call" && idea.call?.type === "await-call")
+  )
+}

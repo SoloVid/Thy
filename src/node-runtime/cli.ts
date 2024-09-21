@@ -2,14 +2,14 @@
 
 import { readFile } from "node:fs/promises"
 import { core } from "../std-lib/core"
-import { interpretThyBlock } from "../interpreter/block"
+import { interpretThyBlockSource } from "../interpreter/block"
 
 const sourceFile = process.argv[2]
 
 async function run() {
   try {
     const source = await readFile(sourceFile, "utf-8")
-    const interpreted = interpretThyBlock(source)
+    const interpreted = interpretThyBlockSource(source)
     interpreted(core)
   } catch (e) {
     console.error(e)

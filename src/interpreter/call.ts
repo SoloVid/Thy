@@ -1,59 +1,51 @@
+import { getFirstToken } from "parser/helper"
+import { GivenCall, ValueCall } from "tree"
 import { interpretThyExpression } from "./expression"
 import {
   InterpreterErrorWithContext,
-  makeInterpreterError,
+  makeInterpreterNodeError,
 } from "./interpreter-error"
-import { Atom, isAtomLiterally, isSimpleAtom, ThyBlockContext } from "./types"
+import { ThyBlockContext } from "./types"
 
 export function interpretThyCall(
   context: ThyBlockContext,
-  parts: readonly Atom[],
+  call: GivenCall | ValueCall,
 ): unknown {
-  const [functionExpression, ...callArgExpressions] = parts
-
-  if (isAtomLiterally(functionExpression, "given")) {
+  if (call.type === "given-call") {
     if (context.implicitArgumentFirstUsed !== null) {
-      throw makeInterpreterError(
-        functionExpression,
+      throw makeInterpreterNodeError(
+        call.func,
         `\`given\` cannot be used after implicit arguments are used. (${context.implicitArgumentFirstUsed} referenced implicit argument.)`,
       )
     }
     context.givenUsed = true
-    if (callArgExpressions.length > 1) {
-      throw makeInterpreterError(
-        callArgExpressions[1],
-        "given may only take one argument",
-      )
-    }
-    if (callArgExpressions.length === 1) {
+    if (call.args.length === 1) {
       const defaultValue = interpretThyExpression(
         context,
-        callArgExpressions[0],
+        call.args[0],
       ).target
       if (context.argsToUse.length === 0) {
         return defaultValue
       }
     }
     if (context.argsToUse.length <= 0) {
-      throw makeInterpreterError(
-        functionExpression,
+      throw makeInterpreterNodeError(
+        call.func,
         `No argument or default available for given`,
       )
     }
     return context.argsToUse.shift()
   }
 
-  const callArgs = callArgExpressions.map(
+  const callArgs = call.args.map(
     (a) => interpretThyExpression(context, a).target,
   )
-  const ie = interpretThyExpression(context, functionExpression)
+  const ie = interpretThyExpression(context, call.func)
   const f = ie.target as (...args: readonly unknown[]) => unknown
-  const functionName = isSimpleAtom(functionExpression)
-    ? functionExpression.text
-    : "<anonymous>"
+  const functionName = call.funcToken?.text ?? "<anonymous>"
   if (!(typeof f === "function")) {
-    throw makeInterpreterError(
-      functionExpression,
+    throw makeInterpreterNodeError(
+      call.func,
       `${functionName} is not a function: ${JSON.stringify(f)}`,
     )
   }
@@ -63,6 +55,6 @@ export function interpretThyCall(
     }
     return f(...callArgs)
   } catch (e) {
-    throw new InterpreterErrorWithContext(e, functionExpression)
+    throw new InterpreterErrorWithContext(e, getFirstToken(call.func))
   }
 }

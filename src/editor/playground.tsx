@@ -4,7 +4,7 @@ import {
 } from "lz-string"
 import { useEffect, useState } from "preact/hooks"
 import { CopyToClipboardButton } from "../home/button"
-import { interpretThyBlock } from "../interpreter/block"
+import { interpretThyBlockSource } from "../interpreter/block"
 import { generateUID } from "../interpreter/split-line"
 import { core } from "../std-lib/core"
 import { dissectErrorTraceAtCloserBaseline } from "../utils/error-helper"
@@ -175,7 +175,7 @@ export default function Playground() {
     let printedLines: string[] = []
     const errorHere = new Error()
     try {
-      const interpreted = interpretThyBlock(sourceCodeToRun)
+      const interpreted = interpretThyBlockSource(sourceCodeToRun)
       const playgroundLib = {
         ...core,
         print: (thing: unknown) => {

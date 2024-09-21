@@ -1,11 +1,8 @@
 import type { CompileError } from "../compile-error"
 import type { Tokenizer } from "../tokenizer/tokenizer"
 import type { Block } from "../tree/block"
-import { makeSymbolTable } from "../tree/symbol-table"
-import { addNodeError, badParse } from "./error"
 import { parseBlockInner } from "./parse-block"
-import type { ParserState } from "./parser-state"
-import { makeTokenBuffer } from "./token-buffer"
+import { makeParserState } from "./parser-state"
 
 export interface ParserOutput {
   top: Block
@@ -16,26 +13,8 @@ export function parse(
   tokenizer: Tokenizer,
   errors: CompileError[] = [],
 ): ParserOutput {
-  const state: ParserState = {
-    buffer: makeTokenBuffer(tokenizer),
-    context: {
-      symbolTable: makeSymbolTable(),
-      takeThat: (thatNode) => {
-        addNodeError(
-          state,
-          thatNode,
-          `"that" should not be taken at the top level`,
-        )
-        return badParse
-      },
-    },
-
-    addError(e) {
-      errors.push(e)
-    },
-  }
   return {
-    top: parseBlockInner(state),
+    top: parseBlockInner(makeParserState(tokenizer, errors)),
     errors: errors,
   }
 }

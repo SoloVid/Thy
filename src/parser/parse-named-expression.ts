@@ -133,6 +133,7 @@ export function parseAnyIndeterminateNamedExpression(
     return {
       type: "indeterminate-type-property-access",
       base: makeNamedNode(baseToken),
+      baseToken,
       propertyAccesses: propertiesAccessed.map((p, i) => ({
         memberAccessOperatorToken: memberAccessOperatorTokens[i],
         propertyToken: p,
@@ -144,6 +145,7 @@ export function parseAnyIndeterminateNamedExpression(
 
   const unsafeValuePropertyAccess: UnsafeIndeterminateValuePropertyAccess = {
     base: makeNamedNode(baseToken),
+    baseToken,
     propertyAccesses: propertiesAccessed.map((p, i) => ({
       memberAccessOperatorToken: memberAccessOperatorTokens[i],
       propertyToken: p,
@@ -204,12 +206,15 @@ function validateValuePropertyAccess(
     }
   }
 
+  const baseToken: Token<typeof tValueIdentifier | typeof tThat> = validIntermediatePropertyAccesses[0].propertyToken
   return {
     type: "indeterminate-value-property-access",
+    // TODO: Can we type this more safely?
     base: {
-      type: "value-identifier",
-      token: validIntermediatePropertyAccesses[0].propertyToken,
-    },
+      type: baseToken.type === tValueIdentifier ? "value-identifier" : "that",
+      token: baseToken,
+    } as ValueIdentifier | TempThatNode,
+    baseToken: baseToken,
     propertyAccesses: [
       ...validIntermediatePropertyAccesses.slice(1),
       finalPropertyAccess,

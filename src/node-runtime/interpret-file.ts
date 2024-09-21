@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises"
 import { resolve } from "node:path"
-import { interpretThyBlock } from "../interpreter/block"
+import { interpretThyBlockSource } from "../interpreter/block"
 
 export type InterpretFileOptions = {
   args: Record<string, unknown>
@@ -11,7 +11,7 @@ export async function interpretFile(
   { args }: InterpretFileOptions,
 ) {
   const contents = await readFile(file, "utf-8")
-  const interpreted = interpretThyBlock(contents, {
+  const interpreted = interpretThyBlockSource(contents, {
     closure: args,
     sourceFile: resolve(file),
   })

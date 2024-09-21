@@ -1,22 +1,38 @@
+import type { CompileError } from "compile-error"
+import { expect } from "expect"
 import assert from "node:assert"
+import { parseBlockInner } from "parser/parse-block"
+import { makeParserState } from "parser/parser-state"
 import { test } from "test-framework"
+import { makeTokenizer } from "tokenizer"
+import { isCall } from "tree/call"
 import { interpretThyExpression } from "./expression"
 import { InterpreterErrorWithContext } from "./interpreter-error"
 import { makeSimpleContext } from "./test-helper"
 import type { ThyBlockContext } from "./types"
 
+const testLocation = {
+  line: 1,
+  column: 4,
+}
+
 function interpretThyExpressionBasic(
   context: ThyBlockContext,
-  expression: string | readonly string[],
+  source: string,
 ) {
-  if (Array.isArray(expression)) {
-    return interpretThyExpression(context, { lines: expression, lineIndex: -1 })
-  }
-  return interpretThyExpression(context, {
-    text: expression as string,
-    lineIndex: -1,
-    columnIndex: -1,
-  })
+  const errors: CompileError[] = []
+  const tokenizer = makeTokenizer(`Comment\ndef ${source}`, errors)
+  const parserState = makeParserState(tokenizer, errors)
+  const block = parseBlockInner(parserState)
+  expect(errors).toEqual([])
+  assert(block.ideas.length === 2, "parsed block should have 2 ideas")
+  const call = block.ideas[1]
+  assert(isCall(call), "parsed idea should be a call")
+  assert(call.args.length === 1, "parsed call should have 1 argument")
+  return interpretThyExpression(
+    context,
+    call.args[0],
+  )
 }
 
 test("interpretThyExpression() can return number", async () => {
@@ -116,9 +132,8 @@ test("interpretThyExpression() barfs if implicit argument used after given", asy
     givenUsed: true,
     implicitArguments: { x: 5 },
   })
-  const token = { text: "x", lineIndex: 1, columnIndex: 2 }
   assert.throws(
-    () => interpretThyExpression(context, token),
+    () => interpretThyExpressionBasic(context, `x`),
     (e) => {
       assert(e instanceof Error)
       assert.match(
@@ -126,7 +141,7 @@ test("interpretThyExpression() barfs if implicit argument used after given", asy
         /Implicit arguments cannot be used \(referenced x\) after `given`/,
       )
       assert(e instanceof InterpreterErrorWithContext)
-      assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
+      assert.deepStrictEqual(e.sourceLocation, testLocation)
       return true
     },
   )
@@ -156,50 +171,17 @@ test("interpretThyExpression() barfs if variable is not found", async () => {
   assert.throws(() => interpretThyExpressionBasic(context, `x`), /x not found/)
 })
 
-test("interpretThyExpression() barfs if identifier is invalid", async () => {
-  const context = makeSimpleContext()
-  const identifierToken = { text: "$x", lineIndex: 1, columnIndex: 2 }
-  assert.throws(
-    () => interpretThyExpression(context, identifierToken),
-    (e) => {
-      assert(e instanceof Error)
-      assert.match(e.message, /Invalid identifier: \$x/)
-      assert(e instanceof InterpreterErrorWithContext)
-      assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
-      return true
-    },
-  )
-})
-
-test("interpretThyExpression() barfs if member access is invalid", async () => {
+test("interpretThyExpression() barfs if member access is attempted on undefined value", async () => {
   const context = makeSimpleContext({
-    variablesInBlock: { x: { $y: { z: 6 } } },
+    variablesInBlock: { x: { y: undefined } },
   })
-  const token = { text: `x.$y.z`, lineIndex: 1, columnIndex: 2 }
   assert.throws(
-    () => interpretThyExpression(context, token),
-    (e) => {
-      assert(e instanceof Error)
-      assert.match(e.message, /Invalid \(member\) identifier: \$y/)
-      assert(e instanceof InterpreterErrorWithContext)
-      assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
-      return true
-    },
-  )
-})
-
-test("interpretThyExpression() barfs if member access is attempted on falsey value", async () => {
-  const context = makeSimpleContext({
-    variablesInBlock: { x: { y: null } },
-  })
-  const token = { text: `x.y.z`, lineIndex: 1, columnIndex: 2 }
-  assert.throws(
-    () => interpretThyExpression(context, token),
+    () => interpretThyExpressionBasic(context, `x.y.z`),
     (e) => {
       assert(e instanceof Error)
       assert.match(e.message, /y has no value/)
       assert(e instanceof InterpreterErrorWithContext)
-      assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
+      assert.deepStrictEqual(e.sourceLocation, testLocation)
       return true
     },
   )
@@ -207,7 +189,7 @@ test("interpretThyExpression() barfs if member access is attempted on falsey val
 
 test("interpretThyExpression() interprets array as block", async () => {
   const context = makeSimpleContext()
-  const f = interpretThyExpressionBasic(context, ["return 5"]).target
+  const f = interpretThyExpressionBasic(context, "\n  return 5").target
   assert(typeof f === "function", "Expression should be a function")
   assert.strictEqual(f(), 5)
 })
@@ -216,147 +198,25 @@ test("interpretThyExpression() allows block to access variables from this scope'
   const context = makeSimpleContext({
     closure: { x: 5 },
   })
-  const f = interpretThyExpressionBasic(context, ["return x"]).target
+  const f = interpretThyExpressionBasic(context, "\n  return x").target
   assert(typeof f === "function", "Expression should be a function")
   assert.strictEqual(f(), 5)
-})
-
-test("interpretThyExpression() allows block to write mutable variables from this scope's closure", async () => {
-  const context = makeSimpleContext({
-    variablesInBlock: { f: () => 6 },
-    closure: { x: 5 },
-  })
-  const f = interpretThyExpressionBasic(context, ["x to f"]).target
-  assert(typeof f === "function", "Expression should be a function")
-  f()
-  assert.strictEqual(context.closure.x, 6)
-})
-
-test("interpretThyExpression() barfs if block attempts to write immutable variables from this scope's closure", async () => {
-  const context = makeSimpleContext({
-    variablesInBlock: { f: () => 6 },
-    closure: { x: 5 },
-    closureVariableIsImmutable: { x: true },
-  })
-  const f = interpretThyExpressionBasic(context, ["x to f"]).target
-  assert(typeof f === "function", "Expression should be a function")
-  assert.throws(() => f(), /x is immutable/)
 })
 
 test("interpretThyExpression() allows block to access variables from this scope's implicit arguments", async () => {
   const context = makeSimpleContext({
     implicitArguments: { x: 5 },
   })
-  const f = interpretThyExpressionBasic(context, ["return x"]).target
+  const f = interpretThyExpressionBasic(context, "\n  return x").target
   assert(typeof f === "function", "Expression should be a function")
   assert.strictEqual(f(), 5)
-})
-
-test("interpretThyExpression() barfs if block attempts to overwrite this scope's implicit arguments", async () => {
-  const context = makeSimpleContext({
-    variablesInBlock: { f: () => 6 },
-    implicitArguments: { x: 5 },
-  })
-  const f = interpretThyExpressionBasic(context, ["x to f"]).target
-  assert(typeof f === "function", "Expression should be a function")
-  // TODO: Should this be made a more explicit error about implicit arguments? Would require tracking more context I think.
-  assert.throws(() => f(), /x is immutable/)
 })
 
 test("interpretThyExpression() allows block to access variables from this scope's local block variables", async () => {
   const context = makeSimpleContext({
     variablesInBlock: { x: 5 },
   })
-  const f = interpretThyExpressionBasic(context, ["return x"]).target
+  const f = interpretThyExpressionBasic(context, "\n  return x").target
   assert(typeof f === "function", "Expression should be a function")
   assert.strictEqual(f(), 5)
-})
-
-test("interpretThyExpression() allows block to write mutable variables from this scope's local block variables", async () => {
-  const context = makeSimpleContext({
-    variablesInBlock: { f: () => 6, x: 5 },
-  })
-  const f = interpretThyExpressionBasic(context, ["x to f"]).target
-  assert(typeof f === "function", "Expression should be a function")
-  f()
-  assert.strictEqual(context.variablesInBlock.x, 6)
-})
-
-test("interpretThyExpression() barfs if block attempts to write immutable variables from this scope's local block variables", async () => {
-  const context = makeSimpleContext({
-    variablesInBlock: { f: () => 6, x: 5 },
-    variableIsImmutable: { x: true },
-  })
-  const f = interpretThyExpressionBasic(context, ["x to f"]).target
-  assert(typeof f === "function", "Expression should be a function")
-  assert.throws(() => f(), /x is immutable/)
-})
-
-test("interpretThyExpression() replaces `that` with stored value from context", async () => {
-  const context = makeSimpleContext({
-    thatValue: 5,
-  })
-  assert.strictEqual(interpretThyExpressionBasic(context, "that").target, 5)
-  // Do it again to verify it wasn't removed.
-  assert.strictEqual(interpretThyExpressionBasic(context, "that").target, 5)
-  // Triple-check it wasn't removed.
-  assert.strictEqual(context.thatValue, 5)
-})
-
-test("interpretThyExpression() replaces `that` with stored value from context when used as base for property access", async () => {
-  const context = makeSimpleContext({
-    thatValue: { a: 5 },
-  })
-  assert.strictEqual(interpretThyExpressionBasic(context, "that.a").target, 5)
-})
-
-test("interpretThyExpression() barfs on `that` if value is unavailable from context", async () => {
-  const context = makeSimpleContext({
-    thatValue: undefined,
-  })
-  const thatToken = { text: "that", lineIndex: 1, columnIndex: 2 }
-  assert.throws(
-    () => interpretThyExpression(context, thatToken),
-    (e) => {
-      assert(e instanceof Error)
-      assert.match(e.message, /Value is not available for `that`/)
-      assert(e instanceof InterpreterErrorWithContext)
-      assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
-      return true
-    },
-  )
-})
-
-test("interpretThyExpression() replaces `beforeThat` with stored value from context", async () => {
-  const context = makeSimpleContext({
-    beforeThatValue: 5,
-  })
-  assert.strictEqual(
-    interpretThyExpressionBasic(context, "beforeThat").target,
-    5,
-  )
-  // Do it again to verify it wasn't removed.
-  assert.strictEqual(
-    interpretThyExpressionBasic(context, "beforeThat").target,
-    5,
-  )
-  // Triple-check it wasn't removed.
-  assert.strictEqual(context.beforeThatValue, 5)
-})
-
-test("interpretThyExpression() barfs on `beforeThat` if value is unavailable from context", async () => {
-  const context = makeSimpleContext({
-    beforeThatValue: undefined,
-  })
-  const beforeThatToken = { text: "beforeThat", lineIndex: 1, columnIndex: 2 }
-  assert.throws(
-    () => interpretThyExpression(context, beforeThatToken),
-    (e) => {
-      assert(e instanceof Error)
-      assert.match(e.message, /Value is not available for `beforeThat`/)
-      assert(e instanceof InterpreterErrorWithContext)
-      assert.deepStrictEqual(e.sourceLocation, { lineIndex: 1, columnIndex: 2 })
-      return true
-    },
-  )
 })

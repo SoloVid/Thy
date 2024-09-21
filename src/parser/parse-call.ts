@@ -66,11 +66,27 @@ export function parseValueCallGivenTarget(
   return {
     type: "value-call",
     func: func,
+    funcToken: getValueCallFuncToken(target),
     typeArgs: args.typeArgs,
     args: args.valueArgs,
     firstToken: getFirstToken(target),
     lastToken: args.lastToken,
   }
+}
+
+function getValueCallFuncToken(
+  target: IndeterminateExpression
+): ValueCall["funcToken"] {
+  if (target.type === "value-identifier") {
+    return target.token
+  }
+  if (target.type === "that") {
+    return target.token
+  }
+  if (target.type === "indeterminate-value-property-access") {
+    return target.propertyAccesses[target.propertyAccesses.length - 1].propertyToken
+  }
+  return null
 }
 
 function ensureFuncCallable(

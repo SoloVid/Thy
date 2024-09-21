@@ -10,6 +10,7 @@ import type { ValueIdentifier } from "./atom"
 import type { AwaitCall, GivenCall, ValueCall } from "./call"
 import type { ValuePropertyAccess } from "./property-access"
 import type { TokenRange } from "./token-range"
+import { TreeNode } from "./tree-node"
 
 export type Assignment =
   | ConstantDeclaration
@@ -24,18 +25,18 @@ const assignmentTypes: readonly Assignment["type"][] = [
   "variable-reassignment",
   "property-assignment",
 ]
-export function isAssignment(node: unknown): node is Assignment {
+export function isAssignment(node: TreeNode): node is Assignment {
   const a = node as Assignment
-  return !!a && assignmentTypes.includes(a.type)
+  return assignmentTypes.includes(a.type)
 }
 
 const declarationTypes: readonly Declaration["type"][] = [
   "constant-declaration",
   "variable-declaration",
 ]
-export function isDeclaration(node: unknown): node is Declaration {
+export function isDeclaration(node: TreeNode): node is Declaration {
   const d = node as Declaration
-  return !!d && declarationTypes.includes(d.type)
+  return declarationTypes.includes(d.type)
 }
 
 export interface ConstantDeclaration extends TokenRange {

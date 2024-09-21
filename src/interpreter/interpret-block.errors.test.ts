@@ -2,15 +2,10 @@ import assert from "assert"
 import { test } from "test-framework"
 import { delay } from "../utils/delay"
 import { getErrorTraceLines } from "../utils/error-helper"
-import { interpretThyBlock } from "./block"
-
-test("interpretThyBlock() should reject given with too many args", async () => {
-  const f = interpretThyBlock(`a is given 1 2`)
-  assert.throws(() => f(), /given may only take one argument/)
-})
+import { interpretThyBlockSource } from "./block"
 
 test("interpretThyBlock() should provide Thy stack trace when error is thrown", () => {
-  const interpreted = interpretThyBlock(`f is given\nf`, {
+  const interpreted = interpretThyBlockSource(`f is given\nf`, {
     functionName: "interpreted",
     sourceFile: "provided-source.thy",
   })
@@ -42,7 +37,7 @@ test("interpretThyBlock() should provide Thy stack trace when error is thrown", 
 })
 
 test("interpretThyBlock() should provide Thy stack trace when error is thrown asynchronously", async () => {
-  const interpreted = interpretThyBlock(`f is given\nf\nawait that`, {
+  const interpreted = interpretThyBlockSource(`f is given\nf\nawait that`, {
     functionName: "interpreted",
     sourceFile: "provided-source.thy",
   })
@@ -78,7 +73,7 @@ test("interpretThyBlock() should provide Thy stack trace when error is thrown as
 })
 
 test("interpretThyBlock() should provide Thy stack trace when error is thrown synchronously from async code", async () => {
-  const interpreted = interpretThyBlock(`f is given\nf\nawait that`, {
+  const interpreted = interpretThyBlockSource(`f is given\nf\nawait that`, {
     functionName: "interpreted",
     sourceFile: "provided-source.thy",
   })
@@ -113,7 +108,7 @@ test("interpretThyBlock() should provide Thy stack trace when error is thrown sy
 })
 
 test("interpretThyBlock() should provide Thy stack trace when error is thrown synchronously from async code", async () => {
-  const interpreted = interpretThyBlock(`f is given\nf\ng is await that`, {
+  const interpreted = interpretThyBlockSource(`f is given\nf\ng is await that`, {
     functionName: "interpreted",
     sourceFile: "provided-source.thy",
   })
@@ -148,7 +143,7 @@ test("interpretThyBlock() should provide Thy stack trace when error is thrown sy
 })
 
 test("interpretThyBlock() should properly transform nested Thy Error stack trace", () => {
-  const interpreted = interpretThyBlock(
+  const interpreted = interpretThyBlockSource(
     `
 ts1 is given
 ts2 is given
@@ -220,7 +215,7 @@ thy1
 })
 
 test("interpretThyBlock() gracefully handles interpreter errors", () => {
-  const interpreted = interpretThyBlock(
+  const interpreted = interpretThyBlockSource(
     `
 f is def
   doesNotExist
@@ -257,19 +252,19 @@ f
 
 function assertErrorTraceLineMatch(
   error: Error,
-  lineIndex: number,
+  line: number,
   pattern: RegExp,
 ) {
   const traceLinesString = getErrorTraceLines(error)
   const traceLines = traceLinesString.split("\n")
   assert(
-    traceLines.length > lineIndex,
-    `Error trace should be more than ${lineIndex} lines. Got:\n${traceLinesString}\n<end trace>`,
+    traceLines.length > line,
+    `Error trace should be more than ${line} lines. Got:\n${traceLinesString}\n<end trace>`,
   )
   assert.match(
-    traceLines[lineIndex],
+    traceLines[line],
     pattern,
-    `Error trace line ${lineIndex + 1} did not match pattern ${pattern.toString()}\n${traceLinesString}\n<end trace>`,
+    `Error trace line ${line + 1} did not match pattern ${pattern.toString()}\n${traceLinesString}\n<end trace>`,
   )
 }
 
@@ -308,7 +303,7 @@ function assertErrorTraceLinesMatch(
 }
 
 test("interpretThyBlock() Thy stack trace counts empty lines and comment lines", () => {
-  const interpreted = interpretThyBlock(
+  const interpreted = interpretThyBlockSource(
     `f is given\n\nComment here (empty line above)\nf`,
     {
       functionName: "interpreted",
