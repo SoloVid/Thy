@@ -1,5 +1,5 @@
 import { getFirstToken } from "parser/helper"
-import { AwaitCall, Call, GivenCall, TreeNode, ValueCall } from "tree"
+import type { AwaitCall, Call, GivenCall, TreeNode, ValueCall } from "tree"
 import { forwardWait, MayWait, notWait, yesWait, YesWait } from "./async-helper"
 import { RuntimeValue, yesIThinkThisIsRuntimeFunction } from "./dynamic-type"
 import { InterpretedExpression, interpretThyExpression } from "./expression"
@@ -7,7 +7,7 @@ import {
   InterpreterErrorWithContext,
   makeInterpreterNodeError,
 } from "./interpreter-error"
-import { ThyBlockContext } from "./types"
+import type { ThyBlockContext } from "./types"
 
 export function interpretThyCall(
   context: ThyBlockContext,

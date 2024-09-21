@@ -1,7 +1,6 @@
+import type { CompileError } from "common/compile-error"
+import type { Token, Tokenizer } from "tokenizer"
 import { tEndStream, TokenType } from "tokenizer/token-type"
-import type { CompileError } from "../compile-error"
-import type { Token } from "../tokenizer/token"
-import type { Tokenizer } from "../tokenizer/tokenizer"
 import type { ParserContext, ParserState } from "./parser-state"
 import { makeTokenBuffer } from "./token-buffer"
 

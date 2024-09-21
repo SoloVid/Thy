@@ -1,4 +1,4 @@
-import type { CompileError } from "compile-error"
+import type { CompileError } from "common/compile-error"
 import { expect } from "expect"
 import assert from "node:assert"
 import { badParse } from "parser/error"

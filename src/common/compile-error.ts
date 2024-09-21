@@ -1,5 +1,5 @@
-import type { Token } from "./tokenizer/token"
-import type { TokenRange } from "./tree/token-range"
+import type { Token } from "tokenizer"
+import type { TokenRange } from "./token-range"
 
 export interface CompileError {
   readonly message: string

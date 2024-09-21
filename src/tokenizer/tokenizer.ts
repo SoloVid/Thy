@@ -1,5 +1,5 @@
-import { CompileError, tokenError } from "../compile-error"
-import { debug, debugDefer } from "./debug"
+import { CompileError, tokenError } from "common/compile-error"
+import { debug } from "./debug"
 import type { Token } from "./token"
 import { makeTokenHere } from "./token-helper"
 import { skipToken, TokenMatcher } from "./token-matcher"

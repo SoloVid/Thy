@@ -1,15 +1,15 @@
-import type { Token } from "../tokenizer/token"
+import type { TokenRange } from "common/token-range"
+import type { Token } from "tokenizer"
 import {
   tConstDeclAssign,
   tExport,
   tNoDeclAssign,
   tPrivate,
   tVarDeclAssign,
-} from "../tokenizer/token-type"
+} from "tokenizer/token-type"
 import type { ValueIdentifier } from "./atom"
 import type { AwaitCall, GivenCall, ValueCall } from "./call"
 import type { ValuePropertyAccess } from "./property-access"
-import type { TokenRange } from "./token-range"
 import { TreeNode } from "./tree-node"
 
 export type Assignment =

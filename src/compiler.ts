@@ -1,5 +1,5 @@
 import type { CodeGenerator } from "./code-gen/generator"
-import type { CompileError } from "./compile-error"
+import type { CompileError } from "./common/compile-error"
 import { parse } from "./parser/parser"
 import { makeTokenizer, TokenizerFactory } from "./tokenizer/tokenizer"
 import type { Block } from "./tree/block"

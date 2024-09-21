@@ -1,13 +1,12 @@
-import type { TypeIdentifier } from "tree"
-import assert from "utils/assert"
 import {
   tConstDeclAssign,
   tNoDeclAssign,
   tType,
   tTypeIdentifier,
   tVarDeclAssign,
-} from "../tokenizer/token-type"
-import type { TypeAssignment } from "../tree/type-assignment"
+} from "tokenizer/token-type"
+import type { TypeAssignment, TypeIdentifier } from "tree"
+import assert from "utils/assert"
 import { addTokenError, badParse, BadParse } from "./error"
 import { applyToSymbolTable } from "./parse-assignment"
 import { parseTypeCallOrValueCall } from "./parse-type-call"

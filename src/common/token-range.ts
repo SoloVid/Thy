@@ -1,4 +1,4 @@
-import type { Token } from "../tokenizer/token"
+import type { Token } from "tokenizer"
 
 export interface TokenRange {
   readonly firstToken: Token

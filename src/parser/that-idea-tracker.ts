@@ -1,7 +1,7 @@
-import { tokenError } from "compile-error"
+import { tokenError } from "common/compile-error"
 import type { Idea } from "tree"
-import { isAssignment } from "tree/assignment"
-import { badParse, BadParse } from "./error"
+import { isAssignment } from "tree"
+import { badParse } from "./error"
 import type { ParserState } from "./parser-state"
 import type { TempThatNode } from "./that"
 

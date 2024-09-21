@@ -1,8 +1,8 @@
-import { NumberLiteral, TypeIdentifier, ValueIdentifier } from "./atom"
+import type { NumberLiteral, TypeIdentifier, ValueIdentifier } from "./atom"
 import type { Block } from "./block"
-import { Call } from "./call"
-import { TypePropertyAccess, ValuePropertyAccess } from "./property-access"
-import { StringLiteral } from "./string"
+import type { Call } from "./call"
+import type { TypePropertyAccess, ValuePropertyAccess } from "./property-access"
+import type { StringLiteral } from "./string"
 
 export type CallableExpression =
   | Block

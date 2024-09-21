@@ -1,12 +1,12 @@
-import type { Block, TypeIdentifier, ValueIdentifier } from "tree"
-import type { NumberLiteral } from "tree/atom"
-import type { StringLiteral } from "tree/string"
-import {
-  tNumberLiteral,
-  tStartBlock,
-  tStartString,
-} from "../tokenizer/token-type"
-import { BadParse } from "./error"
+import { tNumberLiteral, tStartBlock, tStartString } from "tokenizer/token-type"
+import type {
+  Block,
+  NumberLiteral,
+  StringLiteral,
+  TypeIdentifier,
+  ValueIdentifier,
+} from "tree"
+import type { BadParse } from "./error"
 import { parseBlock } from "./parse-block"
 import {
   parseAnyIndeterminateNamedExpression,

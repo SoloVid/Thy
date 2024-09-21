@@ -1,6 +1,6 @@
 import type { Idea } from "./idea"
 import type { ReadSymbolTable } from "./symbol-table"
-import type { TokenRange } from "./token-range"
+import type { TokenRange } from "common/token-range"
 
 export const returnStyle = {
   implicitExport: "implicitExport",

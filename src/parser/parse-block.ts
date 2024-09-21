@@ -1,9 +1,8 @@
-import assert from "assert"
-import { isIdeaAsync } from "tree/idea"
+import type { Token } from "tokenizer"
+import { tEndBlock, tEndStream, tStartBlock } from "tokenizer/token-type"
+import { Block, isIdeaAsync, ReturnStyle, returnStyle } from "tree"
 import { SymbolTable } from "tree/symbol-table"
-import type { Token } from "../tokenizer/token"
-import { tEndBlock, tEndStream, tStartBlock } from "../tokenizer/token-type"
-import { Block, ReturnStyle, returnStyle } from "../tree/block"
+import assert from "utils/assert"
 import { evaluateReturnStyle } from "./evaluate-return-style"
 import { getLastToken } from "./helper"
 import { parseIdea } from "./parse-idea"
@@ -12,12 +11,18 @@ import { makeThatIdeaTracker } from "./that-idea-tracker"
 
 export function parseBlock(state: ParserState): Block {
   const firstToken = state.buffer.consumeToken()
-  assert(firstToken.type === tStartBlock)
+  assert(
+    firstToken.type === tStartBlock,
+    "parseBlock() should only be called if next token is start block",
+  )
 
   const result = parseBlockInner(state)
 
   const lastToken = state.buffer.consumeToken()
-  assert(lastToken.type === tEndBlock)
+  assert(
+    lastToken.type === tEndBlock,
+    "parseBlock() should always have closing end block token",
+  )
 
   return result
 }

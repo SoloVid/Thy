@@ -1,3 +1,4 @@
+import type { SourcePosition } from "common"
 import type { TokenType } from "./token-type"
 
 export interface OneTokenizer {
@@ -14,14 +15,3 @@ export type Token<T extends TokenType = TokenType> = SourcePosition &
         readonly text: string
       }
     : never)
-
-export type SaferToken<T extends TokenType = never> = Token<T>
-
-export interface SourcePosition {
-  /** 0-based index of character relative to start of file. */
-  readonly offset: number
-  /** 0-based index of line in source. */
-  readonly line: number
-  /** 0-based index of column in source. */
-  readonly column: number
-}

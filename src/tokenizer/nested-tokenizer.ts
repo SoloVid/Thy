@@ -1,4 +1,4 @@
-import type { CompileError } from "../compile-error"
+import type { CompileError } from "../common/compile-error"
 import type { TokenMatcher } from "./token-matcher"
 import type { tErrorToken, TokenType } from "./token-type"
 import { makeGenericTokenizer } from "./tokenizer"

@@ -1,9 +1,10 @@
-import { CompileError, tokenError, tokenRangeError } from "compile-error"
-import { Token } from "tokenizer/token"
-import { BlankLine, TokenRange, TreeNode } from "tree"
-import { IndeterminateExpression } from "./parse-expression"
-import { ParserState } from "./parser-state"
-import { IndeterminateTypePropertyAccess } from "./that"
+import { tokenError, tokenRangeError } from "common/compile-error"
+import type { TokenRange } from "common/token-range"
+import type { Token } from "tokenizer"
+import type { BlankLine, TreeNode } from "tree"
+import type { IndeterminateExpression } from "./parse-expression"
+import type { ParserState } from "./parser-state"
+import type { IndeterminateTypePropertyAccess } from "./that"
 
 export const badParse = Symbol("badParse")
 export type BadParse = typeof badParse
@@ -39,14 +40,4 @@ export function addNodeError(
     return
   }
   addTokenRangeError(state, node, message)
-}
-
-export function nodeError(
-  node: ErrorableTreeNode,
-  message: string,
-): CompileError {
-  if ("token" in node) {
-    return tokenError(node.token, message)
-  }
-  return tokenRangeError(node, message)
 }

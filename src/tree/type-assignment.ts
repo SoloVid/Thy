@@ -1,13 +1,13 @@
-import type { Token } from "../tokenizer/token"
+import type { TokenRange } from "common/token-range"
+import type { Token } from "tokenizer"
 import type {
   tConstDeclAssign,
   tExport,
   tPrivate,
   tType,
-} from "../tokenizer/token-type"
+} from "tokenizer/token-type"
 import type { TypeIdentifier } from "./atom"
 import type { Call } from "./call"
-import type { TokenRange } from "./token-range"
 import type { TypeCall, TypeGivenCall } from "./type-call"
 
 export interface TypeAssignment extends TokenRange {

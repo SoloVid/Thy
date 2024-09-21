@@ -1,14 +1,8 @@
 import assert from "assert"
 import type { Token } from "../tokenizer/token"
 import type { tMemberAccessOperator } from "../tokenizer/token-type"
-import type {
-  PropertyAccess,
-  TreeNode,
-  TypeAssignment,
-  TypeCall,
-} from "../tree"
+import type { TreeNode, TypeAssignment, TypeCall } from "../tree"
 import type { Assignment } from "../tree/assignment"
-import type { Atom } from "../tree/atom"
 import type { Call } from "../tree/call"
 import type { LetCall } from "../tree/let-call"
 import { CodeGeneratorFunc, fromNode, GeneratedSnippets } from "./generator"

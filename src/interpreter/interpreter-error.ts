@@ -1,6 +1,6 @@
-import { CompileError } from "compile-error"
-import { SourcePosition } from "tokenizer/token"
-import { TreeNode } from "tree"
+import type { CompileError } from "common/compile-error"
+import type { SourcePosition } from "common/source-position"
+import type { TreeNode } from "tree"
 
 export function makeInterpreterNodeError(node: TreeNode, message: string) {
   return new InterpreterErrorWithContext(

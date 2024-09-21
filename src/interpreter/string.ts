@@ -1,4 +1,4 @@
-import type { StringLiteral } from "tree/string"
+import type { StringLiteral } from "tree"
 import { interpretThyValueIdentifier } from "./expression"
 import { makeInterpreterNodeError } from "./interpreter-error"
 import type { ThyBlockContext } from "./types"

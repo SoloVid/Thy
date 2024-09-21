@@ -1,6 +1,6 @@
-import type { CompileError } from "../compile-error"
+import type { CompileError } from "../common/compile-error"
 import type { Token } from "../tokenizer/token"
-import type { TokenRange } from "../tree/token-range"
+import type { TokenRange } from "../common/token-range"
 import type { TreeNode } from "../tree/tree-node"
 import type { GeneratorState } from "./generator-state"
 import type { LibraryGeneratorCollection } from "./library-generator"
@@ -66,7 +66,7 @@ export function fromNode(
   if (node.type === "blank-line") {
     return { text }
   }
-  if (node.type === "atom" || node.type === "non-code") {
+  if ("token" in node) {
     return fromToken(node.token, text)
   }
   return fromTokenRange(node, text)

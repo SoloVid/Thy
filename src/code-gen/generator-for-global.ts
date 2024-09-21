@@ -1,5 +1,5 @@
 import type { tTypeIdentifier, tValueIdentifier } from "../tokenizer/token-type"
-import type { Atom, PropertyAccess, TypeAssignment, TypeCall } from "../tree"
+import type { TypeAssignment, TypeCall } from "../tree"
 import type { Assignment } from "../tree/assignment"
 import type { Call } from "../tree/call"
 import type { LetCall } from "../tree/let-call"

@@ -1,4 +1,4 @@
-import type { CompileError } from "../compile-error"
+import type { CompileError } from "../common/compile-error"
 import { matchComment, matchMultilineComment } from "./comment"
 import { debug } from "./debug"
 import {

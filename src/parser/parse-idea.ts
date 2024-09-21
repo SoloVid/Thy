@@ -7,8 +7,8 @@ import {
   tReturn,
   tStatementTerminator,
   tType,
-} from "../tokenizer/token-type"
-import type { Idea } from "../tree"
+} from "tokenizer/token-type"
+import type { Idea } from "tree"
 import { badParse, BadParse } from "./error"
 import {
   parseAssignmentOrCall,

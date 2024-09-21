@@ -1,6 +1,6 @@
-import { TypeGivenAtom } from "./atom"
+import type { TokenRange } from "common/token-range"
+import type { TypeGivenAtom } from "./atom"
 import type { Expression, TypeExpression } from "./expression"
-import type { TokenRange } from "./token-range"
 
 export interface TypeCall extends TokenRange {
   readonly type: "type-call"

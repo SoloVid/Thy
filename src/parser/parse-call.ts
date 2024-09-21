@@ -9,13 +9,7 @@ import type {
   Return,
   ValueCall,
 } from "../tree/call"
-import {
-  addNodeError,
-  addTokenError,
-  badParse,
-  BadParse,
-  nodeError,
-} from "./error"
+import { addNodeError, addTokenError, badParse, BadParse } from "./error"
 import { getFirstToken } from "./helper"
 import { parseCallArgs } from "./parse-call-arguments"
 import {
@@ -114,11 +108,10 @@ function parseAwaitCall(state: ParserState): AwaitCall | BadParse {
   const args = parseCallArgs(state)
   if (args === badParse) return badParse
   for (let i = 0; i < args.typeArgs.length; i++) {
-    state.addError(
-      nodeError(
-        args.typeArgs[i],
-        `"await" call should not receive any type arguments`,
-      ),
+    addNodeError(
+      state,
+      args.typeArgs[i],
+      `"await" call should not receive any type arguments`,
     )
   }
   if (args.valueArgs.length === 0) {
@@ -131,11 +124,10 @@ function parseAwaitCall(state: ParserState): AwaitCall | BadParse {
   }
   const validArgs = [args.valueArgs[0] as Expression] as const
   for (let i = 1; i < args.valueArgs.length; i++) {
-    state.addError(
-      nodeError(
-        args.valueArgs[i],
-        `"await" call should not receive more than one argument`,
-      ),
+    addNodeError(
+      state,
+      args.valueArgs[i],
+      `"await" call should not receive more than one argument`,
     )
   }
   return {
@@ -164,11 +156,10 @@ function parseGivenCall(state: ParserState): GivenCall | BadParse {
       ? ([args.typeArgs[0] as TypeExpression] as const)
       : ([] as const)
   for (let i = 1; i < args.typeArgs.length; i++) {
-    state.addError(
-      nodeError(
-        args.typeArgs[i],
-        `"given" call should not receive more than one type argument`,
-      ),
+    addNodeError(
+      state,
+      args.typeArgs[i],
+      `"given" call should not receive more than one type argument`,
     )
   }
   const validArgs =
@@ -176,11 +167,10 @@ function parseGivenCall(state: ParserState): GivenCall | BadParse {
       ? ([args.valueArgs[0] as Expression] as const)
       : ([] as const)
   for (let i = 1; i < args.valueArgs.length; i++) {
-    state.addError(
-      nodeError(
-        args.valueArgs[i],
-        `"given" call should not receive more than one argument`,
-      ),
+    addNodeError(
+      state,
+      args.valueArgs[i],
+      `"given" call should not receive more than one argument`,
     )
   }
   return {
@@ -209,11 +199,10 @@ export function parseReturn(state: ParserState): Return | BadParse {
       ? ([args.typeArgs[0] as TypeExpression] as const)
       : ([] as const)
   for (let i = 1; i < args.typeArgs.length; i++) {
-    state.addError(
-      nodeError(
-        args.typeArgs[i],
-        `"return" should not receive more than one type argument`,
-      ),
+    addNodeError(
+      state,
+      args.typeArgs[i],
+      `"return" should not receive more than one type argument`,
     )
   }
   if (args.valueArgs.length === 0) {
@@ -226,11 +215,10 @@ export function parseReturn(state: ParserState): Return | BadParse {
   }
   const validArgs = [args.valueArgs[0] as Expression] as const
   for (let i = 1; i < args.valueArgs.length; i++) {
-    state.addError(
-      nodeError(
-        args.valueArgs[i],
-        `"return" should not receive more than one argument`,
-      ),
+    addNodeError(
+      state,
+      args.valueArgs[i],
+      `"return" should not receive more than one argument`,
     )
   }
   return {

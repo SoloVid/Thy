@@ -1,5 +1,3 @@
-import { isAssignment } from "tree/assignment"
-import assert from "utils/assert"
 import {
   tConstDeclAssign,
   tExport,
@@ -7,8 +5,10 @@ import {
   tPrivate,
   tType,
   tVarDeclAssign,
-} from "../tokenizer/token-type"
-import type { Assignment } from "../tree"
+} from "tokenizer/token-type"
+import type { Assignment } from "tree"
+import { isAssignment } from "tree"
+import assert from "utils/assert"
 import { addTokenError, badParse } from "./error"
 import {
   parseConstantDeclarationGivenTargetAndOperator,

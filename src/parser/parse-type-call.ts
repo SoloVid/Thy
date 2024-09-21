@@ -1,13 +1,13 @@
-import { Token } from "tokenizer/token"
+import type { TokenRange } from "common/token-range"
+import type { Token } from "tokenizer"
 import {
   tStatementContinuation,
   tStatementTerminator,
   tTypeGiven,
 } from "tokenizer/token-type"
-import { TokenRange } from "tree"
+import type { TypeCall, TypeGivenCall } from "tree"
 import assert from "utils/assert"
-import type { TypeCall, TypeGivenCall } from "../tree/type-call"
-import { BadParse, badParse, nodeError } from "./error"
+import { addNodeError, BadParse, badParse } from "./error"
 import { getFirstToken, getLastToken } from "./helper"
 import {
   parseSpecialCallOrFallback,
@@ -105,11 +105,10 @@ function parseTypeGivenCall(state: ParserState): TypeGivenCall | BadParse {
   const args = parseTypeCallArgs(state)
   if (args === badParse) return badParse
   for (let i = 2; i < args.args.length; i++) {
-    state.addError(
-      nodeError(
-        args.args[i],
-        `"Given" call should not receive more than two arguments`,
-      ),
+    addNodeError(
+      state,
+      args.args[i],
+      `"Given" call should not receive more than two arguments`,
     )
   }
   return {

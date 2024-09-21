@@ -1,4 +1,4 @@
-import type { SaferToken, Token } from "./token"
+import type { Token } from "./token"
 import type { TokenType } from "./token-type"
 import type { TokenizerState } from "./tokenizer-state"
 
@@ -6,7 +6,7 @@ export function makeTokenHere(
   state: TokenizerState,
   type: TokenType,
   text: string,
-): SaferToken<TokenType> {
+): Token<TokenType> {
   const token = {
     type: type,
     offset: state.offset,
@@ -15,5 +15,5 @@ export function makeTokenHere(
     text,
   }
   state.advance(type, text.length)
-  return token as SaferToken<TokenType>
+  return token as Token<TokenType>
 }

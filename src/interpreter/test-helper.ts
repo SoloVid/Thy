@@ -1,6 +1,6 @@
 import { makeSymbolTable } from "tree/symbol-table"
-import type { ThyBlockContext } from "./types"
 import { RuntimeValue } from "./dynamic-type"
+import type { ThyBlockContext } from "./types"
 
 type TestContextOptions = {
   readonly argsToUse: unknown[]

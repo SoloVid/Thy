@@ -1,7 +1,6 @@
+import type { Token, Tokenizer } from "tokenizer"
 import { tEndStream, TokenType } from "tokenizer/token-type"
 import assert from "utils/assert"
-import type { Token } from "../tokenizer/token"
-import type { Tokenizer } from "../tokenizer/tokenizer"
 
 export interface TokenBuffer {
   hasNextToken(): boolean

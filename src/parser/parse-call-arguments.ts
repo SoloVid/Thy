@@ -1,4 +1,4 @@
-import { TokenRange } from "tree"
+import { TokenRange } from "common"
 import assert from "utils/assert"
 import {
   tStatementContinuation,

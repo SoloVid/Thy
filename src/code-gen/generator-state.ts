@@ -1,10 +1,7 @@
-import type { CompileError } from "../compile-error"
+import type { CompileError } from "../common/compile-error"
 import type { Token } from "../tokenizer/token"
-import type { Block, TreeNode } from "../tree"
-import type {
-  CodeGeneratorFunc,
-  IndependentCodeGeneratorFunc,
-} from "./generator"
+import type { Block } from "../tree"
+import type { IndependentCodeGeneratorFunc } from "./generator"
 
 // These context types are listed in order from most restrictive to most permissive.
 export const contextType = {
@@ -32,10 +29,6 @@ export const contextType = {
    * (including await and return) instead of just expressions.
    */
   blockAllowingReturn: "blockAllowingReturn",
-  /**
-   * Is it valid to export at this level?
-   */
-  blockAllowingExport: "blockAllowingExport",
 } as const
 
 export type ContextType = (typeof contextType)[keyof typeof contextType]

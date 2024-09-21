@@ -1,16 +1,12 @@
-import { tokenError } from "../compile-error"
-import type { Token } from "../tokenizer/token"
+import { tokenError } from "common/compile-error"
+import type { Token } from "tokenizer"
 import {
   tMemberAccessOperator,
   tThat,
   tTypeIdentifier,
   tValueIdentifier,
-} from "../tokenizer/token-type"
-import type {
-  TypeIdentifier,
-  ValueIdentifier,
-  ValuePropertyAccess,
-} from "../tree"
+} from "tokenizer/token-type"
+import type { TypeIdentifier, ValueIdentifier, ValuePropertyAccess } from "tree"
 import { addNodeError, addTokenError, badParse, BadParse } from "./error"
 import type { ParserState } from "./parser-state"
 import {

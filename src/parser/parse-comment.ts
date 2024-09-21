@@ -1,4 +1,4 @@
-import { tokenError } from "compile-error"
+import { tokenError } from "common/compile-error"
 import { tComment, tStatementTerminator } from "tokenizer/token-type"
 import type { Comment } from "tree"
 import assert from "utils/assert"

@@ -1,7 +1,7 @@
 import { expect } from "expect"
 import { defineTestGroup } from "test-framework"
 import { makeTokenizer } from "."
-import type { CompileError } from "../compile-error"
+import type { CompileError } from "../common/compile-error"
 import { readExampleFile } from "../example"
 import type { Token } from "./token"
 import { tEndStream, type TokenType } from "./token-type"

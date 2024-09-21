@@ -2,7 +2,7 @@ import { expect } from "expect"
 import { test } from "test-framework"
 import { parseSource } from "./example-test"
 
-test("interpretThyBlock() should return a function that can return a number", async () => {
+test("parse() should accept block that returns a number", async () => {
   const { top, errors } = parseSource(`return 5`)
   expect(errors).toMatchObject([])
 })

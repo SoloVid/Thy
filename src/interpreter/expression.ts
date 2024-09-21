@@ -4,8 +4,8 @@ import type {
   ValueIdentifier,
   ValuePropertyAccess,
 } from "tree"
-import { isCall } from "tree/call"
-import assert from "../utils/assert"
+import { isCall } from "tree"
+import assert from "utils/assert"
 import { forwardWait, MayWait, NotWait, notWait } from "./async-helper"
 import { interpretThyBlockNode } from "./block"
 import { interpretThyCall } from "./call"

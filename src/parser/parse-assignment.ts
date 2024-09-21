@@ -1,5 +1,5 @@
-import { tokenError } from "../compile-error"
-import type { Token } from "../tokenizer/token"
+import { tokenError } from "common/compile-error"
+import type { Token } from "tokenizer"
 import {
   tConstDeclAssign,
   tExport,
@@ -7,16 +7,16 @@ import {
   tTypeIdentifier,
   tValueIdentifier,
   tVarDeclAssign,
-} from "../tokenizer/token-type"
-import { ValueIdentifier } from "../tree"
+} from "tokenizer/token-type"
 import type {
   Assignment,
   ConstantDeclaration,
   Declaration,
   PropertyAssignment,
+  ValueIdentifier,
   VariableDeclaration,
   VariableReassignment,
-} from "../tree/assignment"
+} from "tree"
 import { addNodeError, addTokenError, badParse, BadParse } from "./error"
 import { getFirstToken } from "./helper"
 import { parseCall } from "./parse-call"

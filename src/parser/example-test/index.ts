@@ -1,12 +1,12 @@
+import type { CompileError } from "common/compile-error"
+import { readExampleFile } from "example"
 import { expect } from "expect"
 import { defineTestGroup } from "test-framework"
+import { makeTokenizer } from "tokenizer"
+import type { TreeNode } from "tree"
 import type { DeepPartial } from "utils/utility-types"
-import type { CompileError } from "../../compile-error"
-import { readExampleFile } from "../../example"
-import { makeTokenizer } from "../../tokenizer"
+import { badParse, BadParse, ErrorableTreeNode } from "../error"
 import { parse } from "../parser"
-import { TreeNode } from "tree"
-import { badParse, BadParse, ErrorableTreeNode } from "parser/error"
 
 export const testParser = defineTestGroup("parser ")
 

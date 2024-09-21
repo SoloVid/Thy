@@ -1,4 +1,4 @@
-import type { Token } from "../tokenizer/token"
+import type { Token } from "tokenizer"
 import type {
   tAwait,
   tGiven,
@@ -7,7 +7,7 @@ import type {
   tTypeGiven,
   tTypeIdentifier,
   tValueIdentifier,
-} from "../tokenizer/token-type"
+} from "tokenizer/token-type"
 
 export interface NumberLiteral {
   readonly type: "number-literal"

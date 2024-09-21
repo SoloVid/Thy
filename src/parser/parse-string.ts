@@ -1,4 +1,4 @@
-import { Token } from "tokenizer/token"
+import type { Token } from "tokenizer"
 import {
   tEndString,
   tEndStringInterpolation,
@@ -7,12 +7,12 @@ import {
   tStringText,
   tValueIdentifier,
 } from "tokenizer/token-type"
-import { ValueIdentifier } from "tree"
 import type {
   StringInterpolation,
   StringLiteral,
   StringPart,
-} from "tree/string"
+  ValueIdentifier,
+} from "tree"
 import assert from "utils/assert"
 import { addTokenError, badParse, BadParse } from "./error"
 import type { ParserState } from "./parser-state"

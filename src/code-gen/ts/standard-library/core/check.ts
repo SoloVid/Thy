@@ -1,4 +1,4 @@
-import { tokenError } from "../../../../compile-error"
+import { tokenError } from "../../../../common/compile-error"
 import { nodeError } from "../../../../tree"
 import { fromComplicated } from "../../../generator"
 import type {

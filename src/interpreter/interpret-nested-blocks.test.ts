@@ -1,9 +1,8 @@
 import assert from "assert"
+import { defBuiltin } from "std-lib/core/def"
+import { math } from "std-lib/core/math"
 import { test } from "test-framework"
 import { interpretThyBlockSource } from "./block"
-import { defBuiltin } from "std-lib/core/def"
-import { printBuiltin } from "std-lib/core/print"
-import { math } from "std-lib/core/math"
 
 test("interpretThyBlock() can return a function that can pass a function to another", async () => {
   const interpreted = interpretThyBlockSource(`f\n  return 4`)

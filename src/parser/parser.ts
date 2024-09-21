@@ -1,6 +1,6 @@
-import type { CompileError } from "../compile-error"
-import type { Tokenizer } from "../tokenizer/tokenizer"
-import type { Block } from "../tree/block"
+import type { CompileError } from "common/compile-error"
+import type { Tokenizer } from "tokenizer"
+import type { Block } from "tree"
 import { parseBlockInner } from "./parse-block"
 import { makeParserState } from "./parser-state"
 

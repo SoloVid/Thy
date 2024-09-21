@@ -1,22 +1,22 @@
-import type { Token } from "../tokenizer/token"
-import type { tTypeIdentifier, tValueIdentifier } from "../tokenizer/token-type"
+import type { Token } from "tokenizer"
+import type { tTypeIdentifier, tValueIdentifier } from "tokenizer/token-type"
 
 export interface ReadSymbolTable {
   readonly localSymbols: Readonly<Map<string, SymbolInfo>>
-  getSymbolInfo(name: string): SymbolInfo | null
+  readonly getSymbolInfo: (name: string) => SymbolInfo | null
 }
 
 export interface SymbolTable extends ReadSymbolTable {
   readonly localSymbols: Readonly<Map<string, ExtendedSymbolInfo>>
   /** Scan local table and child tables to see if symbol already used. */
-  isSymbolNameTakenHereOrInChild(name: string): boolean
+  readonly isSymbolNameTakenHereOrInChild: (name: string) => boolean
 
-  addSymbol(
+  readonly addSymbol: (
     token: Token<typeof tValueIdentifier | typeof tTypeIdentifier>,
     isConstant: boolean,
     visibility: SymbolVisibility,
-  ): void
-  makeChild(): SymbolTable
+  ) => void
+  readonly makeChild: () => SymbolTable
 }
 
 export interface SymbolInfo {
@@ -24,7 +24,7 @@ export interface SymbolInfo {
   readonly isConstant: boolean
 }
 
-type SymbolVisibility = "bare" | "export" | "private"
+export type SymbolVisibility = "bare" | "export" | "private"
 export interface ExtendedSymbolInfo extends SymbolInfo {
   readonly visibility: SymbolVisibility
 }

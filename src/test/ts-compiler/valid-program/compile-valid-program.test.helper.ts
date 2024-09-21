@@ -1,7 +1,7 @@
 import fs from "fs/promises"
 import path from "path"
 import { expect } from "expect"
-import type { CompileError } from "../../../compile-error"
+import type { CompileError } from "../../../common/compile-error"
 import type { Compiler } from "../../../compiler"
 
 export async function compileAndVerifyOutput(
