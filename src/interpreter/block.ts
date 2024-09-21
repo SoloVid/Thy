@@ -27,7 +27,7 @@ import { interpretThyStatement } from "./statement"
 import { ThyBlockContext } from "./types"
 
 type BlockOptions = {
-  closure: ThyBlockContext["closure"]
+  closure: Record<string, unknown>
   functionName?: string
   sourceFile: ThyBlockContext["sourceFile"]
   additionalTraceLinesToHide?: number
@@ -89,7 +89,7 @@ function makeHelper(
     implicitArgumentFirstUsed: null,
     isAsync: block.isAsync,
     symbolTable: block.symbolTable,
-    closure: options.closure,
+    closure: options.closure as Record<string, RuntimeValue>,
     variablesInBlock: {},
     sourceFile: options.sourceFile,
   }
