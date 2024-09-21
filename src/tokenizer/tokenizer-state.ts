@@ -54,7 +54,7 @@ export function makeTokenizerState(source: string): TokenizerState {
       me.offset += characters
       while (
         me.line + 1 < lineOffsets.length &&
-        lineOffsets[me.line + 1] < me.offset
+        lineOffsets[me.line + 1] <= me.offset
       ) {
         me.line++
       }
