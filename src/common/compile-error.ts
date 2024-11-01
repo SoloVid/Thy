@@ -1,5 +1,6 @@
 import type { Token } from "tokenizer"
 import type { TokenRange } from "./token-range"
+import type { TreeNode } from "tree"
 
 export interface CompileError {
   readonly message: string
@@ -24,4 +25,11 @@ export function tokenRangeError(
     start: tokenRange.firstToken,
     end: tokenRange.lastToken,
   }
+}
+
+export function nodeError(node: TreeNode, message: string) {
+  if ("token" in node) {
+    return tokenError(node.token, message)
+  }
+  return tokenRangeError(node, message)
 }

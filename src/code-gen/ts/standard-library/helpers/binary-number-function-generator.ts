@@ -1,8 +1,8 @@
-import { nodeError } from "../../../../tree"
-import { fromComplicated } from "../../../generator"
+import { nodeError } from "common/compile-error"
+import { fromComplicated } from "code-gen/utils/from-complicated"
 import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
 import { contextType } from "../../../generator-state"
-import { autoTight, autoTightS } from "./auto-tight"
+import { autoTight, autoTightS } from "../../utils/auto-tight"
 
 export function makeBinaryNumberFunctionGenerator(
   name: string,

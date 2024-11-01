@@ -1,12 +1,9 @@
-import { nodeError, TreeNode } from "../../tree/tree-node"
-import type { TypeCall } from "../../tree/type-call"
-import {
-  fromTokenRange,
-  GeneratedSnippets,
-  GeneratorFixture,
-} from "../generator"
-import type { GeneratorState } from "../generator-state"
-import { generateCallTs } from "./call/generate-call-ts"
+import { nodeError } from "common/compile-error"
+import type { TreeNode, TypeCall } from "tree"
+import { GeneratedSnippets, GeneratorFixture } from "../../generator"
+import { fromTokenRange } from "code-gen/utils/from-token-range"
+import type { GeneratorState } from "../../generator-state"
+import { generateCallTs } from "../call/generate-call-ts"
 
 export function tryGenerateDanglingTypeCallTs(
   node: TreeNode,

@@ -1,7 +1,8 @@
-import { nodeError } from "../../../../tree/tree-node"
-import { fromComplicated, fromTokenRange } from "../../../generator"
+import { nodeError } from "common/compile-error"
+import { fromComplicated } from "code-gen/utils/from-complicated"
+import { fromTokenRange } from "code-gen/utils/from-token-range"
 import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
-import { autoTight, autoTightS } from "../helpers/auto-tight"
+import { autoTight, autoTightS } from "../../utils/auto-tight"
 
 export const castGenerator: GeneratorForGlobalSpec = {
   name: "cast",

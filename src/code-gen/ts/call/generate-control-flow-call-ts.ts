@@ -1,13 +1,12 @@
-import { tokenError } from "../../../common/compile-error"
-import type { Call } from "../../../tree/call"
-import { nodeError } from "../../../tree/tree-node"
+import { nodeError, tokenError } from "common/compile-error"
+import type { Call } from "tree"
 import {
   CodeGeneratorFunc,
-  fromComplicated,
-  fromToken,
   GeneratedSnippets,
   GeneratorFixture,
 } from "../../generator"
+import { fromComplicated } from "code-gen/utils/from-complicated"
+import { fromToken } from "code-gen/utils/from-token"
 import { contextType, GeneratorState } from "../../generator-state"
 
 export function makeControlFlowCallTsGenerator(
@@ -18,7 +17,10 @@ export function makeControlFlowCallTsGenerator(
     state: GeneratorState,
     fixture: GeneratorFixture,
   ): void | GeneratedSnippets => {
-    if (node.func.type !== "atom") {
+    if (node.type !== "value-call") {
+      return
+    }
+    if (node.func.type !== "value-identifier") {
       return
     }
     if (node.func.token.text !== keyword) {

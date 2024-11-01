@@ -1,7 +1,7 @@
-import { fromNode } from "../../../generator"
+import { fromNode } from "code-gen/utils/from-node"
 import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
-import { generateTypeInstanceTs } from "../../generate-type-instance-ts"
-import { autoTightS } from "../helpers/auto-tight"
+import { generateTypeInstanceTs } from "../../type/generate-type-instance-ts"
+import { autoTightS } from "../../utils/auto-tight"
 
 export const unionGenerator: GeneratorForGlobalSpec = {
   name: "Union",

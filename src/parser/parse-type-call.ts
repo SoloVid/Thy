@@ -114,7 +114,7 @@ function parseTypeGivenCall(state: ParserState): TypeGivenCall | BadParse {
   return {
     type: "type-given-call",
     func: {
-      type: "type-given-atom",
+      type: "type-given-term",
       token: givenToken,
     },
     // TODO: Why is this a type error?

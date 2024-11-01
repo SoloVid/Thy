@@ -1,13 +1,14 @@
 import { tokenError } from "../../../../common/compile-error"
 import { nodeError } from "../../../../tree/tree-node"
-import { fromComplicated, GeneratedSnippet } from "../../../generator"
+import { GeneratedSnippet } from "../../../generator"
+import { fromComplicated } from "code-gen/utils/from-complicated"
 import type {
   GeneratorForGlobalParentSpec,
   GeneratorForGlobalSpec,
 } from "../../../generator-for-global"
 import { contextType } from "../../../generator-state"
-import { makeIndent } from "../../../indent-string"
-import { autoTightS } from "../helpers/auto-tight"
+import { makeIndent } from "../../../utils/indent"
+import { autoTightS } from "../../utils/auto-tight"
 import { ensureStringLiteral } from "../helpers/ensure-string-literal"
 import { namespaceThyScopeGenerator } from "./thy-scope"
 

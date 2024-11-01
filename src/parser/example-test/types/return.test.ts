@@ -50,7 +50,7 @@ testParser("should parse example program types/return.thy", async () => {
                   call: {
                     type: "given-call",
                     func: {
-                      type: "given-atom",
+                      type: "given-term",
                       token: {
                         type: "Given",
                         text: "given",
@@ -85,7 +85,7 @@ testParser("should parse example program types/return.thy", async () => {
                   call: {
                     type: "given-call",
                     func: {
-                      type: "given-atom",
+                      type: "given-term",
                       token: {
                         type: "Given",
                         text: "given",
@@ -106,7 +106,7 @@ testParser("should parse example program types/return.thy", async () => {
                 {
                   type: "return",
                   func: {
-                    type: "return-atom",
+                    type: "return-term",
                     token: {
                       type: "Return",
                       text: "return",

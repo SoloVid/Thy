@@ -1,5 +1,6 @@
 import type { Expression } from "tree"
 import type { CallableExpression, TypeExpression } from "tree/expression"
+import type { TypeReturn } from "tree/type-call"
 import assert from "utils/assert"
 import { tAwait, tGiven, tReturn } from "../tokenizer/token-type"
 import type {
@@ -133,7 +134,7 @@ function parseAwaitCall(state: ParserState): AwaitCall | BadParse {
   return {
     type: "await-call",
     func: {
-      type: "await-atom",
+      type: "await-term",
       token: awaitToken,
     },
     typeArgs: [],
@@ -176,7 +177,7 @@ function parseGivenCall(state: ParserState): GivenCall | BadParse {
   return {
     type: "given-call",
     func: {
-      type: "given-atom",
+      type: "given-term",
       token: givenToken,
     },
     typeArgs: validTypeArgs,
@@ -186,7 +187,9 @@ function parseGivenCall(state: ParserState): GivenCall | BadParse {
   }
 }
 
-export function parseReturn(state: ParserState): Return | BadParse {
+export function parseReturn(
+  state: ParserState,
+): Return | TypeReturn | BadParse {
   const returnToken = state.buffer.consumeToken()
   assert(
     returnToken.type === tReturn,
@@ -206,6 +209,19 @@ export function parseReturn(state: ParserState): Return | BadParse {
     )
   }
   if (args.valueArgs.length === 0) {
+    if (validTypeArgs.length !== 0) {
+      return {
+        type: "type-return",
+        func: {
+          type: "return-term",
+          token: returnToken,
+        },
+        args: validTypeArgs,
+        firstToken: returnToken,
+        lastToken: args.lastToken,
+      }
+    }
+
     addTokenError(
       state,
       returnToken,
@@ -224,7 +240,7 @@ export function parseReturn(state: ParserState): Return | BadParse {
   return {
     type: "return",
     func: {
-      type: "return-atom",
+      type: "return-term",
       token: returnToken,
     },
     typeArgs: validTypeArgs,

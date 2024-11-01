@@ -1,5 +1,5 @@
 import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
-import { autoTightS } from "./auto-tight"
+import { autoTightS } from "../../utils/auto-tight"
 
 export function makePrimitiveTypeGenerator(
   name: string,

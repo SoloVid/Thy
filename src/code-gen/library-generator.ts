@@ -1,11 +1,19 @@
 import assert from "assert"
 import type { Token } from "../tokenizer/token"
-import type { tMemberAccessOperator } from "../tokenizer/token-type"
-import type { TreeNode, TypeAssignment, TypeCall } from "../tree"
+import type {
+  TreeNode,
+  TypeAssignment,
+  TypeCall,
+  TypeIdentifier,
+  TypePropertyAccess,
+  ValueIdentifier,
+  ValuePropertyAccess,
+} from "../tree"
 import type { Assignment } from "../tree/assignment"
 import type { Call } from "../tree/call"
 import type { LetCall } from "../tree/let-call"
-import { CodeGeneratorFunc, fromNode, GeneratedSnippets } from "./generator"
+import { CodeGeneratorFunc, GeneratedSnippets } from "./generator"
+import { fromNode } from "./utils/from-node"
 import {
   GeneratorForGlobalParentSpec,
   GeneratorForGlobalSpec,
@@ -15,9 +23,11 @@ import {
 import type { GeneratorState } from "./generator-state"
 
 export interface LibraryGeneratorCollection {
-  atomGenerator: CodeGeneratorFunc<Atom>
-  propertyAccessGenerator: CodeGeneratorFunc<PropertyAccess<never>>
-  typeInstanceGenerator: CodeGeneratorFunc<Atom | PropertyAccess<never>>
+  valueIdentifierGenerator: CodeGeneratorFunc<ValueIdentifier>
+  propertyAccessGenerator: CodeGeneratorFunc<ValuePropertyAccess>
+  typeInstanceGenerator: CodeGeneratorFunc<
+    ValueIdentifier | TypeIdentifier | ValuePropertyAccess | TypePropertyAccess
+  >
   callGenerator: CodeGeneratorFunc<Call>
   assignmentGenerator: CodeGeneratorFunc<Assignment>
   letCallGenerator: CodeGeneratorFunc<LetCall>
@@ -51,11 +61,12 @@ interface LookupResult {
 
 function lookupByName(
   specMap: SpecMap,
-  identifier: UnwrappedPropertyAccess,
+  base: ValueIdentifier,
+  propertyAccesses: ValuePropertyAccess["propertyAccesses"],
 ): null | LookupResult {
   const names = [
-    identifier[0].text,
-    ...(identifier.slice(1) as readonly PropertyPair[]).map((p) => p[1].text),
+    base.token.text,
+    ...propertyAccesses.map((pa) => pa.propertyToken.text),
   ]
   let currentMap = specMap
   for (let i = 0; i < names.length; i++) {
@@ -71,7 +82,10 @@ function lookupByName(
     } else {
       return {
         spec: inward,
-        unusedPropertyAccessTokens: identifier.slice(i + 1).flat(),
+        unusedPropertyAccessTokens: propertyAccesses
+          .slice(i)
+          .map((pa) => [pa.memberAccessOperatorToken, pa.propertyToken])
+          .flat(),
       }
     }
   }
@@ -92,9 +106,9 @@ export function aggregateLibrary(
   libraries: readonly LibraryGeneratorCollection[],
 ): LibraryGeneratorCollection {
   return {
-    atomGenerator(node, state, fixture) {
+    valueIdentifierGenerator(node, state, fixture) {
       for (const lib of libraries) {
-        const output = lib.atomGenerator(node, state, fixture)
+        const output = lib.valueIdentifierGenerator(node, state, fixture)
         if (output) {
           return output
         }
@@ -179,7 +193,10 @@ export function makeLibraryGenerators(
   const simpleTypeCallSpecMap = makeSpecMap(specs, "generateSimpleTypeCall")
   const typeAssignmentSpecMap = makeSpecMap(specs, "generateTypeAssignment")
 
-  function valueGenerator(node: Atom | PropertyAccess, state: GeneratorState) {
+  function valueGenerator(
+    node: ValueIdentifier | ValuePropertyAccess,
+    state: GeneratorState,
+  ) {
     const lookup = tryLookupNamedNode(valueSpecMap, node)
     if (lookup === null) {
       return
@@ -202,7 +219,11 @@ export function makeLibraryGenerators(
   }
 
   function typeInstanceGenerator(
-    node: Atom | PropertyAccess,
+    node:
+      | ValueIdentifier
+      | ValuePropertyAccess
+      | TypeIdentifier
+      | TypePropertyAccess,
     state: GeneratorState,
   ) {
     const lookup = tryLookupNamedNode(valueSpecMap, node)
@@ -224,7 +245,7 @@ export function makeLibraryGenerators(
   }
 
   return {
-    atomGenerator(node, state, fixture) {
+    valueIdentifierGenerator(node, state, fixture) {
       return valueGenerator(node, state)
     },
     propertyAccessGenerator(node, state, fixture) {
@@ -256,6 +277,9 @@ export function makeLibraryGenerators(
       return lookup.spec.generateAssignment(node as any, state, fixture)
     },
     letCallGenerator(node, state, fixture) {
+      if (node.call === null) {
+        return
+      }
       const lookup = tryLookupNamedNode(letCallSpecMap, node.call.func)
       if (
         lookup === null ||
@@ -303,42 +327,14 @@ export function makeLibraryGenerators(
 }
 
 function tryLookupNamedNode(specMap: SpecMap, node: TreeNode) {
-  if (node.type === "atom") {
-    return lookupByName(specMap, [node.token])
+  if (node.type === "value-identifier") {
+    return lookupByName(specMap, node, [])
   }
-  if (node.type === "property-access") {
-    const unwrapped = unwrapPropertyAccess(node)
-    if (unwrapped !== undefined) {
-      return lookupByName(specMap, unwrapped)
-    }
+  if (
+    node.type === "value-property-access" &&
+    node.base.type === "value-identifier"
+  ) {
+    return lookupByName(specMap, node.base, node.propertyAccesses)
   }
   return null
-}
-
-type PropertyPair = readonly [Token<typeof tMemberAccessOperator>, Token]
-type UnwrappedPropertyAccess = readonly [Token, ...PropertyPair[]]
-
-function unwrapPropertyAccess(
-  propertyAccess: PropertyAccess,
-): UnwrappedPropertyAccess | undefined {
-  if (propertyAccess.base.type === "call") {
-    return
-  }
-  if (propertyAccess.base.type === "property-access") {
-    const baseUnwrapped = unwrapPropertyAccess(propertyAccess.base)
-    if (baseUnwrapped === undefined) {
-      return
-    }
-    return [
-      ...baseUnwrapped,
-      [
-        propertyAccess.memberAccessOperatorToken,
-        propertyAccess.property,
-      ] as const,
-    ] as const
-  }
-  return [
-    propertyAccess.base.token,
-    [propertyAccess.memberAccessOperatorToken, propertyAccess.property],
-  ]
 }

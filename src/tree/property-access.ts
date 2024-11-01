@@ -6,7 +6,7 @@ import type {
   tTypeIdentifier,
   tValueIdentifier,
 } from "tokenizer/token-type"
-import type { TypeIdentifier, ValueIdentifier } from "./atom"
+import type { TypeIdentifier, ValueIdentifier } from "./term"
 import type { Call } from "./call"
 
 export interface ValuePropertyAccess extends TokenRange {

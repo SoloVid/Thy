@@ -2,13 +2,13 @@ import { tokenError } from "../../../../common/compile-error"
 import type { Call } from "../../../../tree/call"
 import { nodeError } from "../../../../tree/tree-node"
 import {
-  fromComplicated,
-  fromNode,
-  fromToken,
-  fromTokenRange,
   GeneratedSnippets,
   GeneratorFixture,
 } from "../../../generator"
+import { fromComplicated } from "code-gen/utils/from-complicated"
+import { fromNode } from "code-gen/utils/from-node"
+import { fromTokenRange } from "code-gen/utils/from-token-range"
+import { fromToken } from "code-gen/utils/from-token"
 import type {
   GeneratorForGlobalSpec,
   SimpleCall,
@@ -18,9 +18,9 @@ import {
   contextType,
   GeneratorState,
 } from "../../../generator-state"
-import { genIndent, makeIndent } from "../../../indent-string"
-import { generateBlockLinesTs } from "../../block/generate-block-ts"
-import { autoTightS } from "../helpers/auto-tight"
+import { genIndent, makeIndent } from "../../../utils/indent"
+import { generateBlockLinesTs } from "code-gen/ts/block/generate-block-lines-ts"
+import { autoTightS } from "../../utils/auto-tight"
 import { ensureStringLiteral } from "../helpers/ensure-string-literal"
 
 export const namespaceThyScopeGenerator: GeneratorForGlobalSpec = {

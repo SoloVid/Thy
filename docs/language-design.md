@@ -73,23 +73,17 @@ Because binary operations are so common, `beforeThat` is provided to go one more
 These keywords need to be recognized by the lexer since they are part of the language grammar.
 
 - `and`: continues function call on new line
+- `await`: affects standard language control flow
 - `be`: denotes preceding identifier as not a function call
 - `export`: modifier for declarations
+- `given`: not really a runtime call
 - `is`: denotes preceding identifier as not a function call
+- `let`: precedes a function call on the same line and potentially effects a return
 - `private`: modifier for declarations
+- `return`: affects standard language control flow
+- `that`: context-dependent value
 - `to`: denotes preceding identifier as not a function call
 - `type`: type-related operations just start breaking the standard language stuff
-- `let`: precedes a function call on the same line and potentially effects a return
-
-### Language Feature Functions
-
-These "functions" allow non-special grammar
-(i.e. the lexer and parser can treat them as function calls).
-Their usage is significantly different from functions you can write in this language.
-
-- `await`: affects standard language control flow
-- `given`: not really a runtime call
-- `return`: affects standard language control flow
 
 ### Reserved Value Names
 
@@ -97,19 +91,16 @@ These values/functions have an interface like stuff you can write in thy,
 but you couldn't actually implement them in thy.
 
 - `array`: define an array
-- `arrayMutable`: define a mutable array
-- `beforeThat`: context-dependent value
 - `catch`: sentinel value argument for try
-- `def`: function
 - `else`: sentinel value argument for if
 - `false`: value
 - `finally`: sentinel value argument for try
 - `get`: array access (may make this a member instead?)
 - `if`: function
+- `list`: define a mutable array
 - `null`: value
 - `set`: array mutate (may make this a member instead?)
 - `switch`: function
-- `that`: context-dependent value
 - `throw`: function
 - `thy`: function / value
 - `true`: value
@@ -118,9 +109,9 @@ but you couldn't actually implement them in thy.
 ### Reserved Type Names
 
 - `Array` (1 type parameter)
-- `ArrayMutable` (1 type parameter)
 - `Boolean`
 - `Function` (something like `(...args: any) => any` in TypeScript)
+- `List` (1 type parameter)
 - `Null`
 - `Number`
 - `String`

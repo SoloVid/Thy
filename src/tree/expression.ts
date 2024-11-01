@@ -1,4 +1,4 @@
-import type { NumberLiteral, TypeIdentifier, ValueIdentifier } from "./atom"
+import type { NumberLiteral, TypeIdentifier, ValueIdentifier } from "./term"
 import type { Block } from "./block"
 import type { Call } from "./call"
 import type { TypePropertyAccess, ValuePropertyAccess } from "./property-access"

@@ -8,6 +8,7 @@ import { getLastToken } from "./helper"
 import { parseIdea } from "./parse-idea"
 import type { ParserContext, ParserState } from "./parser-state"
 import { makeThatIdeaTracker } from "./that-idea-tracker"
+import { addNodeError } from "./error"
 
 export function parseBlock(state: ParserState): Block {
   const firstToken = state.buffer.consumeToken()
@@ -32,6 +33,7 @@ export function parseBlockInner(state: ParserState): Block {
 
   let blockReturnStyle: ReturnStyle = returnStyle.implicitExport
   let isAsync = false
+  let returnTypeCount = 0
   const thatIdeaTracker = makeThatIdeaTracker(state.addError)
 
   const context: ParserContext = {
@@ -49,6 +51,19 @@ export function parseBlockInner(state: ParserState): Block {
 
       blockReturnStyle = evaluateReturnStyle(state, blockReturnStyle, idea)
       isAsync = isAsync || isIdeaAsync(idea)
+      if (
+        idea.type === "type-return" ||
+        (idea.type === "return" && idea.typeArgs.length !== 0)
+      ) {
+        returnTypeCount++
+        if (returnTypeCount > 1) {
+          addNodeError(
+            state,
+            idea,
+            "Return type cannot be specified more than once in a block",
+          )
+        }
+      }
 
       nextToken = state.buffer.peekToken()
     }

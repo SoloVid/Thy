@@ -8,7 +8,7 @@ export function makeGenerator<InType extends TreeNode, SpecializedType>(
 ): CodeGeneratorFunc<InType> {
   return (node, state, fixture) => {
     const specializedNode = transformNode(node)
-    if (!specializedNode) {
+    if (specializedNode === undefined) {
       return
     }
 

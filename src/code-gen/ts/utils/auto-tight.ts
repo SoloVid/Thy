@@ -1,5 +1,5 @@
-import type { GeneratedSnippets } from "../../../generator"
-import { contextType, GeneratorState } from "../../../generator-state"
+import type { GeneratedSnippets } from "../../generator"
+import { contextType, GeneratorState } from "../../generator-state"
 
 export function autoTightS(
   state: GeneratorState,

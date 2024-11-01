@@ -6,7 +6,7 @@ import type {
   tPrivate,
   tType,
 } from "tokenizer/token-type"
-import type { TypeIdentifier } from "./atom"
+import type { TypeIdentifier } from "./term"
 import type { Call } from "./call"
 import type { TypeCall, TypeGivenCall } from "./type-call"
 

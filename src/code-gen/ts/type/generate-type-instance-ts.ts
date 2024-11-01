@@ -1,19 +1,20 @@
-import type { Atom } from "../../tree/atom"
-import { nodeError, PropertyAccess, TreeNode } from "../../tree"
+import { nodeError } from "common/compile-error"
+import type {
+  TreeNode,
+  TypeIdentifier,
+  TypePropertyAccess,
+  ValueIdentifier,
+  ValuePropertyAccess,
+} from "tree"
 import {
-  CodeGeneratorFunc,
-  fromComplicated,
-  fromNode,
-  fromToken,
   GeneratedSnippets,
   GeneratorFixture,
-} from "../generator"
-import type { GeneratorState } from "../generator-state"
-import { generateAtomTs } from "./atom/generate-atom-ts"
-import { generatePropertyAccessTs } from "./generate-property-access-ts"
-import type { ErrorableTreeNode } from "../../tree/tree-node"
-import { makeGenerator } from "../generate-from-options"
-import type { LibraryGeneratorCollection } from "../library-generator"
+} from "../../generator"
+import { fromComplicated } from "code-gen/utils/from-complicated"
+import { fromNode } from "code-gen/utils/from-node"
+import { fromToken } from "code-gen/utils/from-token"
+import type { GeneratorState } from "../../generator-state"
+import { generatePropertyAccessTs } from "../generate-property-access-ts"
 
 // export function typeInstanceGeneratorTs(standardLibrary: LibraryGeneratorCollection) {
 //     return makeTypeInstanceTsGenerator([
@@ -30,11 +31,16 @@ import type { LibraryGeneratorCollection } from "../library-generator"
 // }
 
 export function checkAndGenerateTypeInstanceTs(
-  node: ErrorableTreeNode,
+  node: TreeNode,
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
-  if (node.type !== "atom" && node.type !== "property-access") {
+  if (
+    node.type !== "value-identifier" &&
+    node.type !== "value-property-access" &&
+    node.type !== "type-identifier" &&
+    node.type !== "type-property-access"
+  ) {
     state.addError(nodeError(node, "Expected type instance"))
     return fromNode(node, "unknown")
   }
@@ -42,7 +48,11 @@ export function checkAndGenerateTypeInstanceTs(
 }
 
 export function generateTypeInstanceTs(
-  node: Atom | PropertyAccess<never>,
+  node:
+    | ValueIdentifier
+    | ValuePropertyAccess
+    | TypeIdentifier
+    | TypePropertyAccess,
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
@@ -55,8 +65,8 @@ export function generateTypeInstanceTs(
     return fromStandardLib
   }
 
-  if (node.type === "atom") {
-    return [fromToken(node.token, "typeof "), generateAtomTs(node, state)]
+  if (node.type === "value-identifier" || node.type === "type-identifier") {
+    return [fromToken(node.token, "typeof "), fixture.generate(node, state)]
   }
   return fromComplicated(node, [
     "typeof ",

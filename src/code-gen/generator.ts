@@ -1,6 +1,5 @@
 import type { CompileError } from "../common/compile-error"
 import type { Token } from "../tokenizer/token"
-import type { TokenRange } from "../common/token-range"
 import type { TreeNode } from "../tree/tree-node"
 import type { GeneratorState } from "./generator-state"
 import type { LibraryGeneratorCollection } from "./library-generator"
@@ -40,44 +39,6 @@ export type IndependentCodeGeneratorFunc = (
   state: GeneratorState,
   fixture: GeneratorFixture,
 ) => GeneratedSnippets
-
-export function fromToken(token: Token, text?: string): MappedGeneratedSnippet {
-  return {
-    text: text ?? token.text,
-    sourceFirstToken: token,
-  }
-}
-
-export function fromTokenRange(
-  range: TokenRange,
-  text: string,
-): MappedGeneratedSnippet {
-  return {
-    text,
-    sourceFirstToken: range.firstToken,
-    sourceLastToken: range.lastToken,
-  }
-}
-
-export function fromNode(
-  node: TreeNode,
-  text: string,
-): MappedGeneratedSnippet | UnmappedGeneratedWhitespace {
-  if (node.type === "blank-line") {
-    return { text }
-  }
-  if ("token" in node) {
-    return fromToken(node.token, text)
-  }
-  return fromTokenRange(node, text)
-}
-
-export function fromComplicated(
-  node: TreeNode,
-  parts: (GeneratedSnippets | string)[],
-): GeneratedSnippets {
-  return parts.map((p) => (typeof p === "string" ? fromNode(node, p) : p))
-}
 
 export type GeneratedSnippets = GeneratedSnippet | DeepArray<GeneratedSnippet>
 type DeepArray<T> = (T | DeepArray<T>)[]

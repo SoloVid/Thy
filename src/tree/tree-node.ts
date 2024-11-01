@@ -1,21 +1,22 @@
 import type { Assignment } from "./assignment"
-import type {
-  AwaitAtom,
-  GivenAtom,
-  NumberLiteral,
-  ReturnAtom,
-  TypeGivenAtom,
-  TypeIdentifier,
-  ValueIdentifier,
-} from "./atom"
 import type { Block } from "./block"
 import type { Call, Return } from "./call"
+import type { TypeReturn } from "./type-call"
 import type { BlankLine, Comment } from "./idea"
 import type { LetCall } from "./let-call"
 import type { TypePropertyAccess, ValuePropertyAccess } from "./property-access"
 import type { StringInterpolation, StringLiteral } from "./string"
+import type {
+  AwaitTerm,
+  GivenTerm,
+  NumberLiteral,
+  ReturnTerm,
+  TypeGivenTerm,
+  TypeIdentifier,
+  ValueIdentifier,
+} from "./term"
 import type { TypeAssignment } from "./type-assignment"
-import type { TypeCall } from "./type-call"
+import type { TypeCall, TypeGivenCall } from "./type-call"
 
 export type TreeNode =
   | Assignment
@@ -24,6 +25,7 @@ export type TreeNode =
   | Block
   | Call
   | Return
+  | TypeReturn
   | NumberLiteral
   | StringLiteral
   | StringInterpolation
@@ -31,10 +33,11 @@ export type TreeNode =
   | TypePropertyAccess
   | TypeAssignment
   | TypeCall
+  | TypeGivenCall
   | LetCall
-  | AwaitAtom
-  | GivenAtom
-  | ReturnAtom
-  | TypeGivenAtom
+  | AwaitTerm
+  | GivenTerm
+  | ReturnTerm
+  | TypeGivenTerm
   | TypeIdentifier
   | ValueIdentifier

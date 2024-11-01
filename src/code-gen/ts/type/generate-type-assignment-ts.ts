@@ -1,16 +1,15 @@
-import type { Call, TypeCall } from "../../tree"
-import type { TreeNode } from "../../tree/tree-node"
-import type { TypeAssignment } from "../../tree/type-assignment"
+import type { Call, TypeCall } from "../../../tree"
+import type { TreeNode } from "../../../tree/tree-node"
+import type { TypeAssignment } from "../../../tree/type-assignment"
 import {
-  fromComplicated,
   GeneratedSnippets,
   GeneratorFixture,
-} from "../generator"
-import { contextType, GeneratorState } from "../generator-state"
-import { maybeGenerateExport } from "./assignment/generate-assignment-ts"
-import { generateCallTs } from "./call/generate-call-ts"
-import { isSimpleNamed } from "./generate-simple-named-expression"
-import { generateTypeCallTs } from "./generate-type-call-ts"
+} from "../../generator"
+import { fromComplicated } from "code-gen/utils/from-complicated"
+import { contextType, GeneratorState } from "../../generator-state"
+import { generateCallTs } from "../call/generate-call-ts"
+import { isSimpleNamed } from "../generate-simple-named-expression"
+import { generateTypeCallTs } from "../generate-type-call-ts"
 
 export function tryGenerateTypeAssignmentTs(
   node: TreeNode,
@@ -43,7 +42,6 @@ export function generateTypeAssignmentTs(
   })
   const typePart = generateTypePart(ta.call, childState, fixture, name)
   return fromComplicated(ta, [
-    maybeGenerateExport(ta, state),
     `const ${name} = undefined as unknown as `,
     typePart,
   ])

@@ -24,22 +24,22 @@ export interface ValueIdentifier {
   readonly token: Token<typeof tValueIdentifier>
 }
 
-export interface AwaitAtom {
-  readonly type: "await-atom"
+export interface AwaitTerm {
+  readonly type: "await-term"
   readonly token: Token<typeof tAwait>
 }
 
-export interface GivenAtom {
-  readonly type: "given-atom"
+export interface GivenTerm {
+  readonly type: "given-term"
   readonly token: Token<typeof tGiven>
 }
 
-export interface ReturnAtom {
-  readonly type: "return-atom"
+export interface ReturnTerm {
+  readonly type: "return-term"
   readonly token: Token<typeof tReturn>
 }
 
-export interface TypeGivenAtom {
-  readonly type: "type-given-atom"
+export interface TypeGivenTerm {
+  readonly type: "type-given-term"
   readonly token: Token<typeof tTypeGiven>
 }

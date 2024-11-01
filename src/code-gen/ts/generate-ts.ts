@@ -1,8 +1,7 @@
-import { nodeError, TreeNode } from "../../tree/tree-node"
+import { nodeError } from "common/compile-error"
+import { TreeNode } from "tree"
 import { makeGenerator } from "../generate-from-options"
 import {
-  fromToken,
-  fromTokenRange,
   GeneratedSnippet,
   GeneratedSnippets,
   GeneratorResult,
@@ -14,16 +13,20 @@ import {
   makeGeneratorState,
 } from "../generator-state"
 import type { LibraryGeneratorCollection } from "../library-generator"
+import { fromNode } from "../utils/from-node"
 import { assignmentGeneratorTs } from "./assignment/generate-assignment-ts"
-import { atomGeneratorTs } from "./atom/generate-atom-ts"
 import { tryGenerateBlockTs } from "./block/generate-block-ts"
 import { callGeneratorTs } from "./call/generate-call-ts"
 import { tryGenerateBlankLineTs } from "./generate-blank-line-ts"
 import { tryGenerateCommentTs } from "./generate-comment-ts"
 import { propertyAccessGeneratorTs } from "./generate-property-access-ts"
-import { tryGenerateTypeAssignmentTs } from "./generate-type-assignment-ts"
-import { tryGenerateDanglingTypeCallTs } from "./generate-type-call-ts"
+import { tryGenerateTypeAssignmentTs } from "./type/generate-type-assignment-ts"
+import { tryGenerateDanglingTypeCallTs } from "./type/generate-type-call-ts"
 import { letCallGeneratorTs } from "./let/generate-let-call-ts"
+import { tryGenerateNumberTs } from "./term/generate-number-ts"
+import { tryGenerateStringTs } from "./term/generate-string-ts"
+import { valueIdentifierGeneratorTs } from "./term/generate-value-identifier-ts"
+import { autoTightS } from "./utils/auto-tight"
 
 export const tsGenerator =
   (
@@ -32,12 +35,12 @@ export const tsGenerator =
   ) =>
   (node: TreeNode): GeneratorResult => {
     const state = makeGeneratorState(undefined, {
-      context: topLevelContext ?? contextType.blockAllowingExport,
+      context: topLevelContext ?? contextType.blockAllowingReturn,
     })
 
-    function generateTs2(node: TreeNode, state: GeneratorState) {
+    function generateTsWithSelfFixture(node: TreeNode, state: GeneratorState) {
       const fixture = {
-        generate: generateTs2,
+        generate: generateTsWithSelfFixture,
         standardLibrary: standardLibrary,
       }
       return generateTs(node, state, fixture) as GeneratedSnippets
@@ -46,30 +49,35 @@ export const tsGenerator =
     const generateTs = makeGenerator(
       (node) => node,
       (node, state) => {
-        if (node.type === "atom") {
-          return fromToken(node.token, JSON.stringify(node))
-        } else if (node.type !== "blank-line" && node.type !== "non-code") {
-          state.addError(nodeError(node, "No code generation available"))
-          return fromTokenRange(node, JSON.stringify(node))
-        }
-        return { text: JSON.stringify(node) }
+        // It *should* be impossible to hit this case if all specializations
+        // are all correctly implemented and added to the specialization list.
+        state.addError(
+          nodeError(
+            node,
+            `No code generation available for node of kind ${node.type}`,
+          ),
+        )
+        return fromNode(node, autoTightS(state, `void ${JSON.stringify(node)}`))
       },
       [
-        assignmentGeneratorTs(standardLibrary),
-        atomGeneratorTs(standardLibrary),
+        // Ordered from simplest to most complex.
         tryGenerateBlankLineTs,
-        tryGenerateBlockTs,
-        callGeneratorTs(standardLibrary),
         tryGenerateCommentTs,
+        tryGenerateNumberTs,
+        tryGenerateStringTs,
+        valueIdentifierGeneratorTs(standardLibrary),
         propertyAccessGeneratorTs(standardLibrary),
-        tryGenerateTypeAssignmentTs,
+        callGeneratorTs(standardLibrary),
         tryGenerateDanglingTypeCallTs,
         letCallGeneratorTs(standardLibrary),
+        assignmentGeneratorTs(standardLibrary),
+        tryGenerateTypeAssignmentTs,
+        tryGenerateBlockTs,
       ],
     )
 
     // There's an open issue in TS 4.7 about typing this correctly. https://github.com/microsoft/TypeScript/issues/49280
-    const output: GeneratedSnippet[] = [generateTs2(node, state)].flat(
+    const output: GeneratedSnippet[] = [generateTsWithSelfFixture(node, state)].flat(
       Infinity as 1,
     ) as GeneratedSnippet[]
     return {

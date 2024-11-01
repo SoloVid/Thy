@@ -1,22 +1,20 @@
-import { nodeError } from "../../../../tree/tree-node"
+import { nodeError } from "common"
 import {
-  fromComplicated,
-  fromNode,
   GeneratedSnippets,
   GeneratorFixture,
 } from "../../../generator"
-import type {
-  GeneratorForGlobalSpec,
-  SimpleCall,
-} from "../../../generator-for-global"
+import { fromComplicated } from "code-gen/utils/from-complicated"
+import { fromNode } from "code-gen/utils/from-node"
+import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
 import {
   ContextType,
   contextType,
   GeneratorState,
 } from "../../../generator-state"
-import { genIndent, makeIndent } from "../../../indent-string"
-import { generateBlockLinesTs } from "../../block/generate-block-ts"
-import { autoTightS } from "../helpers/auto-tight"
+import { genIndent, makeIndent } from "../../../utils/indent"
+import { generateBlockLinesTs } from "code-gen/ts/block/generate-block-lines-ts"
+import { autoTightS } from "../../utils/auto-tight"
+import { ValueCall } from "tree"
 
 export const ifGenerator: GeneratorForGlobalSpec = {
   name: "if",
@@ -48,7 +46,7 @@ ${space}}`,
 }
 
 function tryGenerateIfTs(
-  node: SimpleCall,
+  node: ValueCall,
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): void | GeneratedSnippets {
@@ -66,7 +64,10 @@ function tryGenerateIfTs(
   const elseLiteral = node.args.length > 2 ? node.args[2] : null
 
   if (elseLiteral !== null) {
-    if (elseLiteral.type !== "atom" || elseLiteral.token.text !== "else") {
+    if (
+      elseLiteral.type !== "value-identifier" ||
+      elseLiteral.token.text !== "else"
+    ) {
       state.addError(nodeError(elseLiteral, `Expected "else"`))
     }
 
@@ -103,11 +104,7 @@ function tryGenerateIfTs(
         return buildTernary()
       }
     } else {
-      if (
-        state.context === contextType.blockAllowingReturn ||
-        state.context === contextType.blockAllowingExport ||
-        !mightReturn
-      ) {
+      if (state.context === contextType.blockAllowingReturn || !mightReturn) {
         return buildIfStatement()
       }
     }

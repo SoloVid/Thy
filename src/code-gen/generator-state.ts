@@ -1,7 +1,7 @@
 import type { CompileError } from "../common/compile-error"
 import type { Token } from "../tokenizer/token"
 import type { Block } from "../tree"
-import type { IndependentCodeGeneratorFunc } from "./generator"
+import type { GeneratedSnippet, GeneratedSnippets, IndependentCodeGeneratorFunc } from "./generator"
 
 // These context types are listed in order from most restrictive to most permissive.
 export const contextType = {
@@ -55,6 +55,29 @@ export interface GeneratorState {
   readonly isTypeContext: boolean
   /** Singleton(ish) array of errors encountered. */
   readonly errors: CompileError[]
+  readonly blockTypeParametersSoFar: {
+    /** Name of type parameter *in TypeScript* (might be different from name in Thy source). */
+    readonly name: string
+    /** TypeScript generated for type parameter specification (item in comma-separated list inside `<...>`). */
+    readonly inlineSnippet: GeneratedSnippets
+  }[]
+  readonly blockParametersSoFar: {
+    /** TypeScript generated for parameter specification (item in comma-separated list inside `(...)`). */
+    readonly inlineSnippet: GeneratedSnippets
+  }[]
+  readonly blockIdeaSnippets: (readonly GeneratedSnippet[])[]
+  /**
+   * If something needs to be generated in a statement context prior
+   * to the current block (e.g. we're putting something into
+   * blockTypeParametersSoFar or blockParametersSoFar),
+   * it can be added to this array.
+   */
+  readonly blockPreStatementGenerators: IndependentCodeGeneratorFunc[]
+  /**
+   * If something needs to be generated in a statement context prior
+   * to the current statement (e.g. we're in a nested expression),
+   * it can be added to this array.
+   */
   readonly preStatementGenerators: IndependentCodeGeneratorFunc[]
   readonly localVariables: LocalVariable[]
   readonly parent: GeneratorState | null

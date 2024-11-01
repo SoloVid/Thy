@@ -2,6 +2,7 @@ import type { Token } from "tokenizer/token"
 import type { tComment, tStatementTerminator } from "tokenizer/token-type"
 import { isAssignment, type Assignment } from "./assignment"
 import type { Call, Return } from "./call"
+import type { TypeReturn } from "./type-call"
 import type { LetCall } from "./let-call"
 import type { TypeAssignment } from "./type-assignment"
 
@@ -20,6 +21,7 @@ export type Idea =
   | Comment
   | Call
   | Return
+  | TypeReturn
   | Assignment
   | TypeAssignment
   | LetCall

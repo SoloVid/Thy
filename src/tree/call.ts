@@ -1,5 +1,5 @@
 import type { Token } from "tokenizer"
-import type { AwaitAtom, GivenAtom, ReturnAtom } from "./atom"
+import type { AwaitTerm, GivenTerm, ReturnTerm } from "./term"
 import type {
   CallableExpression,
   Expression,
@@ -31,21 +31,21 @@ export interface ValueCall extends TokenRange {
 
 export interface AwaitCall extends TokenRange {
   readonly type: "await-call"
-  readonly func: AwaitAtom
+  readonly func: AwaitTerm
   readonly typeArgs: readonly []
   readonly args: readonly [Expression]
 }
 
 export interface GivenCall extends TokenRange {
   readonly type: "given-call"
-  readonly func: GivenAtom
+  readonly func: GivenTerm
   readonly typeArgs: readonly [] | readonly [TypeExpression]
   readonly args: readonly [] | readonly [Expression]
 }
 
 export interface Return extends TokenRange {
   readonly type: "return"
-  readonly func: ReturnAtom
+  readonly func: ReturnTerm
   readonly typeArgs: readonly [] | readonly [TypeExpression]
   readonly args: readonly [Expression]
 }

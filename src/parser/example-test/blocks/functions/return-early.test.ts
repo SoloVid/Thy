@@ -36,7 +36,7 @@ testParser(
                   {
                     type: "return",
                     func: {
-                      type: "return-atom",
+                      type: "return-term",
                       token: {
                         type: "Return",
                         text: "return",
@@ -68,7 +68,7 @@ testParser(
         {
           type: "return",
           func: {
-            type: "return-atom",
+            type: "return-term",
             token: {
               type: "Return",
               text: "return",

@@ -1,24 +1,22 @@
-import type { tTypeIdentifier, tValueIdentifier } from "../tokenizer/token-type"
-import type { TypeAssignment, TypeCall } from "../tree"
+import type {
+  TypeAssignment,
+  TypeCall,
+  TypeExpression,
+  ValueIdentifier,
+  ValuePropertyAccess,
+} from "../tree"
 import type { Assignment } from "../tree/assignment"
-import type { Call } from "../tree/call"
+import type { Call, ValueCall } from "../tree/call"
 import type { LetCall } from "../tree/let-call"
 import type { CodeGeneratorFunc } from "./generator"
 import type { GeneratorState } from "./generator-state"
 
-export interface SimpleCall extends Call {
-  func: Atom | PropertyAccess<never, typeof tValueIdentifier>
+export interface SimpleCall extends ValueCall {
+  readonly func: ValueIdentifier | ValuePropertyAccess
 }
 
-export interface SimpleTypeCall extends TypeCall {
-  func: Atom | PropertyAccess<never, typeof tTypeIdentifier>
-}
-
-export interface ReallySimpleTypeCall extends SimpleTypeCall {
-  args: (
-    | Atom<typeof tTypeIdentifier>
-    | PropertyAccess<never, typeof tTypeIdentifier>
-  )[]
+export interface ReallySimpleTypeCall extends TypeCall {
+  readonly args: readonly TypeExpression[]
 }
 
 export interface GeneratorForGlobalSpec {
@@ -34,12 +32,12 @@ export interface GeneratorForGlobalSpec {
    * Since the default type-call generator ends up calling the call generator,
    * I'm not sure this is actually useful.
    */
-  generateTypeCall?: CodeGeneratorFunc<SimpleTypeCall>
+  generateTypeCall?: CodeGeneratorFunc<TypeCall>
   /** Given a really simple type call (like `Union String Number`), generate a _**type**_. */
   generateSimpleTypeCall?: CodeGeneratorFunc<ReallySimpleTypeCall>
   generateAssignment?: CodeGeneratorFunc<Assignment & { call: SimpleCall }>
   generateTypeAssignment?: CodeGeneratorFunc<
-    TypeAssignment & { call: SimpleCall | SimpleTypeCall }
+    TypeAssignment & { call: SimpleCall | TypeCall }
   >
   generateLetCall?: CodeGeneratorFunc<LetCall & { call: SimpleCall }>
 }

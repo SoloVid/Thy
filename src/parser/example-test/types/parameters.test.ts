@@ -54,7 +54,7 @@ testParser("should parse example program types/parameters.thy", async () => {
                   call: {
                     type: "type-given-call",
                     func: {
-                      type: "type-given-atom",
+                      type: "type-given-term",
                       token: {
                         type: "TypeGiven",
                         text: "Given",
@@ -92,7 +92,7 @@ testParser("should parse example program types/parameters.thy", async () => {
                   call: {
                     type: "type-given-call",
                     func: {
-                      type: "type-given-atom",
+                      type: "type-given-term",
                       token: {
                         type: "TypeGiven",
                         text: "Given",
@@ -126,7 +126,7 @@ testParser("should parse example program types/parameters.thy", async () => {
                   call: {
                     type: "given-call",
                     func: {
-                      type: "given-atom",
+                      type: "given-term",
                       token: {
                         type: "Given",
                         text: "given",
@@ -153,7 +153,7 @@ testParser("should parse example program types/parameters.thy", async () => {
                   call: {
                     type: "given-call",
                     func: {
-                      type: "given-atom",
+                      type: "given-term",
                       token: {
                         type: "Given",
                         text: "given",

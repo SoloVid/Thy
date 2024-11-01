@@ -51,7 +51,7 @@ testParser(
                     call: {
                       type: "given-call",
                       func: {
-                        type: "given-atom",
+                        type: "given-term",
                         token: {
                           type: "Given",
                           text: "given",
@@ -77,7 +77,7 @@ testParser(
                     call: {
                       type: "given-call",
                       func: {
-                        type: "given-atom",
+                        type: "given-term",
                         token: {
                           type: "Given",
                           text: "given",
@@ -130,7 +130,7 @@ testParser(
                   {
                     type: "return",
                     func: {
-                      type: "return-atom",
+                      type: "return-term",
                       token: {
                         type: "Return",
                         text: "return",

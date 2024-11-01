@@ -1,6 +1,6 @@
 import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
 import type { GeneratorState } from "../../../generator-state"
-import { makeIndent } from "../../../indent-string"
+import { makeIndent } from "../../../utils/indent"
 
 type SpecMap = Map<string, GeneratorForGlobalSpec | SpecMap>
 

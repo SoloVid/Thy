@@ -1,14 +1,14 @@
+import { TypePropertyAccess, ValuePropertyAccess } from "tree"
 import type { Token } from "../../tokenizer/token"
 import { tMemberAccessOperator } from "../../tokenizer/token-type"
-import type { PropertyAccess } from "../../tree"
 import type { TreeNode } from "../../tree/tree-node"
 import { makeGenerator } from "../generate-from-options"
 import {
   CodeGeneratorFunc,
-  fromToken,
   GeneratedSnippets,
   GeneratorFixture,
 } from "../generator"
+import { fromToken } from "code-gen/utils/from-token"
 import type { GeneratorState } from "../generator-state"
 import type { LibraryGeneratorCollection } from "../library-generator"
 
@@ -21,11 +21,11 @@ export function propertyAccessGeneratorTs(
 }
 
 export function makePropertyAccessTsGenerator(
-  specializations: CodeGeneratorFunc<PropertyAccess>[],
+  specializations: CodeGeneratorFunc<ValuePropertyAccess>[],
 ): CodeGeneratorFunc<TreeNode> {
   return makeGenerator(
     (node) => {
-      if (node.type === "property-access") {
+      if (node.type === "value-property-access") {
         return node
       }
     },
@@ -35,15 +35,16 @@ export function makePropertyAccessTsGenerator(
 }
 
 export function generatePropertyAccessTs(
-  node: PropertyAccess,
+  node: ValuePropertyAccess | TypePropertyAccess,
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
   const baseGenerated = fixture.generate(node.base, state)
-  const tailGenerated = fillOutPropertyAccessExpression([
-    node.memberAccessOperatorToken,
-    node.property,
-  ])
+  const tailGenerated = fillOutPropertyAccessExpression(
+    node.propertyAccesses
+      .map((pa) => [pa.memberAccessOperatorToken, pa.propertyToken])
+      .flat(),
+  )
   return [baseGenerated, tailGenerated]
 }
 

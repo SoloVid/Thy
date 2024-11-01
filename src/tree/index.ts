@@ -7,18 +7,17 @@ export type {
   VariableDeclaration,
   VariableReassignment,
 } from "./assignment"
-export type {
-  AwaitAtom,
-  GivenAtom,
-  NumberLiteral,
-  ReturnAtom,
-  TypeIdentifier,
-  ValueIdentifier,
-} from "./atom"
 export { returnStyle } from "./block"
 export type { Block, ReturnStyle } from "./block"
 export { isCall } from "./call"
-export type { AwaitCall, Call, GivenCall, Return, ValueCall } from "./call"
+export type {
+  AwaitCall,
+  Call,
+  GivenCall,
+  Return,
+  TypeReturn,
+  ValueCall,
+} from "./call"
 export type {
   CallableExpression,
   Expression,
@@ -35,6 +34,14 @@ export type {
   StringPart,
 } from "./string"
 export type { ReadSymbolTable, SymbolTable } from "./symbol-table"
+export type {
+  AwaitTerm,
+  GivenTerm,
+  NumberLiteral,
+  ReturnTerm,
+  TypeIdentifier,
+  ValueIdentifier,
+} from "./term"
 export type { TreeNode } from "./tree-node"
 export type { TypeAssignment } from "./type-assignment"
 export type { TypeCall, TypeGivenCall } from "./type-call"

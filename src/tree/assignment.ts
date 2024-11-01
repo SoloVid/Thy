@@ -7,7 +7,7 @@ import {
   tPrivate,
   tVarDeclAssign,
 } from "tokenizer/token-type"
-import type { ValueIdentifier } from "./atom"
+import type { ValueIdentifier } from "./term"
 import type { AwaitCall, GivenCall, ValueCall } from "./call"
 import type { ValuePropertyAccess } from "./property-access"
 import { TreeNode } from "./tree-node"

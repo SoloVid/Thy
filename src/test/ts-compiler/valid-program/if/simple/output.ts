@@ -1,53 +1,55 @@
-export const condition = true
-if (condition) {
-  console.log("yay" as const)
-}
+export function _initThy() {
+  const condition = true
+  if (condition) {
+    console.log("yay" as const)
+  }
 
-if (condition) {
-  console.log("yes" as const)
-} else {
-  console.log("no" as const)
-}
+  if (condition) {
+    console.log("yes" as const)
+  } else {
+    console.log("no" as const)
+  }
 
-export const callback = () => {
-  console.log("yay" as const)
-}
+  const callback = () => {
+    console.log("yay" as const)
+  }
 
-// Iff both callbacks are inline
-if (condition) {
-  callback()
-} else {
-  callback()
-}
-export const captured = condition ? callback() : callback()
+  // Iff both callbacks are inline
+  if (condition) {
+    callback()
+  } else {
+    callback()
+  }
+  const captured = condition ? callback() : callback()
 
-if (condition) {
-  callback()
-} else {
-  console.log("no" as const)
-}
+  if (condition) {
+    callback()
+  } else {
+    console.log("no" as const)
+  }
 
-if (condition) {
-  console.log("yes" as const)
-} else {
-  callback()
-}
+  if (condition) {
+    console.log("yes" as const)
+  } else {
+    callback()
+  }
 
-// The following cases are errors.
+  // The following cases are errors.
 
-if (false) {
-}
+  if (false) {
+  }
 
-if (condition) {
-}
+  if (condition) {
+  }
 
-if (condition) {
-  console.log("yes" as const)
-} else {
-}
+  if (condition) {
+    console.log("yes" as const)
+  } else {
+  }
 
-if (condition) {
-  console.log("yes" as const)
-} else {
-  console.log("no" as const)
+  if (condition) {
+    console.log("yes" as const)
+  } else {
+    console.log("no" as const)
+  }
 }

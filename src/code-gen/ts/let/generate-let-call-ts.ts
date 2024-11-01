@@ -3,12 +3,12 @@ import type { TreeNode } from "../../../tree/tree-node"
 import { makeGenerator } from "../../generate-from-options"
 import {
   CodeGeneratorFunc,
-  fromComplicated,
   GeneratedSnippets,
   GeneratorFixture,
 } from "../../generator"
+import { fromComplicated } from "code-gen/utils/from-complicated"
 import { contextType, GeneratorState } from "../../generator-state"
-import { makeIndent } from "../../indent-string"
+import { makeIndent } from "../../utils/indent"
 import type { LibraryGeneratorCollection } from "../../library-generator"
 
 export function letCallGeneratorTs(
@@ -36,6 +36,9 @@ export function generateLetCallTs(
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
+  if (letCall.call === null) {
+    return []
+  }
   const captureVar = state.getUniqueVariableName()
   const callTs = fixture.generate(
     letCall.call,

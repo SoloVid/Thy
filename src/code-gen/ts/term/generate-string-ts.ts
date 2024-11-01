@@ -1,0 +1,32 @@
+import type { TreeNode } from "tree"
+import { GeneratedSnippets } from "../../generator"
+import { fromComplicated } from "code-gen/utils/from-complicated"
+import { fromNode } from "code-gen/utils/from-node"
+import { fromToken } from "code-gen/utils/from-token"
+import { contextType, GeneratorState } from "../../generator-state"
+
+export function tryGenerateStringTs(
+  node: TreeNode,
+  state: GeneratorState,
+): GeneratedSnippets | undefined {
+  if (node.type === "string-literal") {
+    const maybeAsConst =
+      state.context === contextType.looseExpression ? "" : " as const"
+    if (node.parts.length === 1 && node.parts[0].type === "string-content") {
+      return fromComplicated(node, [
+        JSON.stringify(node.parts[0].token.text),
+        maybeAsConst,
+      ])
+    }
+    return fromComplicated(node, [
+      "`",
+      ...node.parts.map((part) =>
+        part.type === "string-content"
+          ? part.token.text
+          : fromComplicated(part, ["${", part.value.token.text, "}"]),
+      ),
+      "`",
+      maybeAsConst,
+    ])
+  }
+}

@@ -1,22 +1,14 @@
-import type { Atom, PropertyAccess } from "../../../../tree"
-import type { Expression, TypeExpression } from "../../../../tree/expression"
-import { nodeError } from "../../../../tree/tree-node"
-import {
-  fromComplicated,
-  fromNode,
-  fromToken,
-  fromTokenRange,
-  GeneratedSnippets,
-} from "../../../generator"
+import { nodeError } from "common/compile-error"
+import type { TreeNode, TypeIdentifier, ValueIdentifier } from "tree"
+import assert from "utils/assert"
+import { GeneratedSnippets } from "../../../generator"
+import { fromComplicated } from "code-gen/utils/from-complicated"
+import { fromTokenRange } from "code-gen/utils/from-token-range"
+import { fromToken } from "code-gen/utils/from-token"
 import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
-import {
-  generateAssignmentTs2,
-  maybeGenerateExport,
-} from "../../assignment/generate-assignment-ts"
-import { isAtomIdentifier } from "../../atom/generate-atom-ts"
-import { isSimpleNamed } from "../../generate-simple-named-expression"
-import { generateTypeInstanceTs } from "../../generate-type-instance-ts"
-import { autoTightS } from "../helpers/auto-tight"
+import { generateAssignmentTs } from "../../assignment/generate-assignment-ts"
+import { generateTypeInstanceTs } from "../../type/generate-type-instance-ts"
+import { autoTightS } from "../../utils/auto-tight"
 
 export const defGenerator: GeneratorForGlobalSpec = {
   name: "def",
@@ -40,7 +32,7 @@ export const defGenerator: GeneratorForGlobalSpec = {
 
     const childState = state.makeChild()
     const expressionTs = fixture.generate(node.call.args[0], childState)
-    return generateAssignmentTs2(
+    return generateAssignmentTs(
       node,
       state,
       fixture,
@@ -64,10 +56,10 @@ export const defGenerator: GeneratorForGlobalSpec = {
   },
   generateTypeAssignment(node, state, fixture) {
     console.log("def type assignment generator")
-    // It should be impossible to hit this case because def is a value function, not a type function.
-    if (node.call.type === "type-call") {
-      return
-    }
+    assert(
+      node.call.type !== "type-call",
+      "It should be impossible to hit this case because def is a value function, not a type function.",
+    )
     if (node.call.args.length === 0 && node.call.typeArgs.length === 0) {
       state.addError(nodeError(node.call.func, "def requires 1 argument"))
       return fromTokenRange(node, "undefined")
@@ -82,12 +74,17 @@ export const defGenerator: GeneratorForGlobalSpec = {
       state.addError(nodeError(arg, `def cannot take more than 1 argument`))
     }
 
+    function isSimpleNamed(
+      arg: TreeNode,
+    ): arg is ValueIdentifier | TypeIdentifier {
+      return arg.type === "value-identifier" || arg.type === "type-identifier"
+    }
+
     function generateSimple(
-      arg: Atom | PropertyAccess<never>,
+      arg: ValueIdentifier | TypeIdentifier,
       typeSnippet?: GeneratedSnippets,
     ) {
       return fromComplicated(node, [
-        maybeGenerateExport(node, state),
         `const `,
         node.variable.token.text,
         ` = undefined as unknown as `,
@@ -103,7 +100,7 @@ export const defGenerator: GeneratorForGlobalSpec = {
     }
 
     const oneArg = node.call.args[0]
-    if (oneArg.type === "atom" && !isAtomIdentifier(oneArg)) {
+    if (oneArg.type === "value-identifier") {
       return generateSimple(oneArg, fromToken(oneArg.token))
     }
 

@@ -1,7 +1,7 @@
 import type { TokenRange } from "common/token-range"
 import type { Token } from "tokenizer"
 import type { tStringText } from "tokenizer/token-type"
-import type { ValueIdentifier } from "./atom"
+import type { ValueIdentifier } from "./term"
 
 export interface StringLiteral extends TokenRange {
   readonly type: "string-literal"

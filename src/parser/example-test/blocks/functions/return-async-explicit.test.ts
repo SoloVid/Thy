@@ -12,7 +12,7 @@ testParser(
           {
             type: "return",
             func: {
-              type: "return-atom",
+              type: "return-term",
               token: {
                 type: "Return",
                 text: "return",
@@ -22,7 +22,7 @@ testParser(
               {
                 type: "await-call",
                 func: {
-                  type: "await-atom",
+                  type: "await-term",
                   token: {
                     type: "Await",
                     text: "await",
