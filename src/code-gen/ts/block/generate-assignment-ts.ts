@@ -1,14 +1,13 @@
+import { CodeGeneratorFunc, GeneratorFixture } from "code-gen/ts/ts-generator"
+import { fromTokenRange } from "code-gen/utils/from-token-range"
 import { isAssignment, type Assignment } from "../../../tree/assignment"
 import type { TreeNode } from "../../../tree/tree-node"
-import { makeGenerator } from "../../generate-from-options"
+import { makeGenerator } from "../generate-from-options"
 import {
-  CodeGeneratorFunc,
   GeneratedSnippets,
-  GeneratorFixture,
 } from "../../generator"
-import { fromTokenRange } from "code-gen/utils/from-token-range"
-import { contextType, GeneratorState } from "../../generator-state"
-import type { LibraryGeneratorCollection } from "../../library-generator"
+import { contextType, GeneratorState } from "../generator-state"
+import type { LibraryGeneratorCollection } from "../library-generator"
 
 export function assignmentGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,

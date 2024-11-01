@@ -22,9 +22,9 @@ export type Idea =
   | Call
   | Return
   | TypeReturn
+  | LetCall
   | Assignment
   | TypeAssignment
-  | LetCall
 
 export function isIdeaAsync(idea: Idea) {
   return (

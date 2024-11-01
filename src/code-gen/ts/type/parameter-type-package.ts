@@ -1,9 +1,11 @@
 import type { TreeNode } from "tree"
-import type { GeneratedSnippets, GeneratorFixture, IndependentCodeGeneratorFunc } from "../../generator"
-import type { GeneratorState } from "../../generator-state"
+import type { GeneratedSnippets } from "../../generator"
 import { fromComplicated } from "../../utils/from-complicated"
-import { fromNode } from "../../utils/from-node"
 import { indentSnippets, makeIndent } from "../../utils/indent"
+import { generateParamsTs } from "../block/generate-params-ts"
+import type { GeneratorState } from "../generator-state"
+import type { GeneratorFixture, IndependentCodeGeneratorFunc } from "../ts-generator"
+import { generateTypeArgsForBlockTs } from "./generate-type-args-ts"
 import { generateTypeParamsTs } from "./generate-type-params-ts"
 
 export function makeParameterTypePackage(
@@ -15,18 +17,7 @@ export function makeParameterTypePackage(
 ) {
   const packageClassName = `_${nameBase}_TypePackage`
   const typeParamsSoFar = generateTypeParamsTs(node, state)
-  const typeArgsSoFar = state.blockTypeParametersSoFar.length === 0 ? "" : fromComplicated(node, [
-    "<",
-    state.blockTypeParametersSoFar.map((tp) => fromNode(node, tp.name)),
-    ">",
-  ])
-  const paramsSoFar: GeneratedSnippets[] = []
-  for (const p of state.blockParametersSoFar) {
-    if (paramsSoFar.length > 0) {
-      paramsSoFar.push(fromNode(node, ", "))
-    }
-    paramsSoFar.push(p.inlineSnippet)
-  }
+  const typeArgsSoFar = generateTypeArgsForBlockTs(node, state)
 
   const packageGenerator: IndependentCodeGeneratorFunc = (s, f) => {
     const indent = makeIndent(s.indentLevel)
@@ -34,7 +25,7 @@ export function makeParameterTypePackage(
     return fromComplicated(node, [
       `class ${packageClassName}`,
       typeParamsSoFar,
-      ` { f(`, paramsSoFar, `) {\n`,
+      ` { f(`, generateParamsTs(node, state, fixture), `) {\n`,
       state.blockIdeaSnippets.map((snippet) => indentSnippets(snippet, s.indentLevel + 1)),
       indent2, `return `, leafValueSnippets, "\n",
       indent,

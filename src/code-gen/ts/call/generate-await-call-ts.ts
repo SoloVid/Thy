@@ -1,11 +1,11 @@
-import type { AwaitCall, Return, TreeNode } from "tree"
-import {
-  GeneratedSnippets,
-  GeneratorFixture,
-} from "../../generator"
+import { GeneratorFixture } from "code-gen/ts/ts-generator"
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromToken } from "code-gen/utils/from-token"
-import { contextType, type GeneratorState } from "../../generator-state"
+import type { AwaitCall, TreeNode } from "tree"
+import {
+  GeneratedSnippets,
+} from "../../generator"
+import { contextType, type GeneratorState } from "../generator-state"
 
 export function tryGenerateAwaitCallTs(
   node: TreeNode,
@@ -22,7 +22,7 @@ export function generateAwaitCallTs(
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
-  const keywordSnippet = fromToken(node.func.token)
+  const keywordSnippet = fromToken(node.func.token, "await")
 
   const childState = state.makeChild({
     context: contextType.isolatedExpression,

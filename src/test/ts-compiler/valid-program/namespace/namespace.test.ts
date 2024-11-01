@@ -1,5 +1,5 @@
+import { tsNamespaceCompiler } from "code-gen/ts/ts-compiler"
 import { test } from "test-framework"
-import { tsNamespaceCompiler } from "../../../../code-gen/ts-compiler"
 import { compileAndVerifyOutput } from "../compile-valid-program.test.helper"
 
 test("compile namespace declaration", async () => {

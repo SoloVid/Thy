@@ -1,7 +1,8 @@
+import type { GeneratorFixture } from "code-gen/ts/ts-generator"
 import type { Block, Idea } from "tree"
-import type { GeneratedSnippets, GeneratorFixture } from "../../generator"
-import type { GeneratorState } from "../../generator-state"
+import type { GeneratedSnippets } from "../../generator"
 import { genIndent } from "../../utils/indent"
+import type { GeneratorState } from "../generator-state"
 import { generateImpliedReturnTs } from "./generate-implied-return-ts"
 import { resolvePreStatementGenerator } from "./resolve-pre-statement-generator"
 

@@ -1,7 +1,8 @@
-import type { CompileError } from "../common/compile-error"
-import type { Token } from "../tokenizer/token"
-import type { Block } from "../tree"
-import type { GeneratedSnippet, GeneratedSnippets, IndependentCodeGeneratorFunc } from "./generator"
+import type { CompileError } from "common/compile-error"
+import type { Token } from "tokenizer/token"
+import type { Block } from "tree"
+import type { GeneratedSnippet, GeneratedSnippets } from "../generator"
+import type { IndependentCodeGeneratorFunc } from "./ts-generator"
 
 // These context types are listed in order from most restrictive to most permissive.
 export const contextType = {
@@ -73,6 +74,7 @@ export interface GeneratorState {
    * it can be added to this array.
    */
   readonly blockPreStatementGenerators: IndependentCodeGeneratorFunc[]
+  blockReturnTypeSnippets: GeneratedSnippets | null
   /**
    * If something needs to be generated in a statement context prior
    * to the current statement (e.g. we're in a nested expression),

@@ -1,32 +1,37 @@
-import type { TreeNode } from "tree"
-import {
+import type { GeneratorFixture } from "code-gen/ts/ts-generator"
+import type { Return, TreeNode, TypeExpression, TypeReturn } from "tree"
+import type {
   GeneratedSnippets,
-  GeneratorFixture,
 } from "../../generator"
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import type { GeneratorState } from "../../generator-state"
-import { checkAndGenerateTypeInstanceTs } from "../type/generate-type-instance-ts"
-import { generatePreStatementAndTypeForParam } from "./generatePreStatementAndTypeForParam"
-import type { PreludeTypeInfo } from "./prelude-type-info"
+import type { GeneratorState } from "../generator-state"
+import { generateTypeTsForFunctionSignature } from "../type/generate-type-ts-for-function-signature"
 
-export function generateReturnTypeTs(
+export function tryGenerateReturnTypeTs(
   node: TreeNode,
   state: GeneratorState,
   fixture: GeneratorFixture,
-  preludeTypeInfo: PreludeTypeInfo,
-): GeneratedSnippets | null {
-  if (node.type !== "type-return" && node.type !== "return") {
-    return null
+): GeneratedSnippets | void {
+  if (node.type !== "type-return" && !isReturnWithExplicitType(node)) {
+    return
   }
+  return generateReturnTypeTs(node, state, fixture)
+}
 
-  const typeInstanceSnippet =
-    preludeTypeInfo.typeSnippets.length === 0
-      ? checkAndGenerateTypeInstanceTs(node.args[0], state, fixture)
-      : generatePreStatementAndTypeForParam(
-          node,
-          state,
-          fixture,
-          preludeTypeInfo,
-        )
-  return fromComplicated(node, [": ", typeInstanceSnippet])
+function isReturnWithExplicitType(
+  node: TreeNode
+): node is ReturnWithExplicitType {
+  return node.type === "return" && node.typeArgs.length !== 0
+}
+
+type ReturnWithExplicitType = Return & {
+  readonly typeArgs: readonly [TypeExpression]
+}
+
+export function generateReturnTypeTs(
+  node: TypeReturn | ReturnWithExplicitType,
+  state: GeneratorState,
+  fixture: GeneratorFixture,
+): GeneratedSnippets {
+  const typeNode = node.type === "type-return" ? node.args[0] : node.typeArgs[0]
+  return generateTypeTsForFunctionSignature(typeNode, state, fixture, state.getUniqueVariableName())
 }

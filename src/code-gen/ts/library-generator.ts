@@ -1,6 +1,10 @@
 import assert from "assert"
-import type { Token } from "../tokenizer/token"
+import { fromToken } from "code-gen/utils/from-token"
+import type { Token } from "tokenizer"
 import type {
+  Assignment,
+  Call,
+  LetCall,
   TreeNode,
   TypeAssignment,
   TypeCall,
@@ -8,12 +12,9 @@ import type {
   TypePropertyAccess,
   ValueIdentifier,
   ValuePropertyAccess,
-} from "../tree"
-import type { Assignment } from "../tree/assignment"
-import type { Call } from "../tree/call"
-import type { LetCall } from "../tree/let-call"
-import { CodeGeneratorFunc, GeneratedSnippets } from "./generator"
-import { fromNode } from "./utils/from-node"
+} from "tree"
+import type { GeneratedSnippets } from "../generator"
+import { fromNode } from "../utils/from-node"
 import {
   GeneratorForGlobalParentSpec,
   GeneratorForGlobalSpec,
@@ -21,6 +22,7 @@ import {
   isParent,
 } from "./generator-for-global"
 import type { GeneratorState } from "./generator-state"
+import type { CodeGeneratorFunc } from "./ts-generator"
 
 export interface LibraryGeneratorCollection {
   valueIdentifierGenerator: CodeGeneratorFunc<ValueIdentifier>
@@ -92,13 +94,9 @@ function lookupByName(
   return null
 }
 
-type FillOutPropertyAccessExpression = (
-  trailingTokens: readonly Token[],
-) => GeneratedSnippets
 type GenerateObject = (hierarchy: SpecMap, state: GeneratorState) => string
 
 interface Options {
-  fillOutPropertyAccessExpression: FillOutPropertyAccessExpression
   generateObject: GenerateObject
 }
 
@@ -183,7 +181,7 @@ export function aggregateLibrary(
 
 export function makeLibraryGenerators(
   specs: (GeneratorForGlobalSpec | GeneratorForGlobalParentSpec)[],
-  { fillOutPropertyAccessExpression, generateObject }: Options,
+  { generateObject }: Options,
 ): LibraryGeneratorCollection {
   const valueSpecMap = makeSpecMap(specs, "generateValue")
   const callSpecMap = makeSpecMap(specs, "generateCall")
@@ -211,7 +209,7 @@ export function makeLibraryGenerators(
     if (lookup.unusedPropertyAccessTokens.length > 0) {
       return [
         partGeneratedNow,
-        fillOutPropertyAccessExpression(lookup.unusedPropertyAccessTokens),
+        lookup.unusedPropertyAccessTokens.map(t => fromToken(t))
       ]
     } else {
       return partGeneratedNow

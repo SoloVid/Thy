@@ -1,5 +1,4 @@
-import { makeLibraryGenerators } from "../../../library-generator"
-import { fillOutPropertyAccessExpression } from "../../generate-property-access-ts"
+import { makeLibraryGenerators } from "../../library-generator"
 import { generateObjectFromHierarchy } from "../helpers/generate-object"
 import { castGenerator } from "./cast"
 import { checkGenerator } from "./check"
@@ -53,7 +52,6 @@ export const standardLibraryCore = makeLibraryGenerators(
     finallyGenerator,
   ],
   {
-    fillOutPropertyAccessExpression: fillOutPropertyAccessExpression,
     generateObject: generateObjectFromHierarchy,
   },
 )

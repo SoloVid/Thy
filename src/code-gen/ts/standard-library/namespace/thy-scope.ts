@@ -3,8 +3,8 @@ import type { Call } from "../../../../tree/call"
 import { nodeError } from "../../../../tree/tree-node"
 import {
   GeneratedSnippets,
-  GeneratorFixture,
 } from "../../../generator"
+import { GeneratorFixture } from "code-gen/ts/ts-generator"
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromNode } from "code-gen/utils/from-node"
 import { fromTokenRange } from "code-gen/utils/from-token-range"

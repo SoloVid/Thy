@@ -1,9 +1,9 @@
+import { fromToken } from "code-gen/utils/from-token"
 import type { Comment, TreeNode } from "tree"
 import assert from "utils/assert"
-import { GeneratedSnippets } from "../generator"
-import { fromToken } from "code-gen/utils/from-token"
+import { GeneratedSnippets } from "../../generator"
+import { makeIndent } from "../../utils/indent"
 import type { GeneratorState } from "../generator-state"
-import { makeIndent } from "../utils/indent"
 
 export function tryGenerateCommentTs(
   node: TreeNode,

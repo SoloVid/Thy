@@ -6,7 +6,7 @@ import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromTokenRange } from "code-gen/utils/from-token-range"
 import { fromToken } from "code-gen/utils/from-token"
 import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
-import { generateAssignmentTs } from "../../assignment/generate-assignment-ts"
+import { generateAssignmentTs } from "../../block/generate-assignment-ts"
 import { generateTypeInstanceTs } from "../../type/generate-type-instance-ts"
 import { autoTightS } from "../../utils/auto-tight"
 

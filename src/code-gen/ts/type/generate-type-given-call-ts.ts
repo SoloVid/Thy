@@ -1,12 +1,12 @@
+import type { GeneratorFixture } from "code-gen/ts/ts-generator"
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromNode } from "code-gen/utils/from-node"
 import type { TreeNode, TypeGivenCall } from "tree"
 import type {
   GeneratedSnippets,
-  GeneratorFixture,
 } from "../../generator"
-import type { GeneratorState } from "../../generator-state"
-import { generateTypeTsForFunctionSignature } from "../type/generate-type-ts-for-function-signature"
+import type { GeneratorState } from "../generator-state"
+import { generateTypeTsForFunctionSignature } from "./generate-type-ts-for-function-signature"
 
 export function tryGenerateTypeGivenCallTs(
   node: TreeNode,

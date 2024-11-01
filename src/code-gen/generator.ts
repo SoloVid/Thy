@@ -1,8 +1,6 @@
 import type { CompileError } from "../common/compile-error"
 import type { Token } from "../tokenizer/token"
 import type { TreeNode } from "../tree/tree-node"
-import type { GeneratorState } from "./generator-state"
-import type { LibraryGeneratorCollection } from "./library-generator"
 
 export interface GeneratorResult {
   readonly output: string
@@ -10,35 +8,6 @@ export interface GeneratorResult {
 }
 
 export type CodeGenerator = (node: TreeNode) => GeneratorResult
-
-export interface CodeGenResult {
-  readonly output: GeneratedSnippets
-  readonly mightReturn: boolean
-}
-
-export interface GeneratorFixture {
-  generate: DefiniteCodeGeneratorFuncNoFixture<TreeNode>
-  readonly standardLibrary: LibraryGeneratorCollection
-}
-
-export type CodeGeneratorFunc<T> = (
-  node: T,
-  state: GeneratorState,
-  fixture: GeneratorFixture,
-) => void | GeneratedSnippets
-export type DefiniteCodeGeneratorFunc<T> = (
-  node: T,
-  state: GeneratorState,
-  fixture: GeneratorFixture,
-) => GeneratedSnippets
-export type DefiniteCodeGeneratorFuncNoFixture<T> = (
-  node: T,
-  state: GeneratorState,
-) => GeneratedSnippets
-export type IndependentCodeGeneratorFunc = (
-  state: GeneratorState,
-  fixture: GeneratorFixture,
-) => GeneratedSnippets
 
 export type GeneratedSnippets = GeneratedSnippet | DeepArray<GeneratedSnippet>
 type DeepArray<T> = (T | DeepArray<T>)[]

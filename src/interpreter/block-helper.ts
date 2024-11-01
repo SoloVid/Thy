@@ -41,7 +41,8 @@ export function makeHelper(
     if (
       idea.type === "blank-line" ||
       idea.type === "comment" ||
-      idea.type === "type-assignment"
+      idea.type === "type-assignment" ||
+      idea.type === "type-return"
     ) {
       return notWait([false, undefined])
     }

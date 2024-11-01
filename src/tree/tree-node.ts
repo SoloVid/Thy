@@ -19,25 +19,41 @@ import type { TypeAssignment } from "./type-assignment"
 import type { TypeCall, TypeGivenCall } from "./type-call"
 
 export type TreeNode =
-  | Assignment
+  // Ordered from simplest to most complex.
+  // (Order is intended to match code generator.)
   | BlankLine
   | Comment
-  | Block
-  | Call
-  | Return
-  | TypeReturn
   | NumberLiteral
   | StringLiteral
-  | StringInterpolation
+  | ValueIdentifier
   | ValuePropertyAccess
+  | TypeIdentifier
   | TypePropertyAccess
-  | TypeAssignment
+  | Call
   | TypeCall
   | TypeGivenCall
+  | Return
+  | TypeReturn
   | LetCall
+  | Assignment
+  | TypeAssignment
+  | Block
+  // These remaining types probably don't have dedicated generators.
   | AwaitTerm
   | GivenTerm
-  | ReturnTerm
   | TypeGivenTerm
-  | TypeIdentifier
+  | ReturnTerm
+  | StringInterpolation
+
+export type TypedTreeNode =
+  // Ordered to match TreeNode
+  | NumberLiteral
+  | StringLiteral
   | ValueIdentifier
+  | ValuePropertyAccess
+  | TypeIdentifier
+  | TypePropertyAccess
+  | Call
+  | TypeCall
+  | TypeGivenCall
+  | Block

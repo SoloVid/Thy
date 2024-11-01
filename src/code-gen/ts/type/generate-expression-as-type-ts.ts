@@ -1,14 +1,14 @@
+import type { GeneratorFixture } from "code-gen/ts/ts-generator"
+import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromNode } from "code-gen/utils/from-node"
-import type { Expression, TypeCall, TypeExpression } from "tree"
+import type { TypedTreeNode } from "tree"
 import type {
   GeneratedSnippets,
-  GeneratorFixture,
 } from "../../generator"
-import type { GeneratorState } from "../../generator-state"
-import { fromComplicated } from "code-gen/utils/from-complicated"
+import type { GeneratorState } from "../generator-state"
 
 export function generateExpressionAsTypeTs(
-  node: Expression | TypeExpression | TypeCall,
+  node: TypedTreeNode,
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
@@ -33,7 +33,7 @@ export function generateExpressionAsTypeTs(
 }
 
 function tryGenerateSimpleTypeCallTs(
-  node: Expression | TypeExpression | TypeCall,
+  node: TypedTreeNode,
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets | void {
@@ -49,6 +49,6 @@ function tryGenerateSimpleTypeCallTs(
   }
 }
 
-function isSimpleNamedExpression(node: Expression | TypeExpression | TypeCall) {
+function isSimpleNamedExpression(node: TypedTreeNode) {
   return node.type === "value-identifier" || node.type === "type-identifier" || (node.type === "value-property-access" && node.base.type === "value-identifier") || (node.type === "type-property-access" && (node.base.type === "type-identifier" || node.base.type === "value-identifier"))
 }

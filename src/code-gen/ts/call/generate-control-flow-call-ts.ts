@@ -1,13 +1,12 @@
-import { nodeError, tokenError } from "common/compile-error"
-import type { Call } from "tree"
-import {
-  CodeGeneratorFunc,
-  GeneratedSnippets,
-  GeneratorFixture,
-} from "../../generator"
+import type { CodeGeneratorFunc, GeneratorFixture } from "code-gen/ts/ts-generator"
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromToken } from "code-gen/utils/from-token"
-import { contextType, GeneratorState } from "../../generator-state"
+import { nodeError, tokenError } from "common/compile-error"
+import type { Call } from "tree"
+import type {
+  GeneratedSnippets,
+} from "../../generator"
+import { contextType, GeneratorState } from "../generator-state"
 
 export function makeControlFlowCallTsGenerator(
   keyword: string,

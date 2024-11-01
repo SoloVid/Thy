@@ -1,3 +1,7 @@
+import { GeneratorFixture } from "code-gen/ts/ts-generator"
+import { fromComplicated } from "code-gen/utils/from-complicated"
+import { fromNode } from "code-gen/utils/from-node"
+import { fromToken } from "code-gen/utils/from-token"
 import { nodeError } from "common/compile-error"
 import type {
   TreeNode,
@@ -8,13 +12,9 @@ import type {
 } from "tree"
 import {
   GeneratedSnippets,
-  GeneratorFixture,
 } from "../../generator"
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import { fromNode } from "code-gen/utils/from-node"
-import { fromToken } from "code-gen/utils/from-token"
-import type { GeneratorState } from "../../generator-state"
-import { generatePropertyAccessTs } from "../generate-property-access-ts"
+import { generatePropertyAccessTs } from "../expression/generate-property-access-ts"
+import type { GeneratorState } from "../generator-state"
 
 // export function typeInstanceGeneratorTs(standardLibrary: LibraryGeneratorCollection) {
 //     return makeTypeInstanceTsGenerator([

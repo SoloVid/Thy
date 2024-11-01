@@ -1,4 +1,4 @@
-import { tsCoreCompiler } from "../../../../../code-gen/ts-compiler"
+import { tsCoreCompiler } from "code-gen/ts/ts-compiler"
 import { compileAndVerifyOutput } from "../../compile-valid-program.test.helper"
 
 test("compile if blocks", async () => {

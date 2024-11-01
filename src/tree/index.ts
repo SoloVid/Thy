@@ -5,7 +5,7 @@ export type {
   Declaration,
   PropertyAssignment,
   VariableDeclaration,
-  VariableReassignment,
+  VariableReassignment
 } from "./assignment"
 export { returnStyle } from "./block"
 export type { Block, ReturnStyle } from "./block"
@@ -15,23 +15,22 @@ export type {
   Call,
   GivenCall,
   Return,
-  TypeReturn,
-  ValueCall,
+  ValueCall
 } from "./call"
 export type {
   CallableExpression,
   Expression,
-  TypeExpression,
+  TypeExpression
 } from "./expression"
 export { isIdeaAsync } from "./idea"
 export type { BlankLine, Comment, Idea } from "./idea"
 export type { LetCall } from "./let-call"
-export type { TypePropertyAccess, ValuePropertyAccess } from "./property-access"
+export type { SimpleTypePropertyAccess, SimpleValuePropertyAccess, TypePropertyAccess, ValuePropertyAccess } from "./property-access"
 export type {
   StringContent,
   StringInterpolation,
   StringLiteral,
-  StringPart,
+  StringPart
 } from "./string"
 export type { ReadSymbolTable, SymbolTable } from "./symbol-table"
 export type {
@@ -40,8 +39,9 @@ export type {
   NumberLiteral,
   ReturnTerm,
   TypeIdentifier,
-  ValueIdentifier,
+  ValueIdentifier
 } from "./term"
-export type { TreeNode } from "./tree-node"
+export type { TreeNode, TypedTreeNode } from "./tree-node"
 export type { TypeAssignment } from "./type-assignment"
-export type { TypeCall, TypeGivenCall } from "./type-call"
+export type { TypeCall, TypeGivenCall, TypeReturn } from "./type-call"
+

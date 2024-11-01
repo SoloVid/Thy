@@ -1,5 +1,5 @@
 import type { TreeNode } from "tree";
-import { GeneratedSnippets } from "../generator";
+import type { GeneratedSnippets } from "../generator";
 import { fromNode } from "./from-node";
 
 export function fromComplicated(

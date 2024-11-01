@@ -1,5 +1,4 @@
-import { makeLibraryGenerators } from "../../../library-generator"
-import { fillOutPropertyAccessExpression } from "../../generate-property-access-ts"
+import { makeLibraryGenerators } from "../../library-generator"
 import { generateObjectFromHierarchy } from "../helpers/generate-object"
 import { namespaceThyGenerator } from "./thy"
 
@@ -9,7 +8,6 @@ import { namespaceThyGenerator } from "./thy"
 export const standardLibraryNamespace = makeLibraryGenerators(
   [namespaceThyGenerator],
   {
-    fillOutPropertyAccessExpression: fillOutPropertyAccessExpression,
     generateObject: generateObjectFromHierarchy,
   },
 )

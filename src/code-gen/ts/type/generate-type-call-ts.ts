@@ -1,25 +1,35 @@
-import { nodeError } from "common/compile-error"
 import type { TreeNode, TypeCall } from "tree"
-import { GeneratedSnippets, GeneratorFixture } from "../../generator"
-import { fromTokenRange } from "code-gen/utils/from-token-range"
-import type { GeneratorState } from "../../generator-state"
-import { generateCallTs } from "../call/generate-call-ts"
+import type { GeneratedSnippets } from "../../generator"
+import { generateCallTsInTypeContext } from "../call/generate-call-ts"
+import { makeGenerator } from "../generate-from-options"
+import type { GeneratorState } from "../generator-state"
+import type { LibraryGeneratorCollection } from "../library-generator"
+import type { CodeGeneratorFunc, GeneratorFixture } from "../ts-generator"
+import { tryGenerateTypeGivenCallTs } from "./generate-type-given-call-ts"
 
-export function tryGenerateDanglingTypeCallTs(
-  node: TreeNode,
-  state: GeneratorState,
-): void | GeneratedSnippets {
-  if (node.type === "type-call") {
-    return generateDanglingTypeCallTs(node, state)
-  }
+export function typeCallGeneratorTs(standardLibrary: LibraryGeneratorCollection) {
+  return makeTypeCallTsGenerator([
+    ...defaultTypeCallTsGenerators,
+    standardLibrary.callGenerator,
+  ])
 }
 
-export function generateDanglingTypeCallTs(
-  tc: TypeCall,
-  state: GeneratorState,
-): GeneratedSnippets {
-  state.addError(nodeError(tc, "Unrecognized dangling type call"))
-  return fromTokenRange(tc, 'void "invalid type call"')
+export const defaultTypeCallTsGenerators = [
+  tryGenerateTypeGivenCallTs,
+]
+
+export function makeTypeCallTsGenerator(
+  specializations: CodeGeneratorFunc<TypeCall>[],
+): CodeGeneratorFunc<TreeNode> {
+  return makeGenerator(
+    (node) => {
+      if (node.type === "type-call") {
+        return node
+      }
+    },
+    generateTypeCallTs,
+    specializations,
+  )
 }
 
 export function generateTypeCallTs(
@@ -36,12 +46,8 @@ export function generateTypeCallTs(
   if (fromStandardLib !== undefined) {
     return fromStandardLib
   }
-  return generateCallTs(
-    {
-      ...node,
-      type: "call",
-      typeArgs: [],
-    },
+  return generateCallTsInTypeContext(
+    node,
     state,
     fixture,
     callName,

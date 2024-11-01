@@ -1,8 +1,8 @@
 import { nodeError } from "common"
 import {
   GeneratedSnippets,
-  GeneratorFixture,
 } from "../../../generator"
+import { GeneratorFixture } from "code-gen/ts/ts-generator"
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromNode } from "code-gen/utils/from-node"
 import type { GeneratorForGlobalSpec } from "../../../generator-for-global"

@@ -1,9 +1,9 @@
-import type { Block } from "tree"
-import { GeneratedSnippets } from "../../generator"
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromToken } from "code-gen/utils/from-token"
-import type { GeneratorState } from "../../generator-state"
+import type { Block } from "tree"
+import { GeneratedSnippets } from "../../generator"
 import { genIndent } from "../../utils/indent"
+import type { GeneratorState } from "../generator-state"
 
 export function generateImpliedReturnTs(block: Block, state: GeneratorState) {
   const impliedLines: GeneratedSnippets = []

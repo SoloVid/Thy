@@ -1,90 +1,113 @@
-import { isCall } from "tree"
-import type { TreeNode, Call } from "tree"
-import { makeGenerator } from "../../generate-from-options"
-import {
-  CodeGeneratorFunc,
-  GeneratedSnippets,
-  GeneratorFixture,
-} from "../../generator"
 import { fromComplicated } from "code-gen/utils/from-complicated"
-import { fromTokenRange } from "code-gen/utils/from-token-range"
-import { contextType, GeneratorState } from "../../generator-state"
-import type { LibraryGeneratorCollection } from "../../library-generator"
-import { generateTypeInstanceTs } from "../type/generate-type-instance-ts"
+import type { TreeNode, TypeCall, ValueCall } from "tree"
+import type {
+  GeneratedSnippets,
+} from "../../generator"
+import { makeGenerator } from "../generate-from-options"
+import { contextType, GeneratorState } from "../generator-state"
+import type { LibraryGeneratorCollection } from "../library-generator"
+import type { CodeGeneratorFunc, GeneratorFixture } from "../ts-generator"
+import { generateTypeArgsTs } from "../type/generate-type-args-ts"
+import { separateSnippetsWithCommas } from "../utils/comma-separated-snippets"
 import { makeControlFlowCallTsGenerator } from "./generate-control-flow-call-ts"
-import { tryGenerateReturnTs } from "./generate-return-ts"
-import { tryGenerateAwaitCallTs } from "./generate-await-call-ts"
 
-export function callGeneratorTs(standardLibrary: LibraryGeneratorCollection) {
-  return makeCallTsGenerator([
-    ...defaultCallTsGenerators,
+export function valueCallGeneratorTs(standardLibrary: LibraryGeneratorCollection) {
+  return makeValueCallTsGenerator([
+    ...defaultValueCallTsGenerators,
     standardLibrary.callGenerator,
   ])
 }
 
-export const defaultCallTsGenerators = [
-  tryGenerateAwaitCallTs,
-  tryGenerateReturnTs,
+export const defaultValueCallTsGenerators = [
   makeControlFlowCallTsGenerator("throw"),
 ]
 
-export function makeCallTsGenerator(
-  specializations: CodeGeneratorFunc<Call>[],
+export function makeValueCallTsGenerator(
+  specializations: CodeGeneratorFunc<ValueCall>[],
 ): CodeGeneratorFunc<TreeNode> {
   return makeGenerator(
     (node) => {
-      if (isCall(node)) {
+      if (node.type === "value-call") {
         return node
       }
     },
-    generateCallTs,
+    generateValueCallTs,
     specializations,
   )
 }
 
-export function generateCallTs(
-  call: Call,
+export function generateValueCallTs(
+  call: ValueCall,
   state: GeneratorState,
   fixture: GeneratorFixture,
   callName?: string,
 ): GeneratedSnippets {
   if (state.isTypeContext) {
-    callName = callName ? `_${callName}` : state.getUniqueVariableName()
-    const callValueSnippet = fixture.generate(
-      call.func,
-      state.makeChild({ context: contextType.isolatedExpression }),
-    )
-    const argsAsUnknown = call.args
-      .map((a) => `${state.getUniqueVariableName()}: unknown, `)
-      .join("")
-    // TODO: Don't duplicate this logic from later down.
-    const argSnippets = call.args.map((a, i) => {
-      const childState = state.makeChild({
-        context: contextType.isolatedExpression,
-      })
-      return [fixture.generate(a, childState), fromTokenRange(call, ", ")]
-    })
-    const wrappedValueFuncName = `${callName}_WrappedValue`
-    const restParamsTypeName = `${callName}_RestParams`
-    state.addPreStatementGenerator((s, f) =>
-      fromComplicated(call, [
-        `function ${wrappedValueFuncName} { return `,
-        callValueSnippet,
-        ` }`,
-      ]),
-    )
-    state.addPreStatementGenerator((s, f) =>
-      fromComplicated(call, [
-        `type ${restParamsTypeName} = (ReturnType<typeof ${wrappedValueFuncName}>) extends (${argsAsUnknown}...rest: infer U) => unknown ? U : []`,
-      ]),
-    )
-    return fromComplicated(call, [
-      `${wrappedValueFuncName}()(`,
-      argSnippets,
-      `...([] as unknown[] as ${restParamsTypeName}))`,
-    ])
+    return generateCallTsInTypeContext(call, state, fixture, callName)
   }
 
+  const { functionSnippet, typeArgSnippets, argSnippets } = generateValueCallPartsTs(call, state, fixture)
+
+  return fromComplicated(call, [
+    functionSnippet,
+    generateTypeArgsTs(call, typeArgSnippets),
+    "(",
+    separateSnippetsWithCommas(call, argSnippets),
+    ")",
+  ])
+}
+
+export function generateCallTsInTypeContext(
+  call: ValueCall | TypeCall,
+  state: GeneratorState,
+  fixture: GeneratorFixture,
+  callName?: string,
+): GeneratedSnippets {
+  callName = callName ? `_${callName}` : state.getUniqueVariableName()
+  const { functionSnippet, typeArgSnippets, argSnippets } = generateCallPartsTs(call, state, fixture)
+
+  const argsAsUnknown = call.args
+    .map((a) => `${state.getUniqueVariableName()}: unknown, `)
+    .join("")
+
+  const wrappedValueFuncName = `${callName}_WrappedValue`
+  const restParamsTypeName = `${callName}_RestParams`
+  state.addPreStatementGenerator((s, f) =>
+    fromComplicated(call, [
+      `function ${wrappedValueFuncName} { return `,
+      functionSnippet, generateTypeArgsTs(call, typeArgSnippets),
+      ` }`,
+    ]),
+  )
+  state.addPreStatementGenerator((s, f) =>
+    fromComplicated(call, [
+      `type ${restParamsTypeName} = (ReturnType<typeof ${wrappedValueFuncName}>) extends (${argsAsUnknown}...rest: infer U) => unknown ? U : []`,
+    ]),
+  )
+  return fromComplicated(call, [
+    `${wrappedValueFuncName}()(`,
+    separateSnippetsWithCommas(call, argSnippets),
+    `, ...([] as unknown[] as ${restParamsTypeName}))`,
+  ])
+}
+
+function generateCallPartsTs(
+  call: ValueCall | TypeCall,
+  state: GeneratorState,
+  fixture: GeneratorFixture,
+) {
+  if (call.type === "value-call") {
+    return generateValueCallPartsTs(call, state, fixture)
+  } else {
+    return generateTypeCallPartsTs(call, state, fixture)
+  }
+}
+
+function generateValueCallPartsTs(
+  call: ValueCall,
+  state: GeneratorState,
+  fixture: GeneratorFixture,
+) {
   const functionSnippet = fixture.generate(
     call.func,
     state.makeChild({ context: contextType.looseExpression }),
@@ -94,28 +117,39 @@ export function generateCallTs(
       context: contextType.isolatedExpression,
       isTypeContext: true,
     })
-    if (i === 0) {
-      return generateTypeInstanceTs(a, childState, fixture)
-    }
-    return [
-      fromTokenRange(call, ", "),
-      generateTypeInstanceTs(a, childState, fixture),
-    ]
+    return fixture.generateAsType(a, childState)
   })
   const argSnippets = call.args.map((a, i) => {
     const childState = state.makeChild({
       context: contextType.isolatedExpression,
     })
-    if (i === 0) {
-      return fixture.generate(a, childState)
-    }
-    return [fromTokenRange(call, ", "), fixture.generate(a, childState)]
+    return fixture.generate(a, childState)
   })
-  return fromComplicated(call, [
+  return {
     functionSnippet,
-    ...(typeArgSnippets.length === 0 ? [] : ["<", typeArgSnippets, ">"]),
-    "(",
+    typeArgSnippets,
     argSnippets,
-    ")",
-  ])
+  }
+}
+
+function generateTypeCallPartsTs(
+  call: TypeCall,
+  state: GeneratorState,
+  fixture: GeneratorFixture,
+) {
+  const functionSnippet = fixture.generate(
+    call.func,
+    state.makeChild({ context: contextType.looseExpression }),
+  )
+  const typeArgSnippets = call.args.map((a, i) => {
+    const childState = state.makeChild({
+      context: contextType.isolatedExpression,
+    })
+    return fixture.generateAsType(a, childState)
+  })
+  return {
+    functionSnippet,
+    typeArgSnippets,
+    argSnippets: [],
+  }
 }

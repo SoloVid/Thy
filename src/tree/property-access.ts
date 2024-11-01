@@ -6,8 +6,8 @@ import type {
   tTypeIdentifier,
   tValueIdentifier,
 } from "tokenizer/token-type"
-import type { TypeIdentifier, ValueIdentifier } from "./term"
 import type { Call } from "./call"
+import type { TypeIdentifier, ValueIdentifier } from "./term"
 
 export interface ValuePropertyAccess extends TokenRange {
   readonly type: "value-property-access"
@@ -17,6 +17,10 @@ export interface ValuePropertyAccess extends TokenRange {
     readonly memberAccessOperatorToken: Token<typeof tMemberAccessOperator>
     readonly propertyToken: Token<typeof tValueIdentifier>
   }[]
+}
+
+export type SimpleValuePropertyAccess = ValuePropertyAccess & {
+  readonly base: ValueIdentifier
 }
 
 export interface TypePropertyAccess extends TokenRange {
@@ -31,4 +35,8 @@ export interface TypePropertyAccess extends TokenRange {
       typeof tTypeIdentifier | typeof tValueIdentifier
     >
   }[]
+}
+
+export type SimpleTypePropertyAccess = TypePropertyAccess & {
+  readonly base: TypeIdentifier | ValueIdentifier
 }

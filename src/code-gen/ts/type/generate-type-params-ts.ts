@@ -1,13 +1,14 @@
+import { fromComplicated } from "code-gen/utils/from-complicated"
 import type { TreeNode } from "tree"
-import type { GeneratorState } from "../../generator-state"
-import { fromComplicated } from "../../utils/from-complicated"
+import type { GeneratorState } from "../generator-state"
+import { separateSnippetsWithCommas } from "../utils/comma-separated-snippets"
 
 export function generateTypeParamsTs(  node: TreeNode,
   state: GeneratorState,
 ) {
-  return state.blockTypeParametersSoFar.length === 0 ? "" : fromComplicated(node, [
+  return fromComplicated(node, [
     "<",
-    state.blockTypeParametersSoFar.map((tp) => tp.inlineSnippet),
+    separateSnippetsWithCommas(node, state.blockTypeParametersSoFar.map(p => p.inlineSnippet)),
     ">",
   ])
 }

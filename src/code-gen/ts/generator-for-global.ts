@@ -1,15 +1,15 @@
 import type {
+  Assignment,
+  LetCall,
   TypeAssignment,
   TypeCall,
   TypeExpression,
+  ValueCall,
   ValueIdentifier,
   ValuePropertyAccess,
-} from "../tree"
-import type { Assignment } from "../tree/assignment"
-import type { Call, ValueCall } from "../tree/call"
-import type { LetCall } from "../tree/let-call"
-import type { CodeGeneratorFunc } from "./generator"
+} from "tree"
 import type { GeneratorState } from "./generator-state"
+import type { CodeGeneratorFunc } from "./ts-generator"
 
 export interface SimpleCall extends ValueCall {
   readonly func: ValueIdentifier | ValuePropertyAccess

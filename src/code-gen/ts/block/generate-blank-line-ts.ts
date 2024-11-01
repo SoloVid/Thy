@@ -1,5 +1,5 @@
-import type { TreeNode } from "../../tree/tree-node"
-import type { GeneratedSnippets } from "../generator"
+import type { TreeNode } from "../../../tree/tree-node"
+import type { GeneratedSnippets } from "../../generator"
 import type { GeneratorState } from "../generator-state"
 
 export function tryGenerateBlankLineTs(

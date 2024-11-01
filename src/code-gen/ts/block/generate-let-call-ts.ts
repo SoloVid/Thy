@@ -1,15 +1,14 @@
+import { CodeGeneratorFunc, GeneratorFixture } from "code-gen/ts/ts-generator"
+import { fromComplicated } from "code-gen/utils/from-complicated"
 import type { LetCall } from "../../../tree/let-call"
 import type { TreeNode } from "../../../tree/tree-node"
-import { makeGenerator } from "../../generate-from-options"
-import {
-  CodeGeneratorFunc,
+import { makeGenerator } from "../generate-from-options"
+import type {
   GeneratedSnippets,
-  GeneratorFixture,
 } from "../../generator"
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import { contextType, GeneratorState } from "../../generator-state"
 import { makeIndent } from "../../utils/indent"
-import type { LibraryGeneratorCollection } from "../../library-generator"
+import { contextType, GeneratorState } from "../generator-state"
+import type { LibraryGeneratorCollection } from "../library-generator"
 
 export function letCallGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,

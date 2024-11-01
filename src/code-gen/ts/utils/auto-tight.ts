@@ -1,5 +1,7 @@
+import { fromComplicated } from "code-gen/utils/from-complicated"
+import type { TreeNode } from "tree"
 import type { GeneratedSnippets } from "../../generator"
-import { contextType, GeneratorState } from "../../generator-state"
+import { contextType, GeneratorState } from "../generator-state"
 
 export function autoTightS(
   state: GeneratorState,
@@ -18,4 +20,15 @@ export function autoTight(
     return ["(", ...looseExpression, ")"]
   }
   return looseExpression
+}
+
+export function autoTightC(
+  state: GeneratorState,
+  node: TreeNode,
+  looseSnippets: GeneratedSnippets,
+): GeneratedSnippets {
+  if (state.context === contextType.looseExpression) {
+    return fromComplicated(node, ["(", looseSnippets, ")"])
+  }
+  return looseSnippets
 }
