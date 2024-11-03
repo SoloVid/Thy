@@ -1,26 +1,20 @@
-import { nodeError } from "common/compile-error"
 import { fromComplicated } from "code-gen/utils/from-complicated"
-import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
-import { contextType } from "../../../generator-state"
-import { autoTight, autoTightS } from "../../utils/auto-tight"
+import type { GeneratorForNameSpec } from "../../generator-for-name"
+import { contextType } from "code-gen/ts/generator-context"
+import { autoTight } from "../../utils/auto-tight"
+import { addErrorForExcessArgs } from "./too-many-args-error"
 
 export function makeBinaryNumberFunctionGenerator(
   name: string,
   jsOperator: string,
-): GeneratorForGlobalSpec {
+): GeneratorForNameSpec {
   return {
     name: name,
-    generateValue(state) {
-      return autoTightS(
-        state,
-        `(_a: number, _b: number) => _a ${jsOperator} _b`,
-      )
-    },
     generateCall(node, state, fixture) {
       if (node.args.length < 2) {
-        state.addError(nodeError(node.func, `${name} requires two arguments`))
-        return fromComplicated(node, ["0"])
+        return
       }
+      addErrorForExcessArgs(node, state, name, 2)
       const childState = state.makeChild({
         context: contextType.looseExpression,
       })

@@ -3,10 +3,9 @@ import { fromTokenRange } from "code-gen/utils/from-token-range"
 import { isAssignment, type Assignment } from "../../../tree/assignment"
 import type { TreeNode } from "../../../tree/tree-node"
 import { makeGenerator } from "../generate-from-options"
-import {
-  GeneratedSnippets,
-} from "../../generator"
-import { contextType, GeneratorState } from "../generator-state"
+import { GeneratedSnippets } from "../../generator"
+import { GeneratorState } from "../generator-state"
+import { contextType } from "../generator-context"
 import type { LibraryGeneratorCollection } from "../library-generator"
 
 export function assignmentGeneratorTs(

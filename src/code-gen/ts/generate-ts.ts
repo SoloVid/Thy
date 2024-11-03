@@ -16,33 +16,46 @@ import { valueCallGeneratorTs } from "./call/generate-call-ts"
 import { tryGenerateGivenCallTs } from "./call/generate-given-call-ts"
 import { tryGenerateReturnTs } from "./call/generate-return-ts"
 import { tryGenerateNumberTs } from "./expression/generate-number-ts"
-import { typePropertyAccessGeneratorTs, valuePropertyAccessGeneratorTs } from "./expression/generate-property-access-ts"
-import { tryGenerateStringTs } from "./expression/generate-string-ts"
-import { typeIdentifierGeneratorTs } from "./expression/generate-type-identifier-ts"
-import { valueIdentifierGeneratorTs } from "./expression/generate-value-identifier-ts"
-import { makeGenerator, makeGeneratorWithFixtureSideCar } from "./generate-from-options"
 import {
-  ContextType,
-  contextType,
-  GeneratorState,
-  makeGeneratorState,
-} from "./generator-state"
+  typePropertyAccessGeneratorTs,
+  valuePropertyAccessGeneratorTs,
+} from "./expression/generate-property-access-ts"
+import { tryGenerateStringTs } from "./expression/generate-string-ts"
+import {
+  typeIdentifierGeneratorTs,
+  typeIdentifierGeneratorTypeTs,
+} from "./expression/generate-type-identifier-ts"
+import { valueIdentifierGeneratorTs } from "./expression/generate-value-identifier-ts"
+import {
+  makeGenerator,
+  makeGeneratorWithFixtureSideCar,
+} from "./generate-from-options"
+import { ContextType, contextType } from "./generator-context"
+import { GeneratorState, makeGeneratorState } from "./generator-state"
 import type { LibraryGeneratorCollection } from "./library-generator"
 import type { GeneratorFixture } from "./ts-generator"
 import { generateExpressionAsTypeTs } from "./type/generate-expression-as-type-ts"
-import { tryGenerateTypeAssignmentTs } from "./type/generate-type-assignment-ts"
-import { typeCallGeneratorTs } from "./type/generate-type-call-ts"
+import { typeAssignmentGeneratorTs } from "./type/generate-type-assignment-ts"
+import {
+  typeCallGeneratorTs,
+  typeCallGeneratorTypeTs,
+} from "./type/generate-type-call-ts"
 import { tryGenerateTypeGivenCallTs } from "./type/generate-type-given-call-ts"
 import { autoTightS } from "./utils/auto-tight"
 
 export const tsGenerator =
   (
     standardLibrary: LibraryGeneratorCollection,
-    topLevelContext?: ContextType,
+    globalsObjectName: string,
+    preludeContent: string,
+    endingContent: string,
+    indent: boolean = false,
   ) =>
   (node: TreeNode): GeneratorResult => {
     const state = makeGeneratorState(undefined, {
-      context: topLevelContext ?? contextType.blockAllowingReturn,
+      context: contextType.topLevel,
+      newImplicitArguments: globalsObjectName,
+      increaseIndent: indent,
     })
 
     function generateTsWithSelfFixture(node: TreeNode, state: GeneratorState) {
@@ -55,10 +68,10 @@ export const tsGenerator =
             return generateExpressionAsTypeTs(node, state, fixture)
           },
           [
-            // TODO: Add specializations for type generation.
-          ]
+            typeIdentifierGeneratorTypeTs(standardLibrary),
+            typeCallGeneratorTypeTs(standardLibrary),
+          ],
         ),
-        standardLibrary: standardLibrary,
       }
       return generateTs(node, state, fixture) as GeneratedSnippets
     }
@@ -94,17 +107,18 @@ export const tsGenerator =
         tryGenerateReturnTs,
         letCallGeneratorTs(standardLibrary),
         assignmentGeneratorTs(standardLibrary),
-        tryGenerateTypeAssignmentTs,
+        typeAssignmentGeneratorTs(standardLibrary),
         tryGenerateBlockTs,
       ],
     )
 
     // There's an open issue in TS 4.7 about typing this correctly. https://github.com/microsoft/TypeScript/issues/49280
-    const output: GeneratedSnippet[] = [generateTsWithSelfFixture(node, state)].flat(
-      Infinity as 1,
-    ) as GeneratedSnippet[]
+    const output: GeneratedSnippet[] = [
+      generateTsWithSelfFixture(node, state),
+    ].flat(Infinity as 1) as GeneratedSnippet[]
     return {
-      output: output.map((s) => s.text).join(""),
+      output:
+        preludeContent + output.map((s) => s.text).join("") + endingContent,
       errors: state.errors,
     }
   }

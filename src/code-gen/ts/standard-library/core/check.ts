@@ -1,40 +1,27 @@
-import { nodeError } from "common/compile-error"
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import type {
-  GeneratorForGlobalParentSpec,
-  GeneratorForGlobalSpec,
-} from "../../../generator-for-global"
-import { contextType } from "../../../generator-state"
-import { autoTight, autoTightS } from "../../utils/auto-tight"
+  GeneratorForNameParentSpec,
+  GeneratorForNameSpec,
+} from "../../generator-for-name"
+import { contextType } from "code-gen/ts/generator-context"
+import { autoTight } from "../../utils/auto-tight"
 import {
   makeLogicalFunctionGenerator,
   makeSequencedLogicalFunctionGenerator,
 } from "../helpers/logical-function-generator"
+import { addErrorForExcessArgs } from "../helpers/too-many-args-error"
 
-const all = makeLogicalFunctionGenerator("all", "&&", "true")
-const asc = makeSequencedLogicalFunctionGenerator("asc", "<", "number", " + 1")
-const desc = makeSequencedLogicalFunctionGenerator(
-  "desc",
-  ">",
-  "number",
-  " - 1",
-)
-const equal = makeSequencedLogicalFunctionGenerator(
-  "equal",
-  "===",
-  "unknown",
-  "",
-)
-const not: GeneratorForGlobalSpec = {
+const all = makeLogicalFunctionGenerator("all", "&&")
+const asc = makeSequencedLogicalFunctionGenerator("asc", "<")
+const desc = makeSequencedLogicalFunctionGenerator("desc", ">")
+const equal = makeSequencedLogicalFunctionGenerator("equal", "===")
+const not: GeneratorForNameSpec = {
   name: "not",
-  generateValue(state) {
-    return autoTightS(state, `(_a: boolean) => !_a`)
-  },
   generateCall(node, state, fixture) {
-    if (node.args.length !== 1) {
-      state.addError(nodeError(node.func, `not takes exactly 1 argument`))
-      return fromComplicated(node, ["false"])
+    if (node.args.length === 0) {
+      return
     }
+    addErrorForExcessArgs(node, state, "not", 1)
     const childState = state.makeChild({
       context: contextType.isolatedExpression,
     })
@@ -44,9 +31,9 @@ const not: GeneratorForGlobalSpec = {
     )
   },
 }
-const some = makeLogicalFunctionGenerator("some", "||", "false")
+const some = makeLogicalFunctionGenerator("some", "||")
 
-export const checkGenerator: GeneratorForGlobalParentSpec = {
+export const checkGenerator: GeneratorForNameParentSpec = {
   name: "check",
   children: [all, asc, desc, equal, not, some],
 }

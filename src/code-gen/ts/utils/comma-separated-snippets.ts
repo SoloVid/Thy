@@ -1,10 +1,10 @@
-import type { GeneratedSnippets } from "code-gen/generator";
-import { fromNode } from "code-gen/utils/from-node";
-import type { TreeNode } from "tree";
+import type { GeneratedSnippets } from "code-gen/generator"
+import { fromNode } from "code-gen/utils/from-node"
+import type { TreeNode } from "tree"
 
 export function separateSnippetsWithCommas(
   node: TreeNode,
-  snippets: readonly GeneratedSnippets[]
+  snippets: readonly GeneratedSnippets[],
 ): GeneratedSnippets {
   const soFar: GeneratedSnippets[] = []
   for (const snippet of snippets) {

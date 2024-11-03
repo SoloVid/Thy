@@ -3,11 +3,10 @@ import { fromComplicated } from "code-gen/utils/from-complicated"
 import type { LetCall } from "../../../tree/let-call"
 import type { TreeNode } from "../../../tree/tree-node"
 import { makeGenerator } from "../generate-from-options"
-import type {
-  GeneratedSnippets,
-} from "../../generator"
+import type { GeneratedSnippets } from "../../generator"
 import { makeIndent } from "../../utils/indent"
-import { contextType, GeneratorState } from "../generator-state"
+import { GeneratorState } from "../generator-state"
+import { contextType } from "../generator-context"
 import type { LibraryGeneratorCollection } from "../library-generator"
 
 export function letCallGeneratorTs(

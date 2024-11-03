@@ -1,17 +1,20 @@
-import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
+import type { GeneratorForNameSpec } from "../../generator-for-name"
 
-function simpleGlobalGenerator(name: string): GeneratorForGlobalSpec {
+function simpleGlobalGenerator(
+  name: string,
+  tsValue: string = name,
+): GeneratorForNameSpec {
   return {
     name: name,
-    generateValue: () => name,
+    generateValue: () => tsValue,
+    generateTypeInstance: () => tsValue,
   }
 }
 
-export const consoleGenerator = simpleGlobalGenerator("console")
 export const falseGenerator = simpleGlobalGenerator("false")
 export const nullGenerator = simpleGlobalGenerator("null")
 export const trueGenerator = simpleGlobalGenerator("true")
 
-export const catchGenerator = simpleGlobalGenerator('"catch"')
-export const elseGenerator = simpleGlobalGenerator('"else"')
-export const finallyGenerator = simpleGlobalGenerator('"finally"')
+export const catchGenerator = simpleGlobalGenerator("catch", '"catch"')
+export const elseGenerator = simpleGlobalGenerator("else", '"else"')
+export const finallyGenerator = simpleGlobalGenerator("finally", '"finally"')

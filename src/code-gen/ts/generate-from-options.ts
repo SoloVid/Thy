@@ -1,6 +1,12 @@
 import type { TreeNode } from "tree"
 import type { GeneratorState } from "./generator-state"
-import type { CodeGeneratorFunc, CodeGeneratorFuncNoFixture, DefiniteCodeGeneratorFunc, DefiniteCodeGeneratorFuncNoFixture, GeneratorFixture } from "./ts-generator"
+import type {
+  CodeGeneratorFunc,
+  CodeGeneratorFuncNoFixture,
+  DefiniteCodeGeneratorFunc,
+  DefiniteCodeGeneratorFuncNoFixture,
+  GeneratorFixture,
+} from "./ts-generator"
 
 export function makeGenerator<InType extends TreeNode, SpecializedType>(
   transformNode: (node: InType) => SpecializedType | void,
@@ -13,7 +19,12 @@ export function makeGenerator<InType extends TreeNode, SpecializedType>(
       return
     }
 
-    const specializedOutput = tryGeneratorOptions(specializedNode, state, fixture, specializations)
+    const specializedOutput = tryGeneratorOptions(
+      specializedNode,
+      state,
+      fixture,
+      specializations,
+    )
     if (specializedOutput !== undefined) {
       return specializedOutput
     }
@@ -22,7 +33,10 @@ export function makeGenerator<InType extends TreeNode, SpecializedType>(
   }
 }
 
-export function makeGeneratorWithFixtureSideCar<InType extends TreeNode, SpecializedType>(
+export function makeGeneratorWithFixtureSideCar<
+  InType extends TreeNode,
+  SpecializedType,
+>(
   getFixture: () => GeneratorFixture,
   transformNode: (node: InType) => SpecializedType,
   generateDefault: DefiniteCodeGeneratorFunc<SpecializedType>,
@@ -31,7 +45,12 @@ export function makeGeneratorWithFixtureSideCar<InType extends TreeNode, Special
   return (node, state) => {
     const specializedNode = transformNode(node)
 
-    const specializedOutput = tryGeneratorOptions(specializedNode, state, getFixture(), specializations)
+    const specializedOutput = tryGeneratorOptions(
+      specializedNode,
+      state,
+      getFixture(),
+      specializations,
+    )
     if (specializedOutput !== undefined) {
       return specializedOutput
     }

@@ -1,13 +1,12 @@
-import { GeneratorFixture } from "code-gen/ts/ts-generator"
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromTokenRange } from "code-gen/utils/from-token-range"
 import type { Block, TreeNode } from "tree"
-import {
-  GeneratedSnippets
-} from "../../generator"
+import { GeneratedSnippets } from "../../generator"
 import { makeIndent } from "../../utils/indent"
-import { contextType, GeneratorState } from "../generator-state"
-import { generateTypeParamsTs } from "../type/generate-type-params-ts"
+import { contextType } from "../generator-context"
+import { GeneratorState, makeGeneratorBlockState } from "../generator-state"
+import type { GeneratorFixture } from "../ts-generator"
+import { generateTypeParamsForBlockTs } from "../type/generate-type-params-ts"
 import { autoTightC } from "../utils/auto-tight"
 import { generateBlockLinesTs } from "./generate-block-lines-ts"
 import { generateParamsTs } from "./generate-params-ts"
@@ -27,7 +26,18 @@ export function generateBlockTs(
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
+  if (state.context === contextType.topLevel) {
+    const blockBodyState = state.makeChild({
+      symbolTable: block.symbolTable,
+      context: contextType.blockAllowingReturn,
+    })
+    return generateBlockLinesTs(block, block.ideas, blockBodyState, fixture)
+  }
+
+  const blockBodyBlockState = makeGeneratorBlockState(block)
   const blockBodyState = state.makeChild({
+    symbolTable: block.symbolTable,
+    block: blockBodyBlockState,
     context: contextType.blockAllowingReturn,
     increaseIndent: true,
     newImplicitArguments: block.explicitParameterCount === 0,
@@ -38,12 +48,18 @@ export function generateBlockTs(
     blockBodyState,
     fixture,
   )
+  state.preStatementGenerators.push(
+    ...blockBodyBlockState.preStatementGenerators,
+  )
 
-  if (block.explicitParameterCount === 0 && blockBodyState.implicitArguments?.used) {
+  if (
+    block.explicitParameterCount === 0 &&
+    blockBodyState.implicitArguments?.used
+  ) {
     const n = blockBodyState.implicitArguments.variableName
     const localName = n + "L"
-    state.blockParametersSoFar.push({
-      inlineSnippet: fromTokenRange(block, localName)
+    blockBodyBlockState.parametersSoFar.push({
+      inlineSnippet: fromTokenRange(block, localName),
     })
     const space = makeIndent(blockBodyState.indentLevel)
     const parentObj = state.implicitArguments?.variableName ?? "{}"
@@ -57,11 +73,13 @@ export function generateBlockTs(
   }
 
   const definition = fromComplicated(block, [
-    generateTypeParamsTs(block, state),
+    generateTypeParamsForBlockTs(block, blockBodyState),
     "(",
-      generateParamsTs(block, state, fixture),
+    generateParamsTs(block, blockBodyState, fixture),
     ")",
-    ...(state.blockReturnTypeSnippets ? [": ", state.blockReturnTypeSnippets] : []),
+    ...(blockBodyBlockState.returnTypeSnippets
+      ? [": ", blockBodyBlockState.returnTypeSnippets]
+      : []),
     " => {\n",
     linesTs,
     makeIndent(state.indentLevel),

@@ -1,8 +1,6 @@
 import { fromToken } from "code-gen/utils/from-token"
 import type { TreeNode, TypePropertyAccess, ValuePropertyAccess } from "tree"
-import type {
-  GeneratedSnippets,
-} from "../../generator"
+import type { GeneratedSnippets } from "../../generator"
 import { makeGenerator } from "../generate-from-options"
 import type { GeneratorState } from "../generator-state"
 import type { LibraryGeneratorCollection } from "../library-generator"
@@ -12,7 +10,7 @@ export function valuePropertyAccessGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,
 ) {
   return makeValuePropertyAccessTsGenerator([
-    standardLibrary.propertyAccessGenerator,
+    standardLibrary.valueIdentifierGenerator,
   ])
 }
 
@@ -33,9 +31,7 @@ export function makeValuePropertyAccessTsGenerator(
 export function typePropertyAccessGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,
 ) {
-  return makeTypePropertyAccessTsGenerator([
-    standardLibrary.typePropertyAccessGenerator,
-  ])
+  return makeTypePropertyAccessTsGenerator([])
 }
 
 export function makeTypePropertyAccessTsGenerator(
@@ -57,13 +53,19 @@ export function generatePropertyAccessTs(
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
-  return [fixture.generate(node.base, state), generatePropertyAccessesTailTs(node)]
+  return [
+    fixture.generate(node.base, state),
+    generatePropertyAccessesTailTs(node),
+  ]
 }
 
 export function generatePropertyAccessesTailTs(
   node: ValuePropertyAccess | TypePropertyAccess,
 ) {
   return node.propertyAccesses
-  .map((pa) => [fromToken(pa.memberAccessOperatorToken, "."), fromToken(pa.propertyToken)])
-  .flat()
+    .map((pa) => [
+      fromToken(pa.memberAccessOperatorToken, "."),
+      fromToken(pa.propertyToken),
+    ])
+    .flat()
 }

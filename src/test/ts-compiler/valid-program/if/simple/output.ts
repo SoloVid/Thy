@@ -1,4 +1,4 @@
-export function _initThy() {
+export function initThy(_global: unknown) {
   const condition = true
   if (condition) {
     console.log("yay" as const)
@@ -32,24 +32,5 @@ export function _initThy() {
     console.log("yes" as const)
   } else {
     callback()
-  }
-
-  // The following cases are errors.
-
-  if (false) {
-  }
-
-  if (condition) {
-  }
-
-  if (condition) {
-    console.log("yes" as const)
-  } else {
-  }
-
-  if (condition) {
-    console.log("yes" as const)
-  } else {
-    console.log("no" as const)
   }
 }

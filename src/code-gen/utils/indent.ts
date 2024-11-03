@@ -1,4 +1,8 @@
-import type { GeneratedSnippet, GeneratedSnippets, UnmappedGeneratedWhitespace } from "../generator"
+import type {
+  GeneratedSnippet,
+  GeneratedSnippets,
+  UnmappedGeneratedWhitespace,
+} from "../generator"
 
 const indentSize = 2
 
@@ -8,7 +12,10 @@ export function indentString(input: string, howManyIndents: number): string {
   return lines.map((s) => indent + s).join("\n")
 }
 
-export function indentSnippets(input: readonly GeneratedSnippet[], howManyIndents: number): GeneratedSnippets {
+export function indentSnippets(
+  input: readonly GeneratedSnippet[],
+  howManyIndents: number,
+): GeneratedSnippets {
   const indent = genIndent(howManyIndents)
   // Always put an indent at the beginning.
   const newSnippets: GeneratedSnippet[] = [indent]
@@ -22,7 +29,7 @@ export function indentSnippets(input: readonly GeneratedSnippet[], howManyIndent
       for (const line of lines) {
         newSnippets.push({
           ...input,
-          text: `${line}\n`
+          text: `${line}\n`,
         })
         newSnippets.push(indent)
       }

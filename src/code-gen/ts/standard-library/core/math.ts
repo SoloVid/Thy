@@ -1,4 +1,4 @@
-import type { GeneratorForGlobalParentSpec } from "../../../generator-for-global"
+import type { GeneratorForNameParentSpec } from "../../generator-for-name"
 import { makeBinaryNumberFunctionGenerator } from "../helpers/binary-number-function-generator"
 
 const mathAddGenerator = makeBinaryNumberFunctionGenerator("add", "+")
@@ -7,7 +7,7 @@ const mathMultiplyGenerator = makeBinaryNumberFunctionGenerator("multiply", "*")
 const mathDivideGenerator = makeBinaryNumberFunctionGenerator("divide", "/")
 const mathModGenerator = makeBinaryNumberFunctionGenerator("mod", "%")
 
-export const mathGenerator: GeneratorForGlobalParentSpec = {
+export const mathGenerator: GeneratorForNameParentSpec = {
   name: "math",
   children: [
     mathAddGenerator,

@@ -1,14 +1,15 @@
 import type { Token } from "tokenizer"
 import { tEndBlock, tEndStream, tStartBlock } from "tokenizer/token-type"
 import { Block, isIdeaAsync, ReturnStyle, returnStyle } from "tree"
+import { hasIdeaGiven } from "tree/idea"
 import { SymbolTable } from "tree/symbol-table"
 import assert from "utils/assert"
+import { addNodeError } from "./error"
 import { evaluateReturnStyle } from "./evaluate-return-style"
 import { getLastToken } from "./helper"
 import { parseIdea } from "./parse-idea"
 import type { ParserContext, ParserState } from "./parser-state"
 import { makeThatIdeaTracker } from "./that-idea-tracker"
-import { addNodeError } from "./error"
 
 export function parseBlock(state: ParserState): Block {
   const firstToken = state.buffer.consumeToken()
@@ -33,6 +34,7 @@ export function parseBlockInner(state: ParserState): Block {
 
   let blockReturnStyle: ReturnStyle = returnStyle.implicitExport
   let isAsync = false
+  let explicitParameterCount = 0
   let returnTypeCount = 0
   const thatIdeaTracker = makeThatIdeaTracker(state.addError)
 
@@ -51,6 +53,9 @@ export function parseBlockInner(state: ParserState): Block {
 
       blockReturnStyle = evaluateReturnStyle(state, blockReturnStyle, idea)
       isAsync = isAsync || isIdeaAsync(idea)
+      if (hasIdeaGiven(idea)) {
+        explicitParameterCount++
+      }
       if (
         idea.type === "type-return" ||
         (idea.type === "return" && idea.typeArgs.length !== 0)
@@ -74,6 +79,7 @@ export function parseBlockInner(state: ParserState): Block {
     return {
       type: "block",
       symbolTable: context.symbolTable,
+      explicitParameterCount: explicitParameterCount,
       isAsync: isAsync,
       ideas: ideas,
       returnStyle: blockReturnStyle,

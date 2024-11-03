@@ -1,16 +1,12 @@
-import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
-import { autoTightS } from "../../utils/auto-tight"
+import type { GeneratorForNameSpec } from "../../generator-for-name"
 
 export function makePrimitiveTypeGenerator(
   name: string,
   tsType: string,
-): GeneratorForGlobalSpec {
+): GeneratorForNameSpec {
   return {
     name: name,
-    generateValue(state) {
-      return autoTightS(state, `undefined as unknown as ${tsType}`)
-    },
-    generateTypeInstance(state) {
+    generateTypeInstance() {
       return tsType
     },
   }

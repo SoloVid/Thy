@@ -1,11 +1,9 @@
 import { makeLibraryGenerators } from "../../library-generator"
-import { generateObjectFromHierarchy } from "../helpers/generate-object"
 import { castGenerator } from "./cast"
 import { checkGenerator } from "./check"
 import { defGenerator } from "./def"
 import {
   catchGenerator,
-  consoleGenerator,
   elseGenerator,
   falseGenerator,
   finallyGenerator,
@@ -21,37 +19,34 @@ import {
   unknownTypeGenerator,
   voidTypeGenerator,
 } from "./primitive-types"
-import { unionGenerator } from "./transform-types"
+import { printGenerator } from "./print"
+import { intersectionGenerator, unionGenerator } from "./transform-types"
 
 /**
  * Standard library for core language functionality (e.g. control flow and math).
  */
-export const standardLibraryCore = makeLibraryGenerators(
-  [
-    castGenerator,
-    checkGenerator,
-    defGenerator,
-    ifGenerator,
-    mathGenerator,
+export const standardLibraryCore = makeLibraryGenerators([
+  castGenerator,
+  checkGenerator,
+  defGenerator,
+  ifGenerator,
+  mathGenerator,
+  printGenerator,
 
-    consoleGenerator,
-    falseGenerator,
-    nullGenerator,
-    trueGenerator,
+  falseGenerator,
+  nullGenerator,
+  trueGenerator,
 
-    booleanTypeGenerator,
-    numberTypeGenerator,
-    stringTypeGenerator,
-    unknownTypeGenerator,
-    voidTypeGenerator,
+  booleanTypeGenerator,
+  numberTypeGenerator,
+  stringTypeGenerator,
+  unknownTypeGenerator,
+  voidTypeGenerator,
 
-    unionGenerator,
+  intersectionGenerator,
+  unionGenerator,
 
-    catchGenerator,
-    elseGenerator,
-    finallyGenerator,
-  ],
-  {
-    generateObject: generateObjectFromHierarchy,
-  },
-)
+  catchGenerator,
+  elseGenerator,
+  finallyGenerator,
+])

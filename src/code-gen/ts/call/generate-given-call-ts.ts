@@ -1,10 +1,9 @@
 import type { GeneratorFixture } from "code-gen/ts/ts-generator"
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromNode } from "code-gen/utils/from-node"
+import { nodeError } from "common"
 import type { GivenCall, TreeNode } from "tree"
-import type {
-  GeneratedSnippets,
-} from "../../generator"
+import type { GeneratedSnippets } from "../../generator"
 import type { GeneratorState } from "../generator-state"
 import { generateTypeTsForFunctionSignature } from "../type/generate-type-ts-for-function-signature"
 
@@ -34,24 +33,39 @@ export function generateGivenCallTsWithParameterName(
   fixture: GeneratorFixture,
   parameterName: string,
 ): GeneratedSnippets {
+  if (state.block === null) {
+    state.addError(
+      nodeError(node, "Parameter (given) cannot be specified in this context"),
+    )
+    return fromNode(node, "undefined")
+  }
+
   const givenTerm = node.func
   const typeNode = node.typeArgs[0]
   const defaultValueNode = node.args[0]
 
   const parameterNameSnippet = fromNode(node, parameterName)
-  const parameterSnippets = typeNode === undefined ? parameterNameSnippet : fromComplicated(node, [
-    parameterNameSnippet,
-    ": ",
-    generateTypeTsForFunctionSignature(typeNode, state, fixture, parameterName),
-  ])
-  state.blockParametersSoFar.push({
-    inlineSnippet: parameterSnippets
+  const parameterSnippets =
+    typeNode === undefined
+      ? parameterNameSnippet
+      : fromComplicated(node, [
+          parameterNameSnippet,
+          ": ",
+          generateTypeTsForFunctionSignature(
+            typeNode,
+            state,
+            fixture,
+            parameterName,
+          ),
+        ])
+  state.block.parametersSoFar.push({
+    inlineSnippet: parameterSnippets,
   })
 
   if (defaultValueNode === undefined) {
     return fromNode(givenTerm, parameterName)
   }
   return fromComplicated(node, [
-    `${parameterName} === undefined ? ${fixture.generate(defaultValueNode, state)} : ${parameterName}`
+    `${parameterName} === undefined ? ${fixture.generate(defaultValueNode, state)} : ${parameterName}`,
   ])
 }

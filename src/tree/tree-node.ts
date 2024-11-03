@@ -45,6 +45,7 @@ export type TreeNode =
   | ReturnTerm
   | StringInterpolation
 
+/** Subset of {@link TreeNode} that can be used in type context. */
 export type TypedTreeNode =
   // Ordered to match TreeNode
   | NumberLiteral

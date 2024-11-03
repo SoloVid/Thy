@@ -1,8 +1,10 @@
-import type { GeneratorFixture, IndependentCodeGeneratorFunc } from "code-gen/ts/ts-generator"
 import type {
-  GeneratedSnippets,
-} from "../../generator"
-import { GeneratorState, contextType } from "../generator-state"
+  GeneratorFixture,
+  IndependentCodeGeneratorFunc,
+} from "code-gen/ts/ts-generator"
+import type { GeneratedSnippets } from "../../generator"
+import { GeneratorState } from "../generator-state"
+import { contextType } from "../generator-context"
 
 export function resolvePreStatementGenerator(
   generator: IndependentCodeGeneratorFunc,

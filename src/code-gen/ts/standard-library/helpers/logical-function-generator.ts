@@ -1,39 +1,21 @@
-import { nodeError } from "common/compile-error"
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromNode } from "code-gen/utils/from-node"
-import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
-import { contextType } from "../../../generator-state"
-import { autoTight, autoTightS } from "../../utils/auto-tight"
+import type { GeneratorForNameSpec } from "../../generator-for-name"
+import { contextType } from "code-gen/ts/generator-context"
+import { autoTight } from "../../utils/auto-tight"
+import { addErrorForExcessArgs } from "./too-many-args-error"
 
 export function makeLogicalFunctionGenerator(
   name: string,
   jsOperator: string,
-  defaultValue: string,
-): GeneratorForGlobalSpec {
+): GeneratorForNameSpec {
   return {
     name: name,
-    generateValue(state) {
-      const expression = [
-        "_a",
-        ...["_b", "_c", "_d"].map((e) => `(${e} ?? ${defaultValue})`),
-      ].join(` ${jsOperator} `)
-      return autoTightS(
-        state,
-        `(_a: boolean, _b?: boolean, _c?: boolean, _d?: boolean) => ${expression}`,
-      )
-    },
     generateCall(node, state, fixture) {
-      if (node.args.length < 1) {
-        state.addError(
-          nodeError(node.func, `${name} requires at least 1 argument`),
-        )
-        return fromComplicated(node, ["false"])
+      if (node.args.length === 0) {
+        return
       }
-      for (const arg of node.args.slice(4)) {
-        state.addError(
-          nodeError(arg, `${name} only supports up to 4 arguments`),
-        )
-      }
+      addErrorForExcessArgs(node, state, name, 4)
       const childState = state.makeChild({
         context: contextType.looseExpression,
       })
@@ -54,38 +36,14 @@ export function makeLogicalFunctionGenerator(
 export function makeSequencedLogicalFunctionGenerator(
   name: string,
   jsOperator: string,
-  constraint: string,
-  fillIn: string,
-): GeneratorForGlobalSpec {
+): GeneratorForNameSpec {
   return {
     name: name,
-    generateValue(state) {
-      const params = ["_a", "_b", "_c", "_d"]
-      const pairedOff = params.slice(1).map((b, i) => {
-        const a = params[i]
-        return ["(", a, ` ${jsOperator} `, b, ")"]
-      })
-      const expression = pairedOff
-        .filter((a) => a.length > 0)
-        .map((a) => a.join(""))
-        .join(" && ")
-      return autoTightS(
-        state,
-        `<_T extends ${constraint}>(_a: _T, _b: _T, _c: _T = _b${fillIn}, _d: _T = _c${fillIn}) => ${expression}`,
-      )
-    },
     generateCall(node, state, fixture) {
       if (node.args.length < 2) {
-        state.addError(
-          nodeError(node.func, `${name} requires at least 2 arguments`),
-        )
-        return fromComplicated(node, ["false"])
+        return
       }
-      for (const arg of node.args.slice(4)) {
-        state.addError(
-          nodeError(arg, `${name} only supports up to 4 arguments`),
-        )
-      }
+      addErrorForExcessArgs(node, state, name, 4)
       const childState = state.makeChild({
         context: contextType.looseExpression,
       })

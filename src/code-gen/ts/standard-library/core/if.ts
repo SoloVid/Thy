@@ -1,38 +1,21 @@
 import { nodeError } from "common"
-import {
-  GeneratedSnippets,
-} from "../../../generator"
-import { GeneratorFixture } from "code-gen/ts/ts-generator"
+import { GeneratedSnippets } from "../../../generator"
+import { GeneratorFixture } from "../../ts-generator"
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromNode } from "code-gen/utils/from-node"
-import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
-import {
-  ContextType,
-  contextType,
-  GeneratorState,
-} from "../../../generator-state"
+import type { GeneratorForNameSpec } from "../../generator-for-name"
+import { GeneratorState } from "../../generator-state"
+import { ContextType } from "code-gen/ts/generator-context"
+import { contextType } from "code-gen/ts/generator-context"
 import { genIndent, makeIndent } from "../../../utils/indent"
-import { generateBlockLinesTs } from "code-gen/ts/block/generate-block-lines-ts"
+import { generateBlockLinesTs } from "../../block/generate-block-lines-ts"
 import { autoTightS } from "../../utils/auto-tight"
 import { ValueCall } from "tree"
+import { addErrorForExcessArgs } from "../helpers/too-many-args-error"
+import assert from "utils/assert"
 
-export const ifGenerator: GeneratorForGlobalSpec = {
+export const ifGenerator: GeneratorForNameSpec = {
   name: "if",
-  generateValue(state) {
-    const space = makeIndent(state.indentLevel)
-    const space2 = makeIndent(state.indentLevel + 1)
-    const space3 = makeIndent(state.indentLevel + 2)
-    return autoTightS(
-      state,
-      `<_T>(condition: boolean, trueCallback: () => _T, elseLiteral?: \"else\", falseCallback?: () => _T) => {
-${space2}if (condition) {
-${space3}trueCallback()
-${space2}} else if (falseCallback) {
-${space3}falseCallback()
-${space2}}
-${space}}`,
-    )
-  },
   generateCall(node, state, fixture) {
     return tryGenerateIfTs(node, state, fixture)
   },
@@ -50,15 +33,11 @@ function tryGenerateIfTs(
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): void | GeneratedSnippets {
-  const ifSnippet = fromNode(node.func, "if")
-
   if (node.args.length < 2) {
-    state.addError(
-      nodeError(
-        node.func,
-        "if requires at least two arguments: 1) condition and 2) callback",
-      ),
-    )
+    return
+  }
+  if (node.typeArgs.length > 0) {
+    return
   }
 
   const elseLiteral = node.args.length > 2 ? node.args[2] : null
@@ -81,36 +60,33 @@ function tryGenerateIfTs(
     }
   }
 
+  addErrorForExcessArgs(node, state, "if", 4, 1)
   for (const arg of node.args.slice(4)) {
     state.addError(nodeError(arg, `if cannot take more than 4 arguments`))
   }
 
-  // TODO: Check type parameters etc.
+  const trueCaseNode = node.args.length > 1 ? node.args[1] : null
+  const elseCaseNode = node.args.length > 3 ? node.args[3] : null
 
-  function buildIf() {
-    const trueCaseNode = node.args.length > 1 ? node.args[1] : null
-    const elseCaseNode = node.args.length > 3 ? node.args[3] : null
+  const requiresBlockSyntax =
+    (trueCaseNode !== null && trueCaseNode.type === "block") ||
+    (elseCaseNode !== null && elseCaseNode.type === "block")
+  // TODO: Is there really a dominant case where mightReturn could be false? Implicit exports make most blocks return.
+  const mightReturn = true
+  // const mightReturn = (trueCaseNode !== null && trueCaseNode.type === "block" && mightAffectReturn(trueCaseNode)) ||
+  //     (elseCaseNode !== null && elseCaseNode.type === "block" && mightAffectReturn(elseCaseNode))
 
-    const requiresBlockSyntax =
-      (trueCaseNode !== null && trueCaseNode.type === "block") ||
-      (elseCaseNode !== null && elseCaseNode.type === "block")
-    // TODO: Is there really a dominant case where mightReturn could be false? Implicit exports make most blocks return.
-    const mightReturn = true
-    // const mightReturn = (trueCaseNode !== null && trueCaseNode.type === "block" && mightAffectReturn(trueCaseNode)) ||
-    //     (elseCaseNode !== null && elseCaseNode.type === "block" && mightAffectReturn(elseCaseNode))
-
-    if (state.isExpressionContext()) {
-      if (!requiresBlockSyntax) {
-        return buildTernary()
-      }
-    } else {
-      if (state.context === contextType.blockAllowingReturn || !mightReturn) {
-        return buildIfStatement()
-      }
+  if (state.isExpressionContext()) {
+    if (!requiresBlockSyntax) {
+      return buildTernary()
     }
-
-    return buildIfExpression()
+  } else {
+    if (state.context === contextType.blockAllowingReturn || !mightReturn) {
+      return buildIfStatement()
+    }
   }
+
+  return buildIfExpression()
 
   function buildTernary() {
     const baseTernary = fromComplicated(node, [
@@ -129,7 +105,7 @@ function tryGenerateIfTs(
 
   function buildIfStatement() {
     const ifFirstHalf = fromComplicated(node, [
-      ifSnippet,
+      fromNode(node.func, "if"),
       " (",
       generateCondition(contextType.isolatedExpression),
       ") {\n",
@@ -166,10 +142,7 @@ function tryGenerateIfTs(
   }
 
   function generateTrueCase(allowNoWhitespace: boolean) {
-    if (node.args.length < 2) {
-      return ""
-    }
-    const trueCaseNode = node.args[1]
+    assert(!!trueCaseNode, "trueCaseNode should not be null")
     if (trueCaseNode.type === "block") {
       return generateBlockLinesTs(
         trueCaseNode,
@@ -196,10 +169,9 @@ function tryGenerateIfTs(
   }
 
   function generateFalseCase(allowNoWhitespace: boolean) {
-    if (node.args.length < 4) {
+    if (!elseCaseNode) {
       return ""
     }
-    const elseCaseNode = node.args[3]
     if (elseCaseNode.type === "block") {
       return generateBlockLinesTs(
         elseCaseNode,
@@ -224,6 +196,4 @@ function tryGenerateIfTs(
       return fromComplicated(node, allParts)
     }
   }
-
-  return buildIf()
 }

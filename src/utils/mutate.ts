@@ -1,3 +1,3 @@
-import { create } from "mutative";
+import { create } from "mutative"
 
 export const mutate = create

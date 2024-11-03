@@ -1,7 +1,8 @@
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import type { TreeNode } from "tree"
 import type { GeneratedSnippets } from "../../generator"
-import { contextType, GeneratorState } from "../generator-state"
+import { GeneratorState } from "../generator-state"
+import { contextType } from "../generator-context"
 
 export function autoTightS(
   state: GeneratorState,

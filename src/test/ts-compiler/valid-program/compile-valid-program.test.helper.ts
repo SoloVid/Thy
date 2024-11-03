@@ -1,8 +1,21 @@
-import fs from "fs/promises"
-import path from "path"
+import { tsGenerator } from "code-gen/ts/generate-ts"
+import { standardLibraryCore } from "code-gen/ts/standard-library/core"
 import { expect } from "expect"
+import fs from "node:fs/promises"
+import path from "node:path"
 import type { CompileError } from "../../../common/compile-error"
 import type { Compiler } from "../../../compiler"
+import { makeCompiler } from "../../../compiler"
+
+export const tsCoreCompiler = makeCompiler(
+  tsGenerator(
+    standardLibraryCore,
+    "_global",
+    "export function initThy(_global: unknown) {\n",
+    "}\n",
+    true,
+  ),
+)
 
 export async function compileAndVerifyOutput(
   compiler: Compiler,

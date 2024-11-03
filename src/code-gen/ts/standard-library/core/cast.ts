@@ -1,37 +1,28 @@
-import { nodeError } from "common/compile-error"
 import { fromComplicated } from "code-gen/utils/from-complicated"
-import { fromTokenRange } from "code-gen/utils/from-token-range"
-import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
-import { autoTight, autoTightS } from "../../utils/auto-tight"
+import type { GeneratorForNameSpec } from "../../generator-for-name"
+import { autoTight } from "../../utils/auto-tight"
+import { addErrorForExcessArgs } from "../helpers/too-many-args-error"
 
-export const castGenerator: GeneratorForGlobalSpec = {
+export const castGenerator: GeneratorForNameSpec = {
   name: "cast",
-  generateValue(state) {
-    return autoTightS(state, "<_T>(_value: unknown) => (_value as _T)")
-  },
   generateCall(node, state, fixture) {
-    if (node.typeArgs.length < 1) {
-      state.addError(nodeError(node.func, `cast requires 1 type argument`))
+    if (node.args.length === 0) {
+      return
     }
-    for (const arg of node.typeArgs.slice(1)) {
-      state.addError(
-        nodeError(arg, `cast cannot take more than 1 type argument`),
-      )
-    }
-    if (node.args.length < 1) {
-      state.addError(nodeError(node.func, `cast requires 1 argument`))
-      return fromTokenRange(node, "null")
-    }
-    for (const arg of node.args.slice(1)) {
-      state.addError(nodeError(arg, `cast cannot take more than 1 argument`))
-    }
+    addErrorForExcessArgs(node, state, "cast", 1, 1)
+
     const childState = state.makeChild()
+    const targetTs = fixture.generate(node.args[0], childState)
+
+    if (node.typeArgs.length === 0) {
+      return targetTs
+    }
     return fromComplicated(
       node,
       autoTight(state, [
-        fixture.generate(node.args[0], childState),
+        targetTs,
         "as unknown as ",
-        fixture.generate(node.typeArgs[0], childState),
+        fixture.generateAsType(node.typeArgs[0], childState),
       ]),
     )
   },

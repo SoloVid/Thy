@@ -2,10 +2,9 @@ import { GeneratorFixture } from "code-gen/ts/ts-generator"
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromToken } from "code-gen/utils/from-token"
 import type { AwaitCall, TreeNode } from "tree"
-import {
-  GeneratedSnippets,
-} from "../../generator"
-import { contextType, type GeneratorState } from "../generator-state"
+import { GeneratedSnippets } from "../../generator"
+import { type GeneratorState } from "../generator-state"
+import { contextType } from "../generator-context"
 
 export function tryGenerateAwaitCallTs(
   node: TreeNode,

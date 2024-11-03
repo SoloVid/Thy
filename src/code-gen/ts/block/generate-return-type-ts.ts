@@ -1,8 +1,6 @@
 import type { GeneratorFixture } from "code-gen/ts/ts-generator"
 import type { Return, TreeNode, TypeExpression, TypeReturn } from "tree"
-import type {
-  GeneratedSnippets,
-} from "../../generator"
+import type { GeneratedSnippets } from "../../generator"
 import type { GeneratorState } from "../generator-state"
 import { generateTypeTsForFunctionSignature } from "../type/generate-type-ts-for-function-signature"
 
@@ -18,7 +16,7 @@ export function tryGenerateReturnTypeTs(
 }
 
 function isReturnWithExplicitType(
-  node: TreeNode
+  node: TreeNode,
 ): node is ReturnWithExplicitType {
   return node.type === "return" && node.typeArgs.length !== 0
 }
@@ -33,5 +31,10 @@ export function generateReturnTypeTs(
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
   const typeNode = node.type === "type-return" ? node.args[0] : node.typeArgs[0]
-  return generateTypeTsForFunctionSignature(typeNode, state, fixture, state.getUniqueVariableName())
+  return generateTypeTsForFunctionSignature(
+    typeNode,
+    state,
+    fixture,
+    state.getUniqueVariableName(),
+  )
 }

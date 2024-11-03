@@ -1,19 +1,27 @@
 import { fromNode } from "code-gen/utils/from-node"
-import type { GeneratorForGlobalSpec } from "../../../generator-for-global"
-import { generateTypeInstanceTs } from "../../type/generate-type-instance-ts"
-import { autoTightS } from "../../utils/auto-tight"
+import type { GeneratorForNameSpec } from "../../generator-for-name"
+import { addErrorForExcessArgs } from "../helpers/too-many-args-error"
 
-export const unionGenerator: GeneratorForGlobalSpec = {
-  name: "Union",
-  generateValue(state) {
-    return autoTightS(
-      state,
-      "<_A, _B>(_a: _A, _b: _B) => (undefined as unknown as _A | _B)",
-    )
-  },
-  generateSimpleTypeCall(node, state, fixture) {
+export const intersectionGenerator: GeneratorForNameSpec = {
+  name: "All",
+  generateTypeCall(node, state, fixture) {
+    addErrorForExcessArgs(node, state, "All", 4)
     return node.args.map((a, i) => {
-      const gen = generateTypeInstanceTs(a, state, fixture)
+      const gen = fixture.generateAsType(a, state)
+      if (i === 0) {
+        return gen
+      }
+      return [fromNode(node.func, " & "), gen]
+    })
+  },
+}
+
+export const unionGenerator: GeneratorForNameSpec = {
+  name: "Some",
+  generateTypeCall(node, state, fixture) {
+    addErrorForExcessArgs(node, state, "Some", 4)
+    return node.args.map((a, i) => {
+      const gen = fixture.generateAsType(a, state)
       if (i === 0) {
         return gen
       }

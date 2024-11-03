@@ -1,21 +1,30 @@
 import { fromComplicated } from "code-gen/utils/from-complicated"
-import type { Call, TreeNode, TypeAssignment, TypeCall, TypeGivenCall } from "tree"
-import type {
-  GeneratedSnippets,
-} from "../../generator"
-import { generateValueCallTs } from "../call/generate-call-ts"
-import { contextType, GeneratorState } from "../generator-state"
-import type { GeneratorFixture } from "../ts-generator"
-import { generateTypeCallTs } from "./generate-type-call-ts"
+import type { TreeNode, TypeAssignment } from "tree"
+import type { GeneratedSnippets } from "../../generator"
+import { makeGenerator } from "../generate-from-options"
+import { GeneratorState } from "../generator-state"
+import { contextType } from "../generator-context"
+import type { LibraryGeneratorCollection } from "../library-generator"
+import type { CodeGeneratorFunc, GeneratorFixture } from "../ts-generator"
 
-export function tryGenerateTypeAssignmentTs(
-  node: TreeNode,
-  state: GeneratorState,
-  fixture: GeneratorFixture,
-): void | GeneratedSnippets {
-  if (node.type === "type-assignment") {
-    return generateTypeAssignmentTs(node, state, fixture)
-  }
+export function typeAssignmentGeneratorTs(
+  standardLibrary: LibraryGeneratorCollection,
+) {
+  return makeTryGenerateAssignmentTs([standardLibrary.typeAssignmentGenerator])
+}
+
+export function makeTryGenerateAssignmentTs(
+  specializations: CodeGeneratorFunc<TypeAssignment>[],
+): CodeGeneratorFunc<TreeNode> {
+  return makeGenerator(
+    (node) => {
+      if (node.type === "type-assignment") {
+        return node
+      }
+    },
+    generateTypeAssignmentTs,
+    specializations,
+  )
 }
 
 export function generateTypeAssignmentTs(
@@ -23,15 +32,6 @@ export function generateTypeAssignmentTs(
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
-  const stdLibGenerated = fixture.standardLibrary.typeAssignmentGenerator(
-    ta,
-    state,
-    fixture,
-  )
-  if (stdLibGenerated) {
-    return stdLibGenerated
-  }
-
   const name = ta.variable.token.text
   const childState = state.makeChild({
     context: contextType.isolatedExpression,

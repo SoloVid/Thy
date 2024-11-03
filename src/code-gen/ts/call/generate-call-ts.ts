@@ -1,17 +1,18 @@
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import type { TreeNode, TypeCall, ValueCall } from "tree"
-import type {
-  GeneratedSnippets,
-} from "../../generator"
+import type { GeneratedSnippets } from "../../generator"
 import { makeGenerator } from "../generate-from-options"
-import { contextType, GeneratorState } from "../generator-state"
+import { GeneratorState } from "../generator-state"
+import { contextType } from "../generator-context"
 import type { LibraryGeneratorCollection } from "../library-generator"
 import type { CodeGeneratorFunc, GeneratorFixture } from "../ts-generator"
 import { generateTypeArgsTs } from "../type/generate-type-args-ts"
 import { separateSnippetsWithCommas } from "../utils/comma-separated-snippets"
 import { makeControlFlowCallTsGenerator } from "./generate-control-flow-call-ts"
 
-export function valueCallGeneratorTs(standardLibrary: LibraryGeneratorCollection) {
+export function valueCallGeneratorTs(
+  standardLibrary: LibraryGeneratorCollection,
+) {
   return makeValueCallTsGenerator([
     ...defaultValueCallTsGenerators,
     standardLibrary.callGenerator,
@@ -46,7 +47,8 @@ export function generateValueCallTs(
     return generateCallTsInTypeContext(call, state, fixture, callName)
   }
 
-  const { functionSnippet, typeArgSnippets, argSnippets } = generateValueCallPartsTs(call, state, fixture)
+  const { functionSnippet, typeArgSnippets, argSnippets } =
+    generateValueCallPartsTs(call, state, fixture)
 
   return fromComplicated(call, [
     functionSnippet,
@@ -64,7 +66,11 @@ export function generateCallTsInTypeContext(
   callName?: string,
 ): GeneratedSnippets {
   callName = callName ? `_${callName}` : state.getUniqueVariableName()
-  const { functionSnippet, typeArgSnippets, argSnippets } = generateCallPartsTs(call, state, fixture)
+  const { functionSnippet, typeArgSnippets, argSnippets } = generateCallPartsTs(
+    call,
+    state,
+    fixture,
+  )
 
   const argsAsUnknown = call.args
     .map((a) => `${state.getUniqueVariableName()}: unknown, `)
@@ -75,7 +81,8 @@ export function generateCallTsInTypeContext(
   state.addPreStatementGenerator((s, f) =>
     fromComplicated(call, [
       `function ${wrappedValueFuncName} { return `,
-      functionSnippet, generateTypeArgsTs(call, typeArgSnippets),
+      functionSnippet,
+      generateTypeArgsTs(call, typeArgSnippets),
       ` }`,
     ]),
   )

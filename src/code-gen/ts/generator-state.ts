@@ -1,45 +1,21 @@
 import type { CompileError } from "common/compile-error"
 import type { Token } from "tokenizer/token"
-import type { Block } from "tree"
+import type { Block, ReadSymbolTable } from "tree"
 import type { GeneratedSnippet, GeneratedSnippets } from "../generator"
+import {
+  ContextType,
+  contextType,
+  isExpressionContext,
+} from "./generator-context"
 import type { IndependentCodeGeneratorFunc } from "./ts-generator"
 
-// These context types are listed in order from most restrictive to most permissive.
-export const contextType = {
-  /**
-   * Indicates we are within a "loose" (potentially ambiguous) expression (e.g. a binary logical operation).
-   * Within this type of context, generated expressions need to remove any ambiguity from themselves.
-   * Function call, literal, or identifier? Fine.
-   * Binary operation? Wrap it in parens.
-   */
-  looseExpression: "looseExpression",
-  /**
-   * Indicates we are within an isolated expression (e.g. function parameter).
-   * Within this type of context, generated expressions may assume isolation and forgo enclosing parens.
-   */
-  isolatedExpression: "isolatedExpression",
-  /**
-   * Are we within a part of the program that has the ability to return?
-   * Within this type of context, generated code may actually be statements instead of just expressions.
-   * These statements MAY NOT EFFECT A RETURN (e.g. `return` or `await` require IIFE wrapping).
-   */
-  blockNoReturn: "blockNoReturn",
-  /**
-   * Are we within a part of the program that has the ability to return?
-   * Within this type of context, generated code may actually be statements
-   * (including await and return) instead of just expressions.
-   */
-  blockAllowingReturn: "blockAllowingReturn",
-} as const
-
-export type ContextType = (typeof contextType)[keyof typeof contextType]
-
 interface GeneratorStateOptions {
-  readonly block?: Block
+  readonly symbolTable?: ReadSymbolTable
+  readonly block?: GeneratorBlockState
   readonly context?: ContextType
   readonly increaseIndent?: boolean
   readonly isTypeContext?: boolean
-  readonly newImplicitArguments?: boolean
+  readonly newImplicitArguments?: boolean | string
   readonly newPreStatementsArray?: boolean
 }
 
@@ -49,32 +25,46 @@ export interface ImplicitArgumentsState {
   markImplicitArgumentUsed(): void
 }
 
-export interface GeneratorState {
-  readonly block: Block | null
-  readonly context: ContextType
-  readonly indentLevel: number
-  readonly isTypeContext: boolean
-  /** Singleton(ish) array of errors encountered. */
-  readonly errors: CompileError[]
-  readonly blockTypeParametersSoFar: {
+export interface GeneratorBlockState {
+  readonly typeParametersSoFar: {
     /** Name of type parameter *in TypeScript* (might be different from name in Thy source). */
     readonly name: string
     /** TypeScript generated for type parameter specification (item in comma-separated list inside `<...>`). */
     readonly inlineSnippet: GeneratedSnippets
   }[]
-  readonly blockParametersSoFar: {
+  readonly parametersSoFar: {
     /** TypeScript generated for parameter specification (item in comma-separated list inside `(...)`). */
     readonly inlineSnippet: GeneratedSnippets
   }[]
-  readonly blockIdeaSnippets: (readonly GeneratedSnippet[])[]
+  readonly ideaSnippets: (readonly GeneratedSnippet[])[]
   /**
    * If something needs to be generated in a statement context prior
    * to the current block (e.g. we're putting something into
    * blockTypeParametersSoFar or blockParametersSoFar),
    * it can be added to this array.
    */
-  readonly blockPreStatementGenerators: IndependentCodeGeneratorFunc[]
-  blockReturnTypeSnippets: GeneratedSnippets | null
+  readonly preStatementGenerators: IndependentCodeGeneratorFunc[]
+  returnTypeSnippets: GeneratedSnippets | null
+}
+
+export function makeGeneratorBlockState(block: Block): GeneratorBlockState {
+  return {
+    typeParametersSoFar: [],
+    parametersSoFar: [],
+    ideaSnippets: [],
+    preStatementGenerators: [],
+    returnTypeSnippets: null,
+  }
+}
+
+export interface GeneratorState {
+  readonly symbolTable: ReadSymbolTable | null
+  readonly block: GeneratorBlockState | null
+  readonly context: ContextType
+  readonly indentLevel: number
+  readonly isTypeContext: boolean
+  /** Singleton(ish) array of errors encountered. */
+  readonly errors: CompileError[]
   /**
    * If something needs to be generated in a statement context prior
    * to the current statement (e.g. we're in a nested expression),
@@ -113,25 +103,32 @@ export function makeGeneratorState(
     preStatementGenerators: options.newPreStatementsArray
       ? []
       : (parent?.preStatementGenerators ?? []),
-    indentLevel:
-      options.increaseIndent && parent
+    indentLevel: options.increaseIndent
+      ? parent
         ? parent.indentLevel + 1
-        : (parent?.indentLevel ?? 0),
+        : 1
+      : parent
+        ? parent.indentLevel
+        : 0,
     isTypeContext:
       options.isTypeContext !== undefined
         ? options.isTypeContext
         : (parent?.isTypeContext ?? false),
     getUniqueVariableName,
+    symbolTable: options.symbolTable ?? parent?.symbolTable ?? null,
     block: options.block ?? parent?.block ?? null,
     context:
       options.context !== undefined
         ? options.context
-        : (contextType.isolatedExpression as ContextType),
+        : (contextType.looseExpression as ContextType),
     localVariables: [],
     parent: parent ?? null,
     implicitArguments: options.newImplicitArguments
       ? {
-          variableName: getUniqueVariableName(),
+          variableName:
+            typeof options.newImplicitArguments === "string"
+              ? options.newImplicitArguments
+              : getUniqueVariableName(),
           used: false,
           markImplicitArgumentUsed() {
             this.used = true
@@ -146,10 +143,7 @@ export function makeGeneratorState(
       this.preStatementGenerators.push(generator)
     },
     isExpressionContext() {
-      return (
-        this.context === contextType.looseExpression ||
-        this.context === contextType.isolatedExpression
-      )
+      return isExpressionContext(this.context)
     },
     makeChild(options: GeneratorStateOptions = {}) {
       return makeGeneratorState(me, options)

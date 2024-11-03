@@ -9,10 +9,10 @@ const innerParts: Grammar = {
 }
 const insideString: Grammar = {
   "string-interpolation": {
-    pattern: /(\.)([a-z][a-zA-Z0-9]*)(\.)/g,
+    pattern: /(\.\.)([a-z][a-zA-Z0-9]*)(\.\.)/g,
     inside: {
       punctuation: {
-        pattern: /\./g,
+        pattern: /\.\./g,
       },
       variable: {
         pattern: /[a-zA-Z0-9]+/,

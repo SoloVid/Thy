@@ -1,8 +1,8 @@
-import type { GeneratorFixture } from "code-gen/ts/ts-generator"
 import type { Block, Idea } from "tree"
 import type { GeneratedSnippets } from "../../generator"
 import { genIndent } from "../../utils/indent"
 import type { GeneratorState } from "../generator-state"
+import type { GeneratorFixture } from "../ts-generator"
 import { generateImpliedReturnTs } from "./generate-implied-return-ts"
 import { resolvePreStatementGenerator } from "./resolve-pre-statement-generator"
 
@@ -26,12 +26,10 @@ export function generateBlockExplicitLinesTs(
 ): GeneratedSnippets {
   const implementationLines = ideas.map((i) => {
     const lineState = state.makeChild({
-      block: block,
       context: state.context,
       newPreStatementsArray: true,
     })
     const primaryGeneratedLine = fixture.generate(i, lineState)
-    state.preStatementGenerators.push(...lineState.blockPreStatementGenerators)
     const preGeneratedLines = lineState.preStatementGenerators.map((g) =>
       resolvePreStatementGenerator(g, state, fixture),
     )

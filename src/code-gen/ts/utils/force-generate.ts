@@ -1,10 +1,12 @@
-import { fromNode } from "code-gen/utils/from-node";
-import { nodeError } from "common/compile-error";
-import { TreeNode } from "tree";
-import { CodeGeneratorFunc, DefiniteCodeGeneratorFunc } from "../ts-generator";
-import { autoTightS } from "./auto-tight";
+import { fromNode } from "code-gen/utils/from-node"
+import { nodeError } from "common/compile-error"
+import { TreeNode } from "tree"
+import { CodeGeneratorFunc, DefiniteCodeGeneratorFunc } from "../ts-generator"
+import { autoTightS } from "./auto-tight"
 
-export function makeGeneratorForced<T extends TreeNode>(generator: CodeGeneratorFunc<T>): DefiniteCodeGeneratorFunc<T> {
+export function makeGeneratorForced<T extends TreeNode>(
+  generator: CodeGeneratorFunc<T>,
+): DefiniteCodeGeneratorFunc<T> {
   return (node, state, fixture) => {
     const maybeResult = generator(node, state, fixture)
     if (maybeResult) {

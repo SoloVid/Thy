@@ -1,6 +1,8 @@
-import { tsCoreCompiler } from "code-gen/ts/ts-compiler"
 import { test } from "test-framework"
-import { compileAndVerifyOutput } from "../compile-valid-program.test.helper"
+import {
+  compileAndVerifyOutput,
+  tsCoreCompiler,
+} from "../compile-valid-program.test.helper"
 
 test("compile simple call", async () => {
   await compileAndVerifyOutput(

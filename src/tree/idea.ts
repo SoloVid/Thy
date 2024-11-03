@@ -33,3 +33,11 @@ export function isIdeaAsync(idea: Idea) {
     (idea.type === "let-call" && idea.call?.type === "await-call")
   )
 }
+
+export function hasIdeaGiven(idea: Idea) {
+  return (
+    idea.type === "given-call" ||
+    (isAssignment(idea) && idea.call.type === "given-call") ||
+    (idea.type === "let-call" && idea.call?.type === "given-call")
+  )
+}
