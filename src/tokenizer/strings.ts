@@ -16,18 +16,18 @@ import {
 
 const matchStringInterpolationEnd = makeSingleRegexMatcher(
   tEndStringInterpolation,
-  /\./,
+  /\.\./,
 )
 export const matchStringInterpolation = makeNestedTokenizerMatcher(
   tStartStringInterpolation,
-  /\.(?=[a-z][a-zA-Z0-9]*\.)/,
+  /\.\.(?=[a-z][a-zA-Z0-9]*\.\.)/,
   [matchValueIdentifier, matchStringInterpolationEnd],
   (state) => state.lastTokenType === tEndStringInterpolation,
 )
 
 const matchStringText = makeSingleRegexMatcher(
   tStringText,
-  /(?:\\.|[^".\r\n]|(?:\.(?![a-z][a-zA-Z0-9]*\.)))+/,
+  /(?:\\.|[^".\r\n]|(?:\.\.(?![a-z][a-zA-Z0-9]*\.\.)))+/,
 )
 const matchSimpleStringLiteralEnd = makeSingleRegexMatcher(tEndString, /"/)
 export const matchSimpleStringLiteral = makeNestedTokenizerMatcher(

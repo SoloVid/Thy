@@ -1,7 +1,7 @@
 ```thy
 await
 type ReturnType is Array String
-type return ReturnType
+return ReturnType
 ```
 
 Asynchronously return full list of Thy Playground files.

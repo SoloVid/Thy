@@ -1,7 +1,7 @@
 ```thy
 param is given Type
 
-type return Type
+return Type
 ```
 
 Fill in description here.

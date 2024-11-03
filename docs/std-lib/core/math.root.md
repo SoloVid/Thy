@@ -2,7 +2,7 @@
 x is given Number
 n is given Number 2
 
-type return Number
+return Number
 ```
 
 Calculate the `n`th root (default square root) of `x` and return the result.

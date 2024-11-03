@@ -1,7 +1,7 @@
 ```thy
 input is given String
 
-type return Unknown
+return Unknown
 ```
 
 Convert the input JSON string to its Thy equivalent.

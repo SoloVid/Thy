@@ -1,10 +1,10 @@
 import type { elseBuiltin } from "./globals"
 
-export const ifBuiltin = <_T>(
+export const ifBuiltin = <T>(
   condition: boolean,
-  trueCallback: () => _T,
+  trueCallback: () => T,
   elseLiteral?: typeof elseBuiltin,
-  falseCallback?: () => _T,
+  falseCallback?: () => T,
 ) => {
   if (condition) {
     return trueCallback()

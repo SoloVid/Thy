@@ -4,7 +4,7 @@ type ArrayType is Array T
 arr is given ArrayType
 index is given Number
 
-type return T
+return T
 ```
 
 Get an array element at the specified index.

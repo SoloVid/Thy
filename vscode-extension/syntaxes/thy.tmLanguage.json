@@ -241,7 +241,7 @@
         },
         {
           "name": "meta.string-interpolation.thy",
-          "match": "(\\.)([a-z][a-zA-Z0-9]*)(\\.)",
+          "match": "(\\.\\.)([a-z][a-zA-Z0-9]*)(\\.\\.)",
           "captures": {
             "2": { "name": "variable.other.thy" },
             "1": { "name": "constant.character.escape.thy" },
@@ -266,7 +266,7 @@
       "patterns": [
         {
           "name": "variable.language.that.thy",
-          "match": "(?<!\\.)\\b(that|beforeThat)\\b"
+          "match": "(?<!\\.)\\b(that)\\b"
         }
       ]
     },

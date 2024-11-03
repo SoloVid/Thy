@@ -2,7 +2,7 @@
 type T is Given Unknown
 value is given T
 
-type return T
+return T
 ```
 
 Return the value.

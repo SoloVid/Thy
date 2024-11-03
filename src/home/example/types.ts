@@ -20,7 +20,7 @@ type MyType is def
     field1 be def Number
     type ArrayT is Array T
     field2 be def ArrayT
-  type return Result
+  return Result
 
 TTT
 TS:
@@ -38,7 +38,7 @@ type Interfaces is def
   type MX is MyType X
   type OY is YOtherType Y
   type Result is All MX OY
-  type return Result
+  return Result
 
 Class definition. class Thing<T> implements Interfaces<T, Yo>
 newThing is def
@@ -47,7 +47,7 @@ newThing is def
   qq is given Q
   qe is given String
   type ReturnType is Interfaces T Yo
-  type return ReturnType
+  return ReturnType
 
   Class members.
   w be def String ""
@@ -59,7 +59,7 @@ newThing is def
   method is def
     x is given
     y is given
-    type return Void
+    return Void
     print x
     print y
 

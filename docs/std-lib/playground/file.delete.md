@@ -1,7 +1,7 @@
 ```thy
 name is given String
 await
-type return Void
+return Void
 ```
 
 Asynchronously delete a file.

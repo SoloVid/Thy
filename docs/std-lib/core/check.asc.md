@@ -4,7 +4,7 @@ b is given Number default
 c is given Number default
 d is given Number default
 
-type return Boolean
+return Boolean
 ```
 
 Check if all of the supplied terms are given in ascending order.

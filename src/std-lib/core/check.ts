@@ -1,36 +1,32 @@
-export const allBuiltin = (
-  _a: boolean,
-  _b?: boolean,
-  _c?: boolean,
-  _d?: boolean,
-) => _a && (_b ?? true) && (_c ?? true) && (_d ?? true)
+export const allBuiltin = (a: boolean, b?: boolean, c?: boolean, d?: boolean) =>
+  a && (b ?? true) && (c ?? true) && (d ?? true)
 export const someBuiltin = (
-  _a: boolean,
-  _b?: boolean,
-  _c?: boolean,
-  _d?: boolean,
-) => _a || (_b ?? false) || (_c ?? false) || (_d ?? false)
+  a: boolean,
+  b?: boolean,
+  c?: boolean,
+  d?: boolean,
+) => a || (b ?? false) || (c ?? false) || (d ?? false)
 
 export const ascBuiltin = (
-  _a: number,
-  _b: number = _a + 1,
-  _c: number = _b + 1,
-  _d: number = _c + 1,
-) => _a < _b && _b < _c && _c < _d
+  a: number,
+  b: number = a + 1,
+  c: number = b + 1,
+  d: number = c + 1,
+) => a < b && b < c && c < d
 export const descBuiltin = (
-  _a: number,
-  _b: number = _a - 1,
-  _c: number = _b - 1,
-  _d: number = _c - 1,
-) => _a > _b && _b > _c && _c > _d
+  a: number,
+  b: number = a - 1,
+  c: number = b - 1,
+  d: number = c - 1,
+) => a > b && b > c && c > d
 export const equalBuiltin = (
-  _a: unknown,
-  _b: unknown = _a,
-  _c: unknown = _b,
-  _d: unknown = _c,
-) => _a === _b && _b === _c && _c === _d
+  a: unknown,
+  b: unknown = a,
+  c: unknown = b,
+  d: unknown = c,
+) => a === b && b === c && c === d
 
-export const notBuiltin = (_a: boolean) => !_a
+export const notBuiltin = (a: boolean) => !a
 
 export const check = {
   all: allBuiltin,

@@ -1,7 +1,7 @@
 ```thy
 a is given Boolean
 
-type return Boolean
+return Boolean
 ```
 
 Check if the supplied term is false

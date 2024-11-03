@@ -1,8 +1,8 @@
 name1 is def "Joe"
 print """
-  .name1.
+  ..name1..
 print """
-  Greetings, .name1.!
+  Greetings, ..name1..!
 name2 is def "Bill"
 print """
-  both .name1. and .name2.
+  both ..name1.. and ..name2..

@@ -1,7 +1,7 @@
 ```thy
 name is given String
 await
-type return String
+return String
 ```
 
 Asynchronously return contents of a file

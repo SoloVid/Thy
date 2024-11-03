@@ -5,7 +5,7 @@ arr is given ArrayType
 index is given Number
 value is given T
 
-type return Void
+return Void
 ```
 
 Set an array element at the specified index.

@@ -4,7 +4,7 @@ expression is given Unknown
 type CallbackReturn is Union T Void
 type Callback is def
   type CaseCallback is def
-    type return CallbackReturn
+    return CallbackReturn
   type SwitchControls is
     type CaseFunction is def
       compare is given Unknown
@@ -12,10 +12,10 @@ type Callback is def
     type DefaultFunction is def
       callback is given CaseCallback
   controls is given SwitchControls
-  type return CallbackReturn
+  return CallbackReturn
 callback is given Callback
 
-type return CallbackReturn
+return CallbackReturn
 ```
 
 This function is intended to feel like the `switch` control statement

@@ -3,12 +3,12 @@ type T is Given Unknown
 type CallbackReturn is Union Void T
 type Callback is def
   i is given Number
-  type return CallbackReturn
+  return CallbackReturn
 n is given Number
 callback is given Callback
 
 type ReturnType is Union Void T
-type return ReturnType
+return ReturnType
 ```
 
 Call `callback` `n` times, passing in the iteration number

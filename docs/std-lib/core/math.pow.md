@@ -2,7 +2,7 @@
 b is given Number
 x is given Number
 
-type return Number
+return Number
 ```
 
 Calculate the `b` raised to the power of `x` (i.e. `b ^ x`) and return the result.

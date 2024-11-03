@@ -6,12 +6,12 @@ type CallbackReturn is Union Void U
 type Callback is def
   element is given T
   i is given Number
-  type return CallbackReturn
+  return CallbackReturn
 arr is given InputArray
 callback is given Callback
 
 type ReturnType is Union Void U
-type return ReturnType
+return ReturnType
 ```
 
 Call `callback` for each element in array `arr`,

@@ -1,7 +1,7 @@
 ```thy
 name is given String
 await
-type return Boolean
+return Boolean
 ```
 
 Asynchronously return whether the file exists.

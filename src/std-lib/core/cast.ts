@@ -1,1 +1,1 @@
-export const castBuiltin = <_T>(_value: unknown) => _value as _T
+export const castBuiltin = <T>(_value: unknown) => _value as T

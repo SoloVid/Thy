@@ -327,7 +327,7 @@ by specifying the variable name surrounded by periods.
 
 ```thy
 myName is def "Grant"
-print "Hello, .myName."
+print "Hello, ..myName.."
 ```
 
 The `.variableName.` interpolation syntax in Thy
@@ -481,18 +481,22 @@ for assignment to object properties.
 myThing.someProp to foo a b
 ```
 
-#### Implicit Assignments (`that`/`beforeThat`)
+#### Implicit Assignments (`that`)
 
 If a call's return value is not captured via explicit variable assignment,
-it is implicitly available as `that` in the next statement
-and as `beforeThat` in the statement after that.
+it is implicitly available as `that` in the next statement.
+`that` can be used multiple times in the same statement
+to use return values from multiple preceding lines.
+When using multiple `that`s in the same statement,
+the order of substitutions is the same
+as the order of the preceding calls.
 
 A common pattern of usage would be something like this:
 
 ```thy
 check.equal foo "A"
 check.equal bar 2
-check.all that beforeThat
+check.all that that
 if that
   doSomething
 ```
@@ -507,7 +511,7 @@ r4 is if r3
   r5 is doSomething
 ```
 
-The `that` and `beforeThat` keywords in Thy minimize
+The `that` keyword in Thy minimizes
 the unnecessary proliferation of variable names
 that would otherwise come with the one-call-per-statement design of Thy.
 
@@ -989,7 +993,7 @@ to an explicit return type may be desired.
 myFunction is def
   a is given Number
   b is given Number
-  type return Number
+  return Number
 
   Do some math or something down here.
 ```
@@ -1002,10 +1006,10 @@ const myFunction = (a: Number, b: Number): Number => {
 }
 ```
 
-By convention, we recommend putting the type return statement immediately
+By convention, we recommend putting the return statement immediately
 after the last `given` statement before any implementation.
 However, there is no such restriction from a technical perspective
-where in the block the type return statement lives.
+where in the block the return statement lives.
 
 #### Type Assignment Statements
 
@@ -1034,7 +1038,7 @@ someFunction is def
   type T is Given Unknown
   param1 is given T
   param2 is given Number
-  type return T
+  return T
   Etc
 myTypedValue is getSomeTypedValue
 Only supplying the first value parameter,
@@ -1070,5 +1074,5 @@ Creating a custom function type is as easy as creating a function:
 ```thy
 type MyFunctionType is def
   param1 is given Number
-  type return String
+  return String
 ```

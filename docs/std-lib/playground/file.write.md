@@ -2,7 +2,7 @@
 name is given String
 contents is given String
 await
-type return Void
+return Void
 ```
 
 Asynchronously write contents to a file.

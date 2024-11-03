@@ -5,7 +5,7 @@ ms is given Number
 def null
 await that
 
-type return Void
+return Void
 ```
 
 Return a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)

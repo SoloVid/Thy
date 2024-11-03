@@ -1,7 +1,7 @@
 ```thy
 a is given Unknown
 
-type return Number
+return Number
 ```
 
 Convert the input argument to a number.

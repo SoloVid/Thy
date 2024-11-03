@@ -1,1 +1,1 @@
-export const defBuiltin = <_T>(input: _T) => input as _T
+export const defBuiltin = <T>(input: T) => input as T

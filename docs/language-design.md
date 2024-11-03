@@ -48,11 +48,11 @@ Every argument must be a single term.
 
 #### Affordances
 
-`that` refers to the returned value from the function call of immediately preceding line.
-It effectively inlines that call unless `that` is used twice in the same line.
-`that` results in a compile error if the preceding line is not just a function call
-(e.g. assignment or start of block).
-Because binary operations are so common, `beforeThat` is provided to go one more line back.
+`that` refers to the returned value from the function call of immediately preceding line and functionally inlines that call.
+If `that` is specified multiple times in a single call,
+n `that`s refer to the preceding n calls in the same order.
+`that` results in a compile error if the preceding line
+is not just a function call (e.g. assignment).
 
 ### Encourage Good Programming Practices
 
@@ -90,14 +90,13 @@ These keywords need to be recognized by the lexer since they are part of the lan
 These values/functions have an interface like stuff you can write in thy,
 but you couldn't actually implement them in thy.
 
-- `array`: define an array
+- `array`: define a mutable array
 - `catch`: sentinel value argument for try
 - `else`: sentinel value argument for if
 - `false`: value
 - `finally`: sentinel value argument for try
 - `get`: array access (may make this a member instead?)
 - `if`: function
-- `list`: define a mutable array
 - `null`: value
 - `set`: array mutate (may make this a member instead?)
 - `switch`: function
@@ -105,16 +104,17 @@ but you couldn't actually implement them in thy.
 - `thy`: function / value
 - `true`: value
 - `try`: function
+- `tuple`: define an immutable array
 
 ### Reserved Type Names
 
 - `Array` (1 type parameter)
 - `Boolean`
 - `Function` (something like `(...args: any) => any` in TypeScript)
-- `List` (1 type parameter)
 - `Null`
 - `Number`
 - `String`
+- `Tuple` (1 type parameter)
 - `Unknown`
 - `Void`
 
@@ -198,7 +198,7 @@ and/or a special Void type.
 splitPath is def
   type MyNullableType is Null MyType
   type SplitPathReturn is Void MyNullableType
-  type return SplitPathReturn
+  return SplitPathReturn
   let if condition
     return null
   doSomethingCool
@@ -209,7 +209,7 @@ But variables cannot hold a value of type Void. `let` is the only part of the la
 
 ```thy
 type A is def
-  type return VoidableNullableType
+  return VoidableNullableType
 given A a
 
 Execute the function and either return NullableType or continue (if void was returned).
@@ -270,7 +270,7 @@ const myObj = {
 
 ```thy
 newThing is def
-  type return Thing
+  return Thing
   given NullableA a
 
   compare.equal a null
@@ -280,8 +280,8 @@ newThing is def
     return a
 
   printA is def
-    type return Void
-    console.log aa
+    return Void
+    print aa
 ```
 
 This fairly strictly translates to the following TypeScript:

@@ -1,7 +1,7 @@
 ```thy
 message is given String
 
-type return Void
+return Void
 ```
 
 Throw an exception to be caught by (`try`/`catch`)[#try].

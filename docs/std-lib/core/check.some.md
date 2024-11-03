@@ -4,7 +4,7 @@ b is given Boolean true
 c is given Boolean true
 d is given Boolean true
 
-type return Boolean
+return Boolean
 ```
 
 Check if some of the supplied terms are true

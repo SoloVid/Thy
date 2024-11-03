@@ -17,7 +17,7 @@ thy.scope "blahBlah.blah"
     This is a comment
     check.all c d
     compare.equal a b
-    check.some beforeThat that
+    check.some that that
     if that
       doThing a b c
       e is calc d
@@ -57,13 +57,13 @@ thy.scope "blahBlah.blah"
   More strictly something like: type FunctionType = typeof makeFunction((pA: A): ReturnType => {})
   type FunctionType is def
     pA is given A
-    type return ReturnType
+    return ReturnType
 
   private typedFun is def
     pA is given A
     pB is given B pBDefault
     type ReturnType is Promise InnerReturnType
-    type return ReturnType
+    return ReturnType
     asyncAdd pA pB
     await that
     math.add pA pB
@@ -76,13 +76,13 @@ thy.scope "blahBlah.blah"
     type BTU is BT U
     pB is given BTU 
     type ReturnType is RT U
-    type return ReturnType
+    return ReturnType
 
   TS: type ConditionalType<T> = T extends A ? AImplication : BImplication
   type ConditionalType is def
     type T is Given Unknown
     type Result is If T A AImplication BImplication
-    type return Result
+    return Result
 
   This doesn't have a TS direct representation. Closest thing is: type ConditionalTypeAlias<T> = ConditionalType<T>
   type ConditionalTypeAlias is TypeFun ConditionalType
@@ -102,7 +102,7 @@ thy.scope "blahBlah.blah"
       field1 be def Number
       type ArrayT is Array T
       field2 be def ArrayT
-    type return Result
+    return Result
 
   TS type Interfaces<X extends number, Y extends X[] = boolean[]> = MyType<X> & YOtherType<Y>
   type Interfaces is def
@@ -115,7 +115,7 @@ thy.scope "blahBlah.blah"
     type MX is MyType X
     type OY is YOtherType Y
     type Result is All MX OY
-    type return Result
+    return Result
 
   Class definition. class Thing<T> implements Interfaces<T, Yo>
   newThing is def
@@ -124,7 +124,7 @@ thy.scope "blahBlah.blah"
     qq is given Q
     qe is given String
     type ReturnType is Interfaces T Yo
-    type return ReturnType
+    return ReturnType
 
     Class members.
     w be def String ""
@@ -142,7 +142,7 @@ thy.scope "blahBlah.blah"
     method is def
       x is given
       y is given
-      type return Void
+      return Void
       print x
       print y
 

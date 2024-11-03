@@ -2,11 +2,11 @@
 type T is Given Unknown
 type CallbackReturn is Union Void T
 type Callback is def
-  type return CallbackReturn
+  return CallbackReturn
 callback is given Callback
 
 type ReturnType is Union Void T
-type return ReturnType
+return ReturnType
 ```
 
 Call `callback` over and over again indefinitely.

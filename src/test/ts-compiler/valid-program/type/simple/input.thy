@@ -4,7 +4,7 @@ himom is def
 type A is himom
 
 funcWithTypes is def
-  type return A
+  return A
   type T is Given A
   p is given A
   return p

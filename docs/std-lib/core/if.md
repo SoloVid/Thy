@@ -2,14 +2,14 @@
 type T is Given Unknown
 type CallbackReturn is Union Void T
 type Callback is def
-  type return CallbackReturn
+  return CallbackReturn
 condition is given Boolean
 trueCallback is given Callback
 elseIndicator is given ElseLiteral null
 falseCallback is given Callback default
 
 type ReturnType is Union Void T
-type return ReturnType
+return ReturnType
 ```
 
 If `condition` is true, call `trueCallback` and return the result.

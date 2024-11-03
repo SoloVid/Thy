@@ -1,9 +1,4 @@
-import {
-  arrayBuiltin,
-  getBuiltin,
-  mutableArrayBuiltin,
-  setBuiltin,
-} from "./array"
+import { arrayBuiltin, getBuiltin, setBuiltin, tupleBuiltin } from "./array"
 import { castBuiltin } from "./cast"
 import { check } from "./check"
 import { defBuiltin } from "./def"
@@ -18,6 +13,7 @@ import {
   trueBuiltin,
 } from "./globals"
 import { ifBuiltin } from "./if"
+import { intersectionBuiltin } from "./intersection"
 import { json } from "./json"
 import {
   loopElementsBuiltin,
@@ -37,10 +33,11 @@ import { regexBuiltin } from "./regex"
 import { stringBuiltin } from "./string"
 import { switchBuiltin } from "./switch"
 import { throwBuiltin, tryBuiltin } from "./throw-try-catch"
+import { unionBuiltin } from "./union"
 
 export const core = {
+  tuple: tupleBuiltin,
   array: arrayBuiltin,
-  list: mutableArrayBuiltin,
   get: getBuiltin,
   set: setBuiltin,
   cast: castBuiltin,
@@ -77,4 +74,7 @@ export const core = {
   catch: catchBuiltin,
   else: elseBuiltin,
   finally: finallyBuiltin,
+
+  All: intersectionBuiltin,
+  Some: unionBuiltin,
 }

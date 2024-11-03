@@ -1,16 +1,16 @@
 ```thy
 type T is Given Unknown
 type TryBlock is def
-  type return T
+  return T
 tryBlock is given TryBlock
 catchOrFinally is given CatchOrFinally
 type SecondBlock is def
   e is given Unknown
   type SecondBlockReturn is Union T Void
-  type return SecondBlockReturn
+  return SecondBlockReturn
 secondBlock is given SecondBlock
 
-type return T
+return T
 ```
 
 This function is intended to feel like the `try` control statement

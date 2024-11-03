@@ -3,7 +3,7 @@ type InputPattern is Union String RegExp
 pattern is given InputPattern
 flags is given String ""
 
-type return RegExp
+return RegExp
 ```
 
 Create a regular expression object

@@ -2,7 +2,7 @@
 a is given Number
 b is given Number
 
-type return Number
+return Number
 ```
 
 Calculate the quotient of `a` and `b` (i.e. `a / b`) and return the result.

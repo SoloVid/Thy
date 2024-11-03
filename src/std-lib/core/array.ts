@@ -24,7 +24,7 @@ export type ArrayInitArgs<T> = {
  * @param init to initialize the array with data
  * @returns mutable [array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array).
  */
-export const mutableArrayBuiltin = <_T>(init?: ArrayInitFunction<_T>) => {
+export const arrayBuiltin = <_T>(init?: ArrayInitFunction<_T>) => {
   const arr: _T[] = []
   if (init) {
     init({
@@ -50,8 +50,8 @@ export const mutableArrayBuiltin = <_T>(init?: ArrayInitFunction<_T>) => {
  * @param init to initialize the array with data
  * @returns immutable [array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array).
  */
-export const arrayBuiltin = <_T>(init?: ArrayInitFunction<_T>): readonly _T[] =>
-  mutableArrayBuiltin(init)
+export const tupleBuiltin = <_T>(init?: ArrayInitFunction<_T>): readonly _T[] =>
+  arrayBuiltin(init)
 
 /**
  * Get an array element.

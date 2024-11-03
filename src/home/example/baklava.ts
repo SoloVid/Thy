@@ -14,7 +14,7 @@ printLine is def
   math.add that 1
   stars is star.repeat that
   
-  print ".spaces..stars."
+  print "..spaces....stars.."
 
 loop.times 10
   private i is given

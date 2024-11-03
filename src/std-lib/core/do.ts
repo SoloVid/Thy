@@ -1,1 +1,1 @@
-export const doBuiltin = <_T>(callback: () => _T) => callback()
+export const doBuiltin = <T>(callback: () => T) => callback()

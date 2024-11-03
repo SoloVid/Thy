@@ -4,7 +4,7 @@ b is given Unknown a
 c is given Unknown b
 d is given Unknown c
 
-type return Boolean
+return Boolean
 ```
 
 Check if all of the supplied terms are the same

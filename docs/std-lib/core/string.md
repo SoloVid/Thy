@@ -4,7 +4,7 @@ b is given Unknown ""
 c is given Unknown ""
 d is given Unknown ""
 
-type return String
+return String
 ```
 
 Convert the input argument(s) to a string (concatenating together if multiple).

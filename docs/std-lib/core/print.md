@@ -1,7 +1,7 @@
 ```thy
 value is given Unknown
 
-type return Void
+return Void
 ```
 
 Print the provided `value` (typically a `String` or `Number`)

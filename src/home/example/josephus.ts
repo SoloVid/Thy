@@ -12,7 +12,7 @@ josephus is def
     math.subtract n 1
     josephus that k
     math.subtract k 1
-    math.add beforeThat that
+    math.add that that
     math.mod that n
     math.add that 1
     return that

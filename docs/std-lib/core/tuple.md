@@ -2,31 +2,27 @@
 type T is Given Unknown
 init is given Function default
 
-type return Array
+type ReturnType is Array T
+return ReturnType
 ```
 
-Create a mutable array
+Create an immutable array
 (implemented with [JavaScript Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array);
-typed as `T[]`).
+typed as `readonly T[]`).
 
 This function optionally takes an initialization block
-which can be used to populate the array.
+which can be used to populate the array prior to it being frozen.
 
 If no `init` function is provided, an empty array will be created.
-
-> Developers are discouraged from using this function
-> since immutable data structures are typically less error-prone.
 
 **Example:**
 
 ```thy
 Create an empty array.
-emptyArray is mutableArray
-Add an element to it.
-emptyArray.push 42
+emptyArray is array
 
 Create an array initialized with three elements.
-arrayWith3 is mutableArray
+arrayWith3 is array
   push 1
   push 2
   push 3

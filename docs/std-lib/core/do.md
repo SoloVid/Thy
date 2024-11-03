@@ -1,10 +1,10 @@
 ```thy
 type T is Given Unknown
 type Callback is def
-  type return T
+  return T
 callback is given Callback
 
-type return T
+return T
 ```
 
 Execute the `callback` function and return the value.

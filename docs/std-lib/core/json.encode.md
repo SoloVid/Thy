@@ -1,7 +1,7 @@
 ```thy
 input is given Unknown
 
-type return String
+return String
 ```
 
 Convert the input value to a JSON string.
