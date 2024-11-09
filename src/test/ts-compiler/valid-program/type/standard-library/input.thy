@@ -9,7 +9,8 @@ unknownFunc is def
 voidFunc is def
   p is given Void
 
-type BasicUnion is Union String Number
-type UnionWithValue is Union String unknownFunc
-type NonTrivialUnion is Union String
+type BasicIntersection is All String Number
+type BasicUnion is Some String Number
+type UnionWithValue is Some String unknownFunc
+type NonTrivialUnion is Some String
   return "himom"

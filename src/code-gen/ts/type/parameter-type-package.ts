@@ -28,6 +28,8 @@ export function makeParameterTypePackage(
   const packageClassName = `_${nameBase}_TypePackage`
   const typeParamsSoFar = generateTypeParamsForBlockTs(node, state)
   const typeArgsSoFar = generateTypeArgsForBlockTs(node, state)
+  const paramsSoFar = generateParamsTs(node, state, fixture)
+  const ideasSoFar = [...blockState.ideaSnippets]
 
   const packageGenerator: IndependentCodeGeneratorFunc = (s, f) => {
     const indent = makeIndent(s.indentLevel)
@@ -36,9 +38,9 @@ export function makeParameterTypePackage(
       `class ${packageClassName}`,
       typeParamsSoFar,
       ` { f(`,
-      generateParamsTs(node, state, fixture),
+      paramsSoFar,
       `) {\n`,
-      blockState.ideaSnippets.map((snippet) =>
+      ideasSoFar.map((snippet) =>
         indentSnippets(snippet, s.indentLevel + 1),
       ),
       indent2,

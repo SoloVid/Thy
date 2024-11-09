@@ -7,6 +7,7 @@ import { GeneratedSnippets } from "../../generator"
 import { GeneratorState } from "../generator-state"
 import { contextType } from "../generator-context"
 import type { LibraryGeneratorCollection } from "../library-generator"
+import { generateGivenCallTs, generateGivenCallTsWithParameterName } from "../call/generate-given-call-ts"
 
 export function assignmentGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,
@@ -35,12 +36,18 @@ export function generateAssignmentTs(
   expressionTsPreGenerated?: GeneratedSnippets,
   typeTs?: GeneratedSnippets,
 ): GeneratedSnippets {
-  const expressionTs =
-    expressionTsPreGenerated ??
-    fixture.generate(
-      a.call,
-      state.makeChild({ context: contextType.isolatedExpression }),
-    )
+  function generateValueExpression(): GeneratedSnippets {
+    if (expressionTsPreGenerated) {
+      return expressionTsPreGenerated
+    }
+    const childState = state.makeChild({ context: contextType.isolatedExpression })
+    if (a.call.type === "given-call" && a.variable.type === "value-identifier") {
+      return generateGivenCallTsWithParameterName(a.call, childState, fixture, `_${a.variable.token.text}`)
+    }
+    return fixture.generate(a.call, childState)
+  }
+
+  const expressionTs = generateValueExpression()
   const variablePart = fixture.generate(a.variable, state)
   const variableTypePart = typeTs
     ? [variablePart, fromTokenRange(a, ": "), typeTs]

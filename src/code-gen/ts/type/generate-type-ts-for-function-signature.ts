@@ -4,6 +4,7 @@ import type { GeneratedSnippets } from "../../generator"
 import type { GeneratorState } from "../generator-state"
 import type { GeneratorFixture } from "../ts-generator"
 import { makeParameterTypePackage } from "./parameter-type-package"
+import { contextType } from "../generator-context"
 
 export function generateTypeTsForFunctionSignature(
   node: TreeNode,
@@ -15,6 +16,22 @@ export function generateTypeTsForFunctionSignature(
     state.block !== null,
     "generateTypeTsForFunctionSignature() should only be called in a block",
   )
+  // For simple type identifiers, we can take a simple approach.
+  if (node.type === "type-identifier") {
+    const childState = state.makeChild({
+      context: contextType.isolatedExpression,
+    })
+    // Types from standard library should be generated in simple fashion.
+    const stdLibGenerated = fixture.standardLibrary.typeIdentifierGenerator(node, childState, fixture)
+    if (stdLibGenerated) {
+      return stdLibGenerated
+    }
+    // TODO: If the symbol can be found in the parent block,
+    // it won't require generating extra stuff prior to the function signature.
+    // if (state.parent?.symbolTable?.getSymbolInfo(node.token.text) ?? null !== null) {
+    //   return fixture.generateAsType(node, childState)
+    // }
+  }
   // This is the generated code for the type expression as literally written,
   // not accounting for any dependencies.
   const leafValueSnippets = fixture.generate(node, state)

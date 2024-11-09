@@ -12,7 +12,7 @@ export const tsCoreCompiler = makeCompiler(
     standardLibraryCore,
     "_global",
     "export function initThy(_global: unknown) {\n",
-    "}\n",
+    "\n}\n",
     true,
   ),
 )

@@ -42,13 +42,8 @@ export function makeSpecMap<RequiredMethod extends keyof GeneratorForNameSpec>(
 
 export function lookupByName<RequiredMethod extends keyof GeneratorForNameSpec>(
   specMap: SpecMap<RequiredMethod>,
-  base: ValueIdentifier,
-  propertyAccesses: ValuePropertyAccess["propertyAccesses"],
+  names: string[],
 ): null | GeneratorForNameSpecWithRequiredMethod<RequiredMethod> {
-  const names = [
-    base.token.text,
-    ...propertyAccesses.map((pa) => pa.propertyToken.text),
-  ]
   let currentMap = specMap
   while (names.length > 0) {
     const name = names.shift()
@@ -74,14 +69,17 @@ export function lookupByName<RequiredMethod extends keyof GeneratorForNameSpec>(
 export function tryLookupNamedNode<
   RequiredMethod extends keyof GeneratorForNameSpec,
 >(specMap: SpecMap<RequiredMethod>, node: TreeNode) {
-  if (node.type === "value-identifier") {
-    return lookupByName(specMap, node, [])
+  if (node.type === "value-identifier" || node.type === "type-identifier") {
+    return lookupByName(specMap, [node.token.text])
   }
   if (
     node.type === "value-property-access" &&
     node.base.type === "value-identifier"
   ) {
-    return lookupByName(specMap, node.base, node.propertyAccesses)
+    return lookupByName(specMap, [
+      node.base.token.text,
+      ...node.propertyAccesses.map((pa) => pa.propertyToken.text),
+    ])
   }
   return null
 }

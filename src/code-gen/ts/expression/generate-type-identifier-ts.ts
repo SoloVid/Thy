@@ -3,11 +3,20 @@ import { makeGenerator, tryGeneratorOptions } from "../generate-from-options"
 import type { LibraryGeneratorCollection } from "../library-generator"
 import type { CodeGeneratorFunc } from "../ts-generator"
 import { generateIdentifierTs } from "./generate-value-identifier-ts"
+import { fromNode } from "code-gen/utils/from-node"
+import { autoTightC } from "../utils/auto-tight"
 
 export function typeIdentifierGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,
 ) {
-  return makeTypeIdentifierTsGenerator([])
+  return makeTypeIdentifierTsGenerator([
+    (node, state, fixture) => {
+      const typeSnippets = standardLibrary.typeIdentifierGenerator(node, state, fixture)
+      if (typeSnippets) {
+        return autoTightC(state, node, [fromNode(node, "undefined as unknown as "), typeSnippets])
+      }
+    }
+  ])
 }
 
 export function makeTypeIdentifierTsGenerator(

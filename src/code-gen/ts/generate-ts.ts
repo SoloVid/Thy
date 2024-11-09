@@ -72,6 +72,7 @@ export const tsGenerator =
             typeCallGeneratorTypeTs(standardLibrary),
           ],
         ),
+        standardLibrary,
       }
       return generateTs(node, state, fixture) as GeneratedSnippets
     }
@@ -118,7 +119,7 @@ export const tsGenerator =
     ].flat(Infinity as 1) as GeneratedSnippet[]
     return {
       output:
-        preludeContent + output.map((s) => s.text).join("") + endingContent,
+        preludeContent + output.map((s) => s.text).join("").trimEnd() + endingContent,
       errors: state.errors,
     }
   }

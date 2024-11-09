@@ -14,14 +14,9 @@ export function valueCallGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,
 ) {
   return makeValueCallTsGenerator([
-    ...defaultValueCallTsGenerators,
     standardLibrary.callGenerator,
   ])
 }
-
-export const defaultValueCallTsGenerators = [
-  makeControlFlowCallTsGenerator("throw"),
-]
 
 export function makeValueCallTsGenerator(
   specializations: CodeGeneratorFunc<ValueCall>[],

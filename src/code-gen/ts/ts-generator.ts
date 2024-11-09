@@ -7,6 +7,7 @@ export interface GeneratorFixture {
   generate: DefiniteCodeGeneratorFuncNoFixture<TreeNode>
   /** Sometimes we want to generate code for the same node, but as specifically a type. */
   generateAsType: DefiniteCodeGeneratorFuncNoFixture<TypedTreeNode>
+  readonly standardLibrary: LibraryGeneratorCollection
 }
 
 export type CodeGeneratorFunc<T> = (

@@ -7,6 +7,7 @@ export function tryGenerateBlankLineTs(
   state: GeneratorState,
 ): void | GeneratedSnippets {
   if (node.type === "blank-line") {
-    return { text: "\n" }
+    return []
+    // return { text: "\n" }
   }
 }

@@ -34,7 +34,7 @@ export function generateTypeAssignmentTs(
 ): GeneratedSnippets {
   const name = ta.variable.token.text
   const childState = state.makeChild({
-    context: contextType.isolatedExpression,
+    context: contextType.looseExpression,
     isTypeContext: true,
   })
   return fromComplicated(ta, [
