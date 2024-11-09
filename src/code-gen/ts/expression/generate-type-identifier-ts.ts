@@ -11,11 +11,18 @@ export function typeIdentifierGeneratorTs(
 ) {
   return makeTypeIdentifierTsGenerator([
     (node, state, fixture) => {
-      const typeSnippets = standardLibrary.typeIdentifierGenerator(node, state, fixture)
+      const typeSnippets = standardLibrary.typeIdentifierGenerator(
+        node,
+        state,
+        fixture,
+      )
       if (typeSnippets) {
-        return autoTightC(state, node, [fromNode(node, "undefined as unknown as "), typeSnippets])
+        return autoTightC(state, node, [
+          fromNode(node, "undefined as unknown as "),
+          typeSnippets,
+        ])
       }
-    }
+    },
   ])
 }
 

@@ -22,7 +22,11 @@ export function generateTypeTsForFunctionSignature(
       context: contextType.isolatedExpression,
     })
     // Types from standard library should be generated in simple fashion.
-    const stdLibGenerated = fixture.standardLibrary.typeIdentifierGenerator(node, childState, fixture)
+    const stdLibGenerated = fixture.standardLibrary.typeIdentifierGenerator(
+      node,
+      childState,
+      fixture,
+    )
     if (stdLibGenerated) {
       return stdLibGenerated
     }

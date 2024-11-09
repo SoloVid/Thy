@@ -24,6 +24,8 @@ export function makeCompiler(codeGenerator: CodeGenerator): Compiler {
       const tokenizerErrors: CompileError[] = []
       const tokenizer = makeTokenizer(source, tokenizerErrors)
       const parserOutput = parse(tokenizer)
+      // console.log(parserOutput)
+      // console.log(parserOutput.top.ideas)
       const generatorOutput = codeGenerator(parserOutput.top)
       return {
         output: generatorOutput.output,

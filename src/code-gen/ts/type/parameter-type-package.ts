@@ -40,9 +40,7 @@ export function makeParameterTypePackage(
       ` { f(`,
       paramsSoFar,
       `) {\n`,
-      ideasSoFar.map((snippet) =>
-        indentSnippets(snippet, s.indentLevel + 1),
-      ),
+      ideasSoFar.map((snippet) => indentSnippets(snippet, s.indentLevel + 1)),
       indent2,
       `return `,
       leafValueSnippets,

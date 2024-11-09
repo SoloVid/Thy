@@ -39,17 +39,13 @@ export function generateBlockExplicitLinesTs(
     ]
     return allGeneratedLines.map((l) => {
       // There's an open issue in TS 4.7 about typing this correctly. https://github.com/microsoft/TypeScript/issues/49280
-      const collapsedLine: GeneratedSnippet[] = [
-        l,
-      ].flat(Infinity as 1) as GeneratedSnippet[]
+      const collapsedLine: GeneratedSnippet[] = [l].flat(
+        Infinity as 1,
+      ) as GeneratedSnippet[]
       if (collapsedLine.length === 0) {
-        return { text: "\n"}
+        return { text: "\n" }
       }
-      return [
-        genIndent(state.indentLevel),
-        collapsedLine,
-        { text: "\n" },
-      ]
+      return [genIndent(state.indentLevel), collapsedLine, { text: "\n" }]
     })
   })
 

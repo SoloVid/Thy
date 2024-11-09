@@ -13,9 +13,7 @@ import { makeControlFlowCallTsGenerator } from "./generate-control-flow-call-ts"
 export function valueCallGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,
 ) {
-  return makeValueCallTsGenerator([
-    standardLibrary.callGenerator,
-  ])
+  return makeValueCallTsGenerator([standardLibrary.callGenerator])
 }
 
 export function makeValueCallTsGenerator(
