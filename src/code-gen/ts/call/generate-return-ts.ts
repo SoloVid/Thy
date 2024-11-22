@@ -27,7 +27,7 @@ export function tryGenerateReturnTs(
     if (node.type === "return") {
       return generateReturnTs(node, state, fixture)
     } else {
-      return fromNode(node, "void null")
+      return fromNode(node, `void "type return erased"`)
     }
   }
 }

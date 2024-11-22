@@ -9,6 +9,8 @@ import type { CodeGeneratorFunc, GeneratorFixture } from "../ts-generator"
 import { generateTypeArgsTs } from "../type/generate-type-args-ts"
 import { separateSnippetsWithCommas } from "../utils/comma-separated-snippets"
 import { makeControlFlowCallTsGenerator } from "./generate-control-flow-call-ts"
+import { trace } from "../utils/debug"
+import { fromNode } from "code-gen/utils/from-node"
 
 export function valueCallGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,
@@ -36,7 +38,10 @@ export function generateValueCallTs(
   fixture: GeneratorFixture,
   callName?: string,
 ): GeneratedSnippets {
+  trace("generateValueCallTs()")
+  // console.log(state)
   if (state.isTypeContext) {
+    trace("isTypeContext")
     return generateCallTsInTypeContext(call, state, fixture, callName)
   }
 
@@ -58,7 +63,8 @@ export function generateCallTsInTypeContext(
   fixture: GeneratorFixture,
   callName?: string,
 ): GeneratedSnippets {
-  callName = callName ? `_${callName}` : state.getUniqueVariableName()
+  trace("generateCallTsInTypeContext()")
+  callName = callName ? `_${callName}` : (state.assignmentContextName ? `_${state.assignmentContextName}` : state.getUniqueVariableName())
   const { functionSnippet, typeArgSnippets, argSnippets } = generateCallPartsTs(
     call,
     state,
@@ -73,7 +79,7 @@ export function generateCallTsInTypeContext(
   const restParamsTypeName = `${callName}_RestParams`
   state.addPreStatementGenerator((s, f) =>
     fromComplicated(call, [
-      `function ${wrappedValueFuncName} { return `,
+      `function ${wrappedValueFuncName}() { return `,
       functionSnippet,
       generateTypeArgsTs(call, typeArgSnippets),
       ` }`,
@@ -81,13 +87,13 @@ export function generateCallTsInTypeContext(
   )
   state.addPreStatementGenerator((s, f) =>
     fromComplicated(call, [
-      `type ${restParamsTypeName} = (ReturnType<typeof ${wrappedValueFuncName}>) extends (${argsAsUnknown}...rest: infer U) => unknown ? U : []`,
+      `type ${restParamsTypeName} = ReturnType<typeof ${wrappedValueFuncName}> extends (${argsAsUnknown}...rest: infer U) => unknown ? U : []`,
     ]),
   )
   return fromComplicated(call, [
     `${wrappedValueFuncName}()(`,
-    separateSnippetsWithCommas(call, argSnippets),
-    `, ...([] as unknown[] as ${restParamsTypeName}))`,
+    separateSnippetsWithCommas(call, [...argSnippets, fromNode(call, `...([] as unknown[] as ${restParamsTypeName})`)]),
+    `)`,
   ])
 }
 

@@ -1,5 +1,5 @@
 foo is def
-  TODO implement
+  TODO: implement
 
 foo
   foo
@@ -8,10 +8,10 @@ foo
         foo
           bar "himom"
       foo
-        console.log "himom"
+        print "himom"
 
 foo
   foo
     bar "himom"
     foo
-      console.log "himom"
+      print "himom"

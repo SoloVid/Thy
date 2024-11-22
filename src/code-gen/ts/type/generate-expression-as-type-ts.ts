@@ -4,21 +4,32 @@ import type { TypedTreeNode } from "tree"
 import type { GeneratedSnippets } from "../../generator"
 import type { GeneratorState } from "../generator-state"
 import type { GeneratorFixture } from "../ts-generator"
+import { trace } from "../utils/debug"
+import { contextType } from "../generator-context"
 
 export function generateExpressionAsTypeTs(
   node: TypedTreeNode,
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
+  trace("generateExpressionAsTypeTs()")
+  // console.log(state)
   if (isSimpleNamedExpression(node)) {
     return [fromNode(node, "typeof "), fixture.generate(node, state)]
   }
+  if (node.type === "type-given-call") {
+    return fixture.generateAsType(node, state)
+  }
 
-  const name = `${state.getUniqueVariableName()}_WrappedType`
+  const nameBase = state.assignmentContextName ? `_${state.assignmentContextName}` : state.getUniqueVariableName()
+  const name = `${nameBase}_WrappedType`
   state.addPreStatementGenerator((s, f) =>
     fromComplicated(node, [
       `function ${name}() { return `,
-      fixture.generate(node, s),
+      fixture.generate(node, s.makeChild({
+        assignmentContextName: state.assignmentContextName,
+        context: contextType.isolatedExpression,
+      })),
       ` }`,
     ]),
   )

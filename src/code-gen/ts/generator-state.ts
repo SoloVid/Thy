@@ -15,6 +15,7 @@ interface GeneratorStateOptions {
   readonly context?: ContextType
   readonly increaseIndent?: boolean
   readonly isTypeContext?: boolean
+  readonly assignmentContextName?: string | null
   readonly newImplicitArguments?: boolean | string
   readonly newPreStatementsArray?: boolean
 }
@@ -36,7 +37,7 @@ export interface GeneratorBlockState {
     /** TypeScript generated for parameter specification (item in comma-separated list inside `(...)`). */
     readonly inlineSnippet: GeneratedSnippets
   }[]
-  readonly ideaSnippets: (readonly GeneratedSnippet[])[]
+  readonly ideaSnippets: (GeneratedSnippet[])[]
   /**
    * If something needs to be generated in a statement context prior
    * to the current block (e.g. we're putting something into
@@ -65,6 +66,7 @@ export interface GeneratorState {
   readonly isTypeContext: boolean
   /** Singleton(ish) array of errors encountered. */
   readonly errors: CompileError[]
+  readonly assignmentContextName: string | null
   /**
    * If something needs to be generated in a statement context prior
    * to the current statement (e.g. we're in a nested expression),
@@ -114,6 +116,7 @@ export function makeGeneratorState(
       options.isTypeContext !== undefined
         ? options.isTypeContext
         : (parent?.isTypeContext ?? false),
+    assignmentContextName: options.assignmentContextName !== undefined ? options.assignmentContextName : (parent?.assignmentContextName ?? null),
     getUniqueVariableName,
     symbolTable: options.symbolTable ?? parent?.symbolTable ?? null,
     block: options.block ?? parent?.block ?? null,

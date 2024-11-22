@@ -4,6 +4,7 @@ import { generateAssignmentTs } from "../../block/generate-assignment-ts"
 import { contextType } from "../../generator-context"
 import type { GeneratorForNameSpec } from "../../generator-for-name"
 import { addErrorForExcessArgs } from "../helpers/too-many-args-error"
+import { trace } from "code-gen/ts/utils/debug"
 
 export const defGenerator: GeneratorForNameSpec = {
   name: "def",
@@ -39,25 +40,31 @@ export const defGenerator: GeneratorForNameSpec = {
     )
   },
   generateTypeAssignment(node, state, fixture) {
+    trace("def:generateTypeAssignment()")
     assert(
       node.call.type === "value-call",
       "It should be impossible to hit this case because def is a value function, not a type function.",
     )
-    // There's nothing special to do if there are value arguments.
-    if (node.call.args.length > 0) {
-      return
-    }
-    // There's nothing special to do if there are no type arguments.
-    if (node.call.typeArgs.length === 0) {
+    // If there are both value and type arguments, we don't want to do something fancy.
+    if (node.call.args.length > 0 && node.call.typeArgs.length > 0) {
       return
     }
     addErrorForExcessArgs(node.call, state, "def", 1, 1)
-
-    return fromComplicated(node, [
-      `const `,
-      node.variable.token.text,
-      ` = undefined as unknown as `,
-      fixture.generateAsType(node.call.typeArgs[0], state),
-    ])
+    if (node.call.args.length > 0) {
+      return fromComplicated(node, [
+        `const `,
+        node.variable.token.text,
+        ` = undefined as unknown as `,
+        fixture.generateAsType(node.call.args[0], state),
+      ])
+    }
+    if (node.call.typeArgs.length > 0) {
+      return fromComplicated(node, [
+        `const `,
+        node.variable.token.text,
+        ` = undefined as unknown as `,
+        fixture.generateAsType(node.call.typeArgs[0], state),
+      ])
+    }
   },
 }

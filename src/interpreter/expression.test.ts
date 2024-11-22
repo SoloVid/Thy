@@ -70,16 +70,26 @@ test("interpretThyExpression() can interpolate string", async () => {
     variablesInBlock: { a: 12 },
   })
   assert.strictEqual(
-    interpretThyExpressionBasic(context, `"check .a."`).target,
+    interpretThyExpressionBasic(context, `"check ..a.."`).target,
     "check 12",
+  )
+})
+
+test("interpretThyExpression() allows periods in non-interpolation formats", async () => {
+  const context = makeSimpleContext({
+    variablesInBlock: { a: 12 },
+  })
+  assert.strictEqual(
+    interpretThyExpressionBasic(context, `"check. .a. some/../path/../here ..a. .a.."`).target,
+    "check. .a. some/../path/../here ..a. .a..",
   )
 })
 
 test("interpretThyExpression() allows escaping periods in string", async () => {
   const context = makeSimpleContext()
   assert.strictEqual(
-    interpretThyExpressionBasic(context, `"check \\.a\\."`).target,
-    "check .a.",
+    interpretThyExpressionBasic(context, `"check \\.\\.a\\.\\."`).target,
+    "check ..a..",
   )
 })
 

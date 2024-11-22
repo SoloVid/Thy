@@ -4,7 +4,7 @@ import { fromNode } from "./from-node"
 
 export function fromComplicated(
   node: TreeNode,
-  parts: (GeneratedSnippets | string)[],
+  parts: readonly (GeneratedSnippets | string)[],
 ): GeneratedSnippets {
   return parts.map((p) => (typeof p === "string" ? fromNode(node, p) : p))
 }

@@ -20,6 +20,7 @@ import {
   voidTypeGenerator,
 } from "./primitive-types"
 import { printGenerator } from "./print"
+import { stringGenerator } from "./string"
 import { intersectionGenerator, unionGenerator } from "./transform-types"
 
 /**
@@ -32,6 +33,7 @@ export const standardLibraryCore = makeLibraryGenerators([
   ifGenerator,
   mathGenerator,
   printGenerator,
+  stringGenerator,
 
   falseGenerator,
   nullGenerator,

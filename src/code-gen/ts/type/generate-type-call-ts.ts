@@ -10,10 +10,8 @@ import { tryGenerateTypeGivenCallTs } from "./generate-type-given-call-ts"
 export function typeCallGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,
 ) {
-  return makeTypeCallTsGenerator([...defaultTypeCallTsGenerators])
+  return makeTypeCallTsGenerator([])
 }
-
-export const defaultTypeCallTsGenerators = [tryGenerateTypeGivenCallTs]
 
 export function makeTypeCallTsGenerator(
   specializations: CodeGeneratorFunc<TypeCall>[],

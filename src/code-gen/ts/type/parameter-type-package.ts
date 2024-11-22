@@ -25,7 +25,7 @@ export function makeParameterTypePackage(
     "makeParameterTypePackage() should only be called in a block",
   )
 
-  const packageClassName = `_${nameBase}_TypePackage`
+  const packageClassName = `_${nameBase.replace(/^_/, "")}_TypePackage`
   const typeParamsSoFar = generateTypeParamsForBlockTs(node, state)
   const typeArgsSoFar = generateTypeArgsForBlockTs(node, state)
   const paramsSoFar = generateParamsTs(node, state, fixture)
@@ -40,7 +40,8 @@ export function makeParameterTypePackage(
       ` { f(`,
       paramsSoFar,
       `) {\n`,
-      ideasSoFar.map((snippet) => indentSnippets(snippet, s.indentLevel + 1)),
+      ideasSoFar,
+      // ideasSoFar.map((snippet) => indentSnippets(snippet, s.indentLevel + 1)),
       indent2,
       `return `,
       leafValueSnippets,

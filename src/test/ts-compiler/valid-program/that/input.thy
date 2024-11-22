@@ -2,7 +2,7 @@ math.add 1 1
 math.multiply 1 1
 math.divide that that
 check.equal that 1
-console.log that
+print that
 
 makeFunctionFunction is def
   a is given Number

@@ -20,7 +20,7 @@ import {
   typePropertyAccessGeneratorTs,
   valuePropertyAccessGeneratorTs,
 } from "./expression/generate-property-access-ts"
-import { tryGenerateStringTs } from "./expression/generate-string-ts"
+import { tryGenerateStringTs, tryGenerateStringTypeTs } from "./expression/generate-string-ts"
 import {
   typeIdentifierGeneratorTs,
   typeIdentifierGeneratorTypeTs,
@@ -42,6 +42,7 @@ import {
 } from "./type/generate-type-call-ts"
 import { tryGenerateTypeGivenCallTs } from "./type/generate-type-given-call-ts"
 import { autoTightS } from "./utils/auto-tight"
+import { trace } from "./utils/debug"
 
 export const tsGenerator =
   (
@@ -52,7 +53,7 @@ export const tsGenerator =
     indent: boolean = false,
   ) =>
   (node: TreeNode): GeneratorResult => {
-    const state = makeGeneratorState(undefined, {
+    const rootState = makeGeneratorState(undefined, {
       context: contextType.topLevel,
       newImplicitArguments: globalsObjectName,
       increaseIndent: indent,
@@ -65,11 +66,15 @@ export const tsGenerator =
           () => fixture,
           (node) => node,
           (node, state) => {
+            trace("generateAsType()")
+            // console.log(state)
             return generateExpressionAsTypeTs(node, state, fixture)
           },
           [
+            tryGenerateStringTypeTs,
             typeIdentifierGeneratorTypeTs(standardLibrary),
             typeCallGeneratorTypeTs(standardLibrary),
+            tryGenerateTypeGivenCallTs,
           ],
         ),
         standardLibrary,
@@ -115,7 +120,7 @@ export const tsGenerator =
 
     // There's an open issue in TS 4.7 about typing this correctly. https://github.com/microsoft/TypeScript/issues/49280
     const output: GeneratedSnippet[] = [
-      generateTsWithSelfFixture(node, state),
+      generateTsWithSelfFixture(node, rootState),
     ].flat(Infinity as 1) as GeneratedSnippet[]
     return {
       output:
@@ -125,6 +130,6 @@ export const tsGenerator =
           .join("")
           .trimEnd() +
         endingContent,
-      errors: state.errors,
+      errors: rootState.errors,
     }
   }

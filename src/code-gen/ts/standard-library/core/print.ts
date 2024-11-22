@@ -1,3 +1,4 @@
+import { contextType } from "code-gen/ts/generator-context"
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromNode } from "code-gen/utils/from-node"
 import type { GeneratorForNameSpec } from "../../generator-for-name"
@@ -11,7 +12,9 @@ export const printGenerator: GeneratorForNameSpec = {
     }
     addErrorForExcessArgs(node, state, "print", 1)
 
-    const childState = state.makeChild()
+    const childState = state.makeChild({
+      context: contextType.isolatedExpression
+    })
     const targetTs = fixture.generate(node.args[0], childState)
 
     return fromComplicated(node, [

@@ -1,47 +1,30 @@
-export const RelatedTypesType = undefined as unknown as "himom"
+export function initThy(_global: unknown) {
+  const RelatedTypesType = undefined as unknown as "himom"
 
-class _T_TypePackage {
-  f() {
-    return undefined as unknown as typeof RelatedTypesType
-  }
-}
-class _U_TypePackage<_T_Param extends ReturnType<_T_TypePackage["f"]>> {
-  f() {
-    const T = undefined as unknown as _T_Param
+  class _U_TypePackage<_T extends typeof RelatedTypesType = typeof RelatedTypesType> { f() {
+    const T = undefined as unknown as _T
     const U0 = undefined as unknown as typeof T | number
-    return undefined as unknown as typeof U0
-  }
-}
-class _1_TypePackage<
-  _T_Param extends ReturnType<_T_TypePackage["f"]>,
-  _U_Param extends ReturnType<_U_TypePackage<_T_Param>["f"]>,
-> {
-  f() {
-    const T = undefined as unknown as _T_Param
+    return U0
+  } }
+  class _1_TypePackage<_T extends typeof RelatedTypesType = typeof RelatedTypesType, _U extends ReturnType<_U_TypePackage<_T>["f"]> = ReturnType<_U_TypePackage<_T>["f"]>> { f() {
+    const T = undefined as unknown as _T
     const U0 = undefined as unknown as typeof T | number
-    const U = undefined as unknown as _U_Param
-    return undefined as unknown as typeof U
-  }
-}
-class _p_TypePackage<
-  _T_Param extends ReturnType<_T_TypePackage["f"]>,
-  _U_Param extends ReturnType<_U_TypePackage<_T_Param>["f"]>,
-> {
-  f() {
-    const T = undefined as unknown as _T_Param
+    const U = undefined as unknown as _U
+    return U
+  } }
+  class _p_TypePackage<_T extends typeof RelatedTypesType = typeof RelatedTypesType, _U extends ReturnType<_U_TypePackage<_T>["f"]> = ReturnType<_U_TypePackage<_T>["f"]>> { f() {
+    const T = undefined as unknown as _T
     const U0 = undefined as unknown as typeof T | number
-    const U = undefined as unknown as _U_Param
-    return undefined as unknown as typeof U
+    const U = undefined as unknown as _U
+    void "type return erased"
+    return U
+  } }
+  const funcWithRelatedTypes = <_T extends typeof RelatedTypesType = typeof RelatedTypesType, _U extends ReturnType<_U_TypePackage<_T>["f"]> = ReturnType<_U_TypePackage<_T>["f"]>>(_p: ReturnType<_p_TypePackage<_T, _U>["f"]>): ReturnType<_1_TypePackage<_T, _U>["f"]> => {
+    const T = undefined as unknown as _T
+    const U0 = undefined as unknown as typeof T | number
+    const U = undefined as unknown as _U
+    void "type return erased"
+    const p = _p
+    return p
   }
-}
-export const funcWithRelatedTypes = <
-  _T_Param extends ReturnType<_T_TypePackage["f"]>,
-  _U_Param extends ReturnType<_U_TypePackage<_T_Param>["f"]>,
->(
-  p: ReturnType<_p_TypePackage<_T_Param, _U_Param>["f"]>,
-): ReturnType<_1_TypePackage<_T_Param, _U_Param>["f"]> => {
-  const T = undefined as unknown as _T_Param
-  const U0 = undefined as unknown as typeof T | number
-  const U = undefined as unknown as _U_Param
-  return p
 }

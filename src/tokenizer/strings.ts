@@ -27,7 +27,7 @@ export const matchStringInterpolation = makeNestedTokenizerMatcher(
 
 const matchStringText = makeSingleRegexMatcher(
   tStringText,
-  /(?:\\.|[^".\r\n]|(?:\.\.(?![a-z][a-zA-Z0-9]*\.\.)))+/,
+  /(?:\\.|(?:\.(?!\.))|[^".\r\n]|(?:\.\.(?![a-z][a-zA-Z0-9]*\.\.)))+/,
 )
 const matchSimpleStringLiteralEnd = makeSingleRegexMatcher(tEndString, /"/)
 export const matchSimpleStringLiteral = makeNestedTokenizerMatcher(

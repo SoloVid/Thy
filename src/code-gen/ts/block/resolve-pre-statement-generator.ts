@@ -10,9 +10,12 @@ export function resolvePreStatementGenerator(
   generator: IndependentCodeGeneratorFunc,
   state: GeneratorState,
   fixture: GeneratorFixture,
-): readonly GeneratedSnippets[] {
+): GeneratedSnippets[] {
   const lineState = state.makeChild({
     context: contextType.blockNoReturn,
+    // There is currently no category of pre-statement generator that is not a type,
+    // and I'm not immediately sure how to translate isTypeContext here otherwise.
+    isTypeContext: true,
     newPreStatementsArray: true,
   })
   const directSnippet = generator(lineState, fixture)

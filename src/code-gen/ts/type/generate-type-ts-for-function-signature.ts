@@ -32,9 +32,9 @@ export function generateTypeTsForFunctionSignature(
     }
     // TODO: If the symbol can be found in the parent block,
     // it won't require generating extra stuff prior to the function signature.
-    // if (state.parent?.symbolTable?.getSymbolInfo(node.token.text) ?? null !== null) {
-    //   return fixture.generateAsType(node, childState)
-    // }
+    if (!state.symbolTable?.localSymbols.has(node.token.text)) {
+      return fixture.generateAsType(node, childState)
+    }
   }
   // This is the generated code for the type expression as literally written,
   // not accounting for any dependencies.

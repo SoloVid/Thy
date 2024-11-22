@@ -6,6 +6,8 @@ import { GeneratorState } from "../generator-state"
 import { contextType } from "../generator-context"
 import type { LibraryGeneratorCollection } from "../library-generator"
 import type { CodeGeneratorFunc, GeneratorFixture } from "../ts-generator"
+import { trace } from "../utils/debug"
+import { generateTypeGivenCallTypeTsWithParameterName } from "./generate-type-given-call-ts"
 
 export function typeAssignmentGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,
@@ -32,13 +34,34 @@ export function generateTypeAssignmentTs(
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
+  trace(`generateTypeAssignmentTs()`)
+
   const name = ta.variable.token.text
-  const childState = state.makeChild({
-    context: contextType.looseExpression,
-    isTypeContext: true,
-  })
+
+  function generateValueExpression() {
+    const childState = state.makeChild({
+      context: contextType.isolatedExpression,
+      isTypeContext: true,
+      assignmentContextName: name,
+    })
+    // console.log(childState)
+    if (
+      ta.call.type === "type-given-call"
+    ) {
+      return generateTypeGivenCallTypeTsWithParameterName(
+        ta.call,
+        childState,
+        fixture,
+        `_${ta.variable.token.text}`,
+      )
+    }
+    return fixture.generateAsType(ta.call, childState)
+  }
+
+  // console.log(name)
+  // console.log(childState)
   return fromComplicated(ta, [
     `const ${name} = undefined as unknown as `,
-    fixture.generateAsType(ta.call, childState),
+    generateValueExpression(),
   ])
 }

@@ -30,6 +30,7 @@ export function generateBlockTs(
     const blockBodyState = state.makeChild({
       symbolTable: block.symbolTable,
       context: contextType.blockAllowingReturn,
+      assignmentContextName: null,
     })
     return generateBlockLinesTs(block, block.ideas, blockBodyState, fixture)
   }
@@ -66,7 +67,7 @@ export function generateBlockTs(
     linesTs = [
       fromTokenRange(
         block,
-        `${space}const ${n} = {...${localName}, ...${parentObj}} as const\n`,
+        `${space}const ${n} = { ...${localName}, ...${parentObj} } as const\n`,
       ),
       linesTs,
     ]

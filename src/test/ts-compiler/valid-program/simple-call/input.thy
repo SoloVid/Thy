@@ -1,1 +1,2 @@
-console.log true "B" 3
+s is string true "B" 3
+print s

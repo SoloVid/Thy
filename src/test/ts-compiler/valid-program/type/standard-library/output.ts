@@ -15,11 +15,11 @@ export function initThy(_global: unknown) {
     const p = _p
   }
 
-  const BasicIntersection = undefined as unknown as (string & number)
-  const BasicUnion = undefined as unknown as (string | number)
-  const UnionWithValue = undefined as unknown as (string | typeof unknownFunc)
-  function _1_WrappedType() { return () => {
+  const BasicIntersection = undefined as unknown as string & number
+  const BasicUnion = undefined as unknown as string | number
+  const UnionWithValue = undefined as unknown as string | typeof unknownFunc
+  function _NonTrivialUnion_WrappedType() { return () => {
     return "himom" as const
   } }
-  const NonTrivialUnion = undefined as unknown as (string | ReturnType<typeof _1_WrappedType>)
+  const NonTrivialUnion = undefined as unknown as string | ReturnType<typeof _NonTrivialUnion_WrappedType>
 }
