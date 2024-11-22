@@ -13,7 +13,7 @@ export const printGenerator: GeneratorForNameSpec = {
     addErrorForExcessArgs(node, state, "print", 1)
 
     const childState = state.makeChild({
-      context: contextType.isolatedExpression
+      context: contextType.isolatedExpression,
     })
     const targetTs = fixture.generate(node.args[0], childState)
 

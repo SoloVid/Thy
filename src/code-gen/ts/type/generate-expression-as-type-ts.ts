@@ -21,15 +21,20 @@ export function generateExpressionAsTypeTs(
     return fixture.generateAsType(node, state)
   }
 
-  const nameBase = state.assignmentContextName ? `_${state.assignmentContextName}` : state.getUniqueVariableName()
+  const nameBase = state.assignmentContextName
+    ? `_${state.assignmentContextName}`
+    : state.getUniqueVariableName()
   const name = `${nameBase}_WrappedType`
   state.addPreStatementGenerator((s, f) =>
     fromComplicated(node, [
       `function ${name}() { return `,
-      fixture.generate(node, s.makeChild({
-        assignmentContextName: state.assignmentContextName,
-        context: contextType.isolatedExpression,
-      })),
+      fixture.generate(
+        node,
+        s.makeChild({
+          assignmentContextName: state.assignmentContextName,
+          context: contextType.isolatedExpression,
+        }),
+      ),
       ` }`,
     ]),
   )

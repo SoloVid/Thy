@@ -37,7 +37,7 @@ export interface GeneratorBlockState {
     /** TypeScript generated for parameter specification (item in comma-separated list inside `(...)`). */
     readonly inlineSnippet: GeneratedSnippets
   }[]
-  readonly ideaSnippets: (GeneratedSnippet[])[]
+  readonly ideaSnippets: GeneratedSnippet[][]
   /**
    * If something needs to be generated in a statement context prior
    * to the current block (e.g. we're putting something into
@@ -116,7 +116,10 @@ export function makeGeneratorState(
       options.isTypeContext !== undefined
         ? options.isTypeContext
         : (parent?.isTypeContext ?? false),
-    assignmentContextName: options.assignmentContextName !== undefined ? options.assignmentContextName : (parent?.assignmentContextName ?? null),
+    assignmentContextName:
+      options.assignmentContextName !== undefined
+        ? options.assignmentContextName
+        : (parent?.assignmentContextName ?? null),
     getUniqueVariableName,
     symbolTable: options.symbolTable ?? parent?.symbolTable ?? null,
     block: options.block ?? parent?.block ?? null,

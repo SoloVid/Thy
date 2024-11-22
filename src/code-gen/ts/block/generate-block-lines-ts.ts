@@ -46,7 +46,11 @@ export function generateBlockExplicitLinesTs(
       if (collapsedLine.length === 0) {
         return [{ text: "\n" }]
       }
-      state.block?.ideaSnippets.push([genIndent(state.indentLevel), ...collapsedLine, { text: "\n" }])
+      state.block?.ideaSnippets.push([
+        genIndent(state.indentLevel),
+        ...collapsedLine,
+        { text: "\n" },
+      ])
       return [genIndent(state.indentLevel), ...collapsedLine, { text: "\n" }]
     })
   })

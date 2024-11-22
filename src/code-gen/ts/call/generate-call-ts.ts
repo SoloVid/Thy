@@ -64,7 +64,11 @@ export function generateCallTsInTypeContext(
   callName?: string,
 ): GeneratedSnippets {
   trace("generateCallTsInTypeContext()")
-  callName = callName ? `_${callName}` : (state.assignmentContextName ? `_${state.assignmentContextName}` : state.getUniqueVariableName())
+  callName = callName
+    ? `_${callName}`
+    : state.assignmentContextName
+      ? `_${state.assignmentContextName}`
+      : state.getUniqueVariableName()
   const { functionSnippet, typeArgSnippets, argSnippets } = generateCallPartsTs(
     call,
     state,
@@ -92,7 +96,10 @@ export function generateCallTsInTypeContext(
   )
   return fromComplicated(call, [
     `${wrappedValueFuncName}()(`,
-    separateSnippetsWithCommas(call, [...argSnippets, fromNode(call, `...([] as unknown[] as ${restParamsTypeName})`)]),
+    separateSnippetsWithCommas(call, [
+      ...argSnippets,
+      fromNode(call, `...([] as unknown[] as ${restParamsTypeName})`),
+    ]),
     `)`,
   ])
 }

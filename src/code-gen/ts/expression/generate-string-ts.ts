@@ -43,9 +43,7 @@ export function tryGenerateStringTypeTs(
 ): GeneratedSnippets | undefined {
   if (node.type === "string-literal") {
     if (node.parts.length === 1 && node.parts[0].type === "string-content") {
-      return fromNode(node, 
-        JSON.stringify(node.parts[0].token.text)
-      )
+      return fromNode(node, JSON.stringify(node.parts[0].token.text))
     }
     return fromComplicated(node, [
       "`",

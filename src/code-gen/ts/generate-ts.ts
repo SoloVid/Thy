@@ -20,7 +20,10 @@ import {
   typePropertyAccessGeneratorTs,
   valuePropertyAccessGeneratorTs,
 } from "./expression/generate-property-access-ts"
-import { tryGenerateStringTs, tryGenerateStringTypeTs } from "./expression/generate-string-ts"
+import {
+  tryGenerateStringTs,
+  tryGenerateStringTypeTs,
+} from "./expression/generate-string-ts"
 import {
   typeIdentifierGeneratorTs,
   typeIdentifierGeneratorTypeTs,

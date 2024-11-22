@@ -20,8 +20,8 @@ export const stringGenerator: GeneratorForNameSpec = {
       node,
       [
         "`",
-        ...node.args.map(a => ["${",fixture.generate(a, childState),"}"]),
-        "`"
+        ...node.args.map((a) => ["${", fixture.generate(a, childState), "}"]),
+        "`",
       ].flat(),
     )
   },

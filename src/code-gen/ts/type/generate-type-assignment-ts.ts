@@ -45,9 +45,7 @@ export function generateTypeAssignmentTs(
       assignmentContextName: name,
     })
     // console.log(childState)
-    if (
-      ta.call.type === "type-given-call"
-    ) {
+    if (ta.call.type === "type-given-call") {
       return generateTypeGivenCallTypeTsWithParameterName(
         ta.call,
         childState,

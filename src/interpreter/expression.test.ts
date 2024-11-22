@@ -80,7 +80,10 @@ test("interpretThyExpression() allows periods in non-interpolation formats", asy
     variablesInBlock: { a: 12 },
   })
   assert.strictEqual(
-    interpretThyExpressionBasic(context, `"check. .a. some/../path/../here ..a. .a.."`).target,
+    interpretThyExpressionBasic(
+      context,
+      `"check. .a. some/../path/../here ..a. .a.."`,
+    ).target,
     "check. .a. some/../path/../here ..a. .a..",
   )
 })
