@@ -38,7 +38,12 @@ export function generateBlockExplicitLinesTs(
       ...preGeneratedLines.flat(1),
       primaryGeneratedLine,
     ]
-    if (Array.isArray(primaryGeneratedLine) && primaryGeneratedLine.length === 0 && preGeneratedLines.length === 0 && idea.type === "let-call") {
+    if (
+      Array.isArray(primaryGeneratedLine) &&
+      primaryGeneratedLine.length === 0 &&
+      preGeneratedLines.length === 0 &&
+      idea.type === "let-call"
+    ) {
       return []
     }
     return allGeneratedLines.map((l) => {

@@ -40,7 +40,5 @@ export function interpretThySyncBlock(
       return helper.formulateResult()
     },
   }
-  return {
-    interpreted: objWithBlockFunction[functionName],
-  }
+  return objWithBlockFunction[functionName]
 }

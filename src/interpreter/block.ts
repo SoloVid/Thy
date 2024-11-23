@@ -4,7 +4,7 @@ import { makeTokenizer } from "tokenizer"
 import type { Block } from "tree"
 import { interpretThyAsyncBlock } from "./block-async"
 import { interpretThySyncBlock } from "./block-sync"
-import { RuntimeFunction, RuntimeValue } from "./dynamic-type"
+import { RuntimeValue } from "./dynamic-type"
 import { makeInterpreterCompileError } from "./interpreter-error"
 import { ThyBlockContext } from "./types"
 
@@ -18,6 +18,7 @@ export type BlockOptions = {
 export type ApiUnknownFunction = (...args: readonly unknown[]) => unknown
 type ApiInterpretedBlockWithMeta = {
   interpreted: ApiUnknownFunction
+  block: Block
 }
 
 export function interpretThyBlockSource(
@@ -45,22 +46,27 @@ export function interpretThyBlockSourceWithMeta(
   }) as ApiInterpretedBlockWithMeta
 }
 
-export function interpretThyBlockNode(
-  block: Block,
-  options: BlockOptions,
-): RuntimeFunction {
-  return interpretThyBlockNodeWithMeta(block, options)
-    .interpreted as RuntimeFunction
-}
-
 export function interpretThyBlockNodeWithMeta(
   block: Block,
   options: BlockOptions,
 ): {
+  block: Block
   interpreted: (
     ...args: readonly RuntimeValue[]
   ) => RuntimeValue | undefined | PromiseLike<RuntimeValue | undefined>
 } {
+  return {
+    block: block,
+    interpreted: interpretThyBlockNode(block, options),
+  }
+}
+
+export function interpretThyBlockNode(
+  block: Block,
+  options: BlockOptions,
+): (
+  ...args: readonly RuntimeValue[]
+) => RuntimeValue | undefined | PromiseLike<RuntimeValue | undefined> {
   const functionName = options.functionName ?? "<anonymous>"
 
   if (block.isAsync) {

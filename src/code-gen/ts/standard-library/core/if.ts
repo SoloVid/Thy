@@ -19,9 +19,15 @@ import { addErrorForExcessArgs } from "../helpers/too-many-args-error"
 export const ifGenerator: GeneratorForNameSpec = {
   name: "if",
   generateCall(node, state, fixture) {
-    return tryGenerateIfTs(node, state.makeChild({
-      context: isExpressionContext(state.context) ? state.context : contextType.blockNoReturn
-    }), fixture)
+    return tryGenerateIfTs(
+      node,
+      state.makeChild({
+        context: isExpressionContext(state.context)
+          ? state.context
+          : contextType.blockNoReturn,
+      }),
+      fixture,
+    )
   },
   generateLetCall(node, state, fixture) {
     return tryGenerateIfTs(
@@ -79,8 +85,13 @@ function tryGenerateIfTs(
   // UPDATE: I believe mightReturn could be false if there is an empty let
   // in both blocks and no other let/return.
   // const mightReturn = true
-  const mightReturn = (trueCaseNode !== null && trueCaseNode.type === "block" && mightAffectReturn(trueCaseNode)) ||
-      (elseCaseNode !== null && elseCaseNode.type === "block" && mightAffectReturn(elseCaseNode))
+  const mightReturn =
+    (trueCaseNode !== null &&
+      trueCaseNode.type === "block" &&
+      mightAffectReturn(trueCaseNode)) ||
+    (elseCaseNode !== null &&
+      elseCaseNode.type === "block" &&
+      mightAffectReturn(elseCaseNode))
 
   if (isExpressionContext(state.context)) {
     if (!requiresBlockSyntax) {
@@ -208,5 +219,9 @@ function mightAffectReturn(block: Block) {
   if (block.returnStyle !== returnStyle.explicitReturn) {
     return true
   }
-  return block.ideas.some(idea => idea.type === "return" || (idea.type === "let-call" && idea.call !== null))
+  return block.ideas.some(
+    (idea) =>
+      idea.type === "return" ||
+      (idea.type === "let-call" && idea.call !== null),
+  )
 }

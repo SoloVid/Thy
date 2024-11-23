@@ -43,7 +43,5 @@ export function interpretThyAsyncBlock(
       return helper.formulateResult()
     },
   }
-  return {
-    interpreted: objWithBlockFunction[functionName],
-  }
+  return objWithBlockFunction[functionName]
 }

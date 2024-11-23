@@ -129,9 +129,10 @@ export function makeGeneratorState(
       ? {
           get variableName() {
             if (cachedImplicitArgumentsVariableName === null) {
-              cachedImplicitArgumentsVariableName = typeof options.newImplicitArguments === "string"
-              ? options.newImplicitArguments
-              : getUniqueVariableName()
+              cachedImplicitArgumentsVariableName =
+                typeof options.newImplicitArguments === "string"
+                  ? options.newImplicitArguments
+                  : getUniqueVariableName()
             }
             return cachedImplicitArgumentsVariableName
           },

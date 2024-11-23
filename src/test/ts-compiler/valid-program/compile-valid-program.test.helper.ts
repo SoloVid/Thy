@@ -11,7 +11,10 @@ export const tsCoreCompiler = makeCompiler(
   tsGenerator(
     standardLibraryCore,
     "_global",
-    "export function initThy(_global: {}) {\n",
+    `import type { Core } from "thy-lang/std-lib"
+
+export function initThy(_global: Core) {
+`,
     "\n}\n",
     true,
   ),

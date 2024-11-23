@@ -95,7 +95,7 @@ function resolveBlock(context: ThyBlockContext, block: Block): RuntimeValue {
     return interpretThyBlockNode(block, {
       closure: childClosure,
       sourceFile: context.sourceFile,
-    })
+    }) as RuntimeFunction
   }
 
   // Rather than immediately construct the function for the block lines,

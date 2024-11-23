@@ -1,3 +1,3 @@
 export function trace(message: string) {
-  console.log(message)
+  // console.log(message)
 }

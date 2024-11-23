@@ -1,4 +1,6 @@
-export function initThy(_global: {}) {
+import type { Core } from "thy-lang/std-lib"
+
+export function initThy(_global: Core) {
   const RelatedTypesType = undefined as unknown as "himom"
 
   class _U_TypePackage<_T extends typeof RelatedTypesType = typeof RelatedTypesType> { f() {

@@ -1,4 +1,6 @@
-export function initThy(_global: {}) {
+import type { Core } from "thy-lang/std-lib"
+
+export function initThy(_global: Core) {
   class _exercise_TypePackage { f() {
     class _args_TypePackage { f() {
       function _Args_WrappedValue() { return (() => {

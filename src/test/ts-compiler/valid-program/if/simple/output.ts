@@ -1,4 +1,6 @@
-export function initThy(_global: {}) {
+import type { Core } from "thy-lang/std-lib"
+
+export function initThy(_global: Core) {
   const condition = true
   if (condition) {
     console.log("yay" as const)

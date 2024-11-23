@@ -31,10 +31,5 @@ export function generateReturnTypeTs(
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
   const typeNode = node.type === "type-return" ? node.args[0] : node.typeArgs[0]
-  return generateTypeTsForFunctionSignature(
-    typeNode,
-    state,
-    fixture,
-    null,
-  )
+  return generateTypeTsForFunctionSignature(typeNode, state, fixture, null)
 }

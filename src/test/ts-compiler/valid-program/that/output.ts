@@ -1,4 +1,6 @@
-export function initThy(_global: {}) {
+import type { Core } from "thy-lang/std-lib"
+
+export function initThy(_global: Core) {
   console.log(((1 + 1) / (1 * 1)) === 1)
 
   const makeFunctionFunction = (_a: number) => {
