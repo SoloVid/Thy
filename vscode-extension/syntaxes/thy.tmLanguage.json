@@ -45,7 +45,6 @@
               "name": "meta.line.content.thy",
               "patterns": [
                 { "include": "#type-assignments" },
-                { "include": "#type-call-statements" },
                 { "include": "#assignments" },
                 { "include": "#lets" },
                 { "include": "#call-continuations" },
@@ -75,25 +74,24 @@
       "patterns": [
         {
           "name": "meta.type-assignment.thy",
-          "match": "\\b(?:(export) +)?(?:(private) +)?(?:(type) +)([A-Z][^ ]*) +(is)( +.*)?$",
+          "match": "\\b(?:(export) +)?(?:(private) +)?(type)(?: +([^ ]*)?)?( +.*)?$",
           "captures": {
             "1": { "name": "keyword.control.export.thy" },
             "2": { "name": "storage.modifier.private.thy" },
             "3": { "name": "storage.type.type.thy" },
             "4": { "patterns": [{ "include": "#type-identifiers" }] },
-            "5": { "name": "keyword.operator.thy" },
-            "6": { "patterns": [{ "include": "#type-calls" }] }
+            "5": { "patterns": [{ "include": "#type-assignment-inners" }] }
           }
         }
       ]
     },
-    "type-call-statements": {
+    "type-assignment-inners": {
       "patterns": [
         {
-          "name": "meta.type-call-statement.thy",
-          "match": "\\b(type)\\b( +.*)?",
+          "name": "meta.type-assignment-inner.thy",
+          "match": " +(is)( +.*)?$",
           "captures": {
-            "1": { "name": "storage.type.type.thy" },
+            "1": { "name": "keyword.operator.thy" },
             "2": { "patterns": [{ "include": "#type-calls" }] }
           }
         }
@@ -134,6 +132,7 @@
             "1": {
               "patterns": [
                 { "include": "#special-functions" },
+                { "include": "#special-values" },
                 {
                   "match": "(?:(.+?)\\.)?(\\b[^. ]+\\b(?!\\.))?",
                   "captures": {
@@ -174,6 +173,7 @@
             "1": {
               "patterns": [
                 { "include": "#special-functions" },
+                { "include": "#special-values" },
                 {
                   "match": "(?:(.+?)\\.)?(\\b[^. ]+\\b(?!\\.))?",
                   "captures": {
@@ -257,13 +257,29 @@
     "special-functions": {
       "patterns": [
         {
-          "name": "keyword.control.thy",
-          "match": "(?<!\\.)\\b(await|return|throw)\\b"
+          "name": "keyword.control.await.thy",
+          "match": "(?<!\\.)\\b(await)\\b"
+        },
+        {
+          "name": "keyword.control.return.thy",
+          "match": "(?<!\\.)\\b(return)\\b"
+        },
+        {
+          "name": "keyword.control.throw.thy",
+          "match": "(?<!\\.)\\b(throw)\\b"
         }
       ]
     },
     "special-values": {
       "patterns": [
+        {
+          "name": "variable.language.type-given.thy",
+          "match": "(?<!\\.)\\b(Given)\\b"
+        },
+        {
+          "name": "variable.language.given.thy",
+          "match": "(?<!\\.)\\b(given)\\b"
+        },
         {
           "name": "variable.language.that.thy",
           "match": "(?<!\\.)\\b(that)\\b"

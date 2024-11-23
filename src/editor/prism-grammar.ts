@@ -4,7 +4,7 @@ import Prism from "prismjs"
 const innerParts: Grammar = {
   punctuation: [/\./],
   "class-name": /\b[A-Z][a-zA-Z0-9]*\b/g,
-  important: [/\bthat\b/g, /\bbeforeThat\b/g],
+  important: [/\bthat\b/g],
   number: [/\b-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?\b/],
 }
 const insideString: Grammar = {
@@ -61,7 +61,7 @@ export const thyPrismGrammar: Grammar = {
         pattern: /\b(await|return|throw)\b/,
         alias: ["keyword"],
       },
-      builtin: [/\bgiven\b/],
+      builtin: [/\b(given|Given)\b/],
       "let-call": {
         pattern: /\blet\b.*$/,
         inside: {
