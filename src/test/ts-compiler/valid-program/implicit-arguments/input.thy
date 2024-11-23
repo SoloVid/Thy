@@ -2,7 +2,7 @@ foo is def
   type ExerciseFunc is def
     type Args is
       bar is def
-        msg is given String
+        msg is given Unknown
         return Void
     args is given Args
     return Void

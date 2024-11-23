@@ -1,3 +1,3 @@
-export const printBuiltin = (thing: unknown) => {
+export const printBuiltin = (thing: unknown): undefined => {
   console.log(thing)
 }

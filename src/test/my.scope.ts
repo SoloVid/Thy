@@ -1,1 +1,0 @@
-export { my_scope_thing as thing } from "./thing"

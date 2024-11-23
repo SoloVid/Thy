@@ -3,9 +3,9 @@ import {
   decompressFromEncodedURIComponent as decompressLz,
 } from "lz-string"
 import { useEffect, useState } from "preact/hooks"
+import { generateUID } from "utils/uid"
 import { CopyToClipboardButton } from "../home/button"
 import { interpretThyBlockSource } from "../interpreter/block"
-import { generateUID } from "../interpreter/split-line"
 import { core } from "../std-lib/core"
 import { dissectErrorTraceAtCloserBaseline } from "../utils/error-helper"
 import CodeInput from "./code-input"

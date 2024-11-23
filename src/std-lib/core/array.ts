@@ -83,7 +83,11 @@ export const getBuiltin = <_T>(_array: _T[], _index: number) => {
   return _array[_index]
 }
 
-export const setBuiltin = <_T>(_array: _T[], _index: number, _value: _T) => {
+export const setBuiltin = <_T>(
+  _array: _T[],
+  _index: number,
+  _value: _T,
+): undefined => {
   assert(_index >= 0, "Array index cannot be negative")
   assert(
     _index < _array.length,

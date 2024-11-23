@@ -5,7 +5,6 @@ import type { CompileResults, FileCompileResults } from "./compile-results"
 import fs from "fs/promises"
 import path from "path"
 import { convertFromInternalError } from "./compile-error"
-import { tsNamespaceCompiler } from "../code-gen/ts-compiler"
 
 export async function compile(
   options: CompileOptions,
@@ -43,8 +42,8 @@ export async function compile(
 
 function pickCompiler(options: CompileOptions): Compiler {
   switch (options.target) {
-    case "ts-namespace":
-      return tsNamespaceCompiler
+    // case "ts-namespace":
+    //   return tsNamespaceCompiler
     default:
       throw new Error(`Unsupported target: ${options.target}`)
   }

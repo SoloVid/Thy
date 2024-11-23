@@ -4,7 +4,7 @@ export function initThy(_global: Core) {
   class _exercise_TypePackage { f() {
     class _args_TypePackage { f() {
       function _Args_WrappedValue() { return (() => {
-        const bar = (_msg: string): undefined => {
+        const bar = (_msg: unknown): undefined => {
           const msg = _msg
           void "type return erased"
         }
@@ -19,7 +19,7 @@ export function initThy(_global: Core) {
     } }
     function _1_WrappedType() { return (_args: ReturnType<_args_TypePackage["f"]>): undefined => {
       function _Args_WrappedValue() { return (() => {
-        const bar = (_msg: string): undefined => {
+        const bar = (_msg: unknown): undefined => {
           const msg = _msg
           void "type return erased"
         }
@@ -39,7 +39,7 @@ export function initThy(_global: Core) {
   const foo = (_exercise: ReturnType<_exercise_TypePackage["f"]>) => {
     class _args_TypePackage { f() {
       function _Args_WrappedValue() { return (() => {
-        const bar = (_msg: string): undefined => {
+        const bar = (_msg: unknown): undefined => {
           const msg = _msg
           void "type return erased"
         }
@@ -54,7 +54,7 @@ export function initThy(_global: Core) {
     } }
     function _1_WrappedType() { return (_args: ReturnType<_args_TypePackage["f"]>): undefined => {
       function _Args_WrappedValue() { return (() => {
-        const bar = (_msg: string): undefined => {
+        const bar = (_msg: unknown): undefined => {
           const msg = _msg
           void "type return erased"
         }

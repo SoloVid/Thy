@@ -1,1 +1,0 @@
-export * as scope from "./my.scope"
