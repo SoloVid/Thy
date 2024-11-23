@@ -11,6 +11,7 @@ import { separateSnippetsWithCommas } from "../utils/comma-separated-snippets"
 import { makeControlFlowCallTsGenerator } from "./generate-control-flow-call-ts"
 import { trace } from "../utils/debug"
 import { fromNode } from "code-gen/utils/from-node"
+import { nodeToString } from "code-gen/utils/to-string"
 
 export function valueCallGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,
@@ -38,10 +39,9 @@ export function generateValueCallTs(
   fixture: GeneratorFixture,
   callName?: string,
 ): GeneratedSnippets {
-  trace("generateValueCallTs()")
+  trace(`generateValueCallTs() <= ${nodeToString(call)}`)
   // console.log(state)
   if (state.isTypeContext) {
-    trace("isTypeContext")
     return generateCallTsInTypeContext(call, state, fixture, callName)
   }
 

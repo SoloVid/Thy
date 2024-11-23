@@ -1,4 +1,4 @@
-export function initThy(_global: unknown) {
+export function initThy(_global: {}) {
   const condition = true
   if (condition) {
     console.log("yay" as const)
@@ -12,6 +12,8 @@ export function initThy(_global: unknown) {
 
   const callback = () => {
     console.log("yay" as const)
+    return {
+    }
   }
 
   // Iff both callbacks are inline
@@ -32,5 +34,11 @@ export function initThy(_global: unknown) {
     console.log("yes" as const)
   } else {
     callback()
+  }
+
+  return {
+    condition,
+    callback,
+    captured,
   }
 }

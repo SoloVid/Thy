@@ -1,45 +1,46 @@
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromToken } from "code-gen/utils/from-token"
-import type { Block } from "tree"
-import { GeneratedSnippets } from "../../generator"
+import { returnStyle, type Block } from "tree"
 import { genIndent } from "../../utils/indent"
 import type { GeneratorState } from "../generator-state"
+import { ContextType, contextType } from "../generator-context"
+
+const allowedContexts: readonly ContextType[] = [contextType.topLevel, contextType.blockAllowingReturn]
 
 export function generateImpliedReturnTs(block: Block, state: GeneratorState) {
-  const impliedLines: GeneratedSnippets = []
-  // TODO: Get local variables stuff working again (probably from tree symbol table?)
-  if (state.localVariables.length > 0) {
-    const impliedReturn = state.localVariables.map((v) => {
-      const ind = genIndent(state.indentLevel + 1)
-      const genT = fromToken(v.token, v.name)
-      if (v.isConstant) {
-        return [ind, genT]
-      }
-      return fromComplicated(block, [
-        ind,
-        "get ",
-        genT,
-        "() { return ",
-        genT,
-        " },\n",
-        ind,
-        "set ",
-        genT,
-        "(__) { ",
-        genT,
-        " = __ }",
-      ])
-    })
-    impliedLines.push(
-      fromComplicated(block, [
-        genIndent(state.indentLevel),
-        "return {\n",
-        impliedReturn,
-        "\n",
-        genIndent(state.indentLevel),
-        "}\n",
-      ]),
-    )
+  if (block.returnStyle === returnStyle.explicitReturn || !allowedContexts.includes(state.context)) {
+    return []
   }
-  return impliedLines
+  const localSymbolEntries = [
+    ...(state.symbolTable?.localSymbols.entries() ?? []),
+  ]
+  const symbolEntriesToExport = block.returnStyle === returnStyle.explicitExport ? localSymbolEntries.filter(([,symbolInfo]) => symbolInfo.visibility === "export") : localSymbolEntries.filter(([,symbolInfo]) => symbolInfo.visibility !== "private")
+  const impliedReturn = symbolEntriesToExport.map(([symbolName, symbolInfo]) => {
+    const ind = genIndent(state.indentLevel + 1)
+    const genT = fromToken(symbolInfo.token, symbolName)
+    if (symbolInfo.isConstant) {
+      return fromComplicated(block, [ind, genT, ",\n"])
+    }
+    return fromComplicated(block, [
+      ind,
+      "get ",
+      genT,
+      "() { return ",
+      genT,
+      " },\n",
+      ind,
+      "set ",
+      genT,
+      "(__) { ",
+      genT,
+      " = __ },\n",
+    ])
+  })
+  return [fromComplicated(block, [
+    genIndent(state.indentLevel),
+    "return {\n",
+    impliedReturn,
+    genIndent(state.indentLevel),
+    "}\n",
+  ])]
 }

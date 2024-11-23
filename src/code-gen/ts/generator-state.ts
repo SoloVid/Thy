@@ -2,12 +2,9 @@ import type { CompileError } from "common/compile-error"
 import type { Token } from "tokenizer/token"
 import type { Block, ReadSymbolTable } from "tree"
 import type { GeneratedSnippet, GeneratedSnippets } from "../generator"
-import {
-  ContextType,
-  contextType,
-  isExpressionContext,
-} from "./generator-context"
+import { ContextType, contextType } from "./generator-context"
 import type { IndependentCodeGeneratorFunc } from "./ts-generator"
+import { trace } from "./utils/debug"
 
 interface GeneratorStateOptions {
   readonly symbolTable?: ReadSymbolTable
@@ -73,14 +70,12 @@ export interface GeneratorState {
    * it can be added to this array.
    */
   readonly preStatementGenerators: IndependentCodeGeneratorFunc[]
-  readonly localVariables: LocalVariable[]
   readonly parent: GeneratorState | null
   readonly implicitArguments: ImplicitArgumentsState | null
   addError(error: CompileError): void
   /** Queue up a generator that needs to be run in a dedicated statement context prior to the current expression context. */
   addPreStatementGenerator(generator: IndependentCodeGeneratorFunc): void
   getUniqueVariableName(): string
-  isExpressionContext(): boolean
   makeChild(options?: GeneratorStateOptions): GeneratorState
 }
 
@@ -98,8 +93,10 @@ export function makeGeneratorState(
   const getUniqueVariableName =
     parent?.getUniqueVariableName ??
     (() => {
+      trace(`getUniqueVariableName() => ${nextVar}`)
       return `_${nextVar++}`
     })
+  let cachedImplicitArgumentsVariableName: string | null = null
   const me = {
     errors: parent?.errors ?? ([] as CompileError[]),
     preStatementGenerators: options.newPreStatementsArray
@@ -127,14 +124,17 @@ export function makeGeneratorState(
       options.context !== undefined
         ? options.context
         : (contextType.looseExpression as ContextType),
-    localVariables: [],
     parent: parent ?? null,
     implicitArguments: options.newImplicitArguments
       ? {
-          variableName:
-            typeof options.newImplicitArguments === "string"
+          get variableName() {
+            if (cachedImplicitArgumentsVariableName === null) {
+              cachedImplicitArgumentsVariableName = typeof options.newImplicitArguments === "string"
               ? options.newImplicitArguments
-              : getUniqueVariableName(),
+              : getUniqueVariableName()
+            }
+            return cachedImplicitArgumentsVariableName
+          },
           used: false,
           markImplicitArgumentUsed() {
             this.used = true
@@ -147,9 +147,6 @@ export function makeGeneratorState(
     },
     addPreStatementGenerator(generator: IndependentCodeGeneratorFunc) {
       this.preStatementGenerators.push(generator)
-    },
-    isExpressionContext() {
-      return isExpressionContext(this.context)
     },
     makeChild(options: GeneratorStateOptions = {}) {
       return makeGeneratorState(me, options)

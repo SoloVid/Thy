@@ -8,6 +8,7 @@ import { makeIndent } from "../../utils/indent"
 import { GeneratorState } from "../generator-state"
 import { contextType } from "../generator-context"
 import type { LibraryGeneratorCollection } from "../library-generator"
+import { fromNode } from "code-gen/utils/from-node"
 
 export function letCallGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,

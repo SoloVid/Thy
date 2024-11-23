@@ -46,6 +46,7 @@ import {
 import { tryGenerateTypeGivenCallTs } from "./type/generate-type-given-call-ts"
 import { autoTightS } from "./utils/auto-tight"
 import { trace } from "./utils/debug"
+import { nodeToString } from "code-gen/utils/to-string"
 
 export const tsGenerator =
   (
@@ -69,7 +70,7 @@ export const tsGenerator =
           () => fixture,
           (node) => node,
           (node, state) => {
-            trace("generateAsType()")
+            trace(`generateAsType() <= ${nodeToString(node)}`)
             // console.log(state)
             return generateExpressionAsTypeTs(node, state, fixture)
           },

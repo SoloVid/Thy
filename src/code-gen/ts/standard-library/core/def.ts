@@ -5,10 +5,12 @@ import { contextType } from "../../generator-context"
 import type { GeneratorForNameSpec } from "../../generator-for-name"
 import { addErrorForExcessArgs } from "../helpers/too-many-args-error"
 import { trace } from "code-gen/ts/utils/debug"
+import { nodeToString } from "code-gen/utils/to-string"
 
 export const defGenerator: GeneratorForNameSpec = {
   name: "def",
   generateCall(node, state, fixture) {
+    trace(`def:generateCall() <= ${nodeToString(node)}`)
     // There's nothing special to do if there are no arguments.
     if (node.args.length === 0) {
       return
@@ -19,6 +21,7 @@ export const defGenerator: GeneratorForNameSpec = {
     return fixture.generate(node.args[0], childState)
   },
   generateAssignment(node, state, fixture) {
+    trace(`def:generateAssignment() <= ${nodeToString(node)}`)
     // There's nothing special to do if there are no arguments.
     if (node.call.args.length === 0) {
       return
@@ -40,7 +43,7 @@ export const defGenerator: GeneratorForNameSpec = {
     )
   },
   generateTypeAssignment(node, state, fixture) {
-    trace("def:generateTypeAssignment()")
+    trace(`def:generateTypeAssignment() <= ${nodeToString(node)}`)
     assert(
       node.call.type === "value-call",
       "It should be impossible to hit this case because def is a value function, not a type function.",

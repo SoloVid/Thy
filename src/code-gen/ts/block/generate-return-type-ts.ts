@@ -35,6 +35,6 @@ export function generateReturnTypeTs(
     typeNode,
     state,
     fixture,
-    state.getUniqueVariableName(),
+    null,
   )
 }

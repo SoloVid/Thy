@@ -10,6 +10,7 @@ import { generateTypeParamsForBlockTs } from "../type/generate-type-params-ts"
 import { autoTightC } from "../utils/auto-tight"
 import { generateBlockLinesTs } from "./generate-block-lines-ts"
 import { generateParamsTs } from "./generate-params-ts"
+import { trace } from "../utils/debug"
 
 export function tryGenerateBlockTs(
   node: TreeNode,
@@ -26,6 +27,7 @@ export function generateBlockTs(
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
+  trace("generateBlockTs()")
   if (state.context === contextType.topLevel) {
     const blockBodyState = state.makeChild({
       symbolTable: block.symbolTable,
@@ -60,14 +62,14 @@ export function generateBlockTs(
     const n = blockBodyState.implicitArguments.variableName
     const localName = n + "L"
     blockBodyBlockState.parametersSoFar.push({
-      inlineSnippet: fromTokenRange(block, localName),
+      inlineSnippet: fromComplicated(block, [localName, " = {} as never"]),
     })
     const space = makeIndent(blockBodyState.indentLevel)
     const parentObj = state.implicitArguments?.variableName ?? "{}"
     linesTs = [
       fromTokenRange(
         block,
-        `${space}const ${n} = { ...${localName}, ...${parentObj} } as const\n`,
+        `${space}const ${n} = { ...${localName} as (typeof ${localName} extends never ? {} : typeof ${localName}), ...${parentObj} } as const\n`,
       ),
       linesTs,
     ]

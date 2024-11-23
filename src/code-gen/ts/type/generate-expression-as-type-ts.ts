@@ -6,13 +6,14 @@ import type { GeneratorState } from "../generator-state"
 import type { GeneratorFixture } from "../ts-generator"
 import { trace } from "../utils/debug"
 import { contextType } from "../generator-context"
+import { nodeToString } from "code-gen/utils/to-string"
 
 export function generateExpressionAsTypeTs(
   node: TypedTreeNode,
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
-  trace("generateExpressionAsTypeTs()")
+  trace(`generateExpressionAsTypeTs() <= ${nodeToString(node)}`)
   // console.log(state)
   if (isSimpleNamedExpression(node)) {
     return [fromNode(node, "typeof "), fixture.generate(node, state)]

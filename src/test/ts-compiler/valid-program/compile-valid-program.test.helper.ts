@@ -11,7 +11,7 @@ export const tsCoreCompiler = makeCompiler(
   tsGenerator(
     standardLibraryCore,
     "_global",
-    "export function initThy(_global: unknown) {\n",
+    "export function initThy(_global: {}) {\n",
     "\n}\n",
     true,
   ),

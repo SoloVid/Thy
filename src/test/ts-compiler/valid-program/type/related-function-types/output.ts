@@ -1,4 +1,4 @@
-export function initThy(_global: unknown) {
+export function initThy(_global: {}) {
   const RelatedTypesType = undefined as unknown as "himom"
 
   class _U_TypePackage<_T extends typeof RelatedTypesType = typeof RelatedTypesType> { f() {
@@ -26,5 +26,10 @@ export function initThy(_global: unknown) {
     void "type return erased"
     const p = _p
     return p
+  }
+
+  return {
+    RelatedTypesType,
+    funcWithRelatedTypes,
   }
 }

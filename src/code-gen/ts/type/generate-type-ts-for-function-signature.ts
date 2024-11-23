@@ -10,7 +10,7 @@ export function generateTypeTsForFunctionSignature(
   node: TreeNode,
   state: GeneratorState,
   fixture: GeneratorFixture,
-  nameBase: string,
+  nameBase: string | null,
 ): GeneratedSnippets {
   assert(
     state.block !== null,
@@ -46,7 +46,7 @@ export function generateTypeTsForFunctionSignature(
     node,
     state,
     fixture,
-    nameBase,
+    nameBase ?? state.getUniqueVariableName(),
     leafValueSnippets,
   )
   state.block.preStatementGenerators.push(typePackage.preStatementGenerator)

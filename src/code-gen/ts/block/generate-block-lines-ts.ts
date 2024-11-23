@@ -25,12 +25,12 @@ export function generateBlockExplicitLinesTs(
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
   // function generateIdeaTs(i: Idea): GeneratedSnippet[][] {
-  return ideas.map((i) => {
+  return ideas.map((idea, i) => {
     const lineState = state.makeChild({
       context: state.context,
       newPreStatementsArray: true,
     })
-    const primaryGeneratedLine = fixture.generate(i, lineState)
+    const primaryGeneratedLine = fixture.generate(idea, lineState)
     const preGeneratedLines = lineState.preStatementGenerators.map((g) =>
       resolvePreStatementGenerator(g, state, fixture),
     )
@@ -38,20 +38,24 @@ export function generateBlockExplicitLinesTs(
       ...preGeneratedLines.flat(1),
       primaryGeneratedLine,
     ]
+    if (Array.isArray(primaryGeneratedLine) && primaryGeneratedLine.length === 0 && preGeneratedLines.length === 0 && idea.type === "let-call") {
+      return []
+    }
     return allGeneratedLines.map((l) => {
       // There's an open issue in TS 4.7 about typing this correctly. https://github.com/microsoft/TypeScript/issues/49280
       const collapsedLine: GeneratedSnippet[] = [l].flat(
         Infinity as 1,
       ) as GeneratedSnippet[]
+      const maybeNewLine = { text: "\n" } // i < ideas.length - 1 ? { text: "\n" } : { text: "" }
       if (collapsedLine.length === 0) {
-        return [{ text: "\n" }]
+        return [maybeNewLine]
       }
       state.block?.ideaSnippets.push([
         genIndent(state.indentLevel),
         ...collapsedLine,
-        { text: "\n" },
+        maybeNewLine,
       ])
-      return [genIndent(state.indentLevel), ...collapsedLine, { text: "\n" }]
+      return [genIndent(state.indentLevel), ...collapsedLine, maybeNewLine]
     })
   })
 

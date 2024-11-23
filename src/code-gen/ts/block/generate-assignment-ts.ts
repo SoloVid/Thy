@@ -11,6 +11,8 @@ import {
   generateGivenCallTs,
   generateGivenCallTsWithParameterName,
 } from "../call/generate-given-call-ts"
+import { trace } from "../utils/debug"
+import { nodeToString } from "code-gen/utils/to-string"
 
 export function assignmentGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,
@@ -39,6 +41,7 @@ export function generateAssignmentTs(
   expressionTsPreGenerated?: GeneratedSnippets,
   typeTs?: GeneratedSnippets,
 ): GeneratedSnippets {
+  trace(`generateAssignmentTs() <= ${nodeToString(a)}`)
   function generateValueExpression(): GeneratedSnippets {
     if (expressionTsPreGenerated) {
       return expressionTsPreGenerated

@@ -2,7 +2,7 @@ import type { TreeNode } from "tree"
 import assert from "utils/assert"
 import type { GeneratedSnippets } from "../../generator"
 import { fromComplicated } from "../../utils/from-complicated"
-import { indentSnippets, makeIndent } from "../../utils/indent"
+import { makeIndent } from "../../utils/indent"
 import { generateParamsTs } from "../block/generate-params-ts"
 import type { GeneratorState } from "../generator-state"
 import type {

@@ -1,23 +1,27 @@
-import { nodeError } from "common"
-import { GeneratedSnippets } from "../../../generator"
-import { GeneratorFixture } from "../../ts-generator"
+import {
+  ContextType,
+  contextType,
+  isExpressionContext,
+} from "code-gen/ts/generator-context"
 import { fromComplicated } from "code-gen/utils/from-complicated"
 import { fromNode } from "code-gen/utils/from-node"
-import type { GeneratorForNameSpec } from "../../generator-for-name"
-import { GeneratorState } from "../../generator-state"
-import { ContextType } from "code-gen/ts/generator-context"
-import { contextType } from "code-gen/ts/generator-context"
+import { nodeError } from "common"
+import { Block, returnStyle, ValueCall } from "tree"
+import assert from "utils/assert"
+import { GeneratedSnippets } from "../../../generator"
 import { genIndent, makeIndent } from "../../../utils/indent"
 import { generateBlockLinesTs } from "../../block/generate-block-lines-ts"
-import { autoTightS } from "../../utils/auto-tight"
-import { ValueCall } from "tree"
+import type { GeneratorForNameSpec } from "../../generator-for-name"
+import { GeneratorState } from "../../generator-state"
+import { GeneratorFixture } from "../../ts-generator"
 import { addErrorForExcessArgs } from "../helpers/too-many-args-error"
-import assert from "utils/assert"
 
 export const ifGenerator: GeneratorForNameSpec = {
   name: "if",
   generateCall(node, state, fixture) {
-    return tryGenerateIfTs(node, state, fixture)
+    return tryGenerateIfTs(node, state.makeChild({
+      context: isExpressionContext(state.context) ? state.context : contextType.blockNoReturn
+    }), fixture)
   },
   generateLetCall(node, state, fixture) {
     return tryGenerateIfTs(
@@ -72,11 +76,13 @@ function tryGenerateIfTs(
     (trueCaseNode !== null && trueCaseNode.type === "block") ||
     (elseCaseNode !== null && elseCaseNode.type === "block")
   // TODO: Is there really a dominant case where mightReturn could be false? Implicit exports make most blocks return.
-  const mightReturn = true
-  // const mightReturn = (trueCaseNode !== null && trueCaseNode.type === "block" && mightAffectReturn(trueCaseNode)) ||
-  //     (elseCaseNode !== null && elseCaseNode.type === "block" && mightAffectReturn(elseCaseNode))
+  // UPDATE: I believe mightReturn could be false if there is an empty let
+  // in both blocks and no other let/return.
+  // const mightReturn = true
+  const mightReturn = (trueCaseNode !== null && trueCaseNode.type === "block" && mightAffectReturn(trueCaseNode)) ||
+      (elseCaseNode !== null && elseCaseNode.type === "block" && mightAffectReturn(elseCaseNode))
 
-  if (state.isExpressionContext()) {
+  if (isExpressionContext(state.context)) {
     if (!requiresBlockSyntax) {
       return buildTernary()
     }
@@ -196,4 +202,11 @@ function tryGenerateIfTs(
       return fromComplicated(node, allParts)
     }
   }
+}
+
+function mightAffectReturn(block: Block) {
+  if (block.returnStyle !== returnStyle.explicitReturn) {
+    return true
+  }
+  return block.ideas.some(idea => idea.type === "return" || (idea.type === "let-call" && idea.call !== null))
 }

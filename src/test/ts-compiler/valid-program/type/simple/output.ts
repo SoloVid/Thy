@@ -1,4 +1,4 @@
-export function initThy(_global: unknown) {
+export function initThy(_global: {}) {
   const himom = () => {
     return "himom" as const
   }
@@ -13,5 +13,11 @@ export function initThy(_global: unknown) {
     const T = undefined as unknown as _T
     const p = _p
     return p
+  }
+
+  return {
+    himom,
+    A,
+    funcWithTypes,
   }
 }

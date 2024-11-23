@@ -8,9 +8,9 @@ export function evaluateReturnStyle(
   existingReturnStyle: ReturnStyle,
   idea: Idea,
 ): ReturnStyle {
-  if (idea.type === "return" || idea.type === "let-call") {
+  if (idea.type === "return" || idea.type === "type-return" || idea.type === "let-call") {
     if (existingReturnStyle === returnStyle.explicitExport) {
-      if (idea.type === "return") {
+      if (idea.type === "return" || idea.type === "type-return") {
         state.addError(
           tokenError(
             idea.func.token,

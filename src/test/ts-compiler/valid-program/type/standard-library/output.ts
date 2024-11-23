@@ -1,4 +1,4 @@
-export function initThy(_global: unknown) {
+export function initThy(_global: {}) {
   const booleanFunc = (_p: boolean) => {
     const p = _p
   }
@@ -22,4 +22,16 @@ export function initThy(_global: unknown) {
     return "himom" as const
   } }
   const NonTrivialUnion = undefined as unknown as string | ReturnType<typeof _NonTrivialUnion_WrappedType>
+
+  return {
+    booleanFunc,
+    numberFunc,
+    stringFunc,
+    unknownFunc,
+    voidFunc,
+    BasicIntersection,
+    BasicUnion,
+    UnionWithValue,
+    NonTrivialUnion,
+  }
 }

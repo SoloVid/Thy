@@ -6,6 +6,7 @@ import { makeGenerator } from "../generate-from-options"
 import type { GeneratorState } from "../generator-state"
 import type { LibraryGeneratorCollection } from "../library-generator"
 import type { CodeGeneratorFunc } from "../ts-generator"
+import { trace } from "../utils/debug"
 
 export function valueIdentifierGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,
@@ -33,6 +34,7 @@ export function generateIdentifierTs(
   node: ValueIdentifier | TypeIdentifier,
   state: GeneratorState,
 ): GeneratedSnippets {
+  trace(`generateIdentifierTs(${node.token.text})`)
   const identifierName = node.token.text
   if (
     state.symbolTable === null ||
