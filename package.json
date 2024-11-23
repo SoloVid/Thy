@@ -10,7 +10,8 @@
     "thy": "bin/thy"
   },
   "files": [
-    "*",
+    "README.md",
+    "package.json",
     "bin/*",
     "lib/api/*.js",
     "lib/**/*.d.ts"
