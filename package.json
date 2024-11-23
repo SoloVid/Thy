@@ -1,11 +1,22 @@
 {
-  "name": "thylang",
+  "name": "thy-lang",
   "version": "0.1.0",
   "description": "Simple language for thy mobile programming",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "exports": {
+    ".": "./lib/api/index.js",
+    "./std-lib": "./lib/api/std-lib.js"
+  },
+  "bin": {
+    "thy": "bin/thy"
+  },
+  "files": [
+    "*",
+    "bin/*",
+    "lib/api/*.js",
+    "lib/**/*.d.ts"
+  ],
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --platform=node --outfile=lib/index.js",
+    "build": "sh -c 'esbuild src/api/*.ts --bundle --platform=node --outdir=lib/api'",
     "check-types": "tsc --noEmit",
     "clean": "node -p \"require('fs').rmSync('lib',{force:true,recursive:true})\"",
     "format": "prettier --no-semi . --write",
