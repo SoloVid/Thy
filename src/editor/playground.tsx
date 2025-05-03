@@ -67,8 +67,8 @@ export default function Playground() {
     }
   }
 
-  // Add path-browserify import at the top of the file if it's not already there
-  // import { join } from "path-browserify"
+  // Import path-browserify at the top of the file
+  import { join } from "path-browserify"
 
   function onSourceUpdate(s: string) {
     state.setSourceCode({

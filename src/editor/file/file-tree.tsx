@@ -56,14 +56,27 @@ export const FileTree = (props: FileTreeProps) => {
   const [renameState, setRenameState] = useState<RenameState>(null)
   const renameInProgressRef = useRef<boolean>(false)
 
+  const getTargetDirectory = () => {
+    if (!selectedPath) return "/"
+    
+    // Check if the selected path is a directory or a file
+    const lastSlashIndex = selectedPath.lastIndexOf("/")
+    if (lastSlashIndex === selectedPath.length - 1) {
+      // It's already a directory path (ends with /)
+      return selectedPath
+    } else {
+      // It's a file path, get the parent directory
+      return selectedPath.substring(0, lastSlashIndex + 1)
+    }
+  }
+
   const handleNewFile = async () => {
     // Determine the directory to create the file in
-    const newFileTarget = selectedPath ?? "/"
-    const targetDir = newFileTarget.substring(0, newFileTarget.lastIndexOf("/"))
+    const targetDir = getTargetDirectory()
 
     // Create a temporary file name
     const tempName = "new-file.thy"
-    const newPath = `${targetDir}/${tempName}`
+    const newPath = `${targetDir}${tempName}`
 
     // Create the file
     await props.fs.write(newPath, "")
@@ -71,6 +84,27 @@ export const FileTree = (props: FileTreeProps) => {
     // Select the new file and start renaming
     setSelectedPath(newPath)
     props.onSelect(newPath)
+    renameInProgressRef.current = true
+    setRenameState({
+      path: newPath,
+      isNew: true,
+      name: tempName,
+    })
+  }
+  
+  const handleNewFolder = async () => {
+    // Determine the directory to create the folder in
+    const targetDir = getTargetDirectory()
+
+    // Create a temporary folder name
+    const tempName = "new-folder"
+    const newPath = `${targetDir}${tempName}/`
+
+    // Create the folder
+    await props.fs.mkdir(newPath)
+
+    // Select the new folder and start renaming
+    setSelectedPath(newPath)
     renameInProgressRef.current = true
     setRenameState({
       path: newPath,
@@ -94,6 +128,7 @@ export const FileTree = (props: FileTreeProps) => {
           title="New Folder..."
           icon={faFolderPlus}
           fixedWidth
+          onClick={handleNewFolder}
         />
       </div>
       <FileTreeNodeList
@@ -244,7 +279,9 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
 
   const handleClick = (e: MouseEvent) => {
     restProps.setSelectedPath(node.path)
-    restProps.onSelect(node.path)
+    if (node.kind === "file") {
+      restProps.onSelect(node.path)
+    }
     if (node.kind === "directory") {
       setIsExpanded(!isExpanded)
     }
@@ -280,8 +317,17 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
     restProps.renameInProgressRef.current = false
 
     const oldPath = restProps.renameState.path
-    const dirPath = oldPath.substring(0, oldPath.lastIndexOf("/"))
-    const newPath = `${dirPath}/${newName}`
+    const isDirectory = node.kind === "directory"
+    
+    // For directories, we need to handle the trailing slash
+    const dirPath = isDirectory 
+      ? oldPath.substring(0, oldPath.lastIndexOf("/", oldPath.length - 2) + 1)
+      : oldPath.substring(0, oldPath.lastIndexOf("/") + 1)
+    
+    // For directories, ensure the new path ends with a slash
+    const newPath = isDirectory
+      ? `${dirPath}${newName}/`
+      : `${dirPath}${newName}`
 
     // Clear rename state
     restProps.setRenameState(null)
@@ -291,19 +337,21 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
 
       // Update selection to the new path
       restProps.setSelectedPath(newPath)
-      restProps.onSelect(newPath)
+      if (!isDirectory) {
+        restProps.onSelect(newPath)
+      }
     } catch (e) {
-      console.error("Failed to rename file:", e)
-      alert(`Failed to rename file: ${e}`)
+      console.error(`Failed to rename ${isDirectory ? 'folder' : 'file'}:`, e)
+      alert(`Failed to rename ${isDirectory ? 'folder' : 'file'}: ${e}`)
     }
   }
 
   const handleCancelRename = () => {
     restProps.renameInProgressRef.current = false
-    // If this was a new file and rename was canceled, delete it
+    // If this was a new item and rename was canceled, delete it
     if (restProps.renameState?.isNew) {
       fs.delete(node.path).catch((e) =>
-        console.error("Failed to delete new file:", e),
+        console.error(`Failed to delete new ${node.kind}:`, e),
       )
     }
     restProps.setRenameState(null)
