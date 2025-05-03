@@ -58,10 +58,11 @@ export function WorkspaceBrowser({
   const loadEntries = async (directory: string) => {
     try {
       const list = await indexedDbFs.list(directory)
+      const dirPath = directory.endsWith('/') ? directory : `${directory}/`
       const mappedEntries: WorkspaceEntry[] = list.map((entry) => ({
-        path: `${directory === "/" ? "" : directory}/${entry.name}${
-          entry.kind === "directory" ? "/" : ""
-        }`,
+        path: directory === "/" 
+          ? `/${entry.name}${entry.kind === "directory" ? "/" : ""}`
+          : `${dirPath}${entry.name}${entry.kind === "directory" ? "/" : ""}`,
         name: entry.name,
         isDirectory: entry.kind === "directory",
       }))
@@ -86,7 +87,11 @@ export function WorkspaceBrowser({
     } else {
       setSelectedEntry(entry.path)
       if (mode === "save") {
-        setNewWorkspaceName(entry.name)
+        // Extract filename without extension for editing
+        const filename = entry.name.endsWith('.json') 
+          ? entry.name.substring(0, entry.name.length - 5) 
+          : entry.name
+        setNewWorkspaceName(filename)
       }
     }
   }
@@ -120,14 +125,23 @@ export function WorkspaceBrowser({
     // Determine the save path
     let savePath: string
     if (selectedEntry && !entries.find(e => e.path === selectedEntry)?.isDirectory) {
-      // Use the selected entry path
-      savePath = selectedEntry
+      // If an entry is selected but we're using a new name, create a new file
+      const selectedDir = selectedEntry.substring(0, selectedEntry.lastIndexOf('/') + 1)
+      if (newWorkspaceName !== selectedEntry.split('/').pop()) {
+        savePath = `${selectedDir}${newWorkspaceName}`
+      } else {
+        // Use the selected entry path if name hasn't changed
+        savePath = selectedEntry
+      }
     } else {
       // Create a new file in the current directory
-      savePath = `${currentDirectory === "/" ? "" : currentDirectory}/${newWorkspaceName}`
-      if (!savePath.endsWith(".json")) {
-        savePath += ".json"
-      }
+      const dirPath = currentDirectory.endsWith('/') ? currentDirectory : `${currentDirectory}/`
+      savePath = dirPath === '/' ? `/${newWorkspaceName}` : `${dirPath}${newWorkspaceName}`
+    }
+    
+    // Ensure .json extension
+    if (!savePath.endsWith(".json")) {
+      savePath += ".json"
     }
 
     try {
@@ -171,7 +185,10 @@ export function WorkspaceBrowser({
     const folderName = await alerts.prompt("Enter folder name:")
     if (!folderName) return
 
-    const folderPath = `${currentDirectory === "/" ? "" : currentDirectory}/${folderName}/`
+    const dirPath = currentDirectory.endsWith('/') ? currentDirectory : `${currentDirectory}/`
+    const folderPath = currentDirectory === "/" 
+      ? `/${folderName}/` 
+      : `${dirPath}${folderName}/`
     
     try {
       await indexedDbFs.mkdir(folderPath)
