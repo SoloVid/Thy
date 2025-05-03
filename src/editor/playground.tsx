@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks"
 import CodeInput from "./code-input"
-import { FileTree } from "./file/file-tree"
+import { FileTree } from "./file/tree-ui/file-tree"
 import { InMemoryFiles, makeInMemoryFiles } from "./file/in-memory-files"
 import Menu from "./menu"
 import OutputContainer from "./output-container"
@@ -66,6 +66,17 @@ export default function Playground() {
     }
   }
 
+  function onFileRename(oldPath: string, newPath: string) {
+    // If the renamed file affects the open file, update the title
+    if (state.sourceCode.path.startsWith(oldPath)) {
+      state.setSourceCode({
+        ...state.sourceCode,
+        // TODO: Recalculate path from file system or based on path manipulation.
+        path: state.sourceCode.path,
+      })
+    }
+  }
+
   function onSourceUpdate(s: string) {
     state.setSourceCode({
       path: state.sourceCode.path,
@@ -106,7 +117,7 @@ export default function Playground() {
       <div
         style={`flex-grow: 1; height:100vh;height:${windowHeight}px;overflow: hidden; display: flex; flex-direction: column;`}
       >
-        <Menu state={state} />
+        <Menu fs={fs} state={state} />
         <div style={`flex-grow: 1;overflow: hidden; display: flex;`}>
           {prefs.leftOpen && (
             <>
@@ -118,6 +129,7 @@ export default function Playground() {
                   directory="/"
                   onSelect={onFileSelect}
                   onDelete={onFileDelete}
+                  onRename={onFileRename}
                 />
               </div>
               <Resizer resizeType="vertical" onResize={onLeftMenuResize} />
