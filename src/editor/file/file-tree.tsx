@@ -41,8 +41,8 @@ type SharedChildProps = SharedProps & {
   renameState: RenameState
   setRenameState: (state: RenameState) => void
   renameInProgressRef: MutableRef<boolean>
-  expandedDirs: Set<string>
-  setExpandedDirs: (dirs: Set<string>) => void
+  expandedDirs: Readonly<Set<string>>
+  setExpandedDirs: (dirs: Readonly<Set<string>>) => void
 }
 
 type FileTreeProps = SharedProps & {
@@ -54,7 +54,7 @@ export const FileTree = (props: FileTreeProps) => {
   const [selectedPath, setSelectedPath] = useState<string | null>(null)
   const [renameState, setRenameState] = useState<RenameState>(null)
   const renameInProgressRef = useRef<boolean>(false)
-  const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set())
+  const [expandedDirs, setExpandedDirs] = useState<Readonly<Set<string>>>(new Set())
 
   const getTargetDirectory = () => {
     if (!selectedPath) return ""
@@ -363,14 +363,6 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
       // Update selection to the new path
       restProps.setSelectedPath(newPath)
       restProps.onSelect(newPath)
-      
-      // If this is a new file/folder, make sure its parent directory is expanded
-      if (restProps.renameState.isNew) {
-        const parentDir = `${dirPath}/`
-        const newExpandedDirs = new Set(restProps.expandedDirs)
-        newExpandedDirs.add(parentDir)
-        restProps.setExpandedDirs(newExpandedDirs)
-      }
     } catch (e) {
       console.error(`Failed to rename ${isDirectory ? 'folder' : 'file'}:`, e)
       alert(`Failed to rename ${isDirectory ? 'folder' : 'file'}: ${e}`)
