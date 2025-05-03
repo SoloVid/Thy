@@ -6,7 +6,9 @@ import {
   faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useAlerts } from "editor/alert-provider"
 import { useMemo, useState } from "preact/hooks"
+import { stringifyError } from "utils/stringify-error"
 import { css } from "../../component/css"
 import {
   FileTreeNodeList,
@@ -18,6 +20,8 @@ import { actionStyle } from "./shared-style"
 
 export const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
   const [isHovering, setIsHovering] = useState(false)
+
+  const alerts = useAlerts()
 
   const isRenaming =
     restProps.renameState && restProps.renameState.path === node.path
@@ -43,17 +47,14 @@ export const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
 
   const handleDelete = (e: MouseEvent) => {
     e.stopPropagation()
-    if (window.confirm(`Delete ${node.name}?`)) {
-      fs.delete(node.path).then(
-        () => {
-          restProps.onDelete(node.path)
-        },
-        (e) => {
-          // TODO: Surface error.
-          console.error(e)
-        },
-      )
-    }
+    alerts.confirm(`Delete ${node.name}?`).then(async (confirmed) => {
+      if (confirmed) {
+        await fs.delete(node.path)
+        restProps.onDelete(node.path)
+      }
+    }, (e) => {
+      alerts.showAlert(`Failed to delete ${node.path}:` + stringifyError(e))
+    })
   }
 
   const handleStartRename = (e: MouseEvent) => {
@@ -107,8 +108,10 @@ export const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
       restProps.setSelectedPath(newPath)
       restProps.onSelect(newPath)
     } catch (e) {
-      console.error(`Failed to rename ${isDirectory ? "folder" : "file"}:`, e)
-      alert(`Failed to rename ${isDirectory ? "folder" : "file"}: ${e}`)
+      alerts.showAlert(
+        `Failed to rename ${isDirectory ? "folder" : "file"}:` +
+          stringifyError(e),
+      )
     }
   }
 
@@ -116,8 +119,14 @@ export const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
     restProps.renameInProgressRef.current = false
     // If this was a new item and rename was canceled, delete it
     if (restProps.renameState?.isNew) {
-      fs.delete(node.path).catch((e) =>
-        console.error(`Failed to delete new ${node.kind}:`, e),
+      fs.delete(node.path).then(
+        () => {
+          // Do nothing.
+        },
+        (e) =>
+          alerts.showAlert(
+            `Failed to delete new ${node.kind}:` + stringifyError(e),
+          ),
       )
     }
     restProps.setRenameState(null)

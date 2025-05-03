@@ -1,12 +1,6 @@
-import { useEffect, useState } from "preact/hooks"
-import {
-  getDataFromHistory,
-  saveCodeInHistory,
-  useSourceCodePopStateListener,
-} from "./source-code/history"
-import { makeRunner, Output } from "./source-code/runner"
+import { useState } from "preact/hooks"
 import { generateUID } from "utils/uid"
-import { SerializedWorkspace } from "./file/serialized-workspace"
+import { makeRunner, Output } from "./source-code/runner"
 
 export type SourceCode = {
   readonly path: string
@@ -15,23 +9,11 @@ export type SourceCode = {
 }
 
 export function useEditorState() {
-  // useSourceCodePopStateListener((state) => {
-  //   if (state.source) {
-  //     setSourceCode(state.source)
-  //   }
-  //   setEditorLanguage(state.language)
-  //   setFileLoaded(state.fileName)
-  // })
-
   const [sourceCode, setSourceCode] = useState<SourceCode>({
     path: "untitled",
     contents: "",
     language: "thy",
   })
-
-  // useEffect(() => {
-  //   saveCodeInHistory(fileLoaded, sourceCode, editorLanguage)
-  // }, [fileLoaded, sourceCode, editorLanguage])
 
   const [output, setOutput] = useState<Output | string | null>(null)
 

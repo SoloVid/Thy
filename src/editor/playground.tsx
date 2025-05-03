@@ -9,7 +9,6 @@ import Resizer from "./resizer"
 import { getPersistedWorkspace } from "./source-code/persisted-workspace"
 import { useEditorState } from "./state"
 import { AlertProvider, useAlerts } from "./alert-provider"
-import "./alert-provider.css"
 
 function PlaygroundContent() {
   useEffect(() => {
@@ -39,9 +38,8 @@ function PlaygroundContent() {
   const [prefs, setPrefs] = useEditorPreferences()
 
   const alerts = useAlerts()
-  
+
   function onFileSelect(path: string) {
-    console.log(path)
     fs.read(path).then(
       (s) => {
         if (!path.endsWith("/")) {
@@ -59,9 +57,11 @@ function PlaygroundContent() {
   }
 
   async function onFileDelete(path: string) {
-    const confirmed = await alerts.confirm(`Are you sure you want to delete "${path}"?`);
-    if (!confirmed) return;
-    
+    const confirmed = await alerts.confirm(
+      `Are you sure you want to delete "${path}"?`,
+    )
+    if (!confirmed) return
+
     // If the deleted file is currently open, clear the editor
     if (state.sourceCode.path === path) {
       state.setSourceCode({
@@ -70,19 +70,19 @@ function PlaygroundContent() {
         language: "thy",
       })
     }
-    
-    alerts.showToast(`Deleted ${path}`, "info");
+
+    alerts.showToast(`Deleted ${path}`, "info")
   }
 
   function onFileRename(oldPath: string, newPath: string) {
     // If the renamed file affects the open file, update the title
     if (state.sourceCode.path.startsWith(oldPath)) {
-      const newFilePath = state.sourceCode.path.replace(oldPath, newPath);
+      const newFilePath = state.sourceCode.path.replace(oldPath, newPath)
       state.setSourceCode({
         ...state.sourceCode,
         path: newFilePath,
       })
-      alerts.showToast(`Renamed ${oldPath} to ${newPath}`, "success");
+      alerts.showToast(`Renamed ${oldPath} to ${newPath}`, "success")
     }
   }
 

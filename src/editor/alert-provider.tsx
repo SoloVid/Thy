@@ -31,8 +31,20 @@ interface AlertProviderProps {
   children: ComponentChildren
 }
 
+const maybeConsole = (message: string, type: AlertType = "error") => {
+  if (type === "error") {
+    console.error(message)
+  }
+  if (type === "warning") {
+    console.warn(message)
+  }
+}
+
 export function AlertProvider({ children }: AlertProviderProps) {
-  const [alert, setAlert] = useState<{ message: string; type: AlertType } | null>(null)
+  const [alert, setAlert] = useState<{
+    message: string
+    type: AlertType
+  } | null>(null)
   const [toasts, setToasts] = useState<Toast[]>([])
   const [confirmDialog, setConfirmDialog] = useState<{
     message: string
@@ -43,58 +55,75 @@ export function AlertProvider({ children }: AlertProviderProps) {
     defaultValue: string
     resolve: (value: string | null) => void
   } | null>(null)
-  
+
   const [nextId, setNextId] = useState(1)
 
-  const showAlert = useCallback((message: string, type: AlertType = "error") => {
-    setAlert({ message, type })
-  }, [])
+  const showAlert = useCallback(
+    (message: string, type: AlertType = "error") => {
+      maybeConsole(message, type)
+      setAlert({ message, type })
+    },
+    [],
+  )
 
-  const showToast = useCallback((message: string, type: AlertType = "info") => {
-    const id = nextId
-    setNextId(id + 1)
-    
-    const toast: Toast = { id, message, type }
-    setToasts(prev => [...prev, toast])
-    
-    // Auto-remove toast after 5 seconds
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id))
-    }, 5000)
-  }, [nextId])
+  const showToast = useCallback(
+    (message: string, type: AlertType = "info") => {
+      maybeConsole(message, type)
+      const id = nextId
+      setNextId(id + 1)
+
+      const toast: Toast = { id, message, type }
+      setToasts((prev) => [...prev, toast])
+
+      // Auto-remove toast after 5 seconds
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== id))
+      }, 5000)
+    },
+    [nextId],
+  )
 
   const confirm = useCallback((message: string): Promise<boolean> => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setConfirmDialog({ message, resolve })
     })
   }, [])
 
-  const prompt = useCallback((message: string, defaultValue: string = ""): Promise<string | null> => {
-    return new Promise(resolve => {
-      setPromptDialog({ message, defaultValue, resolve })
-    })
-  }, [])
+  const prompt = useCallback(
+    (message: string, defaultValue: string = ""): Promise<string | null> => {
+      return new Promise((resolve) => {
+        setPromptDialog({ message, defaultValue, resolve })
+      })
+    },
+    [],
+  )
 
   const handleCloseAlert = useCallback(() => {
     setAlert(null)
   }, [])
 
-  const handleConfirm = useCallback((value: boolean) => {
-    if (confirmDialog) {
-      confirmDialog.resolve(value)
-      setConfirmDialog(null)
-    }
-  }, [confirmDialog])
+  const handleConfirm = useCallback(
+    (value: boolean) => {
+      if (confirmDialog) {
+        confirmDialog.resolve(value)
+        setConfirmDialog(null)
+      }
+    },
+    [confirmDialog],
+  )
 
-  const handlePromptSubmit = useCallback((value: string | null) => {
-    if (promptDialog) {
-      promptDialog.resolve(value)
-      setPromptDialog(null)
-    }
-  }, [promptDialog])
+  const handlePromptSubmit = useCallback(
+    (value: string | null) => {
+      if (promptDialog) {
+        promptDialog.resolve(value)
+        setPromptDialog(null)
+      }
+    },
+    [promptDialog],
+  )
 
   const removeToast = useCallback((id: number) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id))
+    setToasts((prev) => prev.filter((toast) => toast.id !== id))
   }, [])
 
   const alertValue = {
@@ -107,10 +136,10 @@ export function AlertProvider({ children }: AlertProviderProps) {
   return (
     <AlertContext.Provider value={alertValue}>
       {children}
-      
+
       {/* Alert Dialog */}
       {alert && (
-        <div className="alert-overlay">
+        <div className="alert-overlay" onClick={handleCloseAlert}>
           <div className={`alert-dialog alert-${alert.type}`}>
             <div className="alert-content">
               <p>{alert.message}</p>
@@ -119,10 +148,10 @@ export function AlertProvider({ children }: AlertProviderProps) {
           </div>
         </div>
       )}
-      
+
       {/* Confirmation Dialog */}
       {confirmDialog && (
-        <div className="alert-overlay">
+        <div className="alert-overlay" onClick={() => handleConfirm(false)}>
           <div className="alert-dialog">
             <div className="alert-content">
               <p>{confirmDialog.message}</p>
@@ -134,35 +163,41 @@ export function AlertProvider({ children }: AlertProviderProps) {
           </div>
         </div>
       )}
-      
+
       {/* Prompt Dialog */}
       {promptDialog && (
         <div className="alert-overlay">
           <div className="alert-dialog">
             <div className="alert-content">
               <p>{promptDialog.message}</p>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 defaultValue={promptDialog.defaultValue}
                 id="prompt-input"
                 autoFocus
               />
               <div className="alert-actions">
-                <button onClick={() => {
-                  const input = document.getElementById('prompt-input') as HTMLInputElement
-                  handlePromptSubmit(input.value)
-                }}>OK</button>
+                <button
+                  onClick={() => {
+                    const input = document.getElementById(
+                      "prompt-input",
+                    ) as HTMLInputElement
+                    handlePromptSubmit(input.value)
+                  }}
+                >
+                  OK
+                </button>
                 <button onClick={() => handlePromptSubmit(null)}>Cancel</button>
               </div>
             </div>
           </div>
         </div>
       )}
-      
+
       {/* Toast Container */}
       {toasts.length > 0 && (
         <div className="toast-container">
-          {toasts.map(toast => (
+          {toasts.map((toast) => (
             <div key={toast.id} className={`toast toast-${toast.type}`}>
               <span>{toast.message}</span>
               <button onClick={() => removeToast(toast.id)}>×</button>

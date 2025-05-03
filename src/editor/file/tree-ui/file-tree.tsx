@@ -3,8 +3,10 @@ import {
   faFolderPlus,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useAlerts } from "editor/alert-provider"
 import { useSetIntervalWhenActive } from "editor/hook/use-set-interval-when-active"
 import { MutableRef, useEffect, useMemo, useRef, useState } from "preact/hooks"
+import { stringifyError } from "utils/stringify-error"
 import { FileEntry, FilesApi } from "../files-api"
 import { FileTreeNode } from "./file-tree-node"
 import { RenameState } from "./rename"
@@ -202,10 +204,12 @@ export const FileTree = (props: FileTreeProps) => {
 
 export const FileTreeNodeList = (props: FileTreeProps & SharedChildProps) => {
   const [nodes, setNodes] = useState<readonly FileEntry[]>([])
+  const alerts = useAlerts()
   function refreshNodes() {
     props.fs.list(props.directory).then(setNodes, (e) => {
-      // TODO: Surface error.
-      console.error(e)
+      alerts.showToast(
+        `Failed to list files for ${props.directory}:` + stringifyError(e),
+      )
     })
   }
   useEffect(refreshNodes, [props.fs, props.directory])

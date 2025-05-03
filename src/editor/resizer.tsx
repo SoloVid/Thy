@@ -16,7 +16,6 @@ export default function Resizer({ resizeType, onResize }: ResizerProps) {
       return
     }
     const listener = (e: MouseEvent) => {
-      // console.log("mouse moved")
       setMousePos((prevPos) => {
         if (prevPos !== null) {
           const dx = e.clientX - prevPos.x

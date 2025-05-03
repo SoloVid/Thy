@@ -27,6 +27,7 @@ function makeHtml(inputScript: string) {
     <link rel="stylesheet" href="/prism-theme.css">
     <link rel="stylesheet" href="/home.css">
     <link rel="stylesheet" href="/code-input.css">
+    <link rel="stylesheet" href="/alert.css">
     <style>
       *:not(code *, code, .line-numbers *) {
         font-family: 'Josefin Sans', sans-serif;

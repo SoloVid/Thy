@@ -225,8 +225,6 @@ export function makeInMemoryFiles(now: Now): InMemoryFiles {
     },
     rename: async (oldPath: string, newPath: string) => {
       if (oldPath === newPath) return
-      console.log(serializeDirectory(root))
-      console.log(`${oldPath} -> ${newPath}`)
       const node = findNode(now, root, oldPath)
       assert(!!node, `File ${oldPath} not found`)
       const oldParent = node.parent
