@@ -7,16 +7,16 @@ import {
   faShareFromSquare,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useState } from "preact/hooks"
 import { CopyToClipboardButton } from "../home/button"
 import { useAlerts } from "./alert-provider"
 import { InMemoryFiles } from "./file/in-memory-files"
+import { makeIndexedDbFiles } from "./file/indexed-db-files"
 import { makeFileManager, useLocalFiles } from "./file/local-files"
+import { SerializedWorkspace } from "./file/serialized-workspace"
+import { WorkspaceBrowser } from "./file/workspace-browser"
 import { makeShareUrl } from "./source-code/share-url"
 import { EditorState } from "./state"
-import { useState } from "preact/hooks"
-import { WorkspaceBrowser } from "./file/workspace-browser"
-import { makeIndexedDbFiles } from "./file/indexed-db-files"
-import { SerializedWorkspace } from "./file/serialized-workspace"
 
 type MenuProps = {
   fs: InMemoryFiles
@@ -31,7 +31,7 @@ export default function Menu({ fs, state, toggleLeftPanel }: MenuProps) {
   const [workspaceBrowserOpen, setWorkspaceBrowserOpen] = useState(false)
   const [workspaceBrowserMode, setWorkspaceBrowserMode] = useState<"load" | "save">("load")
   const [currentWorkspacePath, setCurrentWorkspacePath] = useState<string | undefined>(undefined)
-  const [indexedDbFs] = useState(() => makeIndexedDbFiles())
+  const [indexedDbFs] = useState(() => makeIndexedDbFiles("workspaces"))
 
   const handleSaveWorkspace = () => {
     setWorkspaceBrowserMode("save")

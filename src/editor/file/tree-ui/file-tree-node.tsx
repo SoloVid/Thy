@@ -13,8 +13,8 @@ import { css } from "../../component/css"
 import {
   FileTreeNodeList,
   FileTreeNodeProps,
-  generateUniqueName,
 } from "./file-tree"
+import { generateUniqueName } from "../generate-unique-name"
 import { InlineRename } from "./rename"
 import { actionStyle } from "./shared-style"
 
