@@ -16,6 +16,9 @@ These coding conventions should be followed for all new TypeScript code in this 
 - Don't use semicolons.
 - Use two-space indentation.
 - Always specify parameter types explicitly.
+- Prefer smaller functions and smaller files.
+  - As indentation levels increase, it is increasingly desirable to split out inline logic into separate functions.
+  - Files over 100 lines or so are getting too large and should be split.
 - Prefer `const` first, then `let` second, then `var` last (probably never)
 - Avoid static and global variables (and the singleton pattern) whenever possible. If it seems absolutely necessary, try really hard to find a different route out.
 - Be careful with type inference. Err on the side of specifying too much type information.
