@@ -5,24 +5,21 @@ import {
   faFolder,
   faFolderOpen,
   faFolderPlus,
-  faPencil,
   faTrash,
   faWandMagicSparkles,
-  faXmark,
+  faXmark
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useSetIntervalWhenActive } from "editor/hook/use-set-interval-when-active"
 import {
   MutableRef,
-  StateUpdater,
   useEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from "preact/hooks"
 import { css } from "../component/css"
 import { FileEntry, FilesApi } from "./files-api"
-import { useSetIntervalWhenActive } from "editor/hook/use-set-interval-when-active"
-import { makeInMemoryFiles } from "./in-memory-files"
 
 type RenameState = {
   path: string

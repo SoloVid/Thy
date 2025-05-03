@@ -12,7 +12,7 @@ type Now = () => number
 type File = {
   readonly kind: "file"
   name: string
-  path: string
+  readonly path: string
   contents: string
   parent: Directory
   timeModified: number
@@ -20,13 +20,36 @@ type File = {
 type Directory = {
   readonly kind: "directory"
   name: string
-  path: string
+  readonly path: string
   children: (File | Directory)[]
   parent: Directory | null
   timeModified: number
 }
 export type SourceCodeWorkspace = Directory
 export type SourceCodeWorkspaceNode = File | Directory
+
+function makeFile(file: Omit<File, "kind" | "path">): File {
+  return {
+    kind: "file",
+    ...file,
+    get path() {
+      return this.parent.path + this.name
+    },
+  }
+}
+
+function makeDirectory(file: Omit<Directory, "kind" | "path">): Directory {
+  return {
+    kind: "directory",
+    ...file,
+    get path() {
+      if (!this.parent) {
+        return "/"
+      }
+      return this.parent.path + this.name + "/"
+    },
+  }
+}
 
 function serializeNode(node: File | Directory): SerializedWorkspaceNode {
   if (node.kind === "directory") {
@@ -36,14 +59,14 @@ function serializeNode(node: File | Directory): SerializedWorkspaceNode {
   }
 }
 function serializeDirectory(node: Directory): SWDirectoryNode {
-  const { parent, children, ...everythingElse } = node
+  const { path, parent, children, ...everythingElse } = node
   return {
     children: children.map(serializeNode),
     ...everythingElse,
   }
 }
 function serializeFile(node: File): SWFileNode {
-  const { parent, ...everythingElse } = node
+  const { path, parent, ...everythingElse } = node
   return everythingElse
 }
 
@@ -62,19 +85,19 @@ function deserializeDirectory(
   parent: Directory | null,
 ): Directory {
   const { children, ...everythingElse } = node
-  const inflated: Directory = {
+  const inflated: Directory = makeDirectory({
     ...node,
     children: [],
     parent,
-  }
+  })
   inflated.children = node.children.map((c) => deserializeNode(c, inflated))
   return inflated
 }
 function deserializeFile(node: SWFileNode, parent: Directory): File {
-  return {
+  return makeFile({
     ...node,
     parent,
-  }
+  })
 }
 
 function findNode(
@@ -96,14 +119,12 @@ function findNode(
     const child = current.children.find((c) => c.name === parts[i])
     if (i === parts.length - 1) {
       if (!child && createIfMissing) {
-        const newChild = {
-          kind: "file",
+        const newChild = makeFile({
           name: parts[i],
-          path: current.path + parts[i],
           contents: "",
           parent: current,
           timeModified: now(),
-        } as const
+        })
         current.children.push(newChild)
         return newChild
       }
@@ -135,14 +156,12 @@ export type InMemoryFiles = FilesApi & {
 }
 
 export function makeInMemoryFiles(now: Now): InMemoryFiles {
-  let root: Directory = {
-    kind: "directory",
+  let root: Directory = makeDirectory({
     name: "/",
-    path: "/",
     children: [],
     parent: null,
     timeModified: now(),
-  }
+  })
 
   return {
     getRaw: () => root,
@@ -191,14 +210,12 @@ export function makeInMemoryFiles(now: Now): InMemoryFiles {
         !parent.children.some((c) => c.name === name),
         "Directory already exists",
       )
-      parent.children.push({
-        kind: "directory",
+      parent.children.push(makeDirectory({
         name,
-        path: parent.path + name + "/",
         children: [],
         parent: parent,
         timeModified: now(),
-      })
+      }))
     },
     rename: async (oldPath: string, newPath: string) => {
       if (oldPath === newPath) return
@@ -220,7 +237,6 @@ export function makeInMemoryFiles(now: Now): InMemoryFiles {
       )
       node.parent = newParent
       node.name = name
-      node.path = newParent.path + name + (node.kind === "directory" ? "/" : "")
       node.timeModified = now()
       oldParent.children = oldParent.children.filter((c) => c !== node)
       newParent.children.push(node)

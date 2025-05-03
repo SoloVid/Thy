@@ -1,14 +1,12 @@
 export type SWFileNode = {
   readonly kind: "file"
   name: string
-  path: string
   contents: string
   timeModified: number
 }
 export type SWDirectoryNode = {
   readonly kind: "directory"
   name: string
-  path: string
   children: (SWFileNode | SWDirectoryNode)[]
   timeModified: number
 }
@@ -22,12 +20,10 @@ export function makeWorkspaceFromScript(
   return {
     kind: "directory",
     name: "/",
-    path: "/",
     children: [
       {
         kind: "file",
         name: "main.thy",
-        path: "/main.thy",
         contents: sourceCode,
         timeModified: new Date().getTime(),
       },
