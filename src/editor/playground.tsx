@@ -39,6 +39,13 @@ function PlaygroundContent() {
 
   const alerts = useAlerts()
 
+  const toggleLeftPanel = () => {
+    setPrefs((before) => ({
+      ...before,
+      leftOpen: !before.leftOpen,
+    }))
+  }
+
   function onFileSelect(path: string) {
     fs.read(path).then(
       (s) => {
@@ -125,7 +132,7 @@ function PlaygroundContent() {
       <div
         style={`flex-grow: 1; height:100vh;height:${windowHeight}px;overflow: hidden; display: flex; flex-direction: column;`}
       >
-        <Menu fs={fs} state={state} />
+        <Menu fs={fs} state={state} toggleLeftPanel={toggleLeftPanel} />
         <div style={`flex-grow: 1;overflow: hidden; display: flex;`}>
           {prefs.leftOpen && (
             <>

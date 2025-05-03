@@ -1,5 +1,5 @@
 import assert from "utils/assert"
-import type { FilesApi } from "./files-api"
+import type { FileEntry, FilesApi } from "./files-api"
 
 const DB_NAME = "files_db"
 const DB_VERSION = 1
@@ -90,7 +90,7 @@ function getNodeName(path: string): string {
   return path.split("/").pop() || "/"
 }
 
-export function makeIndexedDbFiles(): FilesApi {
+export function makeIndexedDbFiles(): IndexedDbFiles {
   // Initialize root if it doesn't exist
   const initRoot = async () => {
     const rootExists = await dbOperation(PATH_STORE, "readonly", (store) =>
@@ -111,6 +111,50 @@ export function makeIndexedDbFiles(): FilesApi {
 
       await dbOperation(PATH_STORE, "readwrite", (store) =>
         store.put({ path: "/", nodeId: rootId }),
+      )
+      
+      // Add example workspace
+      const exampleWorkspaceId = generateId()
+      const exampleWorkspace: FileNode = {
+        id: exampleWorkspaceId,
+        type: "file",
+        name: "example-workspace.json",
+        parentId: rootId,
+        contents: JSON.stringify({
+          type: "directory",
+          name: "",
+          children: [
+            {
+              type: "file",
+              name: "main.thy",
+              content: "let greeting = \"Hello, Thy!\"\nreturn greeting"
+            },
+            {
+              type: "directory",
+              name: "examples",
+              children: [
+                {
+                  type: "file",
+                  name: "factorial.thy",
+                  content: "let factorial = function n\n  if n == 0\n    return 1\n  return n * factorial(n - 1)"
+                }
+              ]
+            }
+          ]
+        }, null, 2)
+      }
+      
+      await dbOperation(NODE_STORE, "readwrite", (store) => store.put(exampleWorkspace))
+      await dbOperation(PATH_STORE, "readwrite", (store) =>
+        store.put({ path: "/example-workspace.json", nodeId: exampleWorkspaceId }),
+      )
+      
+      // Update root's childIds
+      await dbOperation(NODE_STORE, "readwrite", (store) =>
+        store.put({
+          ...rootNode,
+          childIds: [exampleWorkspaceId],
+        }),
       )
     }
   }
@@ -157,10 +201,14 @@ export function makeIndexedDbFiles(): FilesApi {
 
   return {
     exists: async (path: string) => {
-      const entry = await dbOperation(PATH_STORE, "readonly", (store) =>
-        store.get(path),
-      )
-      return !!entry
+      try {
+        const entry = await dbOperation(PATH_STORE, "readonly", (store) =>
+          store.get(path),
+        )
+        return !!entry
+      } catch (error) {
+        return false
+      }
     },
 
     read: async (path: string) => {
@@ -170,55 +218,116 @@ export function makeIndexedDbFiles(): FilesApi {
     },
 
     write: async (path: string, contents: string) => {
-      const parentPath = getParentPath(path)
-      const parent = await getNodeByPath(parentPath)
-      assert(parent.type === "directory", `${parentPath} is not a directory`)
+      try {
+        // Check if file already exists
+        const exists = await dbOperation(PATH_STORE, "readonly", (store) =>
+          store.get(path),
+        )
+        
+        if (exists) {
+          // Update existing file
+          const node = await getNodeByPath(path)
+          assert(node.type === "file", `${path} is a directory`)
+          
+          const updatedNode: FileNode = {
+            ...node as FileNode,
+            contents,
+          }
+          
+          await dbOperation(NODE_STORE, "readwrite", (store) => 
+            store.put(updatedNode)
+          )
+          return
+        }
+        
+        // Create new file
+        const parentPath = getParentPath(path)
+        const parent = await getNodeByPath(parentPath)
+        assert(parent.type === "directory", `${parentPath} is not a directory`)
 
-      const fileId = generateId()
-      const fileNode: FileNode = {
-        id: fileId,
-        type: "file",
-        name: getNodeName(path),
-        parentId: parent.id,
-        contents,
+        const fileId = generateId()
+        const fileNode: FileNode = {
+          id: fileId,
+          type: "file",
+          name: getNodeName(path),
+          parentId: parent.id,
+          contents,
+        }
+
+        await addNode(path, fileNode)
+      } catch (error) {
+        // If parent directory doesn't exist, create it recursively
+        if (error.message?.includes("not found")) {
+          const parentPath = getParentPath(path)
+          if (parentPath !== "/") {
+            await api.mkdir(parentPath)
+            await api.write(path, contents)
+          }
+        } else {
+          throw error
+        }
       }
-
-      await addNode(path, fileNode)
     },
 
     list: async (path: string) => {
-      const node = await getNodeByPath(path)
-      assert(node.type === "directory", `${path} is not a directory`)
+      try {
+        const node = await getNodeByPath(path)
+        assert(node.type === "directory", `${path} is not a directory`)
 
-      const children = await Promise.all(
-        node.childIds.map((id) =>
-          dbOperation(NODE_STORE, "readonly", (store) => store.get(id)),
-        ),
-      )
+        const children = await Promise.all(
+          node.childIds.map((id) =>
+            dbOperation(NODE_STORE, "readonly", (store) => store.get(id)),
+          ),
+        )
 
-      return children.map((child) => child.name)
+        return children.map((child) => ({
+          kind: child.type,
+          name: child.name,
+        }))
+      } catch (error) {
+        return []
+      }
     },
 
     mkdir: async (path: string) => {
-      const parentPath = getParentPath(path)
-      const parent = await getNodeByPath(parentPath)
-      assert(parent.type === "directory", `${parentPath} is not a directory`)
+      try {
+        // Check if directory already exists
+        const exists = await dbOperation(PATH_STORE, "readonly", (store) =>
+          store.get(path),
+        )
+        
+        if (exists) {
+          const node = await getNodeByPath(path)
+          assert(node.type === "directory", `${path} is a file`)
+          return // Directory already exists
+        }
+        
+        const parentPath = getParentPath(path)
+        const parent = await getNodeByPath(parentPath)
+        assert(parent.type === "directory", `${parentPath} is not a directory`)
 
-      const exists = await dbOperation(PATH_STORE, "readonly", (store) =>
-        store.get(path),
-      )
-      assert(!exists, `${path} already exists`)
+        const dirId = generateId()
+        const dirNode: DirectoryNode = {
+          id: dirId,
+          type: "directory",
+          name: getNodeName(path),
+          parentId: parent.id,
+          childIds: [],
+        }
 
-      const dirId = generateId()
-      const dirNode: DirectoryNode = {
-        id: dirId,
-        type: "directory",
-        name: getNodeName(path),
-        parentId: parent.id,
-        childIds: [],
+        await addNode(path, dirNode)
+      } catch (error) {
+        // If parent directory doesn't exist, create it recursively
+        if (error.message?.includes("not found")) {
+          const parentPath = getParentPath(path)
+          if (parentPath !== path && parentPath !== "/") {
+            await api.mkdir(parentPath)
+            await api.mkdir(path)
+          }
+        } else {
+          throw error
+        }
       }
-
-      await addNode(path, dirNode)
     },
 
     rename: async (oldPath: string, newPath: string) => {
@@ -340,3 +449,6 @@ export function makeIndexedDbFiles(): FilesApi {
     },
   }
 }
+
+const api = makeIndexedDbFiles()
+export type IndexedDbFiles = FilesApi
