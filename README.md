@@ -2,6 +2,13 @@
 
 Thy is a programming language. This project implements some tools to work with it.
 
+## Language
+
+The most digestible documentation for Thy is in [docs/](./docs/),
+with the two most important documents being
+the [language spec](./docs/language-spec.md)
+and [miscellaneous design notes](./docs/language-design.md).
+
 ## VSCode Development
 
 A core aspect of this project is IDE tooling.
@@ -55,13 +62,3 @@ Try out compiler (after building):
 ```
 node lib/api/cli.js -t ts-namespace -r src -o dist
 ```
-
-## Language
-
-The most digestible documentation for Thy is split between the [example program](example-program.thy)
-and the [lessons](lessons.md), and there are some more dense language notes in [notes.md](notes.md).
-(Both of these are best viewed with the VSCode extension enabled.)
-
-Many of the features outlines in these documents have not yet been implemented
-and to some degree only live in the mind of Grant,
-but these documents should still be a good starting place for understanding the language.
