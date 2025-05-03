@@ -57,16 +57,13 @@ export const FileTree = (props: FileTreeProps) => {
   const renameInProgressRef = useRef<boolean>(false)
 
   const getTargetDirectory = () => {
-    if (!selectedPath) return "/"
+    if (!selectedPath) return ""
     
-    // Check if the selected path is a directory or a file
-    const lastSlashIndex = selectedPath.lastIndexOf("/")
-    if (lastSlashIndex === selectedPath.length - 1) {
-      // It's already a directory path (ends with /)
-      return selectedPath
+    if (selectedPath.endsWith("/")) {
+      return selectedPath.substring(0, selectedPath.length - 1)
     } else {
       // It's a file path, get the parent directory
-      return selectedPath.substring(0, lastSlashIndex + 1)
+      return selectedPath.substring(0, selectedPath.lastIndexOf("/"))
     }
   }
 
@@ -76,7 +73,7 @@ export const FileTree = (props: FileTreeProps) => {
 
     // Create a temporary file name
     const tempName = "new-file.thy"
-    const newPath = `${targetDir}${tempName}`
+    const newPath = `${targetDir}/${tempName}`
 
     // Create the file
     await props.fs.write(newPath, "")
@@ -98,7 +95,7 @@ export const FileTree = (props: FileTreeProps) => {
 
     // Create a temporary folder name
     const tempName = "new-folder"
-    const newPath = `${targetDir}${tempName}/`
+    const newPath = `${targetDir}/${tempName}/`
 
     // Create the folder
     await props.fs.mkdir(newPath)
@@ -279,9 +276,7 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
 
   const handleClick = (e: MouseEvent) => {
     restProps.setSelectedPath(node.path)
-    if (node.kind === "file") {
-      restProps.onSelect(node.path)
-    }
+    restProps.onSelect(node.path)
     if (node.kind === "directory") {
       setIsExpanded(!isExpanded)
     }
@@ -317,17 +312,14 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
     restProps.renameInProgressRef.current = false
 
     const oldPath = restProps.renameState.path
-    const isDirectory = node.kind === "directory"
-    
     // For directories, we need to handle the trailing slash
-    const dirPath = isDirectory 
-      ? oldPath.substring(0, oldPath.lastIndexOf("/", oldPath.length - 2) + 1)
-      : oldPath.substring(0, oldPath.lastIndexOf("/") + 1)
-    
+    const oldPathNoTrailingSlash = oldPath.replace(/\/$/, "")
+    const dirPath = oldPathNoTrailingSlash.substring(0, oldPathNoTrailingSlash.lastIndexOf("/"))
+    const isDirectory = node.kind === "directory"
     // For directories, ensure the new path ends with a slash
     const newPath = isDirectory
-      ? `${dirPath}${newName}/`
-      : `${dirPath}${newName}`
+      ? `${dirPath}/${newName}/`
+      : `${dirPath}/${newName}`
 
     // Clear rename state
     restProps.setRenameState(null)
@@ -337,9 +329,7 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
 
       // Update selection to the new path
       restProps.setSelectedPath(newPath)
-      if (!isDirectory) {
-        restProps.onSelect(newPath)
-      }
+      restProps.onSelect(newPath)
     } catch (e) {
       console.error(`Failed to rename ${isDirectory ? 'folder' : 'file'}:`, e)
       alert(`Failed to rename ${isDirectory ? 'folder' : 'file'}: ${e}`)

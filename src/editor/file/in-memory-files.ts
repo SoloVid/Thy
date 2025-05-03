@@ -121,7 +121,7 @@ function findParentDirectory(
   root: Directory,
   path: string,
 ): Directory {
-  const parent = findNode(now, root, path.split("/").slice(0, -1).join("/"))
+  const parent = findNode(now, root, path.replace(/\/$/, "").split("/").slice(0, -1).join("/"))
   if (!parent) throw new Error(`File ${path} not found`)
   if (parent.kind !== "directory") throw new Error(`${path} is not a directory`)
   return parent
@@ -185,7 +185,7 @@ export function makeInMemoryFiles(now: Now): InMemoryFiles {
     },
     mkdir: async (path: string) => {
       const parent = findParentDirectory(now, root, path)
-      const name = path.split("/").pop()
+      const name = path.replace(/\/$/, "").split("/").pop()
       assert(!!name, "Directory name is required")
       assert(
         !parent.children.some((c) => c.name === name),
