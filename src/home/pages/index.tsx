@@ -15,12 +15,9 @@ renderStandardPage(
         to <em>not alienate developers</em>.
       </p>
 
-      <Button
-        text="To the Playground!"
-        centered
-        href={`${playgroundBaseUrl}`}
-        newTab
-      ></Button>
+      <Button centered href={`${playgroundBaseUrl}`} newTab>
+        To the Playground!
+      </Button>
 
       <p>Here are Thy's core design goals:</p>
 

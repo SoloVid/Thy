@@ -1,8 +1,6 @@
 // @ts-expect-error Import only valid because of esbuild magic.
 import arrayDoc from "../../../../../docs/std-lib/core/array.md"
 // @ts-expect-error Import only valid because of esbuild magic.
-import arrayMutableDoc from "../../../../../docs/std-lib/core/array-mutable.md"
-// @ts-expect-error Import only valid because of esbuild magic.
 import castDoc from "../../../../../docs/std-lib/core/cast.md"
 // @ts-expect-error Import only valid because of esbuild magic.
 import catchDoc from "../../../../../docs/std-lib/core/catch.md"
@@ -82,13 +80,14 @@ import throwDoc from "../../../../../docs/std-lib/core/throw.md"
 import trueDoc from "../../../../../docs/std-lib/core/true.md"
 // @ts-expect-error Import only valid because of esbuild magic.
 import tryDoc from "../../../../../docs/std-lib/core/try.md"
+// @ts-expect-error Import only valid because of esbuild magic.
+import tupleDoc from "../../../../../docs/std-lib/core/tuple.md"
 
 import { makeMultiMarkdown } from "../../../multi-markdown"
 import { renderStandardPage } from "../../../standard-page-frame"
 
 const sections = [
   ["array", arrayDoc],
-  ["arrayMutable", arrayMutableDoc],
   ["cast", castDoc],
   ["catch", catchDoc],
   ["check.all", checkAllDoc],
@@ -129,6 +128,7 @@ const sections = [
   ["throw", throwDoc],
   ["true", trueDoc],
   ["try", tryDoc],
+  ["tuple", tupleDoc],
 ] as const
 
 const { toc, renderedSections } = makeMultiMarkdown(sections)

@@ -2,6 +2,7 @@ import type { JSX } from "preact"
 import { useEffect, useMemo, useRef, useState } from "preact/hooks"
 import Prism from "prismjs"
 import { addThyPrismGrammarAndAwaitAvailable } from "./prism-grammar"
+import useSize from "./hook/size"
 
 export type CodeInputProps = {
   id: string
@@ -48,6 +49,8 @@ export default function CodeInput({
       }
     })
   }, [])
+
+  const textareaSize = useSize($textarea)
 
   const highlightedHtml = useMemo(() => {
     const valueToHighlight =
@@ -278,7 +281,7 @@ export default function CodeInput({
           {value}
         </textarea>
         <div
-          style={`position:absolute;width:${$textarea.current?.clientWidth ?? 9999}px;height:${$textarea.current?.clientHeight ?? 9999}px;overflow:hidden;`}
+          style={`position:absolute;width:${textareaSize[0] ?? 9999}px;height:${textareaSize[1] ?? 9999}px;overflow:hidden;`}
         >
           {/* <div style={`position:relative;width:100px;height:100px;overflow:hidden;`}> */}
           <pre

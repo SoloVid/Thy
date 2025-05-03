@@ -1,8 +1,8 @@
-import type { JSX } from "preact"
+import type { ComponentChildren, JSX } from "preact"
 import { useState } from "preact/hooks"
 
 type ButtonProps = {
-  text: string
+  children: ComponentChildren
   centered?: boolean
   extraButtonClass?: string
   href?: string
@@ -11,7 +11,7 @@ type ButtonProps = {
 }
 
 export default function Button({
-  text,
+  children,
   centered,
   extraButtonClass,
   href,
@@ -25,10 +25,9 @@ export default function Button({
       href={href}
       target={newTab ? "_blank" : undefined}
       onClick={onClick}
-      style="margin:5px;"
       {...remainingProps}
     >
-      {text}
+      {children}
     </a>
   )
   if (centered) {
@@ -45,24 +44,27 @@ type TryButtonProps = {
 export function TryButton({ playgroundUrl, source }: TryButtonProps) {
   return (
     <Button
-      text="Try"
       centered
       href={`${playgroundUrl}#b64=${btoa(source.trim())}`}
       newTab
-    ></Button>
+    >
+      Try
+    </Button>
   )
 }
 
 type CopyToClipboardButtonProps = {
   extraButtonClass?: string
   getValue: () => string
+  title?: string
   tooltip?: string
-  children: string
+  children: ComponentChildren
 }
 
 export function CopyToClipboardButton({
   extraButtonClass,
   getValue,
+  title,
   tooltip,
   children,
 }: CopyToClipboardButtonProps) {
@@ -81,13 +83,13 @@ export function CopyToClipboardButton({
   }
 
   return (
-    <span style="position:relative;">
-      <Button
-        extraButtonClass={extraButtonClass}
-        text={children}
-        onClick={copyToClipboard}
-      ></Button>
+    <Button
+      extraButtonClass={extraButtonClass}
+      onClick={copyToClipboard}
+      title={title}
+    >
+      {children}
       {showTooltip && <div className="tooltip">{tooltip ?? "Copied!"}</div>}
-    </span>
+    </Button>
   )
 }
