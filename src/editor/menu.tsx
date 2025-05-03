@@ -9,11 +9,13 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useState } from "preact/hooks"
 import { CopyToClipboardButton } from "../home/button"
+import { FilesApi } from "./file/files-api"
 import { makeFileManager, useLocalFiles } from "./file/local-files"
 import { makeShareUrl } from "./source-code/share-url"
 import { EditorState } from "./state"
 
 type MenuProps = {
+  fs: FilesApi
   state: EditorState
 }
 

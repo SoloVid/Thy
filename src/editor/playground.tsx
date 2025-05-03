@@ -1,14 +1,13 @@
-import { useEffect, useMemo, useState } from "preact/hooks"
+import { useEffect, useState } from "preact/hooks"
 import CodeInput from "./code-input"
+import { FileTree } from "./file/file-tree"
+import { InMemoryFiles, makeInMemoryFiles } from "./file/in-memory-files"
 import Menu from "./menu"
 import OutputContainer from "./output-container"
-import { useEditorState } from "./state"
-import Resizer from "./resizer"
 import { useEditorPreferences } from "./preferences"
-import AppBar from "./component/app-bar"
-import { ExampleFileTree, FileTree } from "./file/file-tree"
-import { InMemoryFiles, makeInMemoryFiles } from "./file/in-memory-files"
+import Resizer from "./resizer"
 import { getPersistedWorkspace } from "./source-code/persisted-workspace"
+import { useEditorState } from "./state"
 
 export default function Playground() {
   useEffect(() => {
