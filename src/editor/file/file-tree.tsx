@@ -1,4 +1,5 @@
 import {
+  faCheck,
   faFile,
   faFileCirclePlus,
   faFolder,
@@ -7,13 +8,21 @@ import {
   faPencil,
   faTrash,
   faWandMagicSparkles,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useEffect, useMemo, useState } from "preact/hooks"
+import { JSX, useEffect, useMemo, useRef, useState } from "preact/hooks"
 import { css } from "../component/css"
 import { FileEntry, FilesApi } from "./files-api"
 import { useSetIntervalWhenActive } from "editor/hook/use-set-interval-when-active"
 import { makeInMemoryFiles } from "./in-memory-files"
+import { join } from "path-browserify"
+
+type RenameState = {
+  path: string
+  isNew: boolean
+  name: string
+} | null
 
 type SharedProps = {
   fs: FilesApi
@@ -26,6 +35,8 @@ type SharedProps = {
 type SharedChildProps = SharedProps & {
   selectedPath: string | null
   setSelectedPath: (newPath: string) => void
+  renameState: RenameState
+  setRenameState: (state: RenameState) => void
 }
 
 type FileTreeProps = SharedProps & {
@@ -35,6 +46,38 @@ type FileTreeProps = SharedProps & {
 // FileTree component
 export const FileTree = (props: FileTreeProps) => {
   const [selectedPath, setSelectedPath] = useState<string | null>(null)
+  const [renameState, setRenameState] = useState<RenameState>(null)
+
+  const handleNewFile = async () => {
+    // Determine the directory to create the file in
+    let targetDir = props.directory
+    if (selectedPath) {
+      const entry = await props.fs.list(selectedPath).then(
+        entries => entries[0],
+        () => null
+      )
+      if (entry) {
+        targetDir = entry.kind === "directory" ? selectedPath : selectedPath.substring(0, selectedPath.lastIndexOf('/'))
+      }
+    }
+    
+    // Create a temporary file name
+    const tempName = "new-file.thy"
+    const newPath = join(targetDir, tempName)
+    
+    // Create the file
+    await props.fs.write(newPath, "")
+    
+    // Select the new file and start renaming
+    setSelectedPath(newPath)
+    props.onSelect(newPath)
+    setRenameState({
+      path: newPath,
+      isNew: true,
+      name: tempName
+    })
+  }
+
   return (
     <div>
       <div style="display:flex; justify-content:flex-end;">
@@ -43,6 +86,7 @@ export const FileTree = (props: FileTreeProps) => {
           title="New File..."
           icon={faFileCirclePlus}
           fixedWidth
+          onClick={handleNewFile}
         />
         <FontAwesomeIcon
           className={actionStyle}
@@ -55,6 +99,8 @@ export const FileTree = (props: FileTreeProps) => {
         {...props}
         selectedPath={selectedPath}
         setSelectedPath={setSelectedPath}
+        renameState={renameState}
+        setRenameState={setRenameState}
       />
     </div>
   )
@@ -70,6 +116,14 @@ const FileTreeNodeList = (props: FileTreeProps & SharedChildProps) => {
   }
   useEffect(refreshNodes, [props.fs, props.directory])
   useSetIntervalWhenActive(refreshNodes, 1000, [props.fs, props.directory])
+  
+  // Refresh immediately when rename state changes
+  useEffect(() => {
+    if (!props.renameState) {
+      refreshNodes()
+    }
+  }, [props.renameState])
+  
   return <FileTreeNodeListSync {...props} nodes={nodes} />
 }
 
@@ -110,10 +164,80 @@ type FileTreeNodeProps = SharedChildProps & {
   node: FileEntry
 }
 
+// Inline rename component
+const InlineRename = ({
+  initialName,
+  onSave,
+  onCancel,
+}: {
+  initialName: string
+  onSave: (newName: string) => void
+  onCancel: () => void
+}) => {
+  const [name, setName] = useState(initialName)
+  const inputRef = useRef<HTMLInputElement>(null)
+  
+  useEffect(() => {
+    // Focus the input and select the name without extension
+    if (inputRef.current) {
+      inputRef.current.focus()
+      
+      // Select name without extension
+      const dotIndex = initialName.lastIndexOf('.')
+      if (dotIndex > 0) {
+        inputRef.current.setSelectionRange(0, dotIndex)
+      } else {
+        inputRef.current.select()
+      }
+    }
+  }, [initialName])
+  
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      onSave(name)
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      onCancel()
+    }
+  }
+  
+  return (
+    <div class={renameContainerStyles}>
+      <input
+        ref={inputRef}
+        type="text"
+        value={name}
+        onInput={(e) => setName((e.target as HTMLInputElement).value)}
+        onKeyDown={handleKeyDown}
+        class={renameInputStyles}
+      />
+      <div class={renameActionsStyles}>
+        <FontAwesomeIcon
+          icon={faCheck}
+          className={renameActionStyle}
+          onClick={() => onSave(name)}
+          title="Save"
+          fixedWidth
+        />
+        <FontAwesomeIcon
+          icon={faXmark}
+          className={renameActionStyle}
+          onClick={onCancel}
+          title="Cancel"
+          fixedWidth
+        />
+      </div>
+    </div>
+  )
+}
+
 const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
-
+  
+  const isRenaming = restProps.renameState && restProps.renameState.path === node.path
+  
   const handleClick = (e: MouseEvent) => {
     restProps.setSelectedPath(node.path)
     restProps.onSelect(node.path)
@@ -127,6 +251,56 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
     if (window.confirm(`Delete ${node.name}?`)) {
       restProps.onDelete(node.path)
     }
+  }
+  
+  const handleStartRename = (e: MouseEvent) => {
+    e.stopPropagation()
+    restProps.setRenameState({
+      path: node.path,
+      isNew: false,
+      name: node.name
+    })
+  }
+  
+  const handleSaveRename = async (newName: string) => {
+    if (!restProps.renameState) return
+    
+    const oldPath = restProps.renameState.path
+    const dirPath = oldPath.substring(0, oldPath.lastIndexOf('/'))
+    const newPath = join(dirPath, newName)
+    
+    try {
+      // If it's a new file, we don't need to rename, just update the path
+      if (restProps.renameState.isNew) {
+        // Read the content of the old file
+        const content = await fs.read(oldPath)
+        // Write to the new path
+        await fs.write(newPath, content)
+        // Delete the old file
+        await fs.delete(oldPath)
+      } else {
+        // For existing files, use the rename API
+        await fs.rename(oldPath, newPath)
+      }
+      
+      // Update selection to the new path
+      restProps.setSelectedPath(newPath)
+      restProps.onSelect(newPath)
+    } catch (e) {
+      console.error("Failed to rename file:", e)
+      alert(`Failed to rename file: ${e}`)
+    }
+    
+    // Clear rename state
+    restProps.setRenameState(null)
+  }
+  
+  const handleCancelRename = () => {
+    // If this was a new file and rename was canceled, delete it
+    if (restProps.renameState?.isNew) {
+      fs.delete(node.path).catch(e => console.error("Failed to delete new file:", e))
+    }
+    restProps.setRenameState(null)
   }
 
   const icon = useMemo(
@@ -162,26 +336,40 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        <div class={nodeHeaderStyles} onClick={handleClick}>
-          {icon}
-          <span class={nodeTextStyles}>{node.name}</span>
-        </div>
-        {isHovering && (
-          <div class={entryActionContainerStyles}>
-            <FontAwesomeIcon
-              className={actionStyle}
-              title="Rename"
-              icon={faWandMagicSparkles}
-              fixedWidth
-            />
-            <FontAwesomeIcon
-              className={actionStyle}
-              title="Delete"
-              icon={faTrash}
-              fixedWidth
-              onClick={handleDelete}
+        {isRenaming ? (
+          <div class={nodeHeaderStyles}>
+            {icon}
+            <InlineRename
+              initialName={restProps.renameState.name}
+              onSave={handleSaveRename}
+              onCancel={handleCancelRename}
             />
           </div>
+        ) : (
+          <>
+            <div class={nodeHeaderStyles} onClick={handleClick}>
+              {icon}
+              <span class={nodeTextStyles}>{node.name}</span>
+            </div>
+            {isHovering && (
+              <div class={entryActionContainerStyles}>
+                <FontAwesomeIcon
+                  className={actionStyle}
+                  title="Rename"
+                  icon={faWandMagicSparkles}
+                  fixedWidth
+                  onClick={handleStartRename}
+                />
+                <FontAwesomeIcon
+                  className={actionStyle}
+                  title="Delete"
+                  icon={faTrash}
+                  fixedWidth
+                  onClick={handleDelete}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
       {childrenContainer}
@@ -236,4 +424,36 @@ const childrenStyles = css`
 
 const entryActionContainerStyles = css`
   display: flex;
+`
+
+const renameContainerStyles = css`
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  margin-left: 4px;
+`
+
+const renameInputStyles = css`
+  flex-grow: 1;
+  background-color: #3c3c3c;
+  color: #ddd;
+  border: 1px solid #555;
+  border-radius: 2px;
+  padding: 2px 4px;
+  font-size: 14px;
+  outline: none;
+`
+
+const renameActionsStyles = css`
+  display: flex;
+  margin-left: 4px;
+`
+
+const renameActionStyle = css`
+  cursor: pointer;
+  padding: 2px 4px;
+  
+  &:hover {
+    background-color: rgba(150, 150, 150, 0.3);
+  }
 `
