@@ -7,17 +7,11 @@ import {
   faFolderPlus,
   faTrash,
   faWandMagicSparkles,
-  faXmark
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useSetIntervalWhenActive } from "editor/hook/use-set-interval-when-active"
-import {
-  MutableRef,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "preact/hooks"
+import { MutableRef, useEffect, useMemo, useRef, useState } from "preact/hooks"
 import { css } from "../component/css"
 import { FileEntry, FilesApi } from "./files-api"
 
@@ -37,7 +31,7 @@ type SharedProps = {
 
 type SharedChildProps = SharedProps & {
   selectedPath: string | null
-  setSelectedPath: (newPath: string) => void
+  setSelectedPath: (newPath: string | null) => void
   renameState: RenameState
   setRenameState: (state: RenameState) => void
   renameInProgressRef: MutableRef<boolean>
@@ -54,37 +48,37 @@ const generateUniqueName = async (
   fs: FilesApi,
   directory: string,
   baseName: string,
-  isDirectory: boolean
+  isDirectory: boolean,
 ): Promise<string> => {
   // For directories, we need to handle the trailing slash in the check
   const checkPath = (name: string) => {
     const path = `${directory}/${name}${isDirectory ? "/" : ""}`
     return fs.exists(path)
   }
-  
+
   // If the base name already has a number suffix, extract it
   const match = baseName.match(/^(.+?)(?:[ _-](\d+))?(\.\w+)?$/)
   if (!match) return baseName
-  
+
   const [, nameWithoutNumber, existingNumber, extension] = match
   const ext = extension || ""
   const nameBase = nameWithoutNumber || baseName
-  
+
   // Check if the base name exists
   if (!(await checkPath(baseName))) {
     return baseName
   }
-  
+
   // Start with 1 or increment the existing number
   let counter = existingNumber ? parseInt(existingNumber, 10) + 1 : 1
-  let newName: string
-  
+  let newName = `${nameBase}${counter}${ext}`
+
   // Keep incrementing until we find a name that doesn't exist
-  do {
+  while (await checkPath(newName)) {
     newName = `${nameBase}${counter}${ext}`
     counter++
-  } while (await checkPath(newName))
-  
+  }
+
   return newName
 }
 
@@ -93,11 +87,13 @@ export const FileTree = (props: FileTreeProps) => {
   const [selectedPath, setSelectedPath] = useState<string | null>(null)
   const [renameState, setRenameState] = useState<RenameState>(null)
   const renameInProgressRef = useRef<boolean>(false)
-  const [expandedDirs, setExpandedDirs] = useState<Readonly<Set<string>>>(new Set())
+  const [expandedDirs, setExpandedDirs] = useState<Readonly<Set<string>>>(
+    new Set(),
+  )
 
   const getTargetDirectory = () => {
     if (!selectedPath) return ""
-    
+
     if (selectedPath.endsWith("/")) {
       return selectedPath.substring(0, selectedPath.length - 1)
     } else {
@@ -109,7 +105,7 @@ export const FileTree = (props: FileTreeProps) => {
   // Helper to ensure all parent directories are expanded
   const expandParentDirectories = (path: string) => {
     const newExpandedDirs = new Set(expandedDirs)
-    
+
     // Get all parent directories
     let currentPath = path
     while (currentPath.includes("/")) {
@@ -119,7 +115,7 @@ export const FileTree = (props: FileTreeProps) => {
         newExpandedDirs.add(dirPath)
       }
     }
-    
+
     setExpandedDirs(newExpandedDirs)
   }
 
@@ -129,9 +125,14 @@ export const FileTree = (props: FileTreeProps) => {
 
     // Create a unique temporary file name
     const baseFileName = "new-file.thy"
-    const uniqueName = await generateUniqueName(props.fs, targetDir, baseFileName, false)
+    const uniqueName = await generateUniqueName(
+      props.fs,
+      targetDir,
+      baseFileName,
+      false,
+    )
     const newPath = `${targetDir}/${uniqueName}`
-    
+
     // Ensure parent directories are expanded
     expandParentDirectories(newPath)
 
@@ -148,16 +149,21 @@ export const FileTree = (props: FileTreeProps) => {
       name: uniqueName,
     })
   }
-  
+
   const handleNewFolder = async () => {
     // Determine the directory to create the folder in
     const targetDir = getTargetDirectory()
 
     // Create a unique temporary folder name
     const baseFolderName = "new-folder"
-    const uniqueName = await generateUniqueName(props.fs, targetDir, baseFolderName, true)
+    const uniqueName = await generateUniqueName(
+      props.fs,
+      targetDir,
+      baseFolderName,
+      true,
+    )
     const newPath = `${targetDir}/${uniqueName}/`
-    
+
     // Ensure parent directories are expanded
     expandParentDirectories(newPath)
 
@@ -175,7 +181,7 @@ export const FileTree = (props: FileTreeProps) => {
   }
 
   return (
-    <div>
+    <div onClick={() => setSelectedPath(null)}>
       <div style="display:flex; justify-content:flex-end;">
         <FontAwesomeIcon
           className={actionStyle}
@@ -338,11 +344,13 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
 
   const isRenaming =
     restProps.renameState && restProps.renameState.path === node.path
-    
+
   // Check if this directory is expanded
-  const isExpanded = node.kind === "directory" && restProps.expandedDirs.has(node.path)
+  const isExpanded =
+    node.kind === "directory" && restProps.expandedDirs.has(node.path)
 
   const handleClick = (e: MouseEvent) => {
+    e.stopPropagation()
     restProps.setSelectedPath(node.path)
     restProps.onSelect(node.path)
     if (node.kind === "directory") {
@@ -388,17 +396,25 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
     const oldPath = restProps.renameState.path
     // For directories, we need to handle the trailing slash
     const oldPathNoTrailingSlash = oldPath.replace(/\/$/, "")
-    const dirPath = oldPathNoTrailingSlash.substring(0, oldPathNoTrailingSlash.lastIndexOf("/"))
+    const dirPath = oldPathNoTrailingSlash.substring(
+      0,
+      oldPathNoTrailingSlash.lastIndexOf("/"),
+    )
     const isDirectory = node.kind === "directory"
-    
+
     // Generate a unique name if the requested name already exists
     // (but only if it's different from the current name)
     let finalName = newName
     if (newName !== node.name) {
-      const uniqueName = await generateUniqueName(fs, dirPath, newName, isDirectory)
+      const uniqueName = await generateUniqueName(
+        fs,
+        dirPath,
+        newName,
+        isDirectory,
+      )
       finalName = uniqueName
     }
-    
+
     // For directories, ensure the new path ends with a slash
     const newPath = isDirectory
       ? `${dirPath}/${finalName}/`
@@ -414,8 +430,8 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
       restProps.setSelectedPath(newPath)
       restProps.onSelect(newPath)
     } catch (e) {
-      console.error(`Failed to rename ${isDirectory ? 'folder' : 'file'}:`, e)
-      alert(`Failed to rename ${isDirectory ? 'folder' : 'file'}: ${e}`)
+      console.error(`Failed to rename ${isDirectory ? "folder" : "file"}:`, e)
+      alert(`Failed to rename ${isDirectory ? "folder" : "file"}: ${e}`)
     }
   }
 

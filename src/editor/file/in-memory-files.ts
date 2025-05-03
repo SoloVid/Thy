@@ -142,7 +142,11 @@ function findParentDirectory(
   root: Directory,
   path: string,
 ): Directory {
-  const parent = findNode(now, root, path.replace(/\/$/, "").split("/").slice(0, -1).join("/"))
+  const parent = findNode(
+    now,
+    root,
+    path.replace(/\/$/, "").split("/").slice(0, -1).join("/"),
+  )
   if (!parent) throw new Error(`File ${path} not found`)
   if (parent.kind !== "directory") throw new Error(`${path} is not a directory`)
   return parent
@@ -210,12 +214,14 @@ export function makeInMemoryFiles(now: Now): InMemoryFiles {
         !parent.children.some((c) => c.name === name),
         "Directory already exists",
       )
-      parent.children.push(makeDirectory({
-        name,
-        children: [],
-        parent: parent,
-        timeModified: now(),
-      }))
+      parent.children.push(
+        makeDirectory({
+          name,
+          children: [],
+          parent: parent,
+          timeModified: now(),
+        }),
+      )
     },
     rename: async (oldPath: string, newPath: string) => {
       if (oldPath === newPath) return
@@ -244,7 +250,7 @@ export function makeInMemoryFiles(now: Now): InMemoryFiles {
     delete: async (path: string) => {
       const parent = findParentDirectory(now, root, path)
       parent.children = parent.children.filter(
-        (c) => c.name !== path.split("/").pop()!,
+        (c) => c.name !== path.replace(/\/$/, "").split("/").pop()!,
       )
     },
   }
