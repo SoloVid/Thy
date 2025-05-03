@@ -173,6 +173,12 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
               title="Delete"
               icon={faTrash}
               fixedWidth
+              onClick={(e) => {
+                e.stopPropagation();
+                if (window.confirm(`Delete ${node.name}?`)) {
+                  restProps.onDelete(node.path);
+                }
+              }}
             />
           </div>
         )}

@@ -106,6 +106,21 @@ export default function Playground() {
               fs={fs}
               directory="/"
               onSelect={onFileSelect}
+              onDelete={(path) => {
+                fs.delete(path).then(() => {
+                  // If the deleted file is currently open, clear the editor
+                  if (state.sourceCode.path === path) {
+                    state.setSourceCode({
+                      path: "",
+                      contents: "",
+                      language: "thy",
+                    });
+                  }
+                }, (e) => {
+                  // TODO: Surface error.
+                  console.error(e);
+                });
+              }}
             />
           </div>
           <Resizer resizeType="vertical" onResize={onLeftMenuResize} />
