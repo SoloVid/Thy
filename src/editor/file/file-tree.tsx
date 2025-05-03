@@ -49,6 +49,45 @@ type FileTreeProps = SharedProps & {
   directory: string
 }
 
+// Helper function to generate a unique name
+const generateUniqueName = async (
+  fs: FilesApi,
+  directory: string,
+  baseName: string,
+  isDirectory: boolean
+): Promise<string> => {
+  // For directories, we need to handle the trailing slash in the check
+  const checkPath = (name: string) => {
+    const path = `${directory}/${name}${isDirectory ? "/" : ""}`
+    return fs.exists(path)
+  }
+  
+  // If the base name already has a number suffix, extract it
+  const match = baseName.match(/^(.+?)(?:[ _-](\d+))?(\.\w+)?$/)
+  if (!match) return baseName
+  
+  const [, nameWithoutNumber, existingNumber, extension] = match
+  const ext = extension || ""
+  const nameBase = nameWithoutNumber || baseName
+  
+  // Check if the base name exists
+  if (!(await checkPath(baseName))) {
+    return baseName
+  }
+  
+  // Start with 1 or increment the existing number
+  let counter = existingNumber ? parseInt(existingNumber, 10) + 1 : 1
+  let newName: string
+  
+  // Keep incrementing until we find a name that doesn't exist
+  do {
+    newName = `${nameBase}${counter}${ext}`
+    counter++
+  } while (await checkPath(newName))
+  
+  return newName
+}
+
 // FileTree component
 export const FileTree = (props: FileTreeProps) => {
   const [selectedPath, setSelectedPath] = useState<string | null>(null)
@@ -88,9 +127,10 @@ export const FileTree = (props: FileTreeProps) => {
     // Determine the directory to create the file in
     const targetDir = getTargetDirectory()
 
-    // Create a temporary file name
-    const tempName = "new-file.thy"
-    const newPath = `${targetDir}/${tempName}`
+    // Create a unique temporary file name
+    const baseFileName = "new-file.thy"
+    const uniqueName = await generateUniqueName(props.fs, targetDir, baseFileName, false)
+    const newPath = `${targetDir}/${uniqueName}`
     
     // Ensure parent directories are expanded
     expandParentDirectories(newPath)
@@ -105,7 +145,7 @@ export const FileTree = (props: FileTreeProps) => {
     setRenameState({
       path: newPath,
       isNew: true,
-      name: tempName,
+      name: uniqueName,
     })
   }
   
@@ -113,9 +153,10 @@ export const FileTree = (props: FileTreeProps) => {
     // Determine the directory to create the folder in
     const targetDir = getTargetDirectory()
 
-    // Create a temporary folder name
-    const tempName = "new-folder"
-    const newPath = `${targetDir}/${tempName}/`
+    // Create a unique temporary folder name
+    const baseFolderName = "new-folder"
+    const uniqueName = await generateUniqueName(props.fs, targetDir, baseFolderName, true)
+    const newPath = `${targetDir}/${uniqueName}/`
     
     // Ensure parent directories are expanded
     expandParentDirectories(newPath)
@@ -129,7 +170,7 @@ export const FileTree = (props: FileTreeProps) => {
     setRenameState({
       path: newPath,
       isNew: true,
-      name: tempName,
+      name: uniqueName,
     })
   }
 
@@ -349,10 +390,19 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
     const oldPathNoTrailingSlash = oldPath.replace(/\/$/, "")
     const dirPath = oldPathNoTrailingSlash.substring(0, oldPathNoTrailingSlash.lastIndexOf("/"))
     const isDirectory = node.kind === "directory"
+    
+    // Generate a unique name if the requested name already exists
+    // (but only if it's different from the current name)
+    let finalName = newName
+    if (newName !== node.name) {
+      const uniqueName = await generateUniqueName(fs, dirPath, newName, isDirectory)
+      finalName = uniqueName
+    }
+    
     // For directories, ensure the new path ends with a slash
     const newPath = isDirectory
-      ? `${dirPath}/${newName}/`
-      : `${dirPath}/${newName}`
+      ? `${dirPath}/${finalName}/`
+      : `${dirPath}/${finalName}`
 
     // Clear rename state
     restProps.setRenameState(null)
