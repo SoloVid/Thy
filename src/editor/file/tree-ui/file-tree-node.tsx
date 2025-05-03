@@ -23,9 +23,6 @@ export const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
 
   const alerts = useAlerts()
 
-  const isRenaming =
-    restProps.renameState && restProps.renameState.path === node.path
-
   // Check if this directory is expanded
   const isExpanded =
     node.kind === "directory" && restProps.expandedDirs.has(node.path)
@@ -165,7 +162,7 @@ export const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        {isRenaming ? (
+        {restProps.renameState && restProps.renameState.path === node.path ? (
           <div class={nodeHeaderStyles}>
             {icon}
             <InlineRename
