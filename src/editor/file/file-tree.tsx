@@ -41,6 +41,8 @@ type SharedChildProps = SharedProps & {
   renameState: RenameState
   setRenameState: (state: RenameState) => void
   renameInProgressRef: MutableRef<boolean>
+  expandedDirs: Set<string>
+  setExpandedDirs: (dirs: Set<string>) => void
 }
 
 type FileTreeProps = SharedProps & {
@@ -52,6 +54,7 @@ export const FileTree = (props: FileTreeProps) => {
   const [selectedPath, setSelectedPath] = useState<string | null>(null)
   const [renameState, setRenameState] = useState<RenameState>(null)
   const renameInProgressRef = useRef<boolean>(false)
+  const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set())
 
   const getTargetDirectory = () => {
     if (!selectedPath) return ""
@@ -64,6 +67,23 @@ export const FileTree = (props: FileTreeProps) => {
     }
   }
 
+  // Helper to ensure all parent directories are expanded
+  const expandParentDirectories = (path: string) => {
+    const newExpandedDirs = new Set(expandedDirs)
+    
+    // Get all parent directories
+    let currentPath = path
+    while (currentPath.includes("/")) {
+      currentPath = currentPath.substring(0, currentPath.lastIndexOf("/"))
+      if (currentPath) {
+        const dirPath = `${currentPath}/`
+        newExpandedDirs.add(dirPath)
+      }
+    }
+    
+    setExpandedDirs(newExpandedDirs)
+  }
+
   const handleNewFile = async () => {
     // Determine the directory to create the file in
     const targetDir = getTargetDirectory()
@@ -71,6 +91,9 @@ export const FileTree = (props: FileTreeProps) => {
     // Create a temporary file name
     const tempName = "new-file.thy"
     const newPath = `${targetDir}/${tempName}`
+    
+    // Ensure parent directories are expanded
+    expandParentDirectories(newPath)
 
     // Create the file
     await props.fs.write(newPath, "")
@@ -93,6 +116,9 @@ export const FileTree = (props: FileTreeProps) => {
     // Create a temporary folder name
     const tempName = "new-folder"
     const newPath = `${targetDir}/${tempName}/`
+    
+    // Ensure parent directories are expanded
+    expandParentDirectories(newPath)
 
     // Create the folder
     await props.fs.mkdir(newPath)
@@ -132,6 +158,8 @@ export const FileTree = (props: FileTreeProps) => {
         renameState={renameState}
         setRenameState={setRenameState}
         renameInProgressRef={renameInProgressRef}
+        expandedDirs={expandedDirs}
+        setExpandedDirs={setExpandedDirs}
       />
     </div>
   )
@@ -265,17 +293,25 @@ const InlineRename = ({
 }
 
 const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
-  const [isExpanded, setIsExpanded] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
 
   const isRenaming =
     restProps.renameState && restProps.renameState.path === node.path
+    
+  // Check if this directory is expanded
+  const isExpanded = node.kind === "directory" && restProps.expandedDirs.has(node.path)
 
   const handleClick = (e: MouseEvent) => {
     restProps.setSelectedPath(node.path)
     restProps.onSelect(node.path)
     if (node.kind === "directory") {
-      setIsExpanded(!isExpanded)
+      const newExpandedDirs = new Set(restProps.expandedDirs)
+      if (isExpanded) {
+        newExpandedDirs.delete(node.path)
+      } else {
+        newExpandedDirs.add(node.path)
+      }
+      restProps.setExpandedDirs(newExpandedDirs)
     }
   }
 
@@ -327,6 +363,14 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
       // Update selection to the new path
       restProps.setSelectedPath(newPath)
       restProps.onSelect(newPath)
+      
+      // If this is a new file/folder, make sure its parent directory is expanded
+      if (restProps.renameState.isNew) {
+        const parentDir = `${dirPath}/`
+        const newExpandedDirs = new Set(restProps.expandedDirs)
+        newExpandedDirs.add(parentDir)
+        restProps.setExpandedDirs(newExpandedDirs)
+      }
     } catch (e) {
       console.error(`Failed to rename ${isDirectory ? 'folder' : 'file'}:`, e)
       alert(`Failed to rename ${isDirectory ? 'folder' : 'file'}: ${e}`)
