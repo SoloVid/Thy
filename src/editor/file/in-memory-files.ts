@@ -1,6 +1,11 @@
 import assert from "utils/assert"
 import type { FilesApi } from "./files-api"
-import { SerializedWorkspace, SerializedWorkspaceNode, SWDirectoryNode, SWFileNode } from "./serialized-workspace"
+import {
+  SerializedWorkspace,
+  SerializedWorkspaceNode,
+  SWDirectoryNode,
+  SWFileNode,
+} from "./serialized-workspace"
 
 type Now = () => number
 
@@ -34,7 +39,7 @@ function serializeDirectory(node: Directory): SWDirectoryNode {
   const { parent, children, ...everythingElse } = node
   return {
     children: children.map(serializeNode),
-    ...everythingElse
+    ...everythingElse,
   }
 }
 function serializeFile(node: File): SWFileNode {
@@ -42,21 +47,27 @@ function serializeFile(node: File): SWFileNode {
   return everythingElse
 }
 
-function deserializeNode(node: SerializedWorkspaceNode, parent: Directory): File | Directory {
+function deserializeNode(
+  node: SerializedWorkspaceNode,
+  parent: Directory,
+): File | Directory {
   if (node.kind === "directory") {
     return deserializeDirectory(node, parent)
   } else {
     return deserializeFile(node, parent)
   }
 }
-function deserializeDirectory(node: SWDirectoryNode, parent: Directory | null): Directory {
+function deserializeDirectory(
+  node: SWDirectoryNode,
+  parent: Directory | null,
+): Directory {
   const { children, ...everythingElse } = node
   const inflated: Directory = {
     ...node,
     children: [],
     parent,
   }
-  inflated.children = node.children.map(c => deserializeNode(c, inflated))
+  inflated.children = node.children.map((c) => deserializeNode(c, inflated))
   return inflated
 }
 function deserializeFile(node: SWFileNode, parent: Directory): File {
@@ -66,7 +77,12 @@ function deserializeFile(node: SWFileNode, parent: Directory): File {
   }
 }
 
-function findNode(now: Now, root: Directory, path: string, createIfMissing: boolean = false): File | Directory | null {
+function findNode(
+  now: Now,
+  root: Directory,
+  path: string,
+  createIfMissing: boolean = false,
+): File | Directory | null {
   const parts = path.split("/").filter((p) => p.length > 0)
   let current: Directory = root
 
@@ -80,7 +96,14 @@ function findNode(now: Now, root: Directory, path: string, createIfMissing: bool
     const child = current.children.find((c) => c.name === parts[i])
     if (i === parts.length - 1) {
       if (!child && createIfMissing) {
-        const newChild = { kind: "file", name: parts[i], path: current.path + parts[i], contents: "", parent: current, timeModified: now() } as const
+        const newChild = {
+          kind: "file",
+          name: parts[i],
+          path: current.path + parts[i],
+          contents: "",
+          parent: current,
+          timeModified: now(),
+        } as const
         current.children.push(newChild)
         return newChild
       }
@@ -93,7 +116,11 @@ function findNode(now: Now, root: Directory, path: string, createIfMissing: bool
   return current
 }
 
-function findParentDirectory(now: Now, root: Directory, path: string): Directory {
+function findParentDirectory(
+  now: Now,
+  root: Directory,
+  path: string,
+): Directory {
   const parent = findNode(now, root, path.split("/").slice(0, -1).join("/"))
   if (!parent) throw new Error(`File ${path} not found`)
   if (parent.kind !== "directory") throw new Error(`${path} is not a directory`)
@@ -160,8 +187,18 @@ export function makeInMemoryFiles(now: Now): InMemoryFiles {
       const parent = findParentDirectory(now, root, path)
       const name = path.split("/").pop()
       assert(!!name, "Directory name is required")
-      assert(!parent.children.some((c) => c.name === name), "Directory already exists")
-      parent.children.push({ kind: "directory", name, path: parent.path + name + "/", children: [], parent: parent, timeModified: now() })
+      assert(
+        !parent.children.some((c) => c.name === name),
+        "Directory already exists",
+      )
+      parent.children.push({
+        kind: "directory",
+        name,
+        path: parent.path + name + "/",
+        children: [],
+        parent: parent,
+        timeModified: now(),
+      })
     },
     rename: async (oldPath: string, newPath: string) => {
       const node = findNode(now, root, oldPath)
@@ -171,7 +208,10 @@ export function makeInMemoryFiles(now: Now): InMemoryFiles {
       const newParent = findParentDirectory(now, root, newPath)
       const name = newPath.split("/").pop()
       assert(!!name, "File name is required")
-      assert(!newParent.children.some((c) => c.name === name), "File already exists")
+      assert(
+        !newParent.children.some((c) => c.name === name),
+        "File already exists",
+      )
       node.parent = newParent
       node.name = name
       node.timeModified = now()

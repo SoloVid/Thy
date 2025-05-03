@@ -39,24 +39,23 @@ export const FileTree = (props: FileTreeProps) => {
     <div>
       <div style="display:flex; justify-content:flex-end;">
         <FontAwesomeIcon
-        className={actionStyle}
-        title="New File..."
-        icon={
-          faFileCirclePlus
-        }
-        fixedWidth
-      />
+          className={actionStyle}
+          title="New File..."
+          icon={faFileCirclePlus}
+          fixedWidth
+        />
         <FontAwesomeIcon
-        className={actionStyle}
-        title="New Folder..."
-        icon={
-          faFolderPlus
-        }
-        fixedWidth
-      />
-
+          className={actionStyle}
+          title="New Folder..."
+          icon={faFolderPlus}
+          fixedWidth
+        />
       </div>
-      <FileTreeNodeList {...props} selectedPath={selectedPath} setSelectedPath={setSelectedPath} />
+      <FileTreeNodeList
+        {...props}
+        selectedPath={selectedPath}
+        setSelectedPath={setSelectedPath}
+      />
     </div>
   )
 }
@@ -79,7 +78,11 @@ type FileTreeNodeListSyncProps = SharedChildProps & {
   nodes: readonly FileEntry[]
 }
 
-const FileTreeNodeListSync = ({ directory, nodes, ...restProps }: FileTreeNodeListSyncProps) => {
+const FileTreeNodeListSync = ({
+  directory,
+  nodes,
+  ...restProps
+}: FileTreeNodeListSyncProps) => {
   const sortedNodes = useMemo(
     () =>
       [...nodes].sort((a, b) => {
@@ -119,6 +122,13 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
     }
   }
 
+  const handleDelete = (e: MouseEvent) => {
+    e.stopPropagation()
+    if (window.confirm(`Delete ${node.name}?`)) {
+      restProps.onDelete(node.path)
+    }
+  }
+
   const icon = useMemo(
     () => (
       <FontAwesomeIcon
@@ -137,8 +147,7 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
 
   const childrenContainer = useMemo(
     () =>
-      isExpanded &&
-       (
+      isExpanded && (
         <div class={childrenStyles}>
           <FileTreeNodeList fs={fs} directory={node.path} {...restProps} />
         </div>
@@ -149,16 +158,13 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
   return (
     <div class={nodeStyles}>
       <div
-              class={`${nodeHeaderContainerStyles} ${restProps.selectedPath === node.path ? nodeHeaderContainerSelectedStyles : ""}`}
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
+        class={`${nodeHeaderContainerStyles} ${restProps.selectedPath === node.path ? nodeHeaderContainerSelectedStyles : ""}`}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
       >
-      <div
-        class={nodeHeaderStyles}
-        onClick={handleClick}
-      >
-        {icon}
-        <span class={nodeTextStyles}>{node.name}</span>
+        <div class={nodeHeaderStyles} onClick={handleClick}>
+          {icon}
+          <span class={nodeTextStyles}>{node.name}</span>
         </div>
         {isHovering && (
           <div class={entryActionContainerStyles}>
@@ -173,12 +179,7 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
               title="Delete"
               icon={faTrash}
               fixedWidth
-              onClick={(e) => {
-                e.stopPropagation();
-                if (window.confirm(`Delete ${node.name}?`)) {
-                  restProps.onDelete(node.path);
-                }
-              }}
+              onClick={handleDelete}
             />
           </div>
         )}
@@ -189,12 +190,12 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
 }
 
 const actionStyle = css`
-cursor: pointer;
-padding: 4px;
+  cursor: pointer;
+  padding: 4px;
 
-&:hover {
-  background-color: rgba(150, 150, 150, 0.3);
-}
+  &:hover {
+    background-color: rgba(150, 150, 150, 0.3);
+  }
 `
 
 const nodeStyles = css``
@@ -236,15 +237,3 @@ const childrenStyles = css`
 const entryActionContainerStyles = css`
   display: flex;
 `
-
-// Example usage
-const exampleFs = makeInMemoryFiles(() => new Date().getTime())
-async function configureExampleFs() {
-  await exampleFs.mkdir("/test-subdir")
-  await exampleFs.write("/test-subdir/a.thy", "print \"a\"")
-  await exampleFs.write("/test-subdir/b.thy", "print \"b\"")
-  await exampleFs.write("/main.thy", "print \"himom\"")
-}
-configureExampleFs()
-
-export const ExampleFileTree = () => <FileTree fs={exampleFs} directory="/" />

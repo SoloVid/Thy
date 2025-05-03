@@ -33,44 +33,63 @@ export default function Playground() {
     fs.ingest(getPersistedWorkspace())
     return fs
   })
-  // async function configureExampleFs() {
-  //   await fs.mkdir("/test-subdir")
-  //   await fs.write("/test-subdir/a.thy", "print \"a\"")
-  //   await fs.write("/test-subdir/b.thy", "print \"b\"")
-  //   await fs.write("/main.thy", "print \"himom\"")
-  // }
-  // useEffect(() => {
-  //   configureExampleFs()
-  // }, [fs])
-
 
   const state = useEditorState()
   const [prefs, setPrefs] = useEditorPreferences()
 
   function onFileSelect(path: string) {
     console.log(path)
-    fs.read(path).then((s) => {
-      if (!path.endsWith("/")) {
-        state.setSourceCode({
-          path: path,
-          contents: s,
-          language: "thy",
-        })
-      }
-    }, (e) => {
-      // TODO: Surface error.
-      console.error(e)
-    })
+    fs.read(path).then(
+      (s) => {
+        if (!path.endsWith("/")) {
+          state.setSourceCode({
+            path: path,
+            contents: s,
+            language: "thy",
+          })
+        }
+      },
+      (e) => {
+        // TODO: Surface error.
+        console.error(e)
+      },
+    )
+  }
+
+  function onFileDelete(path: string) {
+    fs.delete(path).then(
+      () => {
+        // If the deleted file is currently open, clear the editor
+        if (state.sourceCode.path === path) {
+          state.setSourceCode({
+            path: "",
+            contents: "",
+            language: "thy",
+          })
+        }
+      },
+      (e) => {
+        // TODO: Surface error.
+        console.error(e)
+      },
+    )
   }
 
   function onSourceUpdate(s: string) {
-    state.setSourceCode({path: state.sourceCode.path, contents: s, language: "thy"})
-    fs.write(state.sourceCode.path, s).then(() => {
-      // Do nothing.
-    }, (e) => {
-      // TODO: Surface error.
-      console.error(e)
+    state.setSourceCode({
+      path: state.sourceCode.path,
+      contents: s,
+      language: "thy",
     })
+    fs.write(state.sourceCode.path, s).then(
+      () => {
+        // Do nothing.
+      },
+      (e) => {
+        // TODO: Surface error.
+        console.error(e)
+      },
+    )
   }
 
   const minLeftWidth = 100
@@ -98,43 +117,35 @@ export default function Playground() {
       >
         <Menu state={state} />
         <div style={`flex-grow: 1;overflow: hidden; display: flex;`}>
-          { prefs.leftOpen && <>
+          {prefs.leftOpen && (
+            <>
+              <div
+                style={`flex-shrink: 0; width: ${prefs.leftWidth}px; background-color: #272822; color: #ddd; padding: 10px;`}
+              >
+                <FileTree
+                  fs={fs}
+                  directory="/"
+                  onSelect={onFileSelect}
+                  onDelete={onFileDelete}
+                />
+              </div>
+              <Resizer resizeType="vertical" onResize={onLeftMenuResize} />
+            </>
+          )}
           <div
-            style={`flex-shrink: 0; width: ${prefs.leftWidth}px; background-color: #272822; color: #ddd; padding: 10px;`}
+            style={`position:relative; width: 100%; height: 100%; flex-grow: 1; overflow: none; background-color: #272822; color: #ddd;`}
           >
-            <FileTree
-              fs={fs}
-              directory="/"
-              onSelect={onFileSelect}
-              onDelete={(path) => {
-                fs.delete(path).then(() => {
-                  // If the deleted file is currently open, clear the editor
-                  if (state.sourceCode.path === path) {
-                    state.setSourceCode({
-                      path: "",
-                      contents: "",
-                      language: "thy",
-                    });
-                  }
-                }, (e) => {
-                  // TODO: Surface error.
-                  console.error(e);
-                });
-              }}
-            />
-          </div>
-          <Resizer resizeType="vertical" onResize={onLeftMenuResize} />
-          </> }
-          <div style={`position:relative; width: 100%; height: 100%; flex-grow: 1; overflow: none; background-color: #272822; color: #ddd;`}>
-            <div style={`padding-left: 20px; padding-top: 10px;`}>{state.sourceCode.path}</div>
-          <CodeInput
-            id="editor"
-            style={`position:relative; width: 100%; height: 100%; flex-grow: 1; overflow: auto; background-color: #272822;`}
-            language={state.sourceCode.language}
-            value={state.sourceCode.contents}
-            setValue={onSourceUpdate}
-            runCode={() => state.runThenSetOutput(state.sourceCode.contents)}
-          ></CodeInput>
+            <div style={`padding-left: 20px; padding-top: 10px;`}>
+              {state.sourceCode.path}
+            </div>
+            <CodeInput
+              id="editor"
+              style={`position:relative; width: 100%; height: 100%; flex-grow: 1; overflow: auto; background-color: #272822;`}
+              language={state.sourceCode.language}
+              value={state.sourceCode.contents}
+              setValue={onSourceUpdate}
+              runCode={() => state.runThenSetOutput(state.sourceCode.contents)}
+            ></CodeInput>
           </div>
           <Resizer resizeType="vertical" onResize={onRightMenuResize} />
           <div

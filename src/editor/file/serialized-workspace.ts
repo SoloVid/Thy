@@ -16,7 +16,9 @@ export type SWDirectoryNode = {
 export type SerializedWorkspaceNode = SWFileNode | SWDirectoryNode
 export type SerializedWorkspace = SWDirectoryNode
 
-export function makeWorkspaceFromScript(sourceCode: string = `return "himom"\n`): SerializedWorkspace {
+export function makeWorkspaceFromScript(
+  sourceCode: string = `return "himom"\n`,
+): SerializedWorkspace {
   return {
     kind: "directory",
     name: "/",
@@ -28,8 +30,8 @@ export function makeWorkspaceFromScript(sourceCode: string = `return "himom"\n`)
         path: "/main.thy",
         contents: sourceCode,
         timeModified: new Date().getTime(),
-      }
+      },
     ],
-    timeModified: new Date().getTime()
+    timeModified: new Date().getTime(),
   }
 }

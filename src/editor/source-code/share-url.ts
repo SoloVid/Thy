@@ -1,15 +1,21 @@
-import { SourceCodeWorkspace, SourceCodeWorkspaceNode } from "editor/file/in-memory-files"
+import {
+  SourceCodeWorkspace,
+  SourceCodeWorkspaceNode,
+} from "editor/file/in-memory-files"
 import {
   compressToEncodedURIComponent as compressLz,
   decompressFromEncodedURIComponent as decompressLz,
 } from "lz-string"
-import { makeWorkspaceFromScript, SerializedWorkspace } from "../file/serialized-workspace"
+import {
+  makeWorkspaceFromScript,
+  SerializedWorkspace,
+} from "../file/serialized-workspace"
 
 const workspaceParam = "w"
 
 function getUrlHashParam(param: string): string | null {
   const regex = new RegExp(`${param}=([^&]+)`)
-  const paramUrlMatch =  regex.exec(window.location.hash)
+  const paramUrlMatch = regex.exec(window.location.hash)
   if (paramUrlMatch !== null) {
     return paramUrlMatch[1]
   }
@@ -51,11 +57,15 @@ export function extractWorkspaceFromUrl(): SerializedWorkspace | null {
   return null
 }
 
-function serializeWorkspace(workspace: SourceCodeWorkspace): SerializedWorkspace {
+function serializeWorkspace(
+  workspace: SourceCodeWorkspace,
+): SerializedWorkspace {
   return serializeWorkspaceNode(workspace)
 }
 
-function serializeWorkspaceNode<NodeType extends SourceCodeWorkspaceNode>(node: NodeType): Omit<NodeType, "parent"> {
+function serializeWorkspaceNode<NodeType extends SourceCodeWorkspaceNode>(
+  node: NodeType,
+): Omit<NodeType, "parent"> {
   if (node.kind === "directory") {
     const { parent, ...everythingElse } = node
     return everythingElse

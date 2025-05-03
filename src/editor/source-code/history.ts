@@ -19,9 +19,9 @@ export function useSourceCodePopStateListener(
 }
 
 export function getDataFromHistory() {
-  const {
-    workspace = null,
-  } = (history.state ?? {}) as { workspace?: SerializedWorkspace | null }
+  const { workspace = null } = (history.state ?? {}) as {
+    workspace?: SerializedWorkspace | null
+  }
   return workspace || null
 }
 

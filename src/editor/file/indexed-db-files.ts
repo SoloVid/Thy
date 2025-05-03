@@ -65,7 +65,7 @@ async function openDb(): Promise<IDBDatabase> {
 async function dbOperation<S extends StoreNames, T>(
   storeName: S,
   mode: IDBTransactionMode,
-  operation: (store: IDBObjectStore) => IDBRequest<T>
+  operation: (store: IDBObjectStore) => IDBRequest<T>,
 ): Promise<T> {
   const db = await openDb()
   return new Promise((resolve, reject) => {
@@ -93,8 +93,8 @@ function getNodeName(path: string): string {
 export function makeIndexedDbFiles(): FilesApi {
   // Initialize root if it doesn't exist
   const initRoot = async () => {
-    const rootExists = await dbOperation(PATH_STORE, "readonly", store =>
-      store.get("/")
+    const rootExists = await dbOperation(PATH_STORE, "readonly", (store) =>
+      store.get("/"),
     )
 
     if (!rootExists) {
@@ -104,15 +104,13 @@ export function makeIndexedDbFiles(): FilesApi {
         type: "directory",
         name: "/",
         parentId: null,
-        childIds: []
+        childIds: [],
       }
 
-      await dbOperation(NODE_STORE, "readwrite", store =>
-        store.put(rootNode)
-      )
+      await dbOperation(NODE_STORE, "readwrite", (store) => store.put(rootNode))
 
-      await dbOperation(PATH_STORE, "readwrite", store =>
-        store.put({ path: "/", nodeId: rootId })
+      await dbOperation(PATH_STORE, "readwrite", (store) =>
+        store.put({ path: "/", nodeId: rootId }),
       )
     }
   }
@@ -120,13 +118,13 @@ export function makeIndexedDbFiles(): FilesApi {
   initRoot()
 
   async function getNodeByPath(path: string): Promise<Node> {
-    const pathEntry = await dbOperation(PATH_STORE, "readonly", store =>
-      store.get(path)
+    const pathEntry = await dbOperation(PATH_STORE, "readonly", (store) =>
+      store.get(path),
     )
     assert(pathEntry, `Path ${path} not found`)
 
-    const node = await dbOperation(NODE_STORE, "readonly", store =>
-      store.get(pathEntry.nodeId)
+    const node = await dbOperation(NODE_STORE, "readonly", (store) =>
+      store.get(pathEntry.nodeId),
     )
     assert(node, `Node ${pathEntry.nodeId} not found`)
 
@@ -135,34 +133,32 @@ export function makeIndexedDbFiles(): FilesApi {
 
   async function addNode(path: string, node: Node): Promise<void> {
     // Add the node
-    await dbOperation(NODE_STORE, "readwrite", store =>
-      store.put(node)
-    )
+    await dbOperation(NODE_STORE, "readwrite", (store) => store.put(node))
 
     // Add the path entry
-    await dbOperation(PATH_STORE, "readwrite", store =>
-      store.put({ path, nodeId: node.id })
+    await dbOperation(PATH_STORE, "readwrite", (store) =>
+      store.put({ path, nodeId: node.id }),
     )
 
     // Update parent's childIds if this isn't the root
     if (node.parentId) {
-      const parent = await dbOperation(NODE_STORE, "readonly", store =>
-        store.get(node.parentId)
-      ) as DirectoryNode
-      
-      await dbOperation(NODE_STORE, "readwrite", store =>
+      const parent = (await dbOperation(NODE_STORE, "readonly", (store) =>
+        store.get(node.parentId),
+      )) as DirectoryNode
+
+      await dbOperation(NODE_STORE, "readwrite", (store) =>
         store.put({
           ...parent,
-          childIds: [...parent.childIds, node.id]
-        })
+          childIds: [...parent.childIds, node.id],
+        }),
       )
     }
   }
 
   return {
     exists: async (path: string) => {
-      const entry = await dbOperation(PATH_STORE, "readonly", store =>
-        store.get(path)
+      const entry = await dbOperation(PATH_STORE, "readonly", (store) =>
+        store.get(path),
       )
       return !!entry
     },
@@ -184,7 +180,7 @@ export function makeIndexedDbFiles(): FilesApi {
         type: "file",
         name: getNodeName(path),
         parentId: parent.id,
-        contents
+        contents,
       }
 
       await addNode(path, fileNode)
@@ -195,12 +191,12 @@ export function makeIndexedDbFiles(): FilesApi {
       assert(node.type === "directory", `${path} is not a directory`)
 
       const children = await Promise.all(
-        node.childIds.map(id =>
-          dbOperation(NODE_STORE, "readonly", store => store.get(id))
-        )
+        node.childIds.map((id) =>
+          dbOperation(NODE_STORE, "readonly", (store) => store.get(id)),
+        ),
       )
 
-      return children.map(child => child.name)
+      return children.map((child) => child.name)
     },
 
     mkdir: async (path: string) => {
@@ -208,8 +204,8 @@ export function makeIndexedDbFiles(): FilesApi {
       const parent = await getNodeByPath(parentPath)
       assert(parent.type === "directory", `${parentPath} is not a directory`)
 
-      const exists = await dbOperation(PATH_STORE, "readonly", store =>
-        store.get(path)
+      const exists = await dbOperation(PATH_STORE, "readonly", (store) =>
+        store.get(path),
       )
       assert(!exists, `${path} already exists`)
 
@@ -219,7 +215,7 @@ export function makeIndexedDbFiles(): FilesApi {
         type: "directory",
         name: getNodeName(path),
         parentId: parent.id,
-        childIds: []
+        childIds: [],
       }
 
       await addNode(path, dirNode)
@@ -229,10 +225,13 @@ export function makeIndexedDbFiles(): FilesApi {
       const node = await getNodeByPath(oldPath)
       const newParentPath = getParentPath(newPath)
       const newParent = await getNodeByPath(newParentPath)
-      assert(newParent.type === "directory", `${newParentPath} is not a directory`)
+      assert(
+        newParent.type === "directory",
+        `${newParentPath} is not a directory`,
+      )
 
-      const exists = await dbOperation(PATH_STORE, "readonly", store =>
-        store.get(newPath)
+      const exists = await dbOperation(PATH_STORE, "readonly", (store) =>
+        store.get(newPath),
       )
       assert(!exists, `${newPath} already exists`)
 
@@ -240,58 +239,58 @@ export function makeIndexedDbFiles(): FilesApi {
       const updatedNode: Node = {
         ...node,
         name: getNodeName(newPath),
-        parentId: newParent.id
+        parentId: newParent.id,
       }
 
       // Remove from old parent's childIds
       if (node.parentId) {
-        const oldParent = await dbOperation(NODE_STORE, "readonly", store =>
-          store.get(node.parentId)
-        ) as DirectoryNode
-        
-        await dbOperation(NODE_STORE, "readwrite", store =>
+        const oldParent = (await dbOperation(NODE_STORE, "readonly", (store) =>
+          store.get(node.parentId),
+        )) as DirectoryNode
+
+        await dbOperation(NODE_STORE, "readwrite", (store) =>
           store.put({
             ...oldParent,
-            childIds: oldParent.childIds.filter(id => id !== node.id)
-          })
+            childIds: oldParent.childIds.filter((id) => id !== node.id),
+          }),
         )
       }
 
       // Add to new parent's childIds
-      await dbOperation(NODE_STORE, "readwrite", store =>
+      await dbOperation(NODE_STORE, "readwrite", (store) =>
         store.put({
           ...newParent,
-          childIds: [...newParent.childIds, node.id]
-        })
+          childIds: [...newParent.childIds, node.id],
+        }),
       )
 
       // Update the node
-      await dbOperation(NODE_STORE, "readwrite", store =>
-        store.put(updatedNode)
+      await dbOperation(NODE_STORE, "readwrite", (store) =>
+        store.put(updatedNode),
       )
 
       // Update path entries
-      await dbOperation(PATH_STORE, "readwrite", store =>
-        store.delete(oldPath)
+      await dbOperation(PATH_STORE, "readwrite", (store) =>
+        store.delete(oldPath),
       )
-      await dbOperation(PATH_STORE, "readwrite", store =>
-        store.put({ path: newPath, nodeId: node.id })
+      await dbOperation(PATH_STORE, "readwrite", (store) =>
+        store.put({ path: newPath, nodeId: node.id }),
       )
 
       // If it's a directory, update all descendant paths
       if (node.type === "directory") {
-        const allPaths = await dbOperation(PATH_STORE, "readonly", store =>
-          store.getAll()
+        const allPaths = await dbOperation(PATH_STORE, "readonly", (store) =>
+          store.getAll(),
         )
-        
+
         for (const pathEntry of allPaths) {
           if (pathEntry.path.startsWith(oldPath + "/")) {
             const newChildPath = newPath + pathEntry.path.slice(oldPath.length)
-            await dbOperation(PATH_STORE, "readwrite", store =>
-              store.delete(pathEntry.path)
+            await dbOperation(PATH_STORE, "readwrite", (store) =>
+              store.delete(pathEntry.path),
             )
-            await dbOperation(PATH_STORE, "readwrite", store =>
-              store.put({ path: newChildPath, nodeId: pathEntry.nodeId })
+            await dbOperation(PATH_STORE, "readwrite", (store) =>
+              store.put({ path: newChildPath, nodeId: pathEntry.nodeId }),
             )
           }
         }
@@ -303,43 +302,41 @@ export function makeIndexedDbFiles(): FilesApi {
 
       // Remove from parent's childIds
       if (node.parentId) {
-        const parent = await dbOperation(NODE_STORE, "readonly", store =>
-          store.get(node.parentId)
-        ) as DirectoryNode
-        
-        await dbOperation(NODE_STORE, "readwrite", store =>
+        const parent = (await dbOperation(NODE_STORE, "readonly", (store) =>
+          store.get(node.parentId),
+        )) as DirectoryNode
+
+        await dbOperation(NODE_STORE, "readwrite", (store) =>
           store.put({
             ...parent,
-            childIds: parent.childIds.filter(id => id !== node.id)
-          })
+            childIds: parent.childIds.filter((id) => id !== node.id),
+          }),
         )
       }
 
       // Delete the node and its path entry
-      await dbOperation(NODE_STORE, "readwrite", store =>
-        store.delete(node.id)
+      await dbOperation(NODE_STORE, "readwrite", (store) =>
+        store.delete(node.id),
       )
-      await dbOperation(PATH_STORE, "readwrite", store =>
-        store.delete(path)
-      )
+      await dbOperation(PATH_STORE, "readwrite", (store) => store.delete(path))
 
       // If it's a directory, recursively delete all descendants
       if (node.type === "directory") {
-        const allPaths = await dbOperation(PATH_STORE, "readonly", store =>
-          store.getAll()
+        const allPaths = await dbOperation(PATH_STORE, "readonly", (store) =>
+          store.getAll(),
         )
-        
+
         for (const pathEntry of allPaths) {
           if (pathEntry.path.startsWith(path + "/")) {
-            await dbOperation(NODE_STORE, "readwrite", store =>
-              store.delete(pathEntry.nodeId)
+            await dbOperation(NODE_STORE, "readwrite", (store) =>
+              store.delete(pathEntry.nodeId),
             )
-            await dbOperation(PATH_STORE, "readwrite", store =>
-              store.delete(pathEntry.path)
+            await dbOperation(PATH_STORE, "readwrite", (store) =>
+              store.delete(pathEntry.path),
             )
           }
         }
       }
-    }
+    },
   }
-} 
+}

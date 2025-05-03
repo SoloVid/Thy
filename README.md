@@ -4,21 +4,21 @@ Thy is a programming language. This project implements some tools to work with i
 
 ## Repository Structure
 
-* `bin/` - entrypoints for CLI
-* `docs/` - end-user documentation for Thy
-* `public/` - (partially dynamic) directory out of which website is served
-* `src/`
-  * `api/` - stuff to be exposed in the npm package
-  * `code-gen/` - code generation (syntax tree to TypeScript output)
-  * `editor/` - [playground](#playground) for editing/running Thy in the browser
-  * `example/` - example Thy code snippets for documentation and testing
-  * `home/` - [website](#website)
-  * `interpreter/` - runtime interpreter for Thy
-  * `parser/` - Thy parser (tokens to syntax tree)
-  * `std-lib/` - implementations of Thy standard library functions
-  * `tokenizer/` - Thy tokenizer (Thy source to tokens)
-  * `tree/` - types for syntax tree
-* `vscode-extension/` - [VS Code extension](#vscode-extension)
+- `bin/` - entrypoints for CLI
+- `docs/` - end-user documentation for Thy
+- `public/` - (partially dynamic) directory out of which website is served
+- `src/`
+  - `api/` - stuff to be exposed in the npm package
+  - `code-gen/` - code generation (syntax tree to TypeScript output)
+  - `editor/` - [playground](#playground) for editing/running Thy in the browser
+  - `example/` - example Thy code snippets for documentation and testing
+  - `home/` - [website](#website)
+  - `interpreter/` - runtime interpreter for Thy
+  - `parser/` - Thy parser (tokens to syntax tree)
+  - `std-lib/` - implementations of Thy standard library functions
+  - `tokenizer/` - Thy tokenizer (Thy source to tokens)
+  - `tree/` - types for syntax tree
+- `vscode-extension/` - [VS Code extension](#vscode-extension)
 
 ## Language
 
@@ -28,14 +28,14 @@ and familiar enough to not alienate developers.
 
 ### Core Design Goals
 
-* No special characters (mobile friendly)
-* TypeScript interoperability
-* Natural (relative to mainstream programming)
-* Strong static types
-* Simple compiler
-* Simple rules
-* Encourage good programming practices
-* Concise (not extremely verbose)
+- No special characters (mobile friendly)
+- TypeScript interoperability
+- Natural (relative to mainstream programming)
+- Strong static types
+- Simple compiler
+- Simple rules
+- Encourage good programming practices
+- Concise (not extremely verbose)
 
 ### More Documentation
 
@@ -48,7 +48,6 @@ and [miscellaneous design notes](./docs/language-design.md).
 
 This repository implements a compiler for Thy as well as some supporting tools
 like an interpreter.
-
 
 ## Compiler/Tools Development
 
