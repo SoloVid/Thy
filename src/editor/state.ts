@@ -1,61 +1,37 @@
 import { useEffect, useState } from "preact/hooks"
 import {
-  extractCodeFromHistoryState,
   getDataFromHistory,
   saveCodeInHistory,
   useSourceCodePopStateListener,
 } from "./source-code/history"
 import { makeRunner, Output } from "./source-code/runner"
-import { extractCodeFromUrl } from "./source-code/share-url"
 import { generateUID } from "utils/uid"
+import { SerializedWorkspace } from "./file/serialized-workspace"
 
 export type SourceCode = {
   readonly path: string
   readonly contents: string
+  readonly language: string
 }
 
 export function useEditorState() {
-  useSourceCodePopStateListener((state) => {
-    if (state.source) {
-      setSourceCode(state.source)
-    }
-    setEditorLanguage(state.language)
-    setFileLoaded(state.fileName)
+  // useSourceCodePopStateListener((state) => {
+  //   if (state.source) {
+  //     setSourceCode(state.source)
+  //   }
+  //   setEditorLanguage(state.language)
+  //   setFileLoaded(state.fileName)
+  // })
+
+  const [sourceCode, setSourceCode] = useState<SourceCode>({
+    path: "untitled",
+    contents: "",
+    language: "thy",
   })
 
-  function getInitialSourceCode(): SourceCode {
-    const sourceFromUrl = extractCodeFromUrl()
-    if (sourceFromUrl) {
-      return {
-        path: "/main.thy",
-        contents: sourceFromUrl,
-      }
-    }
-    const sourceFromHistory = extractCodeFromHistoryState()
-    if (sourceFromHistory) {
-      return {
-        path: "/main.thy",
-        contents: sourceFromHistory,
-      }
-    }
-    return {
-      path: "/main.thy",
-      contents: `return "himom"\n`,
-    }
-  }
-
-  const [editorLanguage, setEditorLanguage] = useState<string>(
-    () => getDataFromHistory().language,
-  )
-  const [sourceCode, setSourceCode] = useState<SourceCode>(getInitialSourceCode)
-
-  const [fileLoaded, setFileLoaded] = useState(
-    () => getDataFromHistory().fileName,
-  )
-
-  useEffect(() => {
-    saveCodeInHistory(fileLoaded, sourceCode, editorLanguage)
-  }, [fileLoaded, sourceCode, editorLanguage])
+  // useEffect(() => {
+  //   saveCodeInHistory(fileLoaded, sourceCode, editorLanguage)
+  // }, [fileLoaded, sourceCode, editorLanguage])
 
   const [output, setOutput] = useState<Output | string | null>(null)
 
@@ -76,8 +52,6 @@ export function useEditorState() {
   return {
     sourceCode,
     setSourceCode,
-    fileLoaded,
-    setFileLoaded,
     output,
     setOutput,
     runThenSetOutput,

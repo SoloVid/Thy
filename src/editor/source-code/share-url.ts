@@ -3,7 +3,7 @@ import {
   compressToEncodedURIComponent as compressLz,
   decompressFromEncodedURIComponent as decompressLz,
 } from "lz-string"
-import { SerializedWorkspace } from "./serialized-workspace"
+import { makeWorkspaceFromScript, SerializedWorkspace } from "../file/serialized-workspace"
 
 const workspaceParam = "w"
 
@@ -28,24 +28,6 @@ export function extractCodeFromSimpleUrl(): string | null {
   return null
 }
 
-export function makeWorkspaceFromScript(sourceCode: string): SerializedWorkspace {
-  return {
-    kind: "directory",
-    name: "/",
-    path: "/",
-    children: [
-      {
-        kind: "file",
-        name: "main.thy",
-        path: "/main.thy",
-        contents: sourceCode,
-        timeModified: new Date().getTime(),
-      }
-    ],
-    timeModified: new Date().getTime()
-  }
-}
-
 export function extractWorkspaceFromSimpleUrl(): SerializedWorkspace | null {
   const s = extractCodeFromSimpleUrl()
   if (s === null) {
@@ -54,7 +36,7 @@ export function extractWorkspaceFromSimpleUrl(): SerializedWorkspace | null {
   return makeWorkspaceFromScript(s)
 }
 
-export function extractCodeFromUrl(): SerializedWorkspace | null {
+export function extractWorkspaceFromUrl(): SerializedWorkspace | null {
   try {
     const w = getUrlHashParam(workspaceParam)
     if (w !== null) {

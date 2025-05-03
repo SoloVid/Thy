@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks"
+import { useEffect, useMemo, useState } from "preact/hooks"
 import CodeInput from "./code-input"
 import Menu from "./menu"
 import OutputContainer from "./output-container"
@@ -8,6 +8,7 @@ import { useEditorPreferences } from "./preferences"
 import AppBar from "./component/app-bar"
 import { ExampleFileTree, FileTree } from "./file/file-tree"
 import { InMemoryFiles, makeInMemoryFiles } from "./file/in-memory-files"
+import { getPersistedWorkspace } from "./source-code/persisted-workspace"
 
 export default function Playground() {
   useEffect(() => {
@@ -29,17 +30,18 @@ export default function Playground() {
 
   const [fs, setFs] = useState<InMemoryFiles>(() => {
     const fs = makeInMemoryFiles(() => new Date().getTime())
+    fs.ingest(getPersistedWorkspace())
     return fs
   })
-  async function configureExampleFs() {
-    await fs.mkdir("/test-subdir")
-    await fs.write("/test-subdir/a.thy", "print \"a\"")
-    await fs.write("/test-subdir/b.thy", "print \"b\"")
-    await fs.write("/main.thy", "print \"himom\"")
-  }
-  useEffect(() => {
-    configureExampleFs()
-  }, [fs])
+  // async function configureExampleFs() {
+  //   await fs.mkdir("/test-subdir")
+  //   await fs.write("/test-subdir/a.thy", "print \"a\"")
+  //   await fs.write("/test-subdir/b.thy", "print \"b\"")
+  //   await fs.write("/main.thy", "print \"himom\"")
+  // }
+  // useEffect(() => {
+  //   configureExampleFs()
+  // }, [fs])
 
 
   const state = useEditorState()
@@ -51,7 +53,8 @@ export default function Playground() {
       if (!path.endsWith("/")) {
         state.setSourceCode({
           path: path,
-          contents: s
+          contents: s,
+          language: "thy",
         })
       }
     }, (e) => {
@@ -61,7 +64,7 @@ export default function Playground() {
   }
 
   function onSourceUpdate(s: string) {
-    state.setSourceCode({path: state.sourceCode.path, contents: s})
+    state.setSourceCode({path: state.sourceCode.path, contents: s, language: "thy"})
     fs.write(state.sourceCode.path, s).then(() => {
       // Do nothing.
     }, (e) => {
@@ -112,7 +115,7 @@ export default function Playground() {
           <CodeInput
             id="editor"
             style={`position:relative; width: 100%; height: 100%; flex-grow: 1; overflow: auto; background-color: #272822;`}
-            language={state.editorLanguage}
+            language={state.sourceCode.language}
             value={state.sourceCode.contents}
             setValue={onSourceUpdate}
             runCode={() => state.runThenSetOutput(state.sourceCode.contents)}

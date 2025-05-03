@@ -1,5 +1,6 @@
 import assert from "utils/assert"
 import type { FilesApi } from "./files-api"
+import { SerializedWorkspace, SerializedWorkspaceNode, SWDirectoryNode, SWFileNode } from "./serialized-workspace"
 
 type Now = () => number
 
@@ -21,6 +22,49 @@ type Directory = {
 }
 export type SourceCodeWorkspace = Directory
 export type SourceCodeWorkspaceNode = File | Directory
+
+function serializeNode(node: File | Directory): SerializedWorkspaceNode {
+  if (node.kind === "directory") {
+    return serializeDirectory(node)
+  } else {
+    return serializeFile(node)
+  }
+}
+function serializeDirectory(node: Directory): SWDirectoryNode {
+  const { parent, children, ...everythingElse } = node
+  return {
+    children: children.map(serializeNode),
+    ...everythingElse
+  }
+}
+function serializeFile(node: File): SWFileNode {
+  const { parent, ...everythingElse } = node
+  return everythingElse
+}
+
+function deserializeNode(node: SerializedWorkspaceNode, parent: Directory): File | Directory {
+  if (node.kind === "directory") {
+    return deserializeDirectory(node, parent)
+  } else {
+    return deserializeFile(node, parent)
+  }
+}
+function deserializeDirectory(node: SWDirectoryNode, parent: Directory | null): Directory {
+  const { children, ...everythingElse } = node
+  const inflated: Directory = {
+    ...node,
+    children: [],
+    parent,
+  }
+  inflated.children = node.children.map(c => deserializeNode(c, inflated))
+  return inflated
+}
+function deserializeFile(node: SWFileNode, parent: Directory): File {
+  return {
+    ...node,
+    parent,
+  }
+}
 
 function findNode(now: Now, root: Directory, path: string, createIfMissing: boolean = false): File | Directory | null {
   const parts = path.split("/").filter((p) => p.length > 0)
@@ -59,6 +103,8 @@ function findParentDirectory(now: Now, root: Directory, path: string): Directory
 export type InMemoryFiles = FilesApi & {
   getRaw: () => Directory
   setRaw: (raw: Directory) => void
+  serialize: () => SerializedWorkspace
+  ingest: (serialized: SerializedWorkspace) => void
 }
 
 export function makeInMemoryFiles(now: Now): InMemoryFiles {
@@ -75,6 +121,12 @@ export function makeInMemoryFiles(now: Now): InMemoryFiles {
     getRaw: () => root,
     setRaw: (raw: Directory) => {
       root = raw
+    },
+    serialize: () => {
+      return serializeDirectory(root)
+    },
+    ingest: (serialized) => {
+      root = deserializeDirectory(serialized, null)
     },
     exists: async (path: string) => {
       return findNode(now, root, path) !== null

@@ -19,7 +19,8 @@ type SharedProps = {
   fs: FilesApi
   onSelect: (newPath: string) => void
   onDelete: (path: string) => void
-  onRename: (oldPath: string, newPath: string) => void
+  // TODO: Implement rename
+  // onRename: (oldPath: string, newPath: string) => void
 }
 
 type SharedChildProps = SharedProps & {

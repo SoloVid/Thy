@@ -3,6 +3,7 @@ import {
   decompressFromEncodedURIComponent as decompressLz,
 } from "lz-string"
 import { useEffect } from "preact/hooks"
+import { SerializedWorkspace } from "../file/serialized-workspace"
 
 export function useSourceCodePopStateListener(
   setState: (state: ReturnType<typeof getDataFromHistory>) => void,
@@ -19,15 +20,9 @@ export function useSourceCodePopStateListener(
 
 export function getDataFromHistory() {
   const {
-    language = "thy",
-    fileName = "",
-    lz = null,
-  } = (history.state ?? {}) as Record<string, string | undefined>
-  return {
-    language,
-    fileName,
-    source: lz ? decompressLz(lz) : null,
-  }
+    workspace = null,
+  } = (history.state ?? {}) as { workspace?: SerializedWorkspace | null }
+  return workspace || null
 }
 
 export function saveCodeInHistory(
@@ -60,7 +55,7 @@ export function saveCodeInHistory(
 
 export function extractCodeFromHistoryState() {
   try {
-    return getDataFromHistory().source
+    return getDataFromHistory()
   } catch (e) {
     console.error(e)
     window.alert(`Error parsing source in history state: ${e}`)
