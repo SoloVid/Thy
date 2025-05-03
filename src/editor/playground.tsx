@@ -8,8 +8,10 @@ import { useEditorPreferences } from "./preferences"
 import Resizer from "./resizer"
 import { getPersistedWorkspace } from "./source-code/persisted-workspace"
 import { useEditorState } from "./state"
+import { AlertProvider, useAlerts } from "./alert-provider"
+import "./alert-provider.css"
 
-export default function Playground() {
+function PlaygroundContent() {
   useEffect(() => {
     document.title = "Thy Playground"
   }, [])
@@ -36,6 +38,8 @@ export default function Playground() {
   const state = useEditorState()
   const [prefs, setPrefs] = useEditorPreferences()
 
+  const alerts = useAlerts()
+  
   function onFileSelect(path: string) {
     console.log(path)
     fs.read(path).then(
@@ -49,13 +53,15 @@ export default function Playground() {
         }
       },
       (e) => {
-        // TODO: Surface error.
-        console.error(e)
+        alerts.showAlert(`Failed to open file: ${e.message || e}`)
       },
     )
   }
 
-  function onFileDelete(path: string) {
+  async function onFileDelete(path: string) {
+    const confirmed = await alerts.confirm(`Are you sure you want to delete "${path}"?`);
+    if (!confirmed) return;
+    
     // If the deleted file is currently open, clear the editor
     if (state.sourceCode.path === path) {
       state.setSourceCode({
@@ -64,16 +70,19 @@ export default function Playground() {
         language: "thy",
       })
     }
+    
+    alerts.showToast(`Deleted ${path}`, "info");
   }
 
   function onFileRename(oldPath: string, newPath: string) {
     // If the renamed file affects the open file, update the title
     if (state.sourceCode.path.startsWith(oldPath)) {
+      const newFilePath = state.sourceCode.path.replace(oldPath, newPath);
       state.setSourceCode({
         ...state.sourceCode,
-        // TODO: Recalculate path from file system or based on path manipulation.
-        path: state.sourceCode.path,
+        path: newFilePath,
       })
+      alerts.showToast(`Renamed ${oldPath} to ${newPath}`, "success");
     }
   }
 
@@ -88,8 +97,7 @@ export default function Playground() {
         // Do nothing.
       },
       (e) => {
-        // TODO: Surface error.
-        console.error(e)
+        alerts.showAlert(`Failed to save file: ${e.message || e}`)
       },
     )
   }
@@ -159,5 +167,13 @@ export default function Playground() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function Playground() {
+  return (
+    <AlertProvider>
+      <PlaygroundContent />
+    </AlertProvider>
   )
 }

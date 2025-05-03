@@ -1,0 +1,137 @@
+.alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.alert-dialog {
+  background-color: #272822;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 20px;
+  min-width: 300px;
+  max-width: 500px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.alert-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.alert-content p {
+  margin: 0;
+  color: #ddd;
+}
+
+.alert-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.alert-dialog button {
+  background-color: #444;
+  color: #ddd;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.alert-dialog button:hover {
+  background-color: #555;
+}
+
+.alert-dialog input {
+  background-color: #333;
+  color: #ddd;
+  border: 1px solid #555;
+  padding: 8px;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.toast {
+  background-color: #272822;
+  color: #ddd;
+  padding: 10px 15px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 250px;
+  max-width: 350px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  animation: slide-in 0.3s ease-out;
+}
+
+.toast button {
+  background: none;
+  border: none;
+  color: #ddd;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.toast-error {
+  border-left: 4px solid #f44336;
+}
+
+.toast-info {
+  border-left: 4px solid #2196f3;
+}
+
+.toast-success {
+  border-left: 4px solid #4caf50;
+}
+
+.toast-warning {
+  border-left: 4px solid #ff9800;
+}
+
+.alert-error {
+  border-left: 4px solid #f44336;
+}
+
+.alert-info {
+  border-left: 4px solid #2196f3;
+}
+
+.alert-success {
+  border-left: 4px solid #4caf50;
+}
+
+.alert-warning {
+  border-left: 4px solid #ff9800;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
