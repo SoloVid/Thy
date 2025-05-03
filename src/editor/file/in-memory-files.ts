@@ -201,12 +201,18 @@ export function makeInMemoryFiles(now: Now): InMemoryFiles {
       })
     },
     rename: async (oldPath: string, newPath: string) => {
+      if (oldPath === newPath) return
+      console.log(serializeDirectory(root))
+      console.log(`${oldPath} -> ${newPath}`)
       const node = findNode(now, root, oldPath)
       assert(!!node, `File ${oldPath} not found`)
       const oldParent = node.parent
       assert(!!oldParent, "Cannot rename root")
       const newParent = findParentDirectory(now, root, newPath)
-      const name = newPath.split("/").pop()
+      const name = newPath
+        .split("/")
+        .filter((s) => !!s)
+        .pop()
       assert(!!name, "File name is required")
       assert(
         !newParent.children.some((c) => c.name === name),
@@ -214,6 +220,7 @@ export function makeInMemoryFiles(now: Now): InMemoryFiles {
       )
       node.parent = newParent
       node.name = name
+      node.path = newParent.path + name + (node.kind === "directory" ? "/" : "")
       node.timeModified = now()
       oldParent.children = oldParent.children.filter((c) => c !== node)
       newParent.children.push(node)

@@ -57,24 +57,16 @@ export default function Playground() {
   }
 
   function onFileDelete(path: string) {
-    fs.delete(path).then(
-      () => {
-        // If the deleted file is currently open, clear the editor
-        if (state.sourceCode.path === path) {
-          state.setSourceCode({
-            path: "",
-            contents: "",
-            language: "thy",
-          })
-        }
-      },
-      (e) => {
-        // TODO: Surface error.
-        console.error(e)
-      },
-    )
+    // If the deleted file is currently open, clear the editor
+    if (state.sourceCode.path === path) {
+      state.setSourceCode({
+        path: "",
+        contents: "",
+        language: "thy",
+      })
+    }
   }
-  
+
   // Add path-browserify import at the top of the file if it's not already there
   // import { join } from "path-browserify"
 

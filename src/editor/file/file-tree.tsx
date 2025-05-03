@@ -11,12 +11,18 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { JSX, useEffect, useMemo, useRef, useState } from "preact/hooks"
+import {
+  MutableRef,
+  StateUpdater,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "preact/hooks"
 import { css } from "../component/css"
 import { FileEntry, FilesApi } from "./files-api"
 import { useSetIntervalWhenActive } from "editor/hook/use-set-interval-when-active"
 import { makeInMemoryFiles } from "./in-memory-files"
-import { join } from "path-browserify"
 
 type RenameState = {
   path: string
@@ -37,6 +43,7 @@ type SharedChildProps = SharedProps & {
   setSelectedPath: (newPath: string) => void
   renameState: RenameState
   setRenameState: (state: RenameState) => void
+  renameInProgressRef: MutableRef<boolean>
 }
 
 type FileTreeProps = SharedProps & {
@@ -47,34 +54,28 @@ type FileTreeProps = SharedProps & {
 export const FileTree = (props: FileTreeProps) => {
   const [selectedPath, setSelectedPath] = useState<string | null>(null)
   const [renameState, setRenameState] = useState<RenameState>(null)
+  const renameInProgressRef = useRef<boolean>(false)
 
   const handleNewFile = async () => {
     // Determine the directory to create the file in
-    let targetDir = props.directory
-    if (selectedPath) {
-      const entry = await props.fs.list(selectedPath).then(
-        entries => entries[0],
-        () => null
-      )
-      if (entry) {
-        targetDir = entry.kind === "directory" ? selectedPath : selectedPath.substring(0, selectedPath.lastIndexOf('/'))
-      }
-    }
-    
+    const newFileTarget = selectedPath ?? "/"
+    const targetDir = newFileTarget.substring(0, newFileTarget.lastIndexOf("/"))
+
     // Create a temporary file name
     const tempName = "new-file.thy"
-    const newPath = join(targetDir, tempName)
-    
+    const newPath = `${targetDir}/${tempName}`
+
     // Create the file
     await props.fs.write(newPath, "")
-    
+
     // Select the new file and start renaming
     setSelectedPath(newPath)
     props.onSelect(newPath)
+    renameInProgressRef.current = true
     setRenameState({
       path: newPath,
       isNew: true,
-      name: tempName
+      name: tempName,
     })
   }
 
@@ -101,6 +102,7 @@ export const FileTree = (props: FileTreeProps) => {
         setSelectedPath={setSelectedPath}
         renameState={renameState}
         setRenameState={setRenameState}
+        renameInProgressRef={renameInProgressRef}
       />
     </div>
   )
@@ -116,14 +118,14 @@ const FileTreeNodeList = (props: FileTreeProps & SharedChildProps) => {
   }
   useEffect(refreshNodes, [props.fs, props.directory])
   useSetIntervalWhenActive(refreshNodes, 1000, [props.fs, props.directory])
-  
+
   // Refresh immediately when rename state changes
   useEffect(() => {
     if (!props.renameState) {
       refreshNodes()
     }
   }, [props.renameState])
-  
+
   return <FileTreeNodeListSync {...props} nodes={nodes} />
 }
 
@@ -176,14 +178,14 @@ const InlineRename = ({
 }) => {
   const [name, setName] = useState(initialName)
   const inputRef = useRef<HTMLInputElement>(null)
-  
+
   useEffect(() => {
     // Focus the input and select the name without extension
     if (inputRef.current) {
       inputRef.current.focus()
-      
+
       // Select name without extension
-      const dotIndex = initialName.lastIndexOf('.')
+      const dotIndex = initialName.lastIndexOf(".")
       if (dotIndex > 0) {
         inputRef.current.setSelectionRange(0, dotIndex)
       } else {
@@ -191,17 +193,17 @@ const InlineRename = ({
       }
     }
   }, [initialName])
-  
+
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault()
       onSave(name)
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       e.preventDefault()
       onCancel()
     }
   }
-  
+
   return (
     <div class={renameContainerStyles}>
       <input
@@ -210,6 +212,7 @@ const InlineRename = ({
         value={name}
         onInput={(e) => setName((e.target as HTMLInputElement).value)}
         onKeyDown={handleKeyDown}
+        onfocusout={() => onSave(name)}
         class={renameInputStyles}
       />
       <div class={renameActionsStyles}>
@@ -235,9 +238,10 @@ const InlineRename = ({
 const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
-  
-  const isRenaming = restProps.renameState && restProps.renameState.path === node.path
-  
+
+  const isRenaming =
+    restProps.renameState && restProps.renameState.path === node.path
+
   const handleClick = (e: MouseEvent) => {
     restProps.setSelectedPath(node.path)
     restProps.onSelect(node.path)
@@ -249,40 +253,42 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
   const handleDelete = (e: MouseEvent) => {
     e.stopPropagation()
     if (window.confirm(`Delete ${node.name}?`)) {
-      restProps.onDelete(node.path)
+      fs.delete(node.path).then(
+        () => {
+          restProps.onDelete(node.path)
+        },
+        (e) => {
+          // TODO: Surface error.
+          console.error(e)
+        },
+      )
     }
   }
-  
+
   const handleStartRename = (e: MouseEvent) => {
     e.stopPropagation()
+    restProps.renameInProgressRef.current = true
     restProps.setRenameState({
       path: node.path,
       isNew: false,
-      name: node.name
+      name: node.name,
     })
   }
-  
+
   const handleSaveRename = async (newName: string) => {
-    if (!restProps.renameState) return
-    
+    if (!restProps.renameState || !restProps.renameInProgressRef.current) return
+    restProps.renameInProgressRef.current = false
+
     const oldPath = restProps.renameState.path
-    const dirPath = oldPath.substring(0, oldPath.lastIndexOf('/'))
-    const newPath = join(dirPath, newName)
-    
+    const dirPath = oldPath.substring(0, oldPath.lastIndexOf("/"))
+    const newPath = `${dirPath}/${newName}`
+
+    // Clear rename state
+    restProps.setRenameState(null)
+
     try {
-      // If it's a new file, we don't need to rename, just update the path
-      if (restProps.renameState.isNew) {
-        // Read the content of the old file
-        const content = await fs.read(oldPath)
-        // Write to the new path
-        await fs.write(newPath, content)
-        // Delete the old file
-        await fs.delete(oldPath)
-      } else {
-        // For existing files, use the rename API
-        await fs.rename(oldPath, newPath)
-      }
-      
+      await fs.rename(oldPath, newPath)
+
       // Update selection to the new path
       restProps.setSelectedPath(newPath)
       restProps.onSelect(newPath)
@@ -290,15 +296,15 @@ const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
       console.error("Failed to rename file:", e)
       alert(`Failed to rename file: ${e}`)
     }
-    
-    // Clear rename state
-    restProps.setRenameState(null)
   }
-  
+
   const handleCancelRename = () => {
+    restProps.renameInProgressRef.current = false
     // If this was a new file and rename was canceled, delete it
     if (restProps.renameState?.isNew) {
-      fs.delete(node.path).catch(e => console.error("Failed to delete new file:", e))
+      fs.delete(node.path).catch((e) =>
+        console.error("Failed to delete new file:", e),
+      )
     }
     restProps.setRenameState(null)
   }
@@ -452,7 +458,7 @@ const renameActionsStyles = css`
 const renameActionStyle = css`
   cursor: pointer;
   padding: 2px 4px;
-  
+
   &:hover {
     background-color: rgba(150, 150, 150, 0.3);
   }
