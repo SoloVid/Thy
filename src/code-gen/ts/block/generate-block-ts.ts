@@ -7,10 +7,9 @@ import { contextType } from "../generator-context"
 import { GeneratorState, makeGeneratorBlockState } from "../generator-state"
 import type { GeneratorFixture } from "../ts-generator"
 import { generateTypeParamsForBlockTs } from "../type/generate-type-params-ts"
-import { autoTightC } from "../utils/auto-tight"
+import { trace } from "../utils/debug"
 import { generateBlockLinesTs } from "./generate-block-lines-ts"
 import { generateParamsTs } from "./generate-params-ts"
-import { trace } from "../utils/debug"
 
 export function tryGenerateBlockTs(
   node: TreeNode,
@@ -28,15 +27,6 @@ export function generateBlockTs(
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
   trace("generateBlockTs()")
-  if (state.context === contextType.topLevel) {
-    const blockBodyState = state.makeChild({
-      symbolTable: block.symbolTable,
-      context: contextType.blockAllowingReturn,
-      assignmentContextName: null,
-    })
-    return generateBlockLinesTs(block, block.ideas, blockBodyState, fixture)
-  }
-
   const blockBodyBlockState = makeGeneratorBlockState(block)
   const blockBodyState = state.makeChild({
     symbolTable: block.symbolTable,
@@ -75,7 +65,7 @@ export function generateBlockTs(
     ]
   }
 
-  const definition = fromComplicated(block, [
+  return fromComplicated(block, [
     generateTypeParamsForBlockTs(block, blockBodyState),
     "(",
     generateParamsTs(block, blockBodyState, fixture),
@@ -88,6 +78,4 @@ export function generateBlockTs(
     makeIndent(state.indentLevel),
     "}",
   ])
-
-  return autoTightC(state, block, definition)
 }

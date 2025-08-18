@@ -6,7 +6,6 @@ import type { GeneratorState } from "../generator-state"
 import { ContextType, contextType } from "../generator-context"
 
 const allowedContexts: readonly ContextType[] = [
-  contextType.topLevel,
   contextType.blockAllowingReturn,
 ]
 

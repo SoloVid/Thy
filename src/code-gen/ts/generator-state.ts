@@ -13,7 +13,7 @@ interface GeneratorStateOptions {
   readonly increaseIndent?: boolean
   readonly isTypeContext?: boolean
   readonly assignmentContextName?: string | null
-  readonly newImplicitArguments?: boolean | string
+  readonly newImplicitArguments?: boolean
   readonly newPreStatementsArray?: boolean
 }
 
@@ -130,9 +130,7 @@ export function makeGeneratorState(
           get variableName() {
             if (cachedImplicitArgumentsVariableName === null) {
               cachedImplicitArgumentsVariableName =
-                typeof options.newImplicitArguments === "string"
-                  ? options.newImplicitArguments
-                  : getUniqueVariableName()
+                getUniqueVariableName()
             }
             return cachedImplicitArgumentsVariableName
           },

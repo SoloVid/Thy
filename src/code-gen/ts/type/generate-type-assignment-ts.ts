@@ -44,7 +44,6 @@ export function generateTypeAssignmentTs(
       isTypeContext: true,
       assignmentContextName: name,
     })
-    // console.log(childState)
     if (ta.call.type === "type-given-call") {
       return generateTypeGivenCallTypeTsWithParameterName(
         ta.call,
@@ -56,8 +55,6 @@ export function generateTypeAssignmentTs(
     return fixture.generateAsType(ta.call, childState)
   }
 
-  // console.log(name)
-  // console.log(childState)
   return fromComplicated(ta, [
     `const ${name} = undefined as unknown as `,
     generateValueExpression(),

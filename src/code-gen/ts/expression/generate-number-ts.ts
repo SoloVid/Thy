@@ -10,8 +10,10 @@ export function tryGenerateNumberTs(
   state: GeneratorState,
 ): GeneratedSnippets | undefined {
   if (node.type === "number-literal") {
-    const maybeAsConst =
-      state.context === contextType.looseExpression ? "" : " as const"
+    // const maybeAsConst =
+    //   state.context === contextType.looseExpression ? "" : " as const"
+    // TODO: Figure out actual desired behavior of when not as const.
+    const maybeAsConst = " as const"
     return [fromToken(node.token), fromNode(node, maybeAsConst)]
   }
 }

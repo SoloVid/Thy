@@ -25,10 +25,6 @@ export const contextType = {
    * (including await and return) instead of just expressions.
    */
   blockAllowingReturn: "blockAllowingReturn",
-  /**
-   * The top-level block of the whole program.
-   */
-  topLevel: "topLevel",
 } as const
 
 export type ContextType = (typeof contextType)[keyof typeof contextType]

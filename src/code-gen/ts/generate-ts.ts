@@ -51,15 +51,13 @@ import { nodeToString } from "code-gen/utils/to-string"
 export const tsGenerator =
   (
     standardLibrary: LibraryGeneratorCollection,
-    globalsObjectName: string,
     preludeContent: string,
     endingContent: string,
     indent: boolean = false,
   ) =>
   (node: TreeNode): GeneratorResult => {
     const rootState = makeGeneratorState(undefined, {
-      context: contextType.topLevel,
-      newImplicitArguments: globalsObjectName,
+      context: contextType.looseExpression,
       increaseIndent: indent,
     })
 

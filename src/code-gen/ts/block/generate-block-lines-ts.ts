@@ -24,7 +24,6 @@ export function generateBlockExplicitLinesTs(
   state: GeneratorState,
   fixture: GeneratorFixture,
 ): GeneratedSnippets {
-  // function generateIdeaTs(i: Idea): GeneratedSnippet[][] {
   return ideas.map((idea, i) => {
     const lineState = state.makeChild({
       context: state.context,
@@ -63,14 +62,4 @@ export function generateBlockExplicitLinesTs(
       return [genIndent(state.indentLevel), ...collapsedLine, maybeNewLine]
     })
   })
-
-  // const implementationLines: GeneratedSnippets[] = []
-
-  // for (const idea of ideas) {
-  //   const snippets = generateIdeaTs(idea)
-  //   implementationLines.push(snippets)
-  //   state.block?.ideaSnippets.push(...snippets)
-  // }
-
-  // return implementationLines
 }

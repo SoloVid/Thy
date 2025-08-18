@@ -5,10 +5,6 @@ import { GeneratorState } from "../generator-state"
 import { contextType } from "../generator-context"
 import { fromNode } from "code-gen/utils/from-node"
 
-const b = "b"
-const c = 1
-type A = `a${typeof b}`
-
 export function tryGenerateStringTs(
   node: TreeNode,
   state: GeneratorState,
