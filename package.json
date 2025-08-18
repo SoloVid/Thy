@@ -4,7 +4,8 @@
   "description": "Simple language for thy mobile programming",
   "exports": {
     ".": "./lib/api/index.js",
-    "./std-lib": "./lib/api/std-lib.js"
+    "./std-lib": "./lib/api/std-lib.js",
+    "./utils": "./lib/api/utils.js"
   },
   "bin": {
     "thy": "bin/thy"
