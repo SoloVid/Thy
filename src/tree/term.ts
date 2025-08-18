@@ -4,6 +4,7 @@ import type {
   tGiven,
   tNumberLiteral,
   tReturn,
+  tThy,
   tTypeGiven,
   tTypeIdentifier,
   tValueIdentifier,
@@ -37,6 +38,11 @@ export interface GivenTerm {
 export interface ReturnTerm {
   readonly type: "return-term"
   readonly token: Token<typeof tReturn>
+}
+
+export interface ThyTerm {
+  readonly type: "thy-term"
+  readonly token: Token<typeof tThy>
 }
 
 export interface TypeGivenTerm {

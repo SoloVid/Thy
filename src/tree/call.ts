@@ -1,19 +1,21 @@
+import type { TokenRange } from "common/token-range"
 import type { Token } from "tokenizer"
-import type { AwaitTerm, GivenTerm, ReturnTerm } from "./term"
+import type { tThat, tValueIdentifier } from "tokenizer/token-type"
 import type {
   CallableExpression,
   Expression,
   TypeExpression,
 } from "./expression"
-import type { TokenRange } from "common/token-range"
+import type { PrimitiveStringLiteral } from "./string"
+import type { AwaitTerm, GivenTerm, ReturnTerm, ThyTerm } from "./term"
 import type { TreeNode } from "./tree-node"
-import type { tThat, tValueIdentifier } from "tokenizer/token-type"
 
-export type Call = AwaitCall | GivenCall | ValueCall
+export type Call = AwaitCall | GivenCall | ThyCall | ValueCall
 
 const callTypes: readonly Call["type"][] = [
   "await-call",
   "given-call",
+  "thy-call",
   "value-call",
 ]
 export function isCall(node: TreeNode): node is Call {
@@ -48,4 +50,11 @@ export interface Return extends TokenRange {
   readonly func: ReturnTerm
   readonly typeArgs: readonly [] | readonly [TypeExpression]
   readonly args: readonly [Expression]
+}
+
+export interface ThyCall extends TokenRange {
+  readonly type: "thy-call"
+  readonly func: ThyTerm
+  readonly typeArgs: readonly []
+  readonly args: readonly [PrimitiveStringLiteral]
 }

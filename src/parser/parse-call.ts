@@ -1,13 +1,15 @@
 import type { Expression } from "tree"
 import type { CallableExpression, TypeExpression } from "tree/expression"
+import type { PrimitiveStringLiteral } from "tree/string"
 import type { TypeReturn } from "tree/type-call"
 import assert from "utils/assert"
-import { tAwait, tGiven, tReturn } from "../tokenizer/token-type"
+import { tAwait, tGiven, tReturn, tThy } from "../tokenizer/token-type"
 import type {
   AwaitCall,
   Call,
   GivenCall,
   Return,
+  ThyCall,
   ValueCall,
 } from "../tree/call"
 import { addNodeError, addTokenError, badParse, BadParse } from "./error"
@@ -31,6 +33,9 @@ export function parseSpecialCallOrFallback<T>(
   }
   if (firstToken.type === tGiven) {
     return parseGivenCall(state)
+  }
+  if (firstToken.type === tThy) {
+    return parseThyCall(state)
   }
 
   return fallback(state)
@@ -246,6 +251,66 @@ export function parseReturn(
     typeArgs: validTypeArgs,
     args: validArgs,
     firstToken: returnToken,
+    lastToken: args.lastToken,
+  }
+}
+
+function parseThyCall(state: ParserState): ThyCall | BadParse {
+  const thyToken = state.buffer.consumeToken()
+  assert(
+    thyToken.type === tThy,
+    `parseThyCall() should only be called if next token is "thy"`,
+  )
+  const args = parseCallArgs(state)
+  if (args === badParse) return badParse
+  for (let i = 0; i < args.typeArgs.length; i++) {
+    addNodeError(
+      state,
+      args.typeArgs[i],
+      `"thy" call should not receive any type arguments`,
+    )
+  }
+  if (args.valueArgs.length === 0) {
+    addTokenError(
+      state,
+      thyToken,
+      `"thy" call should receive exactly one argument`,
+    )
+    return badParse
+  }
+  const validArgs = [args.valueArgs[0] as PrimitiveStringLiteral] as const
+  for (let i = 1; i < args.valueArgs.length; i++) {
+    addNodeError(
+      state,
+      args.valueArgs[i],
+      `"thy" call should not receive more than one argument`,
+    )
+  }
+  if (validArgs[0].type !== "string-literal") {
+    addNodeError(
+      state,
+      validArgs[0],
+      `"thy" call should only receive literal string values`,
+    )
+  }
+  for (const part of validArgs[0].parts) {
+    if (part.type !== "string-content") {
+      addNodeError(
+        state,
+        validArgs[0],
+        `"thy" call should not receive templated (interpolated) string values`,
+      )
+    }
+  }
+  return {
+    type: "thy-call",
+    func: {
+      type: "thy-term",
+      token: thyToken,
+    },
+    typeArgs: [],
+    args: validArgs,
+    firstToken: thyToken,
     lastToken: args.lastToken,
   }
 }

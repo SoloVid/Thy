@@ -3,6 +3,10 @@ import type { Token } from "tokenizer"
 import type { tStringText } from "tokenizer/token-type"
 import type { ValueIdentifier } from "./term"
 
+export interface PrimitiveStringLiteral extends StringLiteral {
+  readonly parts: readonly StringContent[]
+}
+
 export interface StringLiteral extends TokenRange {
   readonly type: "string-literal"
   readonly parts: readonly StringPart[]

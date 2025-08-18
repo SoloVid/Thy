@@ -10,6 +10,7 @@ import {
   tReturn,
   tStatementContinuation,
   tThat,
+  tThy,
   tType,
   tTypeGiven,
   tVarDeclAssign,
@@ -37,5 +38,6 @@ export const matchLet = makeSingleRegexMatcher(tLet, /\blet\b/)
 export const matchAwait = makeSingleRegexMatcher(tAwait, /\bawait\b/)
 export const matchGiven = makeSingleRegexMatcher(tGiven, /\bgiven\b/)
 export const matchReturn = makeSingleRegexMatcher(tReturn, /\breturn\b/)
+export const matchThy = makeSingleRegexMatcher(tThy, /\bthy\b/)
 export const matchThat = makeSingleRegexMatcher(tThat, /\bthat\b/)
 export const matchTypeGiven = makeSingleRegexMatcher(tTypeGiven, /\bGiven\b/)

@@ -18,6 +18,7 @@ import {
   matchReturn,
   matchStatementContinuation,
   matchThat,
+  matchThy,
   matchType,
   matchTypeGiven,
   matchVarDeclAssign,
@@ -66,6 +67,7 @@ export function makeTopTokenizer(
     matchAwait,
     matchGiven,
     matchReturn,
+    matchThy,
     matchThat,
     matchTypeGiven,
 

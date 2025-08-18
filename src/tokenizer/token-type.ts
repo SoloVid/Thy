@@ -21,6 +21,7 @@ export const tLet = "Let"
 export const tAwait = "Await"
 export const tGiven = "Given"
 export const tReturn = "Return"
+export const tThy = "Thy"
 export const tThat = "That"
 export const tTypeGiven = "TypeGiven"
 
@@ -55,6 +56,7 @@ export type TokenType =
   | typeof tAwait
   | typeof tGiven
   | typeof tReturn
+  | typeof tThy
   | typeof tThat
   | typeof tTypeGiven
   | typeof tMemberAccessOperator
