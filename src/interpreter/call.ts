@@ -1,6 +1,6 @@
 import { getFirstToken } from "parser/helper"
 import type { AwaitCall, Call, GivenCall, TreeNode, ValueCall } from "tree"
-import { forwardWait, MayWait, notWait, yesWait, YesWait } from "./async-helper"
+import { forwardWait, MayWait, NotWait, notWait, yesWait, YesWait } from "./async-helper"
 import { RuntimeValue, yesIThinkThisIsRuntimeFunction } from "./dynamic-type"
 import { InterpretedExpression, interpretThyExpression } from "./expression"
 import {
@@ -8,6 +8,7 @@ import {
   makeInterpreterNodeError,
 } from "./interpreter-error"
 import type { ThyBlockContext } from "./types"
+import { ThyCall } from "tree/call"
 
 export function interpretThyCall(
   context: ThyBlockContext,
@@ -18,6 +19,9 @@ export function interpretThyCall(
   }
   if (call.type === "given-call") {
     return interpretThyGivenCall(context, call)
+  }
+  if (call.type === "thy-call") {
+    return interpretThyThyCall(context, call)
   }
 
   const fr = interpretThyExpression(context, call.func)
@@ -104,6 +108,15 @@ function interpretThyAwaitCall(
       throw new InterpreterErrorWithContext(e, call.func.token, 0, errorHere, 2)
     }
   })
+}
+
+function interpretThyThyCall(
+  context: ThyBlockContext,
+  call: ThyCall,
+): NotWait<RuntimeValue> {
+  const target = call.args[0].parts.map(p => p.token.text).join("")
+  const result = context.resolveThy(context.thyResolutionRelativePath, target)
+  return notWait(result)
 }
 
 function checkFunction(

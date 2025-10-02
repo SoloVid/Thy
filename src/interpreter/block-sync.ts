@@ -10,6 +10,7 @@ export function interpretThySyncBlock(
   block: Block,
   options: BlockOptions,
 ) {
+  // console.log(options)
   const objWithBlockFunction: {
     [functionName: string]: (
       ...args: readonly RuntimeValue[]
@@ -33,7 +34,7 @@ export function interpretThySyncBlock(
         throwTransformedError(
           e,
           functionName,
-          options.sourceFile,
+          options.stackTracePath,
           helper.additionalTraceLinesToHide,
         )
       }

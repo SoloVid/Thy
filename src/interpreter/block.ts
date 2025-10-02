@@ -7,11 +7,16 @@ import { interpretThySyncBlock } from "./block-sync"
 import { RuntimeValue } from "./dynamic-type"
 import { makeInterpreterCompileError } from "./interpreter-error"
 import { ThyBlockContext } from "./types"
+import { FileBrowseApi } from "utils/fs/file-browse-api"
+import { parseAll } from "compiler/parse-workspace"
+import { makeThyResolver } from "./thy-resolver"
 
 export type BlockOptions = {
   closure: Record<string, unknown>
   functionName?: string
-  sourceFile: ThyBlockContext["sourceFile"]
+  stackTracePath: ThyBlockContext["stackTracePath"]
+  thyResolutionRelativePath: ThyBlockContext["thyResolutionRelativePath"]
+  resolveThy: ThyBlockContext["resolveThy"]
   additionalTraceLinesToHide?: number
 }
 
@@ -19,6 +24,16 @@ export type ApiUnknownFunction = (...args: readonly unknown[]) => unknown
 type ApiInterpretedBlockWithMeta = {
   interpreted: ApiUnknownFunction
   block: Block
+}
+
+export async function interpretThyWorkspace(
+  workspaceBrowser: FileBrowseApi,
+  entrypoint: string,
+  options: Partial<BlockOptions> = {},
+) {
+  const workspaceParseMap = await parseAll(workspaceBrowser, entrypoint)
+  const resolver = makeThyResolver(workspaceParseMap, options)
+  return resolver.resolveThy(entrypoint, entrypoint)
 }
 
 export function interpretThyBlockSource(
@@ -41,7 +56,7 @@ export function interpretThyBlockSourceWithMeta(
   return interpretThyBlockNodeWithMeta(top, {
     closure: options.closure ?? {},
     functionName: options.functionName,
-    sourceFile: options.sourceFile ?? "inline-thy-code",
+    stackTracePath: options.stackTracePath ?? "inline-thy-code",
     additionalTraceLinesToHide: options.additionalTraceLinesToHide ?? 0,
   }) as ApiInterpretedBlockWithMeta
 }

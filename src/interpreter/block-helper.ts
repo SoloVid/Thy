@@ -33,7 +33,9 @@ export function makeHelper(
     symbolTable: block.symbolTable,
     closure: options.closure as Record<string, RuntimeValue>,
     variablesInBlock: {},
-    sourceFile: options.sourceFile,
+    stackTracePath: options.stackTracePath,
+    thyResolutionRelativePath: options.thyResolutionRelativePath,
+    resolveThy: options.resolveThy,
   }
 
   type IdeaResult = [shouldReturn: boolean, value: RuntimeValue | undefined]

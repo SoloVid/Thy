@@ -7,14 +7,17 @@ import { makeParserState } from "./parser-state"
 export interface ParserOutput {
   top: Block
   errors: CompileError[]
+  references: readonly string[]
 }
 
 export function parse(
   tokenizer: Tokenizer,
   errors: CompileError[] = [],
 ): ParserOutput {
+  const state = makeParserState(tokenizer, errors)
   return {
-    top: parseBlockInner(makeParserState(tokenizer, errors)),
+    top: parseBlockInner(state),
     errors: errors,
+    references: state.references,
   }
 }

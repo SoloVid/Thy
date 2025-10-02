@@ -10,5 +10,9 @@ export type ThyBlockContext = {
   readonly symbolTable: ReadSymbolTable
   readonly closure: Record<string, RuntimeValue>
   readonly variablesInBlock: Record<string, RuntimeValue>
-  sourceFile: string
+  /** Source file path for stack traces. */
+  stackTracePath: string
+  /** Relative source file path for thy() call resolution. */
+  readonly thyResolutionRelativePath: string
+  readonly resolveThy: (thyResolutionRelativePath: string, pathSpec: string) => RuntimeValue
 }

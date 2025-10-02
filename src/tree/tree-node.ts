@@ -10,6 +10,7 @@ import type {
   GivenTerm,
   NumberLiteral,
   ReturnTerm,
+  ThyTerm,
   TypeGivenTerm,
   TypeIdentifier,
   ValueIdentifier,
@@ -42,6 +43,7 @@ export type TreeNode =
   | GivenTerm
   | TypeGivenTerm
   | ReturnTerm
+  | ThyTerm
   | StringInterpolation
 
 /** Subset of {@link TreeNode} that can be used in type context. */

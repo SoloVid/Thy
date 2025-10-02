@@ -12,8 +12,10 @@ import { makeTokenBuffer } from "./token-buffer"
 export interface ParserState {
   readonly buffer: TokenBuffer
   context: ParserContext
+  readonly references: readonly string[]
 
   addError(error: CompileError): void
+  addReference(reference: string): void
 }
 
 export interface ParserContext {
@@ -26,6 +28,7 @@ export function makeParserState(
   tokenizer: Tokenizer,
   errors: CompileError[],
 ): ParserState {
+  const references: string[] = []
   const state: ParserState = {
     buffer: makeTokenBuffer(tokenizer),
     context: {
@@ -39,9 +42,13 @@ export function makeParserState(
         return badParse
       },
     },
+    references: references,
 
     addError(e) {
       errors.push(e)
+    },
+    addReference(reference) {
+      references.push(reference)
     },
   }
   return state

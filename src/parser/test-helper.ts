@@ -26,6 +26,7 @@ export function makeParserTestFixture(
   tokens: readonly (TokenType | Partial<Token>)[],
 ) {
   const errors: CompileError[] = []
+  const references: string[] = []
   const state: ParserState = {
     buffer: makeTokenBuffer(makeMockTokenizer(tokens)),
     context: {
@@ -33,10 +34,14 @@ export function makeParserTestFixture(
       // takeThat: () => thatNotFound,
       // takeBeforeThat: () => thatNotFound,
     } as ParserContext,
+    references,
 
     addError(e) {
       errors.push(e)
     },
+    addReference(reference) {
+      references.push(reference)
+    }
   }
   return {
     errors,

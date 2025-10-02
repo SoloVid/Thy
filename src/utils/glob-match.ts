@@ -1,4 +1,4 @@
-function globToRegExp(pattern: string): RegExp {
+export function globToRegExp(pattern: string): RegExp {
   const escaped = pattern
     // Escape regex special characters
     .replace(/[-[\]{}()+?.\\^$|]/g, '\\$&')
@@ -9,9 +9,14 @@ function globToRegExp(pattern: string): RegExp {
     // Create regex version of **
     .replace(/§§/g, '.*')
 
-  return new RegExp(`^${escaped}$`);
+  return new RegExp(`^${escaped}$`)
 }
 
 export function globMatch(pattern: string, path: string): boolean {
-  return globToRegExp(pattern).test(path);
+  return globToRegExp(pattern).test(path)
+}
+
+export function globMatchAll(pattern: string, paths: readonly string[]): readonly string[] {
+  const regex = globToRegExp(pattern)
+  return paths.filter(p => regex.test(p))
 }

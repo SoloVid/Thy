@@ -1,16 +1,16 @@
 import type { TokenRange } from "common/token-range"
 import type { Token } from "tokenizer"
-import {
+import type {
   tConstDeclAssign,
   tExport,
   tNoDeclAssign,
   tPrivate,
   tVarDeclAssign,
 } from "tokenizer/token-type"
-import type { ValueIdentifier } from "./term"
-import type { AwaitCall, GivenCall, ValueCall } from "./call"
+import type { Call } from "./call"
 import type { ValuePropertyAccess } from "./property-access"
-import { TreeNode } from "./tree-node"
+import type { ValueIdentifier } from "./term"
+import type { TreeNode } from "./tree-node"
 
 export type Assignment =
   | ConstantDeclaration
@@ -44,7 +44,7 @@ export interface ConstantDeclaration extends TokenRange {
   readonly modifier: Token<typeof tExport | typeof tPrivate> | null
   readonly variable: ValueIdentifier
   readonly operator: Token<typeof tConstDeclAssign>
-  readonly call: ValueCall | AwaitCall | GivenCall
+  readonly call: Call
 }
 
 export interface VariableDeclaration extends TokenRange {
@@ -52,7 +52,7 @@ export interface VariableDeclaration extends TokenRange {
   readonly modifier: Token<typeof tExport | typeof tPrivate> | null
   readonly variable: ValueIdentifier
   readonly operator: Token<typeof tVarDeclAssign>
-  readonly call: ValueCall | AwaitCall | GivenCall
+  readonly call: Call
 }
 
 export interface PropertyAssignment extends TokenRange {
@@ -60,7 +60,7 @@ export interface PropertyAssignment extends TokenRange {
   readonly modifier: null
   readonly variable: ValuePropertyAccess
   readonly operator: Token<typeof tNoDeclAssign>
-  readonly call: ValueCall | AwaitCall | GivenCall
+  readonly call: Call
 }
 
 export interface VariableReassignment extends TokenRange {
@@ -68,5 +68,5 @@ export interface VariableReassignment extends TokenRange {
   readonly modifier: null
   readonly variable: ValueIdentifier
   readonly operator: Token<typeof tNoDeclAssign>
-  readonly call: ValueCall | AwaitCall | GivenCall
+  readonly call: Call
 }

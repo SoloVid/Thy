@@ -302,6 +302,7 @@ function parseThyCall(state: ParserState): ThyCall | BadParse {
       )
     }
   }
+  state.addReference(validArgs[0].parts.map(p => p.token.text).join(""))
   return {
     type: "thy-call",
     func: {

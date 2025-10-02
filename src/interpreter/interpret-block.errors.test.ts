@@ -17,7 +17,7 @@ function nonWallabyTest(
 test("interpretThyBlock() should provide Thy stack trace when error is thrown synchronously", () => {
   const interpreted = interpretThyBlockSource(`f is given\nf`, {
     functionName: "interpreted",
-    sourceFile: "provided-source.thy",
+    stackTracePath: "provided-source.thy",
   })
   function foo() {
     throw new Error("f bad")
@@ -50,7 +50,7 @@ nonWallabyTest(
 
     const interpreted = interpretThyBlockSource(`f is given\nf\nawait that`, {
       functionName: "interpreted",
-      sourceFile: "provided-source.thy",
+      stackTracePath: "provided-source.thy",
     })
     async function foo() {
       await delay(10)
@@ -82,7 +82,7 @@ nonWallabyTest(
   async () => {
     const interpreted = interpretThyBlockSource(`f is given\nf\nawait that`, {
       functionName: "interpreted",
-      sourceFile: "provided-source.thy",
+      stackTracePath: "provided-source.thy",
     })
     async function foo() {
       throw new Error("f bad")
@@ -118,7 +118,7 @@ nonWallabyTest(
       `f is given\nf\ng is await that`,
       {
         functionName: "interpreted",
-        sourceFile: "provided-source.thy",
+        stackTracePath: "provided-source.thy",
       },
     )
     async function foo() {
@@ -164,7 +164,7 @@ thy1
 `,
     {
       functionName: "interpreted",
-      sourceFile: "provided-source.thy",
+      stackTracePath: "provided-source.thy",
       closure: {
         def: (thing: unknown) => thing,
       },
@@ -217,7 +217,7 @@ f
 `,
     {
       functionName: "interpreted",
-      sourceFile: "provided-source.thy",
+      stackTracePath: "provided-source.thy",
       closure: {
         def: (thing: unknown) => thing,
       },
@@ -322,7 +322,7 @@ test("interpretThyBlock() Thy stack trace counts empty lines and comment lines",
     `f is given\n\nComment here (empty line above)\nf`,
     {
       functionName: "interpreted",
-      sourceFile: "provided-source.thy",
+      stackTracePath: "provided-source.thy",
     },
   )
   function foo() {

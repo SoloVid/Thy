@@ -33,7 +33,7 @@ export function interpretThyAsyncBlock(
           throwTransformedError(
             e,
             functionName,
-            options.sourceFile,
+            options.stackTracePath,
             helper.additionalTraceLinesToHide,
             errorHere,
           )

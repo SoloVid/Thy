@@ -30,6 +30,10 @@ export const makeSimpleContext = (
       RuntimeValue
     >,
     closure: (o.closure ?? {}) as Record<string, RuntimeValue>,
-    sourceFile: "<test thy source>",
+    stackTracePath: "<test thy source>",
+    thyResolutionRelativePath: "source.thy",
+    resolveThy: () => {
+      throw new Error(`resolveThy() not implemented`)
+    },
   }
 }

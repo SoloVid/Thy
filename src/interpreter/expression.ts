@@ -94,7 +94,9 @@ function resolveBlock(context: ThyBlockContext, block: Block): RuntimeValue {
     }
     return interpretThyBlockNode(block, {
       closure: childClosure,
-      sourceFile: context.sourceFile,
+      stackTracePath: context.stackTracePath,
+      thyResolutionRelativePath: context.thyResolutionRelativePath,
+      resolveThy: context.resolveThy,
     }) as RuntimeFunction
   }
 

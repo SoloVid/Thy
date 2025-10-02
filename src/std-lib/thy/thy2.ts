@@ -1,4 +1,4 @@
-import { globMatch } from "../utils/glob-match"
+import { globMatch } from "../../utils/glob-match"
 
 export type ThyCache = {
   readonly mine: Map<string, unknown>
@@ -16,6 +16,8 @@ type ThyCacheInheritanceRule = {
   pattern: string
 }
 
+export type ThyCacheInit<T> = (cache: ThyCache) => T
+
 /**
  *
  * @param id Canonical ID of dependency.
@@ -23,20 +25,20 @@ type ThyCacheInheritanceRule = {
  * @param init Initialization function for obtaining the dependency.
  * @returns 
  */
-export function resolveThy<T>(id: string, cache: ThyCache, init: (cache: ThyCache) => T): T {
+export function resolveThy<T>(id: string, cache: ThyCache, init: ThyCacheInit<T>): T {
   if (cache.mine.has(id)) {
     return cache.mine as T
   }
   return resolveForMe(id, cache, init)
 }
 
-function resolveForMe<T>(id: string, cache: ThyCache, init: (cache: ThyCache) => T): T {
+function resolveForMe<T>(id: string, cache: ThyCache, init: ThyCacheInit<T>): T {
   const newThing = resolveUncached(id, cache, init)
   cache.mine.set(id, newThing)
   return newThing
 }
 
-function resolveUncached<T>(id: string, cache: ThyCache, init: (cache: ThyCache) => T): T {
+function resolveUncached<T>(id: string, cache: ThyCache, init: ThyCacheInit<T>): T {
   if (cache.inherit) {
     const filter = findRule(id, cache.inherit)
     if (filter?.useParent) {

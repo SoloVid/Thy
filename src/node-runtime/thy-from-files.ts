@@ -23,7 +23,7 @@ export async function makeThyFromFiles({
         file: f,
         block: interpretThyBlockSource(contents, {
           closure: args,
-          sourceFile: f,
+          stackTracePath: f,
         }),
       }
     }),

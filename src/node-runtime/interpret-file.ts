@@ -13,7 +13,7 @@ export async function interpretFile(
   const contents = await readFile(file, "utf-8")
   const interpreted = interpretThyBlockSource(contents, {
     closure: args,
-    sourceFile: resolve(file),
+    stackTracePath: resolve(file),
   })
   await interpreted()
 }
