@@ -10,8 +10,13 @@ export async function compileTs() {
     loader: {
       ".md": "text",
     },
+    alias: {
+      "react": "preact/compat",
+      "react-dom": "preact/compat",
+    },
     bundle: true,
     platform: "browser",
+    target: "es2021",
     jsx: "automatic",
     outdir: pageOutputDir,
     outbase: pageInputDir,

@@ -19,8 +19,6 @@
     "paths": {
       "thy-lang": ["./api/index"],
       "thy-lang/*": ["./api/*"],
-      "react": ["../node_modules/preact/compat"],
-      "react-dom": ["../node_modules/preact/compat"],
       "test-framework": ["./utils/test-entrypoint"]
     }
   },
