@@ -10,17 +10,19 @@ import { forwardWait, MayWait, NotWait, notWait } from "./async-helper"
 import { interpretThyBlockNode } from "./block"
 import { interpretThyCall } from "./call"
 import {
+  isVoid,
   RuntimeFunction,
+  RuntimeReturn,
   RuntimeValue,
   yesIThinkThisIsRuntimeObject,
-  yesThisValueIsForRuntime,
+  yesThisValueIsForRuntime
 } from "./dynamic-type"
 import { makeInterpreterNodeError } from "./interpreter-error"
 import { interpretThyString } from "./string"
 import type { ThyBlockContext } from "./types"
 
 export type InterpretedExpression = {
-  target: RuntimeValue
+  target: RuntimeReturn
   thisValue?: RuntimeValue
 }
 
@@ -148,8 +150,12 @@ export function interpretThyValuePropertyAccessExceptLeaf(
   thyExpression: ValuePropertyAccess,
 ): MayWait<MostlyAccessed> {
   const baseValueResult = interpretThyExpression(context, thyExpression.base)
-  return forwardWait(baseValueResult, (value) =>
-    interpretThyValuePropertyAccessExceptLeafSync(thyExpression, value.target),
+  return forwardWait(baseValueResult, (value) => {
+    if (isVoid(value.target)) {
+      throw makeInterpreterNodeError(thyExpression.base, `void cannot be used as base of property access`)
+    }
+    return interpretThyValuePropertyAccessExceptLeafSync(thyExpression, value.target)
+  },
   )
 }
 

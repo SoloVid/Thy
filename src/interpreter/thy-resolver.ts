@@ -1,13 +1,14 @@
-import { ParseResult } from "compiler/parse-workspace"
 import { resolvePathSpecSync } from "std-lib/thy/resolve-path-spec"
-import { resolveThy, ThyCache, ThyCacheInit } from "std-lib/thy/thy2"
-import type { FileBrowseApi } from "utils/fs/file-browse-api"
-import { BlockOptions, interpretThyBlockNode, interpretThyBlockSource } from "./block"
+import { resolveThy, ThyCache } from "std-lib/thy/thy2"
+import type { Block } from "tree"
 import assert from "utils/assert"
+import { BlockOptions, interpretThyBlockNode } from "./block"
+import { runtimeVoid, yesThisValueIsForRuntime } from "./dynamic-type"
 
 export function makeThyResolver(
-  parseMap: Map<string, ParseResult>,
-  options: Partial<BlockOptions> = {},
+  parseMap: Map<string, Readonly<Block>>,
+  globals: Record<string, unknown>,
+  options: Omit<BlockOptions, "thyResolutionRelativePath" | "resolveThy">,
 ) {
   const knownFilePaths = [...parseMap.keys()]
   // console.log(knownFilePaths)
@@ -18,17 +19,26 @@ export function makeThyResolver(
   const resolveFunction = (thyResolutionRelativePath: string, pathSpec: string) => {
     const resolvedPaths = resolvePathSpecSync(thyResolutionRelativePath, knownFilePaths, pathSpec)
     // console.log(resolvedPaths)
-    assert(resolvedPaths.length > 0, `thy("${pathSpec}") did not resolve from ${thyResolutionRelativePath}`)
+    assert(resolvedPaths.length > 0, `thy "${pathSpec}" did not resolve from ${thyResolutionRelativePath}`)
     const resolvedValues = resolvedPaths.map(
-      p => resolveThy(p, cache, (c) => interpretThyBlockNode(parseMap.get(p)?.tree, {
-        ...options,
-        thyResolutionRelativePath: p,
-        resolveThy: resolveFunction,
-      })())
+      p => resolveThy(p, cache, (c) => {
+        const tree = parseMap.get(p)
+        assert(!!tree, `${p} should be parsed`)
+        const interpreted = interpretThyBlockNode(tree, {
+          ...options,
+          // TODO: Fix these values per file?
+          // functionName: options.functionName,
+          // stackTracePath: options.stackTracePath ?? "inline-thy-code",
+          thyResolutionRelativePath: p,
+          resolveThy: resolveFunction,
+        })
+        return interpreted(yesThisValueIsForRuntime(globals))
+      })
     )
     if (resolvedValues.length === 1) {
       return resolvedValues[0]
     }
+    return runtimeVoid
   }
   return {
     resolveThy: resolveFunction

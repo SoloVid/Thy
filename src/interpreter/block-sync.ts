@@ -3,7 +3,7 @@ import assert from "utils/assert"
 import type { BlockOptions } from "./block"
 import { throwTransformedError } from "./block-error-transformer"
 import { makeHelper } from "./block-helper"
-import type { RuntimeValue } from "./dynamic-type"
+import type { RuntimeFunction, RuntimeValue } from "./dynamic-type"
 
 export function interpretThySyncBlock(
   functionName: string,
@@ -12,9 +12,7 @@ export function interpretThySyncBlock(
 ) {
   // console.log(options)
   const objWithBlockFunction: {
-    [functionName: string]: (
-      ...args: readonly RuntimeValue[]
-    ) => RuntimeValue | undefined
+    [functionName: string]: RuntimeFunction
   } = {
     [functionName]: (...args) => {
       const helper = makeHelper(block, options, args)

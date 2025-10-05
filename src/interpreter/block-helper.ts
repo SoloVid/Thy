@@ -4,14 +4,18 @@ import { forwardWait, MayWait, notWait } from "./async-helper"
 import type { BlockOptions } from "./block"
 import { interpretThyCall } from "./call"
 import {
+  assertNotVoid,
+  isVoid,
   RuntimeObject,
   RuntimeValue,
+  runtimeVoid,
   yesIThinkThisIsRuntimeObject,
   yesThisValueIsForRuntime,
 } from "./dynamic-type"
 import { interpretThyExpression } from "./expression"
 import { interpretThyStatement } from "./statement"
 import type { ThyBlockContext } from "./types"
+import { makeInterpreterNodeError } from "./interpreter-error"
 
 export function makeHelper(
   block: Block,
@@ -38,7 +42,7 @@ export function makeHelper(
     resolveThy: options.resolveThy,
   }
 
-  type IdeaResult = [shouldReturn: boolean, value: RuntimeValue | undefined]
+  type IdeaResult = [shouldReturn: true, value: RuntimeValue] | [shouldReturn: false, value: RuntimeValue | undefined]
   function evaluateStatement(idea: Idea): MayWait<IdeaResult> {
     if (
       idea.type === "blank-line" ||
@@ -51,16 +55,24 @@ export function makeHelper(
     if (idea.type === "return") {
       return forwardWait(
         interpretThyExpression(context, idea.args[0]),
-        (ie) => [true, ie.target],
+        (ie) => {
+          if (isVoid(ie.target)) {
+            throw makeInterpreterNodeError(idea.args[0], `void cannot be explicitly returned`)
+          }
+          return [true, ie.target]
+        },
       )
     }
     if (idea.type === "let-call") {
       if (idea.call === null) {
         return notWait([false, undefined])
       }
-      return forwardWait(interpretThyCall(context, idea.call), (returnValue) =>
-        returnValue === undefined ? [false, undefined] : [true, returnValue],
-      )
+      return forwardWait(interpretThyCall(context, idea.call), (returnValue) => {
+        if (isVoid(returnValue)) {
+          return [false, undefined]
+        }
+        return [true, returnValue]
+      })
     }
     return forwardWait(interpretThyStatement(context, idea), () => [
       false,
@@ -74,7 +86,7 @@ export function makeHelper(
       block.exportedSymbols.length === 0 ||
       block.returnStyle === returnStyle.explicitReturn
     ) {
-      return undefined
+      return runtimeVoid
     }
     const implicitReturn: RuntimeObject = {}
     for (const variableName of exportSource) {

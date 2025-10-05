@@ -1,10 +1,10 @@
+import { interpretThyWorkspace } from "interpreter/block"
 import assert from "node:assert"
-import { test } from "test-framework"
-import { core } from "std-lib/core"
-import { interpretThyBlockSource, interpretThyWorkspace } from "interpreter/block"
-import { FileBrowseApi } from "utils/fs/file-browse-api"
 import { readdir, readFile } from "node:fs/promises"
 import { join } from "node:path"
+import { core } from "std-lib/core"
+import { test } from "test-framework"
+import { FileBrowseApi } from "utils/fs/file-browse-api"
 
 function makeFileBrowser(root: string): FileBrowseApi {
   return {
@@ -20,9 +20,7 @@ function makeFileBrowser(root: string): FileBrowseApi {
 
 async function interpretFile(root: string, entrypoint: string) {
   const fileBrowser = makeFileBrowser(root)
-  const result = await interpretThyWorkspace(fileBrowser, entrypoint, {
-    closure: core
-  })
+  const result = await interpretThyWorkspace(fileBrowser, entrypoint, core)
   return result
 }
 

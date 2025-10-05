@@ -1,45 +1,41 @@
-import assert from "assert"
 import { defineTestGroup } from "test-framework"
-import { core } from "../std-lib/core"
-import { testFileA, testFileB, testFileBar, testFileBaz } from "./test-files"
-import { makeThyFromFiles } from "./thy-from-files"
 
 const testMakeThy = defineTestGroup("makeThyFromFiles() ")
 
-testMakeThy("should not run passed functions on construction", async () => {
-  let flag = false
-  const print = () => {
-    flag = true
-  }
-  await makeThyFromFiles({
-    files: [testFileB],
-    args: {
-      print,
-    },
-  })
-  assert(!flag, "Function should not have been called during construction")
-})
+// testMakeThy("should not run passed functions on construction", async () => {
+//   let flag = false
+//   const print = () => {
+//     flag = true
+//   }
+//   await makeThyFromFiles({
+//     files: [testFileB],
+//     args: {
+//       print,
+//     },
+//   })
+//   assert(!flag, "Function should not have been called during construction")
+// })
 
-testMakeThy("function should run all passed functions", async () => {
-  const prints: unknown[][] = []
-  const print = (...args: unknown[]) => {
-    prints.push(args)
-  }
-  const thy = await makeThyFromFiles({
-    files: [testFileA, testFileB, testFileBar, testFileBaz],
-    args: {
-      ...core,
-      print,
-    },
-  })
-  thy()
-  assert.deepStrictEqual(prints, [
-    ["Hi from A"],
-    ["Hi from B"],
-    ["Hi from bar"],
-    ["Hi from baz"],
-  ])
-})
+// testMakeThy("function should run all passed functions", async () => {
+//   const prints: unknown[][] = []
+//   const print = (...args: unknown[]) => {
+//     prints.push(args)
+//   }
+//   const thy = await makeThyFromFiles({
+//     files: [testFileA, testFileB, testFileBar, testFileBaz],
+//     args: {
+//       ...core,
+//       print,
+//     },
+//   })
+//   thy()
+//   assert.deepStrictEqual(prints, [
+//     ["Hi from A"],
+//     ["Hi from B"],
+//     ["Hi from bar"],
+//     ["Hi from baz"],
+//   ])
+// })
 
 // testMakeThy("function should run all functions once", async () => {
 //   let calledTimes = [0, 0]

@@ -13,6 +13,20 @@ test("interpretThyBlock() should return a function that can return a string", as
   assert.strictEqual(interpreted(), "himom")
 })
 
+test("interpretThyBlock() should properly process a block that explicitly exports", async () => {
+  const interpreted = interpretThyBlockSource(
+    `export a is\n  return 5\nprivate b is\n  return 2\nc is\n  return 3`,
+  )
+  assert.deepStrictEqual(interpreted(), { a: 5 })
+})
+
+test("interpretThyBlock() should properly process a block that implicitly exports", async () => {
+  const interpreted = interpretThyBlockSource(
+    `private a is\n  return 5\nb is\n  return 2`,
+  )
+  assert.deepStrictEqual(interpreted(), { b: 2 })
+})
+
 test("interpretThyBlock() should return a function that can return a parameter passed in", async () => {
   const interpreted = interpretThyBlockSource(`a is given\nreturn a`)
   assert.strictEqual(interpreted(42), 42)
@@ -126,9 +140,10 @@ test("interpretThyBlock() should return object of implicitly exported variables,
 })
 
 test("interpretThyBlock() should not return object of implicitly exported variables if let was used", async () => {
-  const interpreted = interpretThyBlockSource(`let f\na is f\nb is f`)
+  const interpreted = interpretThyBlockSource(`let f\na is g\nb is g`)
   const f = () => undefined
-  assert.deepStrictEqual(interpreted({ f }), undefined)
+  const g = () => 5
+  assert.deepStrictEqual(interpreted({ f, g }), undefined)
 })
 
 test("interpretThyBlock() should share mutable variable state", async () => {

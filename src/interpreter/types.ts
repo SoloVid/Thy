@@ -1,5 +1,5 @@
 import type { ReadSymbolTable } from "tree/symbol-table"
-import type { RuntimeValue } from "./dynamic-type"
+import type { RuntimeReturn, RuntimeValue } from "./dynamic-type"
 
 export type ThyBlockContext = {
   readonly argsToUse: RuntimeValue[]
@@ -14,5 +14,5 @@ export type ThyBlockContext = {
   stackTracePath: string
   /** Relative source file path for thy() call resolution. */
   readonly thyResolutionRelativePath: string
-  readonly resolveThy: (thyResolutionRelativePath: string, pathSpec: string) => RuntimeValue
+  readonly resolveThy: (thyResolutionRelativePath: string, pathSpec: string) => RuntimeReturn
 }

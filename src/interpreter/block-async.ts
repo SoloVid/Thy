@@ -2,7 +2,7 @@ import type { Block } from "tree"
 import type { BlockOptions } from "./block"
 import { throwTransformedError } from "./block-error-transformer"
 import { makeHelper } from "./block-helper"
-import type { RuntimeValue } from "./dynamic-type"
+import { forgetThisRuntimeFunctionIsAsync, type RuntimeFunction, type RuntimeFunctionAsync, type RuntimeValue } from "./dynamic-type"
 
 export function interpretThyAsyncBlock(
   functionName: string,
@@ -10,9 +10,7 @@ export function interpretThyAsyncBlock(
   options: BlockOptions,
 ) {
   const objWithBlockFunction: {
-    [functionName: string]: (
-      ...args: readonly RuntimeValue[]
-    ) => PromiseLike<RuntimeValue | undefined>
+    [functionName: string]: RuntimeFunctionAsync
   } = {
     [functionName]: async (...args) => {
       // Note: I moved this up out of the loop. Not sure if that is going to break stuff.
@@ -43,5 +41,5 @@ export function interpretThyAsyncBlock(
       return helper.formulateResult()
     },
   }
-  return objWithBlockFunction[functionName]
+  return forgetThisRuntimeFunctionIsAsync(objWithBlockFunction[functionName])
 }
