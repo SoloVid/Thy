@@ -1,14 +1,12 @@
 import { useEffect, useState } from "preact/hooks"
+import { AlertProvider, useAlerts } from "./alert-provider"
 import CodeInput from "./code-input"
 import { FileTree } from "./file/tree-ui/file-tree"
-import { InMemoryFiles, makeInMemoryFiles } from "./file/in-memory-files"
 import Menu from "./menu"
 import OutputContainer from "./output-container"
 import { useEditorPreferences } from "./preferences"
 import Resizer from "./resizer"
-import { getPersistedWorkspace } from "./source-code/persisted-workspace"
 import { useEditorState } from "./state"
-import { AlertProvider, useAlerts } from "./alert-provider"
 
 function PlaygroundContent() {
   useEffect(() => {
@@ -28,12 +26,6 @@ function PlaygroundContent() {
   })
   const editorHeight = Math.min(windowHeight, 500)
 
-  const [fs, setFs] = useState<InMemoryFiles>(() => {
-    const fs = makeInMemoryFiles(() => new Date().getTime())
-    fs.ingest(getPersistedWorkspace())
-    return fs
-  })
-
   const state = useEditorState()
   const [prefs, setPrefs] = useEditorPreferences()
 
@@ -47,7 +39,7 @@ function PlaygroundContent() {
   }
 
   function onFileSelect(path: string) {
-    fs.read(path).then(
+    state.fs.read(path).then(
       (s) => {
         if (!path.endsWith("/")) {
           state.setSourceCode({
@@ -99,7 +91,7 @@ function PlaygroundContent() {
       contents: s,
       language: "thy",
     })
-    fs.write(state.sourceCode.path, s).then(
+    state.fs.write(state.sourceCode.path, s).then(
       () => {
         // Do nothing.
       },
@@ -132,7 +124,7 @@ function PlaygroundContent() {
       <div
         style={`flex-grow: 1; height:100vh;height:${windowHeight}px;overflow: hidden; display: flex; flex-direction: column;`}
       >
-        <Menu fs={fs} state={state} toggleLeftPanel={toggleLeftPanel} />
+        <Menu fs={state.fs} state={state} toggleLeftPanel={toggleLeftPanel} />
         <div style={`flex-grow: 1;overflow: hidden; display: flex;`}>
           {prefs.leftOpen && (
             <>
@@ -140,7 +132,7 @@ function PlaygroundContent() {
                 style={`flex-shrink: 0; width: ${prefs.leftWidth}px; background-color: #272822; color: #ddd; padding: 10px;`}
               >
                 <FileTree
-                  fs={fs}
+                  fs={state.fs}
                   directory="/"
                   onSelect={onFileSelect}
                   onDelete={onFileDelete}

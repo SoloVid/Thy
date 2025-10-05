@@ -1,5 +1,6 @@
 // Implementation from https://github.com/jaredLunde/react-hook/blob/472fc4797dbd5a85fd87cb69a9c1ed8816367bf1/packages/size/src/index.tsx
 
+import type { RefObject } from "preact"
 import { useLayoutEffect, useState } from "preact/hooks"
 import useResizeObserver from "./resize-observer"
 
@@ -10,7 +11,7 @@ import useResizeObserver from "./resize-observer"
  * @param options Configures the initial width and initial height of the hook's state
  */
 const useSize = <T extends HTMLElement>(
-  target: React.RefObject<T> | T | null,
+  target: RefObject<T> | T | null,
   options?: UseSizeOptions,
 ): [number, number] => {
   const [size, setSize] = useState<[number, number]>(() => {

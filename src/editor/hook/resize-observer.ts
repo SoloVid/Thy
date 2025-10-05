@@ -3,6 +3,7 @@
 
 // Implementation from https://github.com/jaredLunde/react-hook/blob/472fc4797dbd5a85fd87cb69a9c1ed8816367bf1/packages/resize-observer/src/index.tsx
 
+import type { RefObject } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import useLatest from "./latest"
 
@@ -14,7 +15,7 @@ import useLatest from "./latest"
  *   the `target` resizes
  */
 function useResizeObserver<T extends Element>(
-  target: React.RefObject<T> | React.ForwardedRef<T> | T | null,
+  target: RefObject<T> | T | null,
   callback: UseResizeObserverCallback,
   options: UseResizeObserverOptions = {},
 ): ResizeObserver {

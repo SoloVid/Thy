@@ -1,7 +1,7 @@
-import { interpretThyBlockSource } from "interpreter/block"
+import { interpretThyWorkspace } from "interpreter/block"
 import { core } from "std-lib/core"
 import { dissectErrorTraceAtCloserBaseline } from "utils/error-helper"
-import { makeThyFilesApi } from "../file/files-api"
+import { FilesApi, makeThyFilesApi } from "../file/files-api"
 import { makeFileManager } from "../file/local-files"
 
 export type Output = {
@@ -13,13 +13,12 @@ export type Output = {
 export function makeRunner() {
   const rawFileManager = makeFileManager()
 
-  async function run(sourceCodeToRun: string): Promise<Output> {
+  async function run(fs: FilesApi, entrypoint: string): Promise<Output> {
     let error: null | string = null
     let returnValue: unknown = undefined
     let printedLines: string[] = []
     const errorHere = new Error()
     try {
-      const interpreted = interpretThyBlockSource(sourceCodeToRun)
       const playgroundLib = {
         ...core,
         print: (thing: unknown) => {
@@ -30,7 +29,7 @@ export function makeRunner() {
         fetch,
         file: makeThyFilesApi(rawFileManager),
       }
-      returnValue = await interpreted(playgroundLib)
+      returnValue = await interpretThyWorkspace(fs, entrypoint, playgroundLib)
     } catch (e) {
       console.error(e)
       if (e instanceof Error) {
