@@ -54,7 +54,7 @@ export const InlineRename = ({
         value={name}
         onInput={(e) => setName((e.target as HTMLInputElement).value)}
         onKeyDown={handleKeyDown}
-        onfocusout={() => onSave(name)}
+        onFocusOut={() => onSave(name)}
         class={renameInputStyles}
       />
       <div class={renameActionsStyles}>
