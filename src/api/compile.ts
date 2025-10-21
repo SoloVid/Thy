@@ -1,4 +1,4 @@
-import type { Compiler } from "../compiler"
+import type { Compiler } from "../compiler/compiler"
 import { asyncGlob } from "../utils/async-glob"
 import type { CompileOptions } from "./compile-options"
 import type { CompileResults, FileCompileResults } from "./compile-results"

@@ -4,8 +4,8 @@ import { expect } from "expect"
 import fs from "node:fs/promises"
 import path from "node:path"
 import type { CompileError } from "../../../common/compile-error"
-import type { Compiler } from "../../../compiler"
-import { makeCompiler } from "../../../compiler"
+import type { Compiler } from "../../../compiler/compiler"
+import { makeCompiler } from "../../../compiler/compiler"
 
 export const tsCoreCompiler = makeCompiler(
   tsGenerator(
