@@ -42,7 +42,9 @@ export function makeHelper(
     resolveThy: options.resolveThy,
   }
 
-  type IdeaResult = [shouldReturn: true, value: RuntimeValue] | [shouldReturn: false, value: RuntimeValue | undefined]
+  type IdeaResult =
+    | [shouldReturn: true, value: RuntimeValue]
+    | [shouldReturn: false, value: RuntimeValue | undefined]
   function evaluateStatement(idea: Idea): MayWait<IdeaResult> {
     if (
       idea.type === "blank-line" ||
@@ -57,7 +59,10 @@ export function makeHelper(
         interpretThyExpression(context, idea.args[0]),
         (ie) => {
           if (isVoid(ie.target)) {
-            throw makeInterpreterNodeError(idea.args[0], `void cannot be explicitly returned`)
+            throw makeInterpreterNodeError(
+              idea.args[0],
+              `void cannot be explicitly returned`,
+            )
           }
           return [true, ie.target]
         },
@@ -67,12 +72,15 @@ export function makeHelper(
       if (idea.call === null) {
         return notWait([false, undefined])
       }
-      return forwardWait(interpretThyCall(context, idea.call), (returnValue) => {
-        if (isVoid(returnValue)) {
-          return [false, undefined]
-        }
-        return [true, returnValue]
-      })
+      return forwardWait(
+        interpretThyCall(context, idea.call),
+        (returnValue) => {
+          if (isVoid(returnValue)) {
+            return [false, undefined]
+          }
+          return [true, returnValue]
+        },
+      )
     }
     return forwardWait(interpretThyStatement(context, idea), () => [
       false,

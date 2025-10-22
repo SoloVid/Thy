@@ -12,7 +12,9 @@ export type RuntimeReturn = RuntimeValue | RuntimeVoid
 export function isVoid(value: RuntimeReturn): value is RuntimeVoid {
   return value === runtimeVoid
 }
-export function assertNotVoid(value: RuntimeReturn): asserts value is RuntimeValue {
+export function assertNotVoid(
+  value: RuntimeReturn,
+): asserts value is RuntimeValue {
   if (isVoid(value)) {
     throw new Error("Unexpected void (undefined) value")
   }
@@ -30,7 +32,9 @@ export function yesIThinkThisIsRuntimeObject(
   return value as unknown as RuntimeObject
 }
 
-export type RuntimeFunction = (...args: readonly RuntimeValue[]) => RuntimeReturn
+export type RuntimeFunction = (
+  ...args: readonly RuntimeValue[]
+) => RuntimeReturn
 export type RuntimeFunctionAsync = (
   ...args: readonly RuntimeValue[]
 ) => PromiseLike<RuntimeReturn>

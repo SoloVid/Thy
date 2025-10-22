@@ -41,7 +41,7 @@ export function makeParserTestFixture(
     },
     addReference(reference) {
       references.push(reference)
-    }
+    },
   }
   return {
     errors,

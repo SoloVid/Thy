@@ -1,14 +1,14 @@
-import { parseAll } from "compiler/parse-workspace";
-import { FileBrowseApi } from "utils/fs/file-browse-api";
-import { BlockOptions } from "./block-options";
-import { makeInterpreterCompileError } from "./interpreter-error";
-import { makeThyResolver } from "./thy-resolver";
+import { parseAll } from "compiler/parse-workspace"
+import { FileBrowseApi } from "utils/fs/file-browse-api"
+import { BlockOptions } from "./block-options"
+import { makeInterpreterCompileError } from "./interpreter-error"
+import { makeThyResolver } from "./thy-resolver"
 
 export async function interpretThyWorkspace(
   workspaceBrowser: FileBrowseApi,
   entrypoint: string,
   globals: Record<string, unknown>,
-  options: Partial<BlockOptions> = {}
+  options: Partial<BlockOptions> = {},
 ): Promise<unknown> {
   const workspaceParseMap = await parseAll(workspaceBrowser, entrypoint)
   // TODO: Handle all errors instead of just one
@@ -20,7 +20,12 @@ export async function interpretThyWorkspace(
       throw makeInterpreterCompileError(error)
     }
   })
-  const parseMap = new Map([...workspaceParseMap.entries()].map(([path, parseResult]) => [path, parseResult.tree]))
+  const parseMap = new Map(
+    [...workspaceParseMap.entries()].map(([path, parseResult]) => [
+      path,
+      parseResult.tree,
+    ]),
+  )
   const resolver = makeThyResolver(parseMap, globals, {
     closure: options.closure ?? {},
     functionName: options.functionName,

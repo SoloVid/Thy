@@ -22,13 +22,20 @@ export interface ParseResult {
   // getAllErrors(): readonly CompileError[]
 }
 
-export async function parseAll(workspaceBrowser: FileBrowseApi, entrypoint: string) {
+export async function parseAll(
+  workspaceBrowser: FileBrowseApi,
+  entrypoint: string,
+) {
   const workspaceParseMap: Map<string, ParseResult> = new Map()
   await parseRecursive(workspaceParseMap, workspaceBrowser, entrypoint)
   return workspaceParseMap
 }
 
-async function parseRecursive(workspaceParseMap: Map<string, ParseResult>, workspaceBrowser: FileBrowseApi, entrypoint: string) {
+async function parseRecursive(
+  workspaceParseMap: Map<string, ParseResult>,
+  workspaceBrowser: FileBrowseApi,
+  entrypoint: string,
+) {
   if (workspaceParseMap.has(entrypoint)) {
     return
   }
@@ -39,7 +46,11 @@ async function parseRecursive(workspaceParseMap: Map<string, ParseResult>, works
   let nextDep = 1
   const references: ReferenceMap = {}
   for (const rawRef of parseResult.references) {
-    const expandedRefs = await resolvePathSpec(entrypoint, workspaceBrowser, rawRef)
+    const expandedRefs = await resolvePathSpec(
+      entrypoint,
+      workspaceBrowser,
+      rawRef,
+    )
     const dependencies: DependencySpec[] = []
     for (const expandedRef of expandedRefs) {
       dependencies.push({

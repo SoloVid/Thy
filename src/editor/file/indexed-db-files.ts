@@ -1,5 +1,5 @@
-import FS from '@isomorphic-git/lightning-fs';
-import type { FilesApi } from "./files-api";
+import FS from "@isomorphic-git/lightning-fs"
+import type { FilesApi } from "./files-api"
 
 export type IndexedDbFiles = FilesApi
 
@@ -23,19 +23,21 @@ export function makeIndexedDbFiles(storeName: string): IndexedDbFiles {
     },
     list: async (path) => {
       const childNames = await fs.promises.readdir(path.replace(/\/$/, ""))
-      return Promise.all(childNames.map(async c => {
-        const childPath = path + "/" + c
-        const stat = await fs.promises.stat(childPath)
-        return {
-          kind: stat.isDirectory() ? "directory" : "file",
-          name: c,
-          path: childPath + (stat.isDirectory() ? "/" : ""),
-          timeModified: stat.mtimeMs,
-          size: stat.size,
-        }
-      }))
+      return Promise.all(
+        childNames.map(async (c) => {
+          const childPath = path + "/" + c
+          const stat = await fs.promises.stat(childPath)
+          return {
+            kind: stat.isDirectory() ? "directory" : "file",
+            name: c,
+            path: childPath + (stat.isDirectory() ? "/" : ""),
+            timeModified: stat.mtimeMs,
+            size: stat.size,
+          }
+        }),
+      )
     },
-    mkdir: async (path)  => {
+    mkdir: async (path) => {
       await fs.promises.mkdir(path)
     },
     rename: async (oldPath, newPath) => {
@@ -44,6 +46,6 @@ export function makeIndexedDbFiles(storeName: string): IndexedDbFiles {
     },
     delete: async (path) => {
       await fs.promises.unlink(path.replace(/\/$/, ""))
-    }
+    },
   }
 }

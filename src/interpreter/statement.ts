@@ -1,7 +1,11 @@
 import { Assignment, Call, isCall, isDeclaration } from "tree"
 import { forwardWait, MayWait, notWait, yesWait } from "./async-helper"
 import { interpretThyCall } from "./call"
-import { isVoid, RuntimeObject, yesIThinkThisIsRuntimeObject } from "./dynamic-type"
+import {
+  isVoid,
+  RuntimeObject,
+  yesIThinkThisIsRuntimeObject,
+} from "./dynamic-type"
 import { interpretThyValuePropertyAccessExceptLeaf } from "./expression"
 import { makeInterpreterNodeError } from "./interpreter-error"
 import type { ThyBlockContext } from "./types"
@@ -29,7 +33,10 @@ export function interpretThyStatement(
   return forwardWait(callResult, (newValue) => {
     if (assignmentDetails) {
       if (isVoid(newValue)) {
-        throw makeInterpreterNodeError(idea, `void return cannot be assigned to ${assignmentDetails.variableName}`)
+        throw makeInterpreterNodeError(
+          idea,
+          `void return cannot be assigned to ${assignmentDetails.variableName}`,
+        )
       }
       assignmentDetails.variableMap[assignmentDetails.variableName] = newValue
     }
@@ -44,9 +51,12 @@ async function interpretThyAssignmentAsync(
   const callResult = interpretThyCall(context, idea.call)
   const newValue = callResult.wait ? await callResult.promise : callResult.value
   if (assignmentDetails) {
-      if (isVoid(newValue)) {
-        throw makeInterpreterNodeError(idea, `void return cannot be assigned to ${assignmentDetails.variableName}`)
-      }
+    if (isVoid(newValue)) {
+      throw makeInterpreterNodeError(
+        idea,
+        `void return cannot be assigned to ${assignmentDetails.variableName}`,
+      )
+    }
     assignmentDetails.variableMap[assignmentDetails.variableName] = newValue
   }
 }

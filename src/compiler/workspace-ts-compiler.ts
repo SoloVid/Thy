@@ -19,32 +19,48 @@ export async function compileWorkspaceTs(options: Options) {
   const importName = stdLib.importName
   const inputFileBrowser = makeNodeFileBrowser(options.inputDirectory)
   const parseResultMap = await parseAll(inputFileBrowser, options.entrypoint)
-  await Promise.all([...parseResultMap.entries()].map(([name, parseResult]) => {
-    const generator = tsGenerator(
-      stdLib.specializedGenerators,
-      [`import { makeThyExport as _makeExport } from "thy-lang/std-lib"`,
-        `import { ${importName} as _${importName} } from "${stdLib.importPath}"`,
-        ...Object.values(parseResult.references).map(dependencies => dependencies.map(dep => `import ${dep.suggestedName} from "./${relative(dirname(join(options.inputDirectory, name)), join(options.inputDirectory, dep.id))}"`)).flat(),
-  ``,
-`const _depMap = {`,
-...Object.entries(parseResult.references).map(([pattern, dependencies]) => [
-`  "${pattern}": [`,
-...dependencies.map(dep => [
-`    {`,
-`      id: "${dep.id}",`,
-`      init: ${dep.suggestedName},`,
-`    },`,
-].join("\n")),
-`  ],`
-].join("\n")),
-`} as const`,
-``,
-  `export default _makeExport(_${importName}, _depMap, `].join("\n"),
-      `)\n`,
-      false,
-    )
-    const generatorResult = generator(parseResult.tree)
-    const outputFile = join(options.outputDirectory, `${name}.ts`)
-    return writeFile(outputFile, generatorResult.output)
-  }))
+  await Promise.all(
+    [...parseResultMap.entries()].map(([name, parseResult]) => {
+      const generator = tsGenerator(
+        stdLib.specializedGenerators,
+        [
+          `import { makeThyExport as _makeExport } from "thy-lang/std-lib"`,
+          `import { ${importName} as _${importName} } from "${stdLib.importPath}"`,
+          ...Object.values(parseResult.references)
+            .map((dependencies) =>
+              dependencies.map(
+                (dep) =>
+                  `import ${dep.suggestedName} from "./${relative(dirname(join(options.inputDirectory, name)), join(options.inputDirectory, dep.id))}"`,
+              ),
+            )
+            .flat(),
+          ``,
+          `const _depMap = {`,
+          ...Object.entries(parseResult.references).map(
+            ([pattern, dependencies]) =>
+              [
+                `  "${pattern}": [`,
+                ...dependencies.map((dep) =>
+                  [
+                    `    {`,
+                    `      id: "${dep.id}",`,
+                    `      init: ${dep.suggestedName},`,
+                    `    },`,
+                  ].join("\n"),
+                ),
+                `  ],`,
+              ].join("\n"),
+          ),
+          `} as const`,
+          ``,
+          `export default _makeExport(_${importName}, _depMap, `,
+        ].join("\n"),
+        `)\n`,
+        false,
+      )
+      const generatorResult = generator(parseResult.tree)
+      const outputFile = join(options.outputDirectory, `${name}.ts`)
+      return writeFile(outputFile, generatorResult.output)
+    }),
+  )
 }

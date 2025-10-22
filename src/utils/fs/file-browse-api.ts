@@ -1,4 +1,3 @@
-
 export type NameFileEntry = {
   isDirectory: boolean
   name: string

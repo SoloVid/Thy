@@ -15,7 +15,7 @@ import {
   RuntimeReturn,
   RuntimeValue,
   yesIThinkThisIsRuntimeObject,
-  yesThisValueIsForRuntime
+  yesThisValueIsForRuntime,
 } from "./dynamic-type"
 import { makeInterpreterNodeError } from "./interpreter-error"
 import { interpretThyString } from "./string"
@@ -152,11 +152,16 @@ export function interpretThyValuePropertyAccessExceptLeaf(
   const baseValueResult = interpretThyExpression(context, thyExpression.base)
   return forwardWait(baseValueResult, (value) => {
     if (isVoid(value.target)) {
-      throw makeInterpreterNodeError(thyExpression.base, `void cannot be used as base of property access`)
+      throw makeInterpreterNodeError(
+        thyExpression.base,
+        `void cannot be used as base of property access`,
+      )
     }
-    return interpretThyValuePropertyAccessExceptLeafSync(thyExpression, value.target)
-  },
-  )
+    return interpretThyValuePropertyAccessExceptLeafSync(
+      thyExpression,
+      value.target,
+    )
+  })
 }
 
 type MostlyAccessed = {

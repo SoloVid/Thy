@@ -11,7 +11,7 @@ export async function compileTs() {
       ".md": "text",
     },
     alias: {
-      "react": "preact/compat",
+      react: "preact/compat",
       "react-dom": "preact/compat",
     },
     bundle: true,

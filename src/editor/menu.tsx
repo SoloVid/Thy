@@ -29,8 +29,12 @@ export default function Menu({ fs, state, toggleLeftPanel }: MenuProps) {
   const fileMan = useLocalFiles(rawFileManager)
   const alerts = useAlerts()
   const [workspaceBrowserOpen, setWorkspaceBrowserOpen] = useState(false)
-  const [workspaceBrowserMode, setWorkspaceBrowserMode] = useState<"load" | "save">("load")
-  const [currentWorkspacePath, setCurrentWorkspacePath] = useState<string | undefined>(undefined)
+  const [workspaceBrowserMode, setWorkspaceBrowserMode] = useState<
+    "load" | "save"
+  >("load")
+  const [currentWorkspacePath, setCurrentWorkspacePath] = useState<
+    string | undefined
+  >(undefined)
   const [indexedDbFs] = useState(() => makeIndexedDbFiles("workspaces"))
 
   const handleSaveWorkspace = () => {
@@ -43,7 +47,10 @@ export default function Menu({ fs, state, toggleLeftPanel }: MenuProps) {
     setWorkspaceBrowserOpen(true)
   }
 
-  const handleWorkspaceSelected = async (path: string, workspace: SerializedWorkspace) => {
+  const handleWorkspaceSelected = async (
+    path: string,
+    workspace: SerializedWorkspace,
+  ) => {
     setWorkspaceBrowserOpen(false)
     setCurrentWorkspacePath(path)
 
@@ -51,7 +58,7 @@ export default function Menu({ fs, state, toggleLeftPanel }: MenuProps) {
       try {
         // Ingest the workspace
         fs.ingest(workspace)
-        
+
         // If there's a main.thy file, open it by default
         if (await fs.exists("/main.thy")) {
           const contents = await fs.read("/main.thy")
@@ -63,10 +70,10 @@ export default function Menu({ fs, state, toggleLeftPanel }: MenuProps) {
         } else {
           // Otherwise, try to find any .thy file to open
           const entries = await fs.list("/")
-          const thyFile = entries.find(entry => 
-            entry.kind === "file" && entry.name.endsWith(".thy")
+          const thyFile = entries.find(
+            (entry) => entry.kind === "file" && entry.name.endsWith(".thy"),
           )
-          
+
           if (thyFile) {
             const contents = await fs.read(`/${thyFile.name}`)
             state.setSourceCode({
@@ -83,7 +90,7 @@ export default function Menu({ fs, state, toggleLeftPanel }: MenuProps) {
             })
           }
         }
-        
+
         alerts.showToast(`Loaded workspace from ${path}`, "success")
       } catch (error) {
         alerts.showAlert(`Failed to load workspace: ${error}`)
@@ -96,25 +103,13 @@ export default function Menu({ fs, state, toggleLeftPanel }: MenuProps) {
   return (
     <div>
       <div className="button-panel">
-        <a
-          onClick={toggleLeftPanel}
-          className="button"
-          title="Show files"
-        >
+        <a onClick={toggleLeftPanel} className="button" title="Show files">
           <FontAwesomeIcon icon={faBars} />
         </a>
-        <a
-          onClick={handleSaveWorkspace}
-          className="button"
-          title="Save"
-        >
+        <a onClick={handleSaveWorkspace} className="button" title="Save">
           <FontAwesomeIcon icon={faFloppyDisk} />
         </a>
-        <a
-          onClick={handleLoadWorkspace}
-          className="button"
-          title="Load"
-        >
+        <a onClick={handleLoadWorkspace} className="button" title="Load">
           <FontAwesomeIcon icon={faFolderOpen} />
         </a>
         <a

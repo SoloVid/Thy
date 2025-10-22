@@ -49,7 +49,7 @@ export function WorkspaceBrowser({
       setCurrentDirectory("/")
       setSelectedEntry(currentPath || null)
       setNewWorkspaceName(
-        currentPath ? currentPath.split("/").pop() || "workspace" : "workspace"
+        currentPath ? currentPath.split("/").pop() || "workspace" : "workspace",
       )
       loadEntries("/")
     }
@@ -58,11 +58,12 @@ export function WorkspaceBrowser({
   const loadEntries = async (directory: string) => {
     try {
       const list = await indexedDbFs.list(directory)
-      const dirPath = directory.endsWith('/') ? directory : `${directory}/`
+      const dirPath = directory.endsWith("/") ? directory : `${directory}/`
       const mappedEntries: WorkspaceEntry[] = list.map((entry) => ({
-        path: directory === "/" 
-          ? `/${entry.name}${entry.kind === "directory" ? "/" : ""}`
-          : `${dirPath}${entry.name}${entry.kind === "directory" ? "/" : ""}`,
+        path:
+          directory === "/"
+            ? `/${entry.name}${entry.kind === "directory" ? "/" : ""}`
+            : `${dirPath}${entry.name}${entry.kind === "directory" ? "/" : ""}`,
         name: entry.name,
         isDirectory: entry.kind === "directory",
       }))
@@ -88,8 +89,8 @@ export function WorkspaceBrowser({
       setSelectedEntry(entry.path)
       if (mode === "save") {
         // Extract filename without extension for editing
-        const filename = entry.name.endsWith('.json') 
-          ? entry.name.substring(0, entry.name.length - 5) 
+        const filename = entry.name.endsWith(".json")
+          ? entry.name.substring(0, entry.name.length - 5)
           : entry.name
         setNewWorkspaceName(filename)
       }
@@ -124,10 +125,16 @@ export function WorkspaceBrowser({
 
     // Determine the save path
     let savePath: string
-    if (selectedEntry && !entries.find(e => e.path === selectedEntry)?.isDirectory) {
+    if (
+      selectedEntry &&
+      !entries.find((e) => e.path === selectedEntry)?.isDirectory
+    ) {
       // If an entry is selected but we're using a new name, create a new file
-      const selectedDir = selectedEntry.substring(0, selectedEntry.lastIndexOf('/') + 1)
-      if (newWorkspaceName !== selectedEntry.split('/').pop()) {
+      const selectedDir = selectedEntry.substring(
+        0,
+        selectedEntry.lastIndexOf("/") + 1,
+      )
+      if (newWorkspaceName !== selectedEntry.split("/").pop()) {
         savePath = `${selectedDir}${newWorkspaceName}`
       } else {
         // Use the selected entry path if name hasn't changed
@@ -135,10 +142,15 @@ export function WorkspaceBrowser({
       }
     } else {
       // Create a new file in the current directory
-      const dirPath = currentDirectory.endsWith('/') ? currentDirectory : `${currentDirectory}/`
-      savePath = dirPath === '/' ? `/${newWorkspaceName}` : `${dirPath}${newWorkspaceName}`
+      const dirPath = currentDirectory.endsWith("/")
+        ? currentDirectory
+        : `${currentDirectory}/`
+      savePath =
+        dirPath === "/"
+          ? `/${newWorkspaceName}`
+          : `${dirPath}${newWorkspaceName}`
     }
-    
+
     // Ensure .json extension
     if (!savePath.endsWith(".json")) {
       savePath += ".json"
@@ -149,7 +161,7 @@ export function WorkspaceBrowser({
       const exists = await indexedDbFs.exists(savePath)
       if (exists) {
         const confirmed = await alerts.confirm(
-          `Workspace "${savePath}" already exists. Overwrite?`
+          `Workspace "${savePath}" already exists. Overwrite?`,
         )
         if (!confirmed) return
       }
@@ -157,7 +169,7 @@ export function WorkspaceBrowser({
       // Save the workspace
       await indexedDbFs.write(
         savePath,
-        JSON.stringify(currentWorkspace, null, 2)
+        JSON.stringify(currentWorkspace, null, 2),
       )
       alerts.showToast(`Workspace saved to ${savePath}`, "success")
       onSelect(savePath, currentWorkspace)
@@ -185,11 +197,12 @@ export function WorkspaceBrowser({
     const folderName = await alerts.prompt("Enter folder name:")
     if (!folderName) return
 
-    const dirPath = currentDirectory.endsWith('/') ? currentDirectory : `${currentDirectory}/`
-    const folderPath = currentDirectory === "/" 
-      ? `/${folderName}/` 
-      : `${dirPath}${folderName}/`
-    
+    const dirPath = currentDirectory.endsWith("/")
+      ? currentDirectory
+      : `${currentDirectory}/`
+    const folderPath =
+      currentDirectory === "/" ? `/${folderName}/` : `${dirPath}${folderName}/`
+
     try {
       await indexedDbFs.mkdir(folderPath)
       loadEntries(currentDirectory)
@@ -201,12 +214,12 @@ export function WorkspaceBrowser({
   // Handle navigation to parent directory
   const navigateUp = () => {
     if (currentDirectory === "/") return
-    
+
     const parentDir = currentDirectory.substring(
       0,
-      currentDirectory.lastIndexOf("/", currentDirectory.length - 2) + 1
+      currentDirectory.lastIndexOf("/", currentDirectory.length - 2) + 1,
     )
-    
+
     setCurrentDirectory(parentDir || "/")
     loadEntries(parentDir || "/")
   }
@@ -234,7 +247,7 @@ export function WorkspaceBrowser({
           <FontAwesomeIcon
             icon={faTimes}
             onClick={onClose}
-            style={{cursor: "pointer"}}
+            style={{ cursor: "pointer" }}
           />
         </div>
 
@@ -276,7 +289,7 @@ export function WorkspaceBrowser({
               >
                 <FontAwesomeIcon
                   icon={entry.isDirectory ? faFolderOpen : faFloppyDisk}
-                  style={{"margin-right": "10px"}}
+                  style={{ "margin-right": "10px" }}
                 />
                 <span style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                   {entry.name}

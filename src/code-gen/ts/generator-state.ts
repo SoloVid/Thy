@@ -129,8 +129,7 @@ export function makeGeneratorState(
       ? {
           get variableName() {
             if (cachedImplicitArgumentsVariableName === null) {
-              cachedImplicitArgumentsVariableName =
-                getUniqueVariableName()
+              cachedImplicitArgumentsVariableName = getUniqueVariableName()
             }
             return cachedImplicitArgumentsVariableName
           },

@@ -20,7 +20,9 @@ export function valueIdentifierGeneratorTs(
 }
 
 export function makeValueIdentifierTsGenerator(
-  specializations: CodeGeneratorFunc<ValueIdentifier | SpecialValueIdentifier>[],
+  specializations: CodeGeneratorFunc<
+    ValueIdentifier | SpecialValueIdentifier
+  >[],
 ): CodeGeneratorFunc<TreeNode> {
   return makeGenerator(
     (node) => {

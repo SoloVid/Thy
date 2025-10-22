@@ -35,9 +35,7 @@ export function interpretThyBlockSource(
 export function interpretThyBlockNode(
   block: Block,
   options: BlockOptions,
-): (
-  ...args: readonly RuntimeValue[]
-) => RuntimeReturn {
+): (...args: readonly RuntimeValue[]) => RuntimeReturn {
   const functionName = options.functionName ?? "<anonymous>"
 
   if (block.isAsync) {

@@ -13,7 +13,7 @@ export const tsCoreCompiler = makeCompiler(
       importPath: "thy-lang/std-lib",
       importName: "core",
       specializedGenerators: standardLibraryCore,
-    }
+    },
   }),
 )
 

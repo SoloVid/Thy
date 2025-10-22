@@ -27,24 +27,36 @@ export type ThyCacheInit<T> = (cache: ThyCache) => T
 /**
  *
  * @param id Canonical ID of dependency.
- * @param cache 
+ * @param cache
  * @param init Initialization function for obtaining the dependency.
- * @returns 
+ * @returns
  */
-export function resolveThy<T>(id: string, cache: ThyCache, init: ThyCacheInit<T>): T {
+export function resolveThy<T>(
+  id: string,
+  cache: ThyCache,
+  init: ThyCacheInit<T>,
+): T {
   if (cache.mine.has(id)) {
     return cache.mine as T
   }
   return resolveForMe(id, cache, init)
 }
 
-function resolveForMe<T>(id: string, cache: ThyCache, init: ThyCacheInit<T>): T {
+function resolveForMe<T>(
+  id: string,
+  cache: ThyCache,
+  init: ThyCacheInit<T>,
+): T {
   const newThing = resolveUncached(id, cache, init)
   cache.mine.set(id, newThing)
   return newThing
 }
 
-function resolveUncached<T>(id: string, cache: ThyCache, init: ThyCacheInit<T>): T {
+function resolveUncached<T>(
+  id: string,
+  cache: ThyCache,
+  init: ThyCacheInit<T>,
+): T {
   if (cache.inherit) {
     const filter = findRule(id, cache.inherit)
     if (filter?.useParent) {

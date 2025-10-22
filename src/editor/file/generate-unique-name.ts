@@ -1,10 +1,10 @@
-import { FilesApi } from "./files-api";
+import { FilesApi } from "./files-api"
 
 export const generateUniqueName = async (
   fs: FilesApi,
   directory: string,
   baseName: string,
-  isDirectory: boolean
+  isDirectory: boolean,
 ): Promise<string> => {
   // For directories, we need to handle the trailing slash in the check
   const checkPath = (name: string) => {

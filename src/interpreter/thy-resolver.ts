@@ -17,12 +17,22 @@ export function makeThyResolver(
     mine: new Map(),
     inherit: null,
   }
-  const resolveFunction = (thyResolutionRelativePath: string, pathSpec: string) => {
-    const resolvedPaths = resolvePathSpecSync(thyResolutionRelativePath, knownFilePaths, pathSpec)
+  const resolveFunction = (
+    thyResolutionRelativePath: string,
+    pathSpec: string,
+  ) => {
+    const resolvedPaths = resolvePathSpecSync(
+      thyResolutionRelativePath,
+      knownFilePaths,
+      pathSpec,
+    )
     // console.log(resolvedPaths)
-    assert(resolvedPaths.length > 0, `thy "${pathSpec}" did not resolve from ${thyResolutionRelativePath}`)
-    const resolvedValues = resolvedPaths.map(
-      p => resolveThy(p, cache, (c) => {
+    assert(
+      resolvedPaths.length > 0,
+      `thy "${pathSpec}" did not resolve from ${thyResolutionRelativePath}`,
+    )
+    const resolvedValues = resolvedPaths.map((p) =>
+      resolveThy(p, cache, (c) => {
         const tree = parseMap.get(p)
         assert(!!tree, `${p} should be parsed`)
         const interpreted = interpretThyBlockNode(tree, {
@@ -34,7 +44,7 @@ export function makeThyResolver(
           resolveThy: resolveFunction,
         })
         return interpreted(yesThisValueIsForRuntime(globals))
-      })
+      }),
     )
     if (resolvedValues.length === 1) {
       return resolvedValues[0]
@@ -42,6 +52,6 @@ export function makeThyResolver(
     return runtimeVoid
   }
   return {
-    resolveThy: resolveFunction
+    resolveThy: resolveFunction,
   }
 }

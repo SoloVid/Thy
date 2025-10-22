@@ -1,7 +1,19 @@
 import { getFirstToken } from "parser/helper"
 import type { AwaitCall, Call, GivenCall, TreeNode, ValueCall } from "tree"
-import { forwardWait, MayWait, NotWait, notWait, yesWait, YesWait } from "./async-helper"
-import { isVoid, RuntimeReturn, RuntimeValue, yesIThinkThisIsRuntimeFunction } from "./dynamic-type"
+import {
+  forwardWait,
+  MayWait,
+  NotWait,
+  notWait,
+  yesWait,
+  YesWait,
+} from "./async-helper"
+import {
+  isVoid,
+  RuntimeReturn,
+  RuntimeValue,
+  yesIThinkThisIsRuntimeFunction,
+} from "./dynamic-type"
 import { InterpretedExpression, interpretThyExpression } from "./expression"
 import {
   InterpreterErrorWithContext,
@@ -34,7 +46,10 @@ export function interpretThyCall(
 
   const ie = fr.value
   if (isVoid(ie.target)) {
-    throw makeInterpreterNodeError(call.func, `void cannot be called as a function`)
+    throw makeInterpreterNodeError(
+      call.func,
+      `void cannot be called as a function`,
+    )
   }
   const f = yesIThinkThisIsRuntimeFunction(ie.target)
 
@@ -86,7 +101,10 @@ function interpretThyGivenCall(
     if (context.argsToUse.length === 0) {
       return forwardWait(eResult, (e) => {
         if (isVoid(e.target)) {
-          throw makeInterpreterNodeError(defaultValueNode, `void cannot be used as argument to "given"`)
+          throw makeInterpreterNodeError(
+            defaultValueNode,
+            `void cannot be used as argument to "given"`,
+          )
         }
         return e.target
       })
@@ -129,7 +147,7 @@ function interpretThyThyCall(
   context: ThyBlockContext,
   call: ThyCall,
 ): NotWait<RuntimeReturn> {
-  const target = call.args[0].parts.map(p => p.token.text).join("")
+  const target = call.args[0].parts.map((p) => p.token.text).join("")
   const result = context.resolveThy(context.thyResolutionRelativePath, target)
   return notWait(result)
 }
@@ -155,7 +173,10 @@ export async function interpretThyValueCallAsync(
 ): Promise<RuntimeReturn> {
   const functionName = call.funcToken?.text ?? "<anonymous>"
   if (isVoid(ie.target)) {
-    throw makeInterpreterNodeError(call.func, `${functionName} is not a function but is void`)
+    throw makeInterpreterNodeError(
+      call.func,
+      `${functionName} is not a function but is void`,
+    )
   }
   const f = yesIThinkThisIsRuntimeFunction(ie.target)
   if (!(typeof f === "function")) {
@@ -173,7 +194,10 @@ export async function interpretThyValueCallAsync(
       ? await callArgInterpResult.promise
       : callArgInterpResult.value
     if (isVoid(value.target)) {
-      throw makeInterpreterNodeError(arg, `void cannot be used as call argument`)
+      throw makeInterpreterNodeError(
+        arg,
+        `void cannot be used as call argument`,
+      )
     }
     callArgs.push(value.target)
   }

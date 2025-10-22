@@ -14,5 +14,8 @@ export type ThyBlockContext = {
   stackTracePath: string
   /** Relative source file path for thy() call resolution. */
   readonly thyResolutionRelativePath: string
-  readonly resolveThy: (thyResolutionRelativePath: string, pathSpec: string) => RuntimeReturn
+  readonly resolveThy: (
+    thyResolutionRelativePath: string,
+    pathSpec: string,
+  ) => RuntimeReturn
 }

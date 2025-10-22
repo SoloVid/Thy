@@ -10,10 +10,7 @@ import { useAlerts } from "editor/alert-provider"
 import { useMemo, useState } from "preact/hooks"
 import { stringifyError } from "utils/stringify-error"
 import { css } from "../../component/css"
-import {
-  FileTreeNodeList,
-  FileTreeNodeProps,
-} from "./file-tree"
+import { FileTreeNodeList, FileTreeNodeProps } from "./file-tree"
 import { generateUniqueName } from "../generate-unique-name"
 import { InlineRename } from "./rename"
 import { actionStyle } from "./shared-style"
@@ -44,14 +41,17 @@ export const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
 
   const handleDelete = (e: MouseEvent) => {
     e.stopPropagation()
-    alerts.confirm(`Delete ${node.name}?`).then(async (confirmed) => {
-      if (confirmed) {
-        await fs.delete(node.path)
-        restProps.onDelete(node.path)
-      }
-    }, (e) => {
-      alerts.showAlert(`Failed to delete ${node.path}:` + stringifyError(e))
-    })
+    alerts.confirm(`Delete ${node.name}?`).then(
+      async (confirmed) => {
+        if (confirmed) {
+          await fs.delete(node.path)
+          restProps.onDelete(node.path)
+        }
+      },
+      (e) => {
+        alerts.showAlert(`Failed to delete ${node.path}:` + stringifyError(e))
+      },
+    )
   }
 
   const handleStartRename = (e: MouseEvent) => {

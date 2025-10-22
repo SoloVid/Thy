@@ -8,7 +8,10 @@ import { type GeneratorState } from "../generator-state"
 import { generateTypeArgsTs } from "../type/generate-type-args-ts"
 import { separateSnippetsWithCommas } from "../utils/comma-separated-snippets"
 import { trace } from "../utils/debug"
-import { generateCallTsInTypeContext, generateValueCallPartsTs } from "./generate-call-ts"
+import {
+  generateCallTsInTypeContext,
+  generateValueCallPartsTs,
+} from "./generate-call-ts"
 
 export type SpecialVanillaCall = ThyCall
 

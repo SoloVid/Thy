@@ -6,11 +6,14 @@ import { FileBrowseApi } from "./file-browse-api"
 // From https://stackoverflow.com/a/45242825/4639640
 function isPathInside(rootDirectory: string, otherPath: string) {
   const relative = path.relative(rootDirectory, otherPath)
-  return !relative.startsWith('..') && !path.isAbsolute(relative)
+  return !relative.startsWith("..") && !path.isAbsolute(relative)
 }
 
 function assertPathInside(rootDirectory: string, relativePath: string) {
-  assert(isPathInside(rootDirectory, path.join(rootDirectory, relativePath)), `${relativePath} is not inside directory ${rootDirectory}`)
+  assert(
+    isPathInside(rootDirectory, path.join(rootDirectory, relativePath)),
+    `${relativePath} is not inside directory ${rootDirectory}`,
+  )
 }
 
 export function makeNodeFileBrowser(rootDirectory: string): FileBrowseApi {
@@ -21,8 +24,10 @@ export function makeNodeFileBrowser(rootDirectory: string): FileBrowseApi {
     },
     async list(relativePath) {
       assertPathInside(rootDirectory, relativePath)
-      const listing = await readdir(path.join(rootDirectory, relativePath), { withFileTypes: true })
-      return listing.map(e => ({
+      const listing = await readdir(path.join(rootDirectory, relativePath), {
+        withFileTypes: true,
+      })
+      return listing.map((e) => ({
         isDirectory: e.isDirectory(),
         name: e.name,
       }))
