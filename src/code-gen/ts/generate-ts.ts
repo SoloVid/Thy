@@ -1,3 +1,4 @@
+import { nodeToString } from "code-gen/utils/to-string"
 import { nodeError } from "common/compile-error"
 import type { TreeNode } from "tree"
 import type {
@@ -15,6 +16,7 @@ import { tryGenerateAwaitCallTs } from "./call/generate-await-call-ts"
 import { valueCallGeneratorTs } from "./call/generate-call-ts"
 import { tryGenerateGivenCallTs } from "./call/generate-given-call-ts"
 import { tryGenerateReturnTs } from "./call/generate-return-ts"
+import { tryGenerateSpecialVanillaCallTs } from "./call/generate-special-vanilla-call-ts"
 import { tryGenerateNumberTs } from "./expression/generate-number-ts"
 import {
   typePropertyAccessGeneratorTs,
@@ -33,7 +35,7 @@ import {
   makeGenerator,
   makeGeneratorWithFixtureSideCar,
 } from "./generate-from-options"
-import { ContextType, contextType } from "./generator-context"
+import { contextType } from "./generator-context"
 import { GeneratorState, makeGeneratorState } from "./generator-state"
 import type { LibraryGeneratorCollection } from "./library-generator"
 import type { GeneratorFixture } from "./ts-generator"
@@ -46,7 +48,6 @@ import {
 import { tryGenerateTypeGivenCallTs } from "./type/generate-type-given-call-ts"
 import { autoTightS } from "./utils/auto-tight"
 import { trace } from "./utils/debug"
-import { nodeToString } from "code-gen/utils/to-string"
 
 export const tsGenerator =
   (
@@ -109,6 +110,7 @@ export const tsGenerator =
         typePropertyAccessGeneratorTs(standardLibrary),
         tryGenerateAwaitCallTs,
         tryGenerateGivenCallTs,
+        tryGenerateSpecialVanillaCallTs,
         valueCallGeneratorTs(standardLibrary),
         typeCallGeneratorTs(standardLibrary),
         tryGenerateTypeGivenCallTs,

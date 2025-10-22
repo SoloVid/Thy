@@ -11,6 +11,7 @@ import type { CodeGeneratorFunc, GeneratorFixture } from "../ts-generator"
 import { generateTypeArgsTs } from "../type/generate-type-args-ts"
 import { separateSnippetsWithCommas } from "../utils/comma-separated-snippets"
 import { trace } from "../utils/debug"
+import { SpecialVanillaCall } from "./generate-special-vanilla-call-ts"
 
 export function valueCallGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,
@@ -57,7 +58,7 @@ export function generateValueCallTs(
 }
 
 export function generateCallTsInTypeContext(
-  call: ValueCall | TypeCall,
+  call: ValueCall | SpecialVanillaCall | TypeCall,
   state: GeneratorState,
   fixture: GeneratorFixture,
   callName?: string,
@@ -103,20 +104,20 @@ export function generateCallTsInTypeContext(
   ])
 }
 
-function generateCallPartsTs(
-  call: ValueCall | TypeCall,
+export function generateCallPartsTs(
+  call: ValueCall | SpecialVanillaCall | TypeCall,
   state: GeneratorState,
   fixture: GeneratorFixture,
 ) {
-  if (call.type === "value-call") {
+  if (call.type === "value-call" || call.type === "thy-call") {
     return generateValueCallPartsTs(call, state, fixture)
   } else {
     return generateTypeCallPartsTs(call, state, fixture)
   }
 }
 
-function generateValueCallPartsTs(
-  call: ValueCall,
+export function generateValueCallPartsTs(
+  call: ValueCall | SpecialVanillaCall,
   state: GeneratorState,
   fixture: GeneratorFixture,
 ) {
@@ -144,7 +145,7 @@ function generateValueCallPartsTs(
   }
 }
 
-function generateTypeCallPartsTs(
+export function generateTypeCallPartsTs(
   call: TypeCall,
   state: GeneratorState,
   fixture: GeneratorFixture,

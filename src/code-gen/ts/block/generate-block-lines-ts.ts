@@ -50,7 +50,7 @@ export function generateBlockExplicitLinesTs(
       const collapsedLine: GeneratedSnippet[] = [l].flat(
         Infinity as 1,
       ) as GeneratedSnippet[]
-      const maybeNewLine = { text: "\n" } // i < ideas.length - 1 ? { text: "\n" } : { text: "" }
+      const maybeNewLine = idea.type !== "blank-line" || ideas.slice(i + 1).some(idea2 => idea2.type !== "blank-line") ? { text: "\n" } : { text: "" }
       if (collapsedLine.length === 0) {
         return [maybeNewLine]
       }

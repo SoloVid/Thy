@@ -1,4 +1,4 @@
-import { tsGenerator } from "code-gen/ts/generate-ts"
+import { makeSingleFileTsGenerator } from "code-gen/ts/single-file-ts-generator"
 import { standardLibraryCore } from "code-gen/ts/standard-library/core"
 import { expect } from "expect"
 import fs from "node:fs/promises"
@@ -8,15 +8,13 @@ import type { Compiler } from "../../../compiler/compiler"
 import { makeCompiler } from "../../../compiler/compiler"
 
 export const tsCoreCompiler = makeCompiler(
-  tsGenerator(
-    standardLibraryCore,
-    `import type { Core } from "thy-lang/std-lib"
-
-export function initThy(_global: Core) {
-`,
-    "\n}\n",
-    true,
-  ),
+  makeSingleFileTsGenerator({
+    standardLibrary: {
+      importPath: "thy-lang/std-lib",
+      importName: "core",
+      specializedGenerators: standardLibraryCore,
+    }
+  }),
 )
 
 export async function compileAndVerifyOutput(

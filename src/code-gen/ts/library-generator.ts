@@ -9,6 +9,7 @@ import type {
   ValuePropertyAccess,
 } from "tree"
 import { fromNode } from "../utils/from-node"
+import type { SpecialValueIdentifier } from "./expression/generate-value-identifier-ts"
 import type {
   GeneratorForNameParentSpec,
   GeneratorForNameSpec,
@@ -18,7 +19,7 @@ import type { CodeGeneratorFunc } from "./ts-generator"
 
 export interface LibraryGeneratorCollection {
   valueIdentifierGenerator: CodeGeneratorFunc<
-    ValueIdentifier | ValuePropertyAccess
+    ValueIdentifier | SpecialValueIdentifier | ValuePropertyAccess
   >
   typeIdentifierGenerator: CodeGeneratorFunc<TypeIdentifier>
   callGenerator: CodeGeneratorFunc<ValueCall>

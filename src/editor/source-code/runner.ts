@@ -1,4 +1,4 @@
-import { interpretThyWorkspace } from "interpreter/block"
+import { interpretThyWorkspace } from "interpreter/workspace"
 import { core } from "std-lib/core"
 import { dissectErrorTraceAtCloserBaseline } from "utils/error-helper"
 import { FilesApi, makeThyFilesApi } from "../file/files-api"

@@ -4,6 +4,12 @@ export type ThyCache = {
   readonly mine: Map<string, unknown>
   readonly inherit: null | ThyCacheInheritance
 }
+export const makeThyCache = (): ThyCache => {
+  return {
+    mine: new Map(),
+    inherit: null,
+  }
+}
 
 type ThyCacheInheritance = {
   readonly parent: ThyCache

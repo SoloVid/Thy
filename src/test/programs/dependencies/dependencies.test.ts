@@ -1,30 +1,27 @@
-import { interpretThyWorkspace } from "interpreter/block"
+import { compileWorkspaceTs } from "compiler/workspace-ts-compiler"
+import { interpretFile } from "node-runtime/interpret-file"
 import assert from "node:assert"
-import { readdir, readFile } from "node:fs/promises"
 import { join } from "node:path"
-import { core } from "std-lib/core"
 import { test } from "test-framework"
-import { FileBrowseApi } from "utils/fs/file-browse-api"
+import { assertDirectoriesMatch } from "test/assert-directories-match"
+import { withTempDir } from "utils/temp-dir"
 
-function makeFileBrowser(root: string): FileBrowseApi {
-  return {
-    read(path) {
-      return readFile(join(root, path), "utf-8")
-    },
-    async list(path) {
-      const nodeResult = await readdir(join(root, path), { withFileTypes: true })
-      return nodeResult.map(e => ({ name: e.name, isDirectory: e.isDirectory() }))
-    },
-  }
-}
+const inputDirectory = join(__dirname, "input")
+const expectedOutputDirectory = join(__dirname, "output")
 
-async function interpretFile(root: string, entrypoint: string) {
-  const fileBrowser = makeFileBrowser(root)
-  const result = await interpretThyWorkspace(fileBrowser, entrypoint, core)
-  return result
-}
-
-test("interpretThyBlock() should return a function that can return a number", async () => {
-  const interpreted = await interpretFile(join(__dirname, "input"), "main.thy")
+test("interpretFile() should process inter-file dependencies", async () => {
+  const interpreted = await interpretFile(inputDirectory, "main.thy")
   assert.strictEqual(interpreted, 5)
+})
+
+test("compileWorkspaceTs() should process inter-file dependencies", async () => {
+  await withTempDir(async (tempDir) => {
+    const results = await compileWorkspaceTs({
+      entrypoint: "main.thy",
+      inputDirectory: inputDirectory,
+      outputDirectory: tempDir,
+    })
+    // TODO: Check for errors.
+    await assertDirectoriesMatch(tempDir, expectedOutputDirectory)
+  })
 })
