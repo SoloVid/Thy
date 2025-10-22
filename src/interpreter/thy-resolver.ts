@@ -1,8 +1,9 @@
 import { resolvePathSpecSync } from "std-lib/thy/resolve-path-spec"
-import { resolveThy, ThyCache } from "std-lib/thy/thy2"
+import { resolveThy, ThyCache } from "std-lib/thy/cache"
 import type { Block } from "tree"
 import assert from "utils/assert"
-import { BlockOptions, interpretThyBlockNode } from "./block"
+import { interpretThyBlockNode } from "./block"
+import { BlockOptions } from "./block-options"
 import { runtimeVoid, yesThisValueIsForRuntime } from "./dynamic-type"
 
 export function makeThyResolver(

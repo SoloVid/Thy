@@ -1,5 +1,5 @@
 import type { Block } from "tree"
-import type { BlockOptions } from "./block"
+import type { BlockOptions } from "./block-options"
 import { throwTransformedError } from "./block-error-transformer"
 import { makeHelper } from "./block-helper"
 import { forgetThisRuntimeFunctionIsAsync, type RuntimeFunction, type RuntimeFunctionAsync, type RuntimeValue } from "./dynamic-type"

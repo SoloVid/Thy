@@ -1,19 +1,12 @@
-import { readFile } from "node:fs/promises"
-import { resolve } from "node:path"
-import { interpretThyBlockSource } from "../interpreter/block"
+import { interpretThyWorkspace } from "interpreter/workspace"
+import assert from "node:assert"
+import { join } from "node:path"
+import { core } from "std-lib/core"
+import { test } from "test-framework"
+import { makeNodeFileBrowser } from "utils/fs/node-fs-file-browse"
 
-export type InterpretFileOptions = {
-  args: Record<string, unknown>
-}
-
-export async function interpretFile(
-  file: string,
-  { args }: InterpretFileOptions,
-) {
-  const contents = await readFile(file, "utf-8")
-  const interpreted = interpretThyBlockSource(contents, {
-    closure: args,
-    stackTracePath: resolve(file),
-  })
-  await interpreted()
+export async function interpretFile(root: string, entrypoint: string) {
+  const fileBrowser = makeNodeFileBrowser(root)
+  const result = await interpretThyWorkspace(fileBrowser, entrypoint, core)
+  return result
 }

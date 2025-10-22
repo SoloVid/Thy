@@ -1,7 +1,7 @@
 import type { Block, Idea } from "tree"
 import { returnStyle } from "tree"
 import { forwardWait, MayWait, notWait } from "./async-helper"
-import type { BlockOptions } from "./block"
+import type { BlockOptions } from "./block-options"
 import { interpretThyCall } from "./call"
 import {
   assertNotVoid,

@@ -1,6 +1,6 @@
 import type { Block } from "tree"
 import assert from "utils/assert"
-import type { BlockOptions } from "./block"
+import type { BlockOptions } from "./block-options"
 import { throwTransformedError } from "./block-error-transformer"
 import { makeHelper } from "./block-helper"
 import type { RuntimeFunction, RuntimeValue } from "./dynamic-type"
