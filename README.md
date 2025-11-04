@@ -2,6 +2,9 @@
 
 Thy is a programming language. This project implements some tools to work with it.
 
+Check out the [`docs/` directory](./docs/) for documentation about the language itself.
+The rest of this README will be focused on the code/tooling in this repository.
+
 ## Repository Structure
 
 - `bin/` - entrypoints for CLI
@@ -19,30 +22,6 @@ Thy is a programming language. This project implements some tools to work with i
   - `tokenizer/` - Thy tokenizer (Thy source to tokens)
   - `tree/` - types for syntax tree
 - `vscode-extension/` - [VS Code extension](#vscode-extension)
-
-## Language
-
-Thy is a programming language that is simple enough to program on your phone,
-powerful enough to integrate with TypeScript,
-and familiar enough to not alienate developers.
-
-### Core Design Goals
-
-- No special characters (mobile friendly)
-- TypeScript interoperability
-- Natural (relative to mainstream programming)
-- Strong static types
-- Simple compiler
-- Simple rules
-- Encourage good programming practices
-- Concise (not extremely verbose)
-
-### More Documentation
-
-The most digestible documentation for Thy is in [docs/](./docs/),
-with the two most important documents being
-the [language spec](./docs/language-spec.md)
-and [miscellaneous design notes](./docs/language-design.md).
 
 ## Compiler/Tools
 
@@ -75,12 +54,6 @@ Run tests (after building):
 npm test
 ```
 
-Run sandbox logic (after building):
-
-```
-npm start
-```
-
 Try out compiler (after building):
 
 ```
@@ -90,7 +63,6 @@ node lib/api/cli.js -t ts-namespace -r src -o dist
 ## Website
 
 This repository also builds the website that is hosted at [thy.dev](https://thy.dev).
-The primary entrypoint for this may be considered [src/home/pages/index.tsx](./src/home/pages/index.tsx).
 
 To run the website:
 
