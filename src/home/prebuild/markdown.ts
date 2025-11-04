@@ -17,13 +17,17 @@ const markedNoTry = makeMarked({ noTry: true })
 function preprocessActionButtons(markdown: string): string {
   return markdown
     .replace(/\r/g, "")
-    .replace(/^\[([^\[\]]+)\]\(([^\(\)]+)\)$/gm, (_, text, url) => {
-      return generateButton({
-        text: text,
-        centered: true,
-        href: url,
-        newTab: false,
-      })
+    .replace(/\n\n\[([^\[\]]+)\]\(([^\(\)]+)\)\n\n/g, (_, text, url) => {
+      return (
+        "\n\n" +
+        generateButton({
+          text: text,
+          centered: true,
+          href: url,
+          newTab: false,
+        }) +
+        "\n\n"
+      )
     })
 }
 

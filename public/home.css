@@ -193,6 +193,8 @@ pre.output {
 @media (min-width: 1300px) {
   #navigation-bar {
     position: fixed;
+    left: 0;
+    top: 0;
   }
 }
 
@@ -210,6 +212,8 @@ pre.output {
 @media (max-width: 768px) {
   #navigation-bar {
     position: fixed;
+    left: 0;
+    top: 0;
     display: none;
   }
 
@@ -281,6 +285,7 @@ pre.output {
   font-size: x-large;
   position: fixed;
   right: 0;
+  top: 0;
 }
 
 .tooltip {

@@ -1,4 +1,4 @@
-## Imperative Programming 101
+# Programming 101 with Thy
 
 Let's jump right in with our first Thy **program**:
 

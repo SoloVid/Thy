@@ -5,7 +5,10 @@ import { collectFiles } from "utils/collect-files"
 
 export async function generateApiIndexMarkdown(directory: string) {
   const inputDir = join(rootDir, "docs", directory)
-  const apiFiles = await collectFiles(inputDir)
+  const overview = await readFile(join(inputDir, "README.md"), "utf-8")
+  const apiFiles = (await collectFiles(inputDir)).filter(
+    (f) => !f.endsWith("README.md"),
+  )
   const apiFilesContents = await Promise.all(
     apiFiles.map((f) => readFile(join(inputDir, f))),
   )
@@ -23,6 +26,5 @@ export async function generateApiIndexMarkdown(directory: string) {
     const title = basename(f, ".md")
     return `----\n\n## ${title}\n\n${apiFilesContents[i]}\n\n${linkToTop}\n`
   })
-  const combinedMarkdown = tableOfContents + "\n" + markdownSections.join("\n")
-  return combinedMarkdown
+  return [overview, tableOfContents, markdownSections.join("\n")].join("\n")
 }

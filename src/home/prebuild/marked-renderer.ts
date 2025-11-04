@@ -62,9 +62,7 @@ ${button}
       .replace(/-+$/, "")
 
     return `
-<h${depth} id="${id}">
-  <a href="#${id}">${text}</a>
-</h${depth}>
+<h${depth} id="${id}">${text}</h${depth}>
 `
   }
 

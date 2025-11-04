@@ -13,7 +13,7 @@ runNodeCli(async () => {
   await runBuild()
 
   chokidar
-    .watch(join(__dirname, ".."), {
+    .watch([join(__dirname, ".."), join(__dirname, "../../docs")], {
       ignoreInitial: true,
     })
     .on("all", (event, path) => {

@@ -1,10 +1,11 @@
 import { mkdir, writeFile } from "node:fs/promises"
-import { dirname, join, relative } from "node:path"
+import { dirname, join } from "node:path"
 import { rootDir } from "root-dir"
-import { getTemplateHtml } from "./template"
 import { walkFiles } from "utils/walk-files"
-import { renderMarkdownDocAsHtml } from "./markdown"
+import { renderMarkdownAsHtml, renderMarkdownDocAsHtml } from "./markdown"
+import { getTemplateHtml } from "./template"
 import { profileSection } from "./time"
+import { generateApiIndexMarkdown } from "./api-index"
 
 const pageOutputDir = join(rootDir, "public")
 
@@ -22,7 +23,7 @@ export async function generateHtml(
 async function makeHtml(pageTitle: string, bodyHtml: string) {
   const templateHtml = await getTemplateHtml()
   return templateHtml
-    .replace("$PAGE_TITLE", pageTitle)
+    .replaceAll("$PAGE_TITLE", pageTitle)
     .replace("$BODY_HTML", bodyHtml)
 }
 
@@ -34,18 +35,35 @@ export async function generateHtmlAll() {
       dir: "",
       ignorePattern: /TODO/,
     },
-    async (f) =>
-      profileSection(f, async () => {
-        const relativePath = f //relative(inputDir, f)
+    async (relativePath) =>
+      profileSection(relativePath, async () => {
         console.log(`Generating HTML for ${relativePath}`)
         const { title, html, preprocessedMarkdown } =
           await renderMarkdownDocAsHtml(relativePath)
         await generateHtml(
-          relativePath.replace(/\.md$/, ".html"),
+          relativePath
+            .replace(/\bREADME\.md$/, "index.md")
+            .replace(/\.md$/, ".html"),
           title,
           `<div class="column-content-md">${html}</div>`,
         )
-        // throw new Error("early stop")
       }),
   )
+}
+
+export async function generateApiReference(inputDir: string) {
+  await profileSection(inputDir, async () => {
+    console.log(`Generating HTML for API reference ${inputDir}`)
+    const indexMarkdown = await generateApiIndexMarkdown(inputDir)
+
+    const { title, html, preprocessedMarkdown } = renderMarkdownAsHtml(
+      indexMarkdown,
+      true,
+    )
+    await generateHtml(
+      `${inputDir}/index.html`,
+      title,
+      `<div class="column-content-md">${html}</div>`,
+    )
+  })
 }

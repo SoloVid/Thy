@@ -1,13 +1,11 @@
 import { addThyPrismGrammarAndAwaitAvailable } from "../../editor/prism-grammar"
-import { generateHtmlAll } from "./helper"
-import generateCoreStdLib from "./pages/std-lib/core"
-import generatePlaygroundStdLib from "./pages/std-lib/playground"
+import { generateApiReference, generateHtmlAll } from "./helper"
 
 export async function generateHtmlFiles() {
   await addThyPrismGrammarAndAwaitAvailable()
+  await generateHtmlAll()
   await Promise.all([
-    generateHtmlAll(),
-    generateCoreStdLib(),
-    generatePlaygroundStdLib(),
+    generateApiReference("std-lib/core"),
+    generateApiReference("std-lib/playground"),
   ])
 }
