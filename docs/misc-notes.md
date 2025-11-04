@@ -1,3 +1,9 @@
+# Misc Notes - Thy (lang)
+
+This page dumps some unsorted thoughts regarding Thy's language design.
+There is a decent chance these notes are significantly out of date with
+the current implementation.
+
 ## Overview of Language Strategy
 
 - No special characters (mobile friendly)

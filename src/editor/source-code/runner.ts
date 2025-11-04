@@ -25,8 +25,6 @@ export function makeRunner() {
           console.log(thing)
           printedLines.push("" + thing)
         },
-        encodeURIComponent,
-        fetch,
         file: makeThyFilesApi(rawFileManager),
       }
       returnValue = await interpretThyWorkspace(fs, entrypoint, playgroundLib)

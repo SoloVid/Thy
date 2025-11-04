@@ -2,6 +2,7 @@
 /lib
 /dist
 /public/**/*.html
+!/public/play/index.html
 /public/**/*.js
 /public/**/*.js.map
 

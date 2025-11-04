@@ -1,4 +1,8 @@
 {
+  "ts-node": {
+    // It is faster to skip typechecking.
+    "transpileOnly": true
+  },
   "compilerOptions": {
     "lib": ["es2021"],
     "module": "commonjs",

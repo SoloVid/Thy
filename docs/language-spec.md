@@ -1,4 +1,4 @@
-# Thy Language Spec
+# Language Spec - Thy (lang)
 
 Thy is a mobile-friendly programming language powered by [TypeScript](https://www.typescriptlang.org) (which is powered by [JavaScript](https://developer.mozilla.org/en-US/docs/Web/javascript)).
 

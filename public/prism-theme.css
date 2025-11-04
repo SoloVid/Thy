@@ -20,14 +20,14 @@ pre[class*="language-"] {
   -ms-hyphens: none;
   hyphens: none;
 }
-pre[class*="language-"] {
+pre:has(code[class*="language-"]) {
   padding: 1em;
   margin: 0.5em 0;
   overflow: auto;
   border-radius: 0.3em;
 }
 :not(pre) > code[class*="language-"],
-pre[class*="language-"] {
+pre:has(code[class*="language-"]) {
   background: #272822;
 }
 :not(pre) > code[class*="language-"] {

@@ -21,10 +21,20 @@ export async function walkFiles(
       path: path.posix.join(dir, e.name),
     }))
     .filter((e) => !ignorePattern.test(e.path))
-  for (const leafFile of tighterListing.filter((e) => !e.isDir)) {
-    await handler(leafFile.path)
-  }
-  for (const directory of tighterListing.filter((e) => e.isDir)) {
-    await walkFiles({ rootDir, dir: directory.path, ignorePattern }, handler)
-  }
+  await Promise.all([
+    ...tighterListing
+      .filter((e) => !e.isDir)
+      .map((leafFile) => handler(leafFile.path)),
+    ...tighterListing
+      .filter((e) => e.isDir)
+      .map((directory) =>
+        walkFiles({ rootDir, dir: directory.path, ignorePattern }, handler),
+      ),
+  ])
+  // for (const leafFile of tighterListing.filter((e) => !e.isDir)) {
+  //   await handler(leafFile.path)
+  // }
+  // for (const directory of tighterListing.filter((e) => e.isDir)) {
+  //   await walkFiles({ rootDir, dir: directory.path, ignorePattern }, handler)
+  // }
 }
