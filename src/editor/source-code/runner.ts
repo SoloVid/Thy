@@ -1,6 +1,7 @@
 import { interpretThyWorkspace } from "interpreter/workspace"
 import { core } from "std-lib/core"
 import { dissectErrorTraceAtCloserBaseline } from "utils/error-helper"
+import type { FileBrowseApi } from "utils/fs/file-browse-api"
 import { FilesApi, makeThyFilesApi } from "../file/files-api"
 import { makeFileManager } from "../file/local-files"
 
@@ -27,7 +28,19 @@ export function makeRunner() {
         },
         file: makeThyFilesApi(rawFileManager),
       }
-      returnValue = await interpretThyWorkspace(fs, entrypoint, playgroundLib)
+      const workspaceBrowser: FileBrowseApi = {
+        async list(path) {
+          const rawList = await fs.list(path)
+          return rawList.map(e => ({
+            name: e.name.replace(/\/$/, ""),
+            isDirectory: e.kind === "directory",
+          }))
+        },
+        read(path) {
+          return fs.read(path)
+        },
+      }
+      returnValue = await interpretThyWorkspace(workspaceBrowser, entrypoint, playgroundLib)
     } catch (e) {
       console.error(e)
       if (e instanceof Error) {

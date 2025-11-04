@@ -14,7 +14,8 @@ export function profileSection<T>(label: string, fn: () => T): T {
       printDuration()
     }
     return result
-  } catch {
+  } catch (e) {
     printDuration()
+    throw e
   }
 }
