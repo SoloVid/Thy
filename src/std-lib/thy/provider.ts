@@ -1,10 +1,15 @@
 import { callUntyped } from "utils/call-untyped"
-import { makeThyCache, resolveThy, ThyCache } from "./cache"
+import { makeThyCache, resolveThyDependency, ThyCache } from "./cache"
 
-type DependencySpec = {
+type InitDependencySpec = {
   id: string
   init: (cache: ThyCache) => unknown
 }
+type SingletonDependencySpec = {
+  id: string
+  value: unknown
+}
+type DependencySpec = InitDependencySpec | SingletonDependencySpec
 type DependencyMapBase = Record<string, readonly DependencySpec[]>
 
 type ThyDependencyLib<DependencyMap extends DependencyMapBase> = {
@@ -15,15 +20,16 @@ type ThyDependencyLib<DependencyMap extends DependencyMapBase> = {
    */
   thy: <Reference extends string & keyof DependencyMap>(
     reference: Reference,
-  ) => DependencySpecInitReturnIfOnlyOne<DependencyMap[Reference]>
+  ) => DependencySpecValueIfOnlyOne<DependencyMap[Reference]>
 }
 
-type DependencySpecInitReturnIfOnlyOne<T extends readonly DependencySpec[]> =
+type DependencySpecValue<T extends DependencySpec> = T extends InitDependencySpec ? ReturnType<T["init"]> : T extends SingletonDependencySpec ? T["value"] : never
+type DependencySpecValueIfOnlyOne<T extends readonly DependencySpec[]> =
   [] extends T
     ? void
-    : T extends readonly [DependencySpec, DependencySpec]
+    : T extends readonly [DependencySpec, DependencySpec, ...DependencySpec[]]
       ? void
-      : ReturnType<T[0]["init"]>
+      : DependencySpecValue<T[0]>
 
 const makeThyDependencyLib = <DependencyMap extends DependencyMapBase>(
   dependencyMap: DependencyMap,
@@ -33,18 +39,23 @@ const makeThyDependencyLib = <DependencyMap extends DependencyMapBase>(
     thy: <Reference extends string & keyof DependencyMap>(
       reference: Reference,
     ) => {
-      const results: unknown[] = []
-      for (const dep of dependencyMap[reference]) {
-        results.push(resolveThy(dep.id, cache, (cache) => dep.init(cache)))
+      type ThyDepReturnType = DependencySpecValueIfOnlyOne<DependencyMap[Reference]>
+      const dependencies = dependencyMap[reference]
+      if (dependencies.length === 1) {
+        const dep = dependencies[0]
+        if ("value" in dep) {
+          return dep.value as ThyDepReturnType
+        }
+        return resolveThyDependency(dep.id, cache, (cache) =>
+          dep.init(cache),
+        ) as ThyDepReturnType
       }
-      if (results.length === 1) {
-        return results[0] as DependencySpecInitReturnIfOnlyOne<
-          DependencyMap[Reference]
-        >
+      for (const dep of dependencies) {
+        if ("init" in dep) {
+          resolveThyDependency(dep.id, cache, (cache) => dep.init(cache))
+        }
       }
-      return undefined as DependencySpecInitReturnIfOnlyOne<
-        DependencyMap[Reference]
-      >
+      return undefined as ThyDepReturnType
     },
   }
 }
