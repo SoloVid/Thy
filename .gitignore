@@ -1,10 +1,5 @@
 /node_modules
-/lib
-/dist
-/public/**/*.html
-!/public/play/index.html
-/public/**/*.js
-/public/**/*.js.map
+/out
 
 .nyc_output/
 coverage/

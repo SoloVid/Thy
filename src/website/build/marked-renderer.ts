@@ -1,5 +1,5 @@
 import { addThyPrismGrammarAndAwaitAvailable } from "editor/prism-grammar"
-import { playgroundBaseUrl } from "home/links"
+import { playgroundBaseUrl } from "website/build/links"
 import { Marked, Renderer } from "marked"
 import { readFile } from "node:fs/promises"
 import { join } from "node:path"

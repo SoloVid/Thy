@@ -3,12 +3,23 @@ import path from "node:path"
 
 export type WalkOptions = {
   rootDir: string
-  dir: string
-  ignorePattern: RegExp
+  dir?: string
+  ignorePattern?: RegExp
 }
 
 export async function walkFiles(
   { rootDir, dir, ignorePattern }: WalkOptions,
+  handler: (filePath: string) => PromiseLike<void>,
+) {
+  return walkFilesRequired({
+    rootDir,
+    dir: dir ?? "",
+    ignorePattern: ignorePattern ?? /NOMATCH/
+  }, handler)
+}
+
+async function walkFilesRequired(
+  { rootDir, dir, ignorePattern }: Required<WalkOptions>,
   handler: (filePath: string) => PromiseLike<void>,
 ) {
   const listing = await readdir(path.join(rootDir, dir), {
@@ -31,10 +42,4 @@ export async function walkFiles(
         walkFiles({ rootDir, dir: directory.path, ignorePattern }, handler),
       ),
   ])
-  // for (const leafFile of tighterListing.filter((e) => !e.isDir)) {
-  //   await handler(leafFile.path)
-  // }
-  // for (const directory of tighterListing.filter((e) => e.isDir)) {
-  //   await walkFiles({ rootDir, dir: directory.path, ignorePattern }, handler)
-  // }
 }

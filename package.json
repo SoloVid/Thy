@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Simple language for thy mobile programming",
   "exports": {
-    ".": "./lib/api/index.js",
-    "./std-lib": "./lib/api/std-lib.js"
+    ".": "./out/api/index.js",
+    "./std-lib": "./out/api/std-lib.js"
   },
   "bin": {
     "thy": "bin/thy"
@@ -13,18 +13,18 @@
     "README.md",
     "package.json",
     "bin/*",
-    "lib/api/*.js",
-    "lib/**/*.d.ts"
+    "out/api/*.js",
+    "out/**/*.d.ts"
   ],
   "scripts": {
-    "build": "sh -c 'esbuild src/api/*.ts --bundle --minify --sourcemap --platform=node --outdir=lib/api'",
+    "build": "sh -c 'esbuild src/api/*.ts --bundle --minify --sourcemap --platform=node --outdir=out/api'",
     "check-types": "tsc --noEmit",
-    "clean": "node -p \"require('fs').rmSync('lib',{force:true,recursive:true})\"",
+    "clean": "node -p \"require('fs').rmSync('out',{force:true,recursive:true})\"",
     "format": "prettier --no-semi . --write",
     "generate-declarations": "tsc --emitDeclarationOnly",
-    "site:build": "node -r esbuild-register src/build/build-site.ts",
-    "site:dev": "nodemon -r esbuild-register src/build/dev-site.ts",
-    "site:dev:node-experimental": "node --experimental-strip-types --watch src/build/dev-site.ts",
+    "website:build": "node -r esbuild-register src/build/build-website.main.ts",
+    "website:dev": "nodemon -r esbuild-register --watch src --watch docs src/build/dev-website.main.ts",
+    "website:dev:node-experimental": "node --experimental-strip-types --watch src/build/dev-website.main.ts",
     "interpret": "node -r esbuild-register src/interpreter/cli.ts",
     "serve": "node -r esbuild-register src/editor/server.ts",
     "test:mocha": "mocha -r esbuild-register",

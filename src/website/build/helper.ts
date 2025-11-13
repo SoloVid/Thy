@@ -7,7 +7,7 @@ import { getTemplateHtml } from "./template"
 import { profileSection } from "./time"
 import { generateApiIndexMarkdown } from "./api-index"
 
-const pageOutputDir = join(rootDir, "public")
+const pageOutputDir = join(rootDir, "out/website")
 
 export async function generateHtml(
   outputFile: string,

@@ -1,4 +1,4 @@
-import { profileSection } from "home/prebuild/time"
+import { profileSection } from "website/build/time"
 import { readFile, writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { rootDir } from "root-dir"

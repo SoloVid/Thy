@@ -23,6 +23,6 @@ async function compile(from: string, to: string) {
 }
 
 export async function compileTs() {
-  await compile("src/editor/index.tsx", "public/play/index.js")
-  await compile("src/home/static-page-scripting.ts", "public/static-page-scripting.js")
+  await compile("src/editor/index.tsx", "out/website/play/index.js")
+  await compile("src/website/static-page-scripting.ts", "out/website/static-page-scripting.js")
 }

@@ -8,7 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useState } from "preact/hooks"
-import { CopyToClipboardButton } from "../home/button"
+import { CopyToClipboardButton } from "../website/static/button"
 import { useAlerts } from "./alert-provider"
 import { InMemoryFiles } from "./file/in-memory-files"
 import { makeIndexedDbFiles } from "./file/indexed-db-files"
