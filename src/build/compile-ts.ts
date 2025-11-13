@@ -1,15 +1,13 @@
 import esbuild from "esbuild"
 import { join } from "node:path"
-import { getPageInputs, pageInputDir, pageOutputDir } from "./page-file-paths"
+import { rootDir } from "root-dir"
 
-export async function compileTs() {
-  const pageInputs = await getPageInputs()
+async function compile(from: string, to: string) {
   await esbuild.build({
     logLevel: "info",
-    entryPoints: pageInputs.map((f) => join(pageInputDir, f)),
-    loader: {
-      ".md": "text",
-    },
+    entryPoints: [
+      join(rootDir, from)
+    ],
     alias: {
       react: "preact/compat",
       "react-dom": "preact/compat",
@@ -18,9 +16,13 @@ export async function compileTs() {
     platform: "browser",
     target: "es2021",
     jsx: "automatic",
-    outdir: pageOutputDir,
-    outbase: pageInputDir,
+    outfile: join(rootDir, to),
     sourcemap: true,
     minify: true,
   })
+}
+
+export async function compileTs() {
+  await compile("src/editor/index.tsx", "public/play/index.js")
+  await compile("src/home/static-page-scripting.ts", "public/static-page-scripting.js")
 }

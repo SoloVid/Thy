@@ -1,7 +1,7 @@
 import "preact/debug"
 
 import { render } from "preact"
-import Playground from "../../../editor/playground"
+import Playground from "./playground"
 
 window.onbeforeunload = function () {
   return true
