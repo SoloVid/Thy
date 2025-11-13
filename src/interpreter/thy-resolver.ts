@@ -1,5 +1,5 @@
 import { resolvePathSpecSync } from "std-lib/thy/resolve-path-spec"
-import { resolveThy, ThyCache } from "std-lib/thy/cache"
+import { resolveThyDependency, ThyCache } from "std-lib/thy/cache"
 import type { Block } from "tree"
 import assert from "utils/assert"
 import { interpretThyBlockNode } from "./block"
@@ -32,7 +32,7 @@ export function makeThyResolver(
       `thy "${pathSpec}" did not resolve from ${thyResolutionRelativePath}`,
     )
     const resolvedValues = resolvedPaths.map((p) =>
-      resolveThy(p, cache, (c) => {
+      resolveThyDependency(p, cache, (c) => {
         const tree = parseMap.get(p)
         assert(!!tree, `${p} should be parsed`)
         const interpreted = interpretThyBlockNode(tree, {

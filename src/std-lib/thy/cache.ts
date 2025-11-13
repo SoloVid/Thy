@@ -31,7 +31,7 @@ export type ThyCacheInit<T> = (cache: ThyCache) => T
  * @param init Initialization function for obtaining the dependency.
  * @returns
  */
-export function resolveThy<T>(
+export function resolveThyDependency<T>(
   id: string,
   cache: ThyCache,
   init: ThyCacheInit<T>,
@@ -60,7 +60,7 @@ function resolveUncached<T>(
   if (cache.inherit) {
     const filter = findRule(id, cache.inherit)
     if (filter?.useParent) {
-      return resolveThy(id, cache.inherit.parent, init)
+      return resolveThyDependency(id, cache.inherit.parent, init)
     }
   }
   return init(cache)

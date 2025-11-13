@@ -1,6 +1,4 @@
 import { core } from "std-lib/core"
-import { ThyCache } from "std-lib/thy/cache"
-import { callUntyped } from "utils/call-untyped"
 
 export { core } from "std-lib/core"
 export type Core = typeof core
