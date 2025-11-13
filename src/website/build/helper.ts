@@ -2,10 +2,10 @@ import { mkdir, writeFile } from "node:fs/promises"
 import { dirname, join } from "node:path"
 import { rootDir } from "root-dir"
 import { walkFiles } from "utils/walk-files"
+import { generateApiIndexMarkdown } from "./api-index"
 import { renderMarkdownAsHtml, renderMarkdownDocAsHtml } from "./markdown"
 import { getTemplateHtml } from "./template"
 import { profileSection } from "./time"
-import { generateApiIndexMarkdown } from "./api-index"
 
 const pageOutputDir = join(rootDir, "out/website")
 
@@ -32,8 +32,6 @@ export async function generateHtmlAll() {
   await walkFiles(
     {
       rootDir: inputDir,
-      dir: "",
-      ignorePattern: /TODO/,
     },
     async (relativePath) =>
       profileSection(relativePath, async () => {

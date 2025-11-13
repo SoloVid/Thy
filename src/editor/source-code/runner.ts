@@ -31,7 +31,7 @@ export function makeRunner() {
       const workspaceBrowser: FileBrowseApi = {
         async list(path) {
           const rawList = await fs.list(path)
-          return rawList.map(e => ({
+          return rawList.map((e) => ({
             name: e.name.replace(/\/$/, ""),
             isDirectory: e.kind === "directory",
           }))
@@ -40,7 +40,11 @@ export function makeRunner() {
           return fs.read(path)
         },
       }
-      returnValue = await interpretThyWorkspace(workspaceBrowser, entrypoint, playgroundLib)
+      returnValue = await interpretThyWorkspace(
+        workspaceBrowser,
+        entrypoint,
+        playgroundLib,
+      )
     } catch (e) {
       console.error(e)
       if (e instanceof Error) {

@@ -11,11 +11,14 @@ export async function walkFiles(
   { rootDir, dir, ignorePattern }: WalkOptions,
   handler: (filePath: string) => PromiseLike<void>,
 ) {
-  return walkFilesRequired({
-    rootDir,
-    dir: dir ?? "",
-    ignorePattern: ignorePattern ?? /NOMATCH/
-  }, handler)
+  return walkFilesRequired(
+    {
+      rootDir,
+      dir: dir ?? "",
+      ignorePattern: ignorePattern ?? /NOMATCH/,
+    },
+    handler,
+  )
 }
 
 async function walkFilesRequired(

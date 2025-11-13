@@ -23,7 +23,12 @@ type ThyDependencyLib<DependencyMap extends DependencyMapBase> = {
   ) => DependencySpecValueIfOnlyOne<DependencyMap[Reference]>
 }
 
-type DependencySpecValue<T extends DependencySpec> = T extends InitDependencySpec ? ReturnType<T["init"]> : T extends SingletonDependencySpec ? T["value"] : never
+type DependencySpecValue<T extends DependencySpec> =
+  T extends InitDependencySpec
+    ? ReturnType<T["init"]>
+    : T extends SingletonDependencySpec
+      ? T["value"]
+      : never
 type DependencySpecValueIfOnlyOne<T extends readonly DependencySpec[]> =
   [] extends T
     ? void
@@ -39,7 +44,9 @@ const makeThyDependencyLib = <DependencyMap extends DependencyMapBase>(
     thy: <Reference extends string & keyof DependencyMap>(
       reference: Reference,
     ) => {
-      type ThyDepReturnType = DependencySpecValueIfOnlyOne<DependencyMap[Reference]>
+      type ThyDepReturnType = DependencySpecValueIfOnlyOne<
+        DependencyMap[Reference]
+      >
       const dependencies = dependencyMap[reference]
       if (dependencies.length === 1) {
         const dep = dependencies[0]

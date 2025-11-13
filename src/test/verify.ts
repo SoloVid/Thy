@@ -11,20 +11,18 @@ type Options = {
   expectedValue: unknown
 }
 
-export async function verifyInterpreterAndCompiler(
-  options: Options
-) {
-    assert.strictEqual(options.logic(), options.expectedValue)
-    const interpreted = await interpretFile(options.inputDir, "main.thy")
-    assert.strictEqual(interpreted, options.expectedValue)
+export async function verifyInterpreterAndCompiler(options: Options) {
+  assert.strictEqual(options.logic(), options.expectedValue)
+  const interpreted = await interpretFile(options.inputDir, "main.thy")
+  assert.strictEqual(interpreted, options.expectedValue)
 
-    await withTempDir(async (tempDir) => {
-      const results = await compileWorkspaceTs({
-        entrypoint: "main.thy",
-        inputDirectory: options.inputDir,
-        outputDirectory: tempDir,
-      })
-      // TODO: Check for errors.
-      await assertDirectoriesMatch(tempDir, options.outputDir)
+  await withTempDir(async (tempDir) => {
+    const results = await compileWorkspaceTs({
+      entrypoint: "main.thy",
+      inputDirectory: options.inputDir,
+      outputDirectory: tempDir,
     })
+    // TODO: Check for errors.
+    await assertDirectoriesMatch(tempDir, options.outputDir)
+  })
 }

@@ -5,8 +5,6 @@ export async function collectFiles(directory: string) {
   await walkFiles(
     {
       rootDir: directory,
-      dir: "",
-      ignorePattern: /TODO/,
     },
     async (f) => {
       files.push(f)

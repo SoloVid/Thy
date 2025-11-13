@@ -5,9 +5,7 @@ import { rootDir } from "root-dir"
 async function compile(from: string, to: string) {
   await esbuild.build({
     logLevel: "info",
-    entryPoints: [
-      join(rootDir, from)
-    ],
+    entryPoints: [join(rootDir, from)],
     alias: {
       react: "preact/compat",
       "react-dom": "preact/compat",
@@ -24,5 +22,8 @@ async function compile(from: string, to: string) {
 
 export async function compileTs() {
   await compile("src/editor/index.tsx", "out/website/play/index.js")
-  await compile("src/website/static-page-scripting.ts", "out/website/static-page-scripting.js")
+  await compile(
+    "src/website/static-page-scripting.ts",
+    "out/website/static-page-scripting.js",
+  )
 }
