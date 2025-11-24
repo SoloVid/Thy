@@ -7,7 +7,7 @@ import { verifyInterpreterAndCompiler } from "test/verify"
 import logic from "./output/main.thy"
 
 test("dependencies verify", async () => {
-  verifyInterpreterAndCompiler({
+  await verifyInterpreterAndCompiler({
     inputDir: join(__dirname, "input"),
     logic: logic,
     outputDir: join(__dirname, "output"),
