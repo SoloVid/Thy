@@ -32,7 +32,7 @@ export function makeRunner() {
         async list(path) {
           const rawList = await fs.list(path)
           return rawList.map((e) => ({
-            name: e.name.replace(/\/$/, ""),
+            name: e.name.replace(/^\/|\/$/, ""),
             isDirectory: e.kind === "directory",
           }))
         },
@@ -42,7 +42,7 @@ export function makeRunner() {
       }
       returnValue = await interpretThyWorkspace(
         workspaceBrowser,
-        entrypoint,
+        entrypoint.replace(/^\//, ""),
         playgroundLib,
       )
     } catch (e) {

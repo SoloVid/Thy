@@ -1,4 +1,4 @@
-import { resolvePathSpecSync } from "std-lib/thy/resolve-path-spec"
+import { resolvePathSpecFromArray } from "std-lib/thy/resolve-path-spec-from-array"
 import { resolveThyDependency, ThyCache } from "std-lib/thy/cache"
 import type { Block } from "tree"
 import assert from "utils/assert"
@@ -21,7 +21,7 @@ export function makeThyResolver(
     thyResolutionRelativePath: string,
     pathSpec: string,
   ) => {
-    const resolvedPaths = resolvePathSpecSync(
+    const resolvedPaths = resolvePathSpecFromArray(
       thyResolutionRelativePath,
       knownFilePaths,
       pathSpec,

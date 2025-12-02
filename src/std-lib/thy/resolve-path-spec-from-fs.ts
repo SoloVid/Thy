@@ -1,19 +1,8 @@
-import { globMatchAll, globToRegExp } from "utils/glob-match"
 import { FileBrowseApi, PathFileEntry } from "utils/fs/file-browse-api"
+import { globToRegExp } from "utils/glob-match"
+import { directoriesOf } from "./directory-utils"
 
-function directoryOf(path: string) {
-  return path.replace(/\/[^/]+$/, "")
-}
-
-function directoriesOf(path: string): readonly string[] {
-  if (!path.includes("/")) {
-    return [""]
-  }
-  const nearestDirectory = directoryOf(path)
-  return [...directoriesOf(nearestDirectory), nearestDirectory]
-}
-
-export async function resolvePathSpec(
+export async function resolvePathSpecFromFs(
   sourceRelativePath: string,
   fileBrowser: FileBrowseApi,
   pathSpec: string,
@@ -70,15 +59,4 @@ export async function resolvePathSpec(
   }
 
   return matches.filter((m) => !m.isDirectory).map((m) => m.path)
-}
-
-export function resolvePathSpecSync(
-  sourceRelativePath: string,
-  knownFilePaths: readonly string[],
-  pathSpec: string,
-): readonly string[] {
-  const possibleStartDirectories = directoriesOf(sourceRelativePath)
-  return possibleStartDirectories
-    .map((d) => globMatchAll(d ? `${d}/${pathSpec}` : pathSpec, knownFilePaths))
-    .flat()
 }

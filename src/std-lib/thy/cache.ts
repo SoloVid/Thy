@@ -37,7 +37,7 @@ export function resolveThyDependency<T>(
   init: ThyCacheInit<T>,
 ): T {
   if (cache.mine.has(id)) {
-    return cache.mine as T
+    return cache.mine.get(id) as T
   }
   return resolveForMe(id, cache, init)
 }

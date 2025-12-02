@@ -1,10 +1,10 @@
 import { CompileError } from "common"
-import { relative } from "node:path/posix"
 import { parse } from "parser/parser"
-import { resolvePathSpec } from "std-lib/thy/resolve-path-spec"
+import { resolvePathSpecFromFs } from "std-lib/thy/resolve-path-spec-from-fs"
 import { makeTokenizer } from "tokenizer"
 import { Block } from "tree"
 import { FileBrowseApi } from "utils/fs/file-browse-api"
+import { relative } from "utils/relative-paths"
 
 type DependencySpec = {
   id: string
@@ -46,7 +46,7 @@ async function parseRecursive(
   let nextDep = 1
   const references: ReferenceMap = {}
   for (const rawRef of parseResult.references) {
-    const expandedRefs = await resolvePathSpec(
+    const expandedRefs = await resolvePathSpecFromFs(
       entrypoint,
       workspaceBrowser,
       rawRef,
