@@ -10,9 +10,11 @@ type OutputContainerProps = {
 
 export default function OutputContainer({ output }: OutputContainerProps) {
   if (!output) {
-    return <div>
-      <em>Code not run yet</em>
-    </div>
+    return (
+      <div>
+        <em>Code not run yet</em>
+      </div>
+    )
   }
   if (typeof output === "string") {
     return (
@@ -21,7 +23,11 @@ export default function OutputContainer({ output }: OutputContainerProps) {
       </div>
     )
   }
-  if (!output.error && output.returnValue === undefined && output.printedLines.length === 0) {
+  if (
+    !output.error &&
+    output.returnValue === undefined &&
+    output.printedLines.length === 0
+  ) {
     return (
       <div>
         <em>No output</em>

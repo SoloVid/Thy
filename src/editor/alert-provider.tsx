@@ -1,5 +1,7 @@
 import { ComponentChildren, createContext } from "preact"
 import { useCallback, useContext, useState } from "preact/hooks"
+import { catchReject } from "utils/promise-helper"
+import { stringifyError } from "utils/stringify-error"
 
 type AlertType = "error" | "info" | "success" | "warning"
 
@@ -12,6 +14,11 @@ interface Toast {
 interface AlertContextType {
   showAlert: (message: string, type?: AlertType) => void
   showToast: (message: string, type?: AlertType) => void
+  catch: (
+    promiseOrFunc: PromiseLike<unknown> | (() => PromiseLike<unknown>),
+    messagePrefix?: string,
+    alertOrToast?: "alert" | "toast",
+  ) => void
   confirm: (message: string) => Promise<boolean>
   prompt: (message: string, defaultValue?: string) => Promise<string | null>
 }
@@ -19,6 +26,7 @@ interface AlertContextType {
 const AlertContext = createContext<AlertContextType>({
   showAlert: () => {},
   showToast: () => {},
+  catch: () => {},
   confirm: () => Promise.resolve(false),
   prompt: () => Promise.resolve(null),
 })
@@ -83,6 +91,24 @@ export function AlertProvider({ children }: AlertProviderProps) {
     [nextId],
   )
 
+  const catchPromiseError = useCallback(
+    (
+      promiseOrFunc: PromiseLike<unknown> | (() => PromiseLike<unknown>),
+      messagePrefix: string = "Error",
+      alertOrToast: "alert" | "toast" = "alert",
+    ) => {
+      catchReject(promiseOrFunc, (e) => {
+        const message = `${messagePrefix}: ${stringifyError(e)}`
+        if (alertOrToast === "alert") {
+          showAlert(message, "error")
+        } else {
+          showToast(message, "error")
+        }
+      })
+    },
+    [showAlert, showToast],
+  )
+
   const confirm = useCallback((message: string): Promise<boolean> => {
     return new Promise((resolve) => {
       setConfirmDialog({ message, resolve })
@@ -129,6 +155,7 @@ export function AlertProvider({ children }: AlertProviderProps) {
   const alertValue = {
     showAlert,
     showToast,
+    catch: catchPromiseError,
     confirm,
     prompt,
   }

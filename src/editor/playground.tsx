@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks"
+import { useEffect, useMemo, useRef, useState } from "preact/hooks"
 import { AlertProvider, useAlerts } from "./alert-provider"
 import CodeInput from "./code-input"
 import { FileTree } from "./file/tree-ui/file-tree"
@@ -6,7 +6,8 @@ import Menu from "./menu"
 import OutputContainer from "./output-container"
 import { useEditorPreferences } from "./preferences"
 import Resizer from "./resizer"
-import { useEditorState } from "./state"
+import { useSourceCodeManager } from "./source-code/manager"
+import { makeInMemoryFiles } from "./file/in-memory-files"
 
 function PlaygroundContent() {
   useEffect(() => {
@@ -26,7 +27,8 @@ function PlaygroundContent() {
   })
   const editorHeight = Math.min(windowHeight, 500)
 
-  const state = useEditorState()
+  const fs = useMemo(() => makeInMemoryFiles(() => new Date().getTime()), [])
+  const scm = useSourceCodeManager(fs)
   const [prefs, setPrefs] = useEditorPreferences()
 
   const alerts = useAlerts()
@@ -39,20 +41,7 @@ function PlaygroundContent() {
   }
 
   function onFileSelect(path: string) {
-    state.fs.read(path).then(
-      (s) => {
-        if (!path.endsWith("/")) {
-          state.setSourceCode({
-            path: path,
-            contents: s,
-            language: "thy",
-          })
-        }
-      },
-      (e) => {
-        alerts.showAlert(`Failed to open file: ${e.message || e}`)
-      },
-    )
+    alerts.catch(scm.selectFile(path), "Failed to open file")
   }
 
   async function onFileDelete(path: string) {
@@ -61,44 +50,22 @@ function PlaygroundContent() {
     )
     if (!confirmed) return
 
-    // If the deleted file is currently open, clear the editor
-    if (state.sourceCode.path === path) {
-      state.setSourceCode({
-        path: "",
-        contents: "",
-        language: "thy",
-      })
-    }
+    alerts.catch(scm.selectFile(null), "Failed to close file")
 
     alerts.showToast(`Deleted ${path}`, "info")
   }
 
   function onFileRename(oldPath: string, newPath: string) {
     // If the renamed file affects the open file, update the title
-    if (state.sourceCode.path.startsWith(oldPath)) {
-      const newFilePath = state.sourceCode.path.replace(oldPath, newPath)
-      state.setSourceCode({
-        ...state.sourceCode,
-        path: newFilePath,
-      })
+    if (scm.sourceOpen && scm.sourceOpen.path.startsWith(oldPath)) {
+      const newFilePath = scm.sourceOpen.path.replace(oldPath, newPath)
+      alerts.catch(scm.selectFile(newFilePath), "Failed to follow renamed file")
       alerts.showToast(`Renamed ${oldPath} to ${newPath}`, "success")
     }
   }
 
   function onSourceUpdate(s: string) {
-    state.setSourceCode({
-      path: state.sourceCode.path,
-      contents: s,
-      language: "thy",
-    })
-    state.fs.write(state.sourceCode.path, s).then(
-      () => {
-        // Do nothing.
-      },
-      (e) => {
-        alerts.showAlert(`Failed to save file: ${e.message || e}`)
-      },
-    )
+    alerts.catch(scm.updateSource(s), "Failed to write file", "toast")
   }
 
   const minLeftWidth = 100
@@ -124,7 +91,7 @@ function PlaygroundContent() {
       <div
         style={`flex-grow: 1; height:100vh;height:${windowHeight}px;overflow: hidden; display: flex; flex-direction: column;`}
       >
-        <Menu fs={state.fs} state={state} toggleLeftPanel={toggleLeftPanel} />
+        <Menu fs={fs} scm={scm} toggleLeftPanel={toggleLeftPanel} />
         <div style={`flex-grow: 1;overflow: hidden; display: flex;`}>
           {prefs.leftOpen && (
             <>
@@ -132,7 +99,7 @@ function PlaygroundContent() {
                 style={`flex-shrink: 0; width: ${prefs.leftWidth}px; background-color: #272822; color: #ddd; padding: 10px;`}
               >
                 <FileTree
-                  fs={state.fs}
+                  fs={fs}
                   directory="/"
                   onSelect={onFileSelect}
                   onDelete={onFileDelete}
@@ -145,23 +112,27 @@ function PlaygroundContent() {
           <div
             style={`position:relative; width: 100%; height: 100%; flex-grow: 1; overflow: none; background-color: #272822; color: #ddd;`}
           >
-            <div style={`padding-left: 20px; padding-top: 10px;`}>
-              {state.sourceCode.path}
-            </div>
-            <CodeInput
-              id="editor"
-              style={`position:relative; width: 100%; height: 100%; flex-grow: 1; overflow: auto; background-color: #272822;`}
-              language={state.sourceCode.language}
-              value={state.sourceCode.contents}
-              setValue={onSourceUpdate}
-              runCode={() => state.runThenSetOutput(state.sourceCode.contents)}
-            ></CodeInput>
+            {scm.sourceOpen && (
+              <>
+                <div style={`padding-left: 20px; padding-top: 10px;`}>
+                  {scm.sourceOpen.path}
+                </div>
+                <CodeInput
+                  id="editor"
+                  style={`position:relative; width: 100%; height: 100%; flex-grow: 1; overflow: auto; background-color: #272822;`}
+                  language={scm.sourceOpen.language}
+                  value={scm.sourceOpen.contents}
+                  setValue={onSourceUpdate}
+                  runCode={() => alerts.catch(scm.run())}
+                ></CodeInput>
+              </>
+            )}
           </div>
           <Resizer resizeType="vertical" onResize={onRightMenuResize} />
           <div
             style={`flex-shrink: 0; width: ${prefs.rightWidth}px; margin: 10px;`}
           >
-            <OutputContainer output={state.output} />
+            <OutputContainer output={scm.output} />
           </div>
         </div>
       </div>

@@ -15,16 +15,17 @@ import { makeIndexedDbFiles } from "./file/indexed-db-files"
 import { makeFileManager, useLocalFiles } from "./file/local-files"
 import { SerializedWorkspace } from "./file/serialized-workspace"
 import { WorkspaceBrowser } from "./file/workspace-browser"
+import { SourceCodeManager } from "./source-code/manager"
+import { serialize } from "./source-code/serialize"
 import { makeShareUrl } from "./source-code/share-url"
-import { EditorState } from "./state"
 
 type MenuProps = {
   fs: InMemoryFiles
-  state: EditorState
+  scm: SourceCodeManager
   toggleLeftPanel: () => void
 }
 
-export default function Menu({ fs, state, toggleLeftPanel }: MenuProps) {
+export default function Menu({ fs, scm, toggleLeftPanel }: MenuProps) {
   const rawFileManager = makeFileManager()
   const fileMan = useLocalFiles(rawFileManager)
   const alerts = useAlerts()
@@ -56,41 +57,7 @@ export default function Menu({ fs, state, toggleLeftPanel }: MenuProps) {
 
     if (workspaceBrowserMode === "load") {
       try {
-        // Ingest the workspace
-        fs.ingest(workspace)
-
-        // If there's a main.thy file, open it by default
-        if (await fs.exists("/main.thy")) {
-          const contents = await fs.read("/main.thy")
-          state.setSourceCode({
-            path: "/main.thy",
-            contents,
-            language: "thy",
-          })
-        } else {
-          // Otherwise, try to find any .thy file to open
-          const entries = await fs.list("/")
-          const thyFile = entries.find(
-            (entry) => entry.kind === "file" && entry.name.endsWith(".thy"),
-          )
-
-          if (thyFile) {
-            const contents = await fs.read(`/${thyFile.name}`)
-            state.setSourceCode({
-              path: `/${thyFile.name}`,
-              contents,
-              language: "thy",
-            })
-          } else {
-            // Clear the editor if no .thy files found
-            state.setSourceCode({
-              path: "",
-              contents: "",
-              language: "thy",
-            })
-          }
-        }
-
+        await scm.loadWorkspace(workspace)
         alerts.showToast(`Loaded workspace from ${path}`, "success")
       } catch (error) {
         alerts.showAlert(`Failed to load workspace: ${error}`)
@@ -122,20 +89,15 @@ export default function Menu({ fs, state, toggleLeftPanel }: MenuProps) {
           <FontAwesomeIcon icon={faGear} />
         </a>
         <a
-          onClick={() => {
-            // TODO: Run interpreter on entire workspace rather than just the one file.
-            // Note that this will require integrating the "thy" function
-            // which is partially implemented today in thy-from-blocks.ts
-            state.runThenSetOutput(state.sourceCode.contents)
-          }}
+          onClick={() => alerts.catch(scm.run())}
           className="button"
-          style={{ backgroundColor: "orange" }}
+          style={scm.isOutputStale ? { backgroundColor: "orange" } : {}}
           title="Run"
         >
           <FontAwesomeIcon icon={faPlay} />
         </a>
         <CopyToClipboardButton
-          getValue={() => makeShareUrl(fs.serialize())}
+          getValue={() => makeShareUrl(serialize(fs, scm))}
           tooltip="Copied URL"
           title="Share"
         >
@@ -149,7 +111,7 @@ export default function Menu({ fs, state, toggleLeftPanel }: MenuProps) {
         onSelect={handleWorkspaceSelected}
         mode={workspaceBrowserMode}
         currentPath={currentWorkspacePath}
-        currentWorkspace={fs.serialize()}
+        getCurrentWorkspace={() => serialize(fs, scm)}
         indexedDbFs={indexedDbFs}
       />
     </div>

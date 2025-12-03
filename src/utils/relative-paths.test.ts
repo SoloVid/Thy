@@ -1,21 +1,15 @@
-import { test } from "test-framework";
-import { relative } from "./relative-paths";
-import assert from "node:assert";
+import { test } from "test-framework"
+import { relative } from "./relative-paths"
+import assert from "node:assert"
 
 test("relative() should resolve self (top-level)", () => {
   relative
-  assert.strictEqual(
-    relative("blue.thy", "blue.thy"),
-    "./blue.thy",
-  )
+  assert.strictEqual(relative("blue.thy", "blue.thy"), "./blue.thy")
 })
 
 test("relative() should resolve sibling (top-level)", () => {
   relative
-  assert.strictEqual(
-    relative("blue.thy", "red.thy"),
-    "./red.thy",
-  )
+  assert.strictEqual(relative("blue.thy", "red.thy"), "./red.thy")
 })
 
 test("relative() should resolve self", () => {

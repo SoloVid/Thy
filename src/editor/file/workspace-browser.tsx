@@ -18,7 +18,7 @@ type WorkspaceBrowserProps = {
   onSelect: (path: string, workspace: SerializedWorkspace) => void
   mode: "load" | "save"
   currentPath?: string
-  currentWorkspace?: SerializedWorkspace
+  getCurrentWorkspace?: () => SerializedWorkspace
   indexedDbFs: FilesApi
 }
 
@@ -34,7 +34,7 @@ export function WorkspaceBrowser({
   onSelect,
   mode,
   currentPath,
-  currentWorkspace,
+  getCurrentWorkspace,
   indexedDbFs,
 }: WorkspaceBrowserProps) {
   const [currentDirectory, setCurrentDirectory] = useState<string>("/")
@@ -113,7 +113,7 @@ export function WorkspaceBrowser({
   }
 
   const handleSave = async () => {
-    if (!currentWorkspace) {
+    if (!getCurrentWorkspace) {
       alerts.showAlert("No workspace to save")
       return
     }
@@ -167,6 +167,7 @@ export function WorkspaceBrowser({
       }
 
       // Save the workspace
+      const currentWorkspace = getCurrentWorkspace()
       await indexedDbFs.write(
         savePath,
         JSON.stringify(currentWorkspace, null, 2),

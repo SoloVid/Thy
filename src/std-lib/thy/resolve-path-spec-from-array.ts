@@ -4,7 +4,7 @@ import { directoriesOf } from "./directory-utils"
 export function resolvePathSpecFromArray(
   sourceRelativePath: string,
   knownFilePaths: readonly string[],
-  pathSpec: string
+  pathSpec: string,
 ): readonly string[] {
   const possibleStartDirectories = directoriesOf(sourceRelativePath)
   return possibleStartDirectories

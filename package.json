@@ -23,7 +23,7 @@
     "format": "prettier --no-semi . --write",
     "generate-declarations": "tsc --emitDeclarationOnly",
     "website:build": "node -r esbuild-register src/build/build-website.main.ts",
-    "website:dev": "nodemon -r esbuild-register --watch src --watch docs src/build/dev-website.main.ts",
+    "website:dev": "nodemon -r esbuild-register -e ts,tsx,json,md --watch src --watch docs src/build/dev-website.main.ts",
     "website:dev:node-experimental": "node --experimental-strip-types --watch src/build/dev-website.main.ts",
     "interpret": "node -r esbuild-register src/interpreter/cli.ts",
     "serve": "node -r esbuild-register src/editor/server.ts",

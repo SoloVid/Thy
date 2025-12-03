@@ -1,7 +1,6 @@
 import assert from "utils/assert"
 import type { FilesApi } from "./files-api"
 import {
-  SerializedWorkspace,
   SerializedWorkspaceNode,
   SWDirectoryNode,
   SWFileNode,
@@ -155,8 +154,8 @@ function findParentDirectory(
 export type InMemoryFiles = FilesApi & {
   getRaw: () => Directory
   setRaw: (raw: Directory) => void
-  serialize: () => SerializedWorkspace
-  ingest: (serialized: SerializedWorkspace) => void
+  serialize: () => SWDirectoryNode
+  ingest: (serialized: SWDirectoryNode) => void
 }
 
 export function makeInMemoryFiles(now: Now): InMemoryFiles {

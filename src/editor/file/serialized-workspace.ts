@@ -12,22 +12,28 @@ export type SWDirectoryNode = {
 }
 
 export type SerializedWorkspaceNode = SWFileNode | SWDirectoryNode
-export type SerializedWorkspace = SWDirectoryNode
+export type SerializedWorkspace = {
+  root: SWDirectoryNode
+  selectedPath: string | null
+}
 
 export function makeWorkspaceFromScript(
   sourceCode: string = `return "himom"\n`,
 ): SerializedWorkspace {
   return {
-    kind: "directory",
-    name: "/",
-    children: [
-      {
-        kind: "file",
-        name: "main.thy",
-        contents: sourceCode,
-        timeModified: new Date().getTime(),
-      },
-    ],
-    timeModified: new Date().getTime(),
+    root: {
+      kind: "directory",
+      name: "/",
+      children: [
+        {
+          kind: "file",
+          name: "main.thy",
+          contents: sourceCode,
+          timeModified: new Date().getTime(),
+        },
+      ],
+      timeModified: new Date().getTime(),
+    },
+    selectedPath: "/main.thy",
   }
 }
