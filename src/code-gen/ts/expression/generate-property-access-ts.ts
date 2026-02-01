@@ -1,10 +1,10 @@
-import { fromToken } from "code-gen/utils/from-token"
+import { fromToken } from "code-gen/utils/from-token.ts"
 import type { TreeNode, TypePropertyAccess, ValuePropertyAccess } from "tree"
-import type { GeneratedSnippets } from "../../generator"
-import { makeGenerator } from "../generate-from-options"
-import type { GeneratorState } from "../generator-state"
-import type { LibraryGeneratorCollection } from "../library-generator"
-import type { CodeGeneratorFunc, GeneratorFixture } from "../ts-generator"
+import type { GeneratedSnippets } from "../../generator.ts"
+import { makeGenerator } from "../generate-from-options.ts"
+import type { GeneratorState } from "../generator-state.ts"
+import type { LibraryGeneratorCollection } from "../library-generator.ts"
+import type { CodeGeneratorFunc, GeneratorFixture } from "../ts-generator.ts"
 
 export function valuePropertyAccessGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,

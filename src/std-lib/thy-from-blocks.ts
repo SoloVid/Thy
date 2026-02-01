@@ -1,4 +1,4 @@
-import type { DebugNever, DefaultNever, NoInfer } from "../utils/utility-types"
+import type { DebugNever, DefaultNever, NoInfer } from "../utils/utility-types.ts"
 
 type BaseBlock = (args: { thy: ThyFunction<{}> }) => unknown
 type BaseBlockMap = Record<string, BaseBlock>

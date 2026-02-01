@@ -1,4 +1,4 @@
-import { globMatch } from "../../utils/glob-match"
+import { globMatch } from "../../utils/glob-match.ts"
 
 export type ThyCache = {
   readonly mine: Map<string, unknown>

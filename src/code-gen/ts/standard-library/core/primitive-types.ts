@@ -1,4 +1,4 @@
-import { makePrimitiveTypeGenerator } from "../helpers/primitive-type-generator"
+import { makePrimitiveTypeGenerator } from "../helpers/primitive-type-generator.ts"
 
 export const booleanTypeGenerator = makePrimitiveTypeGenerator(
   "Boolean",

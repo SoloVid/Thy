@@ -1,11 +1,11 @@
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import assert from "utils/assert"
-import { generateAssignmentTs } from "../../block/generate-assignment-ts"
-import { contextType } from "../../generator-context"
-import type { GeneratorForNameSpec } from "../../generator-for-name"
-import { addErrorForExcessArgs } from "../helpers/too-many-args-error"
-import { trace } from "code-gen/ts/utils/debug"
-import { nodeToString } from "code-gen/utils/to-string"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
+import assert from "utils/assert.ts"
+import { generateAssignmentTs } from "../../block/generate-assignment-ts.ts"
+import { contextType } from "../../generator-context.ts"
+import type { GeneratorForNameSpec } from "../../generator-for-name.ts"
+import { addErrorForExcessArgs } from "../helpers/too-many-args-error.ts"
+import { trace } from "code-gen/ts/utils/debug.ts"
+import { nodeToString } from "code-gen/utils/to-string.ts"
 
 export const defGenerator: GeneratorForNameSpec = {
   name: "def",

@@ -1,7 +1,7 @@
-import { tsGenerator } from "code-gen/ts/generate-ts"
-import { CodeGenTsStdLib, defaultCodeGenTsStdLib } from "code-gen/ts/std-lib"
-import { parseAll } from "./parse-workspace"
-import { makeNodeFileBrowser } from "utils/fs/node-fs-file-browse"
+import { tsGenerator } from "code-gen/ts/generate-ts.ts"
+import { CodeGenTsStdLib, defaultCodeGenTsStdLib } from "code-gen/ts/std-lib.ts"
+import { parseAll } from "./parse-workspace.ts"
+import { makeNodeFileBrowser } from "utils/fs/node-fs-file-browse.ts"
 import { writeFile } from "node:fs/promises"
 import { dirname, join, relative } from "node:path"
 import pathPosix from "node:path/posix"
@@ -30,7 +30,7 @@ export async function compileWorkspaceTs(options: Options) {
             .map((dependencies) =>
               dependencies.map(
                 (dep) =>
-                  `import ${dep.suggestedName} from "./${relative(dirname(join(options.inputDirectory, name)), join(options.inputDirectory, dep.id))}"`,
+                  `import ${dep.suggestedName} from "./${relative(dirname(join(options.inputDirectory, name)), join(options.inputDirectory, dep.id))}.ts"`,
               ),
             )
             .flat(),

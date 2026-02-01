@@ -1,5 +1,5 @@
 import { test } from "test-framework"
-import { resolvePathSpecFromArray } from "./resolve-path-spec-from-array"
+import { resolvePathSpecFromArray } from "./resolve-path-spec-from-array.ts"
 import assert from "node:assert"
 
 test("resolvePathSpecFromArray() should resolve singleton", () => {

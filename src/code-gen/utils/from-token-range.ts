@@ -1,5 +1,5 @@
 import type { TokenRange } from "common"
-import type { MappedGeneratedSnippet } from "../generator"
+import type { MappedGeneratedSnippet } from "../generator.ts"
 
 export function fromTokenRange(
   range: TokenRange,

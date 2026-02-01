@@ -1,12 +1,12 @@
-import type { CompileError } from "common/compile-error"
-import { readExampleFile } from "example"
+import type { CompileError } from "common/compile-error.ts"
+import { readExampleFile } from "@/example/index.ts"
 import { expect } from "expect"
 import { defineTestGroup } from "test-framework"
 import { makeTokenizer } from "tokenizer"
 import type { TreeNode } from "tree"
-import type { DeepPartial } from "utils/utility-types"
-import { badParse, BadParse, ErrorableTreeNode } from "../error"
-import { parse } from "../parser"
+import type { DeepPartial } from "utils/utility-types.ts"
+import { badParse, BadParse, ErrorableTreeNode } from "../error.ts"
+import { parse } from "../parser.ts"
 
 export const testParser = defineTestGroup("parser ")
 

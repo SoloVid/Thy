@@ -3,7 +3,7 @@ import {
   decompressFromEncodedURIComponent as decompressLz,
 } from "lz-string"
 import { useEffect } from "preact/hooks"
-import { SerializedWorkspace } from "../file/serialized-workspace"
+import { SerializedWorkspace } from "../file/serialized-workspace.ts"
 
 export function useSourceCodePopStateListener(
   setState: (state: ReturnType<typeof getDataFromHistory>) => void,

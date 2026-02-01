@@ -1,5 +1,5 @@
-import { tsGenerator } from "./generate-ts"
-import { CodeGenTsStdLib, defaultCodeGenTsStdLib } from "./std-lib"
+import { tsGenerator } from "./generate-ts.ts"
+import { CodeGenTsStdLib, defaultCodeGenTsStdLib } from "./std-lib.ts"
 
 type Options = {
   standardLibrary?: CodeGenTsStdLib

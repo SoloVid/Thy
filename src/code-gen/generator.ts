@@ -1,6 +1,6 @@
-import type { CompileError } from "../common/compile-error"
-import type { Token } from "../tokenizer/token"
-import type { TreeNode } from "../tree/tree-node"
+import type { CompileError } from "../common/compile-error.ts"
+import type { Token } from "../tokenizer/token.ts"
+import type { TreeNode } from "../tree/tree-node.ts"
 
 export interface GeneratorResult {
   readonly output: string

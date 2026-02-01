@@ -1,6 +1,6 @@
-import { nodeError } from "common/compile-error"
+import { nodeError } from "common/compile-error.ts"
 import type { Call, TypeCall } from "tree"
-import type { GeneratorState } from "../../generator-state"
+import type { GeneratorState } from "../../generator-state.ts"
 
 export function addErrorForExcessArgs(
   call: Call | TypeCall,

@@ -5,7 +5,7 @@ import {
 import {
   makeWorkspaceFromScript,
   SerializedWorkspace,
-} from "../file/serialized-workspace"
+} from "../file/serialized-workspace.ts"
 
 const workspaceParam = "w"
 

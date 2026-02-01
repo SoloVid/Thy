@@ -1,4 +1,4 @@
-import assert from "utils/assert"
+import assert from "utils/assert.ts"
 
 const navBar = document.getElementById("navigation-bar")
 let navBarUp: boolean = false

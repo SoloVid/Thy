@@ -1,6 +1,6 @@
 import assert from "node:assert"
 import { test } from "test-framework"
-import { interpretThyBlockSource } from "./block"
+import { interpretThyBlockSource } from "./block.ts"
 
 test("interpretThyBlock() should return an async function if the block contains `await` call-only line", async () => {
   const interpreted = interpretThyBlockSource(`await 5\nreturn that`)

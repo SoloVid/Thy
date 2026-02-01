@@ -2,7 +2,7 @@
 
 import type { RefObject } from "preact"
 import { useLayoutEffect, useState } from "preact/hooks"
-import useResizeObserver from "./resize-observer"
+import useResizeObserver from "./resize-observer.ts"
 
 /**
  * A React hook for measuring the size of HTML elements including when they change

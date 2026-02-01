@@ -1,5 +1,5 @@
 import type { Token } from "tokenizer"
-import type { tThat } from "tokenizer/token-type"
+import type { tThat } from "tokenizer/token-type.ts"
 import type {
   Expression,
   TypeExpression,
@@ -8,12 +8,12 @@ import type {
   ValueIdentifier,
   ValuePropertyAccess,
 } from "tree"
-import { type BadParse, badParse } from "./error"
+import { type BadParse, badParse } from "./error.ts"
 import type {
   IndeterminateExpression,
   IndeterminateTypeExpression,
-} from "./parse-expression"
-import type { ParserState } from "./parser-state"
+} from "./parse-expression.ts"
+import type { ParserState } from "./parser-state.ts"
 
 export type TempThatNode = {
   readonly type: "that"

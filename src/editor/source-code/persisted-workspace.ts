@@ -1,9 +1,9 @@
-import { extractCodeFromHistoryState } from "./history"
+import { extractCodeFromHistoryState } from "./history.ts"
 import {
   makeWorkspaceFromScript,
   SerializedWorkspace,
-} from "../file/serialized-workspace"
-import { extractWorkspaceFromUrl } from "./share-url"
+} from "../file/serialized-workspace.ts"
+import { extractWorkspaceFromUrl } from "./share-url.ts"
 
 export function getPersistedWorkspace(): SerializedWorkspace {
   const workspaceFromUrl = extractWorkspaceFromUrl()

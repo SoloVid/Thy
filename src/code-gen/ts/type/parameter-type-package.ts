@@ -1,16 +1,16 @@
 import type { TreeNode } from "tree"
-import assert from "utils/assert"
-import type { GeneratedSnippets } from "../../generator"
-import { fromComplicated } from "../../utils/from-complicated"
-import { makeIndent } from "../../utils/indent"
-import { generateParamsTs } from "../block/generate-params-ts"
-import type { GeneratorState } from "../generator-state"
+import assert from "utils/assert.ts"
+import type { GeneratedSnippets } from "../../generator.ts"
+import { fromComplicated } from "../../utils/from-complicated.ts"
+import { makeIndent } from "../../utils/indent.ts"
+import { generateParamsTs } from "../block/generate-params-ts.ts"
+import type { GeneratorState } from "../generator-state.ts"
 import type {
   GeneratorFixture,
   IndependentCodeGeneratorFunc,
-} from "../ts-generator"
-import { generateTypeArgsForBlockTs } from "./generate-type-args-ts"
-import { generateTypeParamsForBlockTs } from "./generate-type-params-ts"
+} from "../ts-generator.ts"
+import { generateTypeArgsForBlockTs } from "./generate-type-args-ts.ts"
+import { generateTypeParamsForBlockTs } from "./generate-type-params-ts.ts"
 
 export function makeParameterTypePackage(
   node: TreeNode,

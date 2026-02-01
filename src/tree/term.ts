@@ -8,7 +8,7 @@ import type {
   tTypeGiven,
   tTypeIdentifier,
   tValueIdentifier,
-} from "tokenizer/token-type"
+} from "tokenizer/token-type.ts"
 
 export interface NumberLiteral {
   readonly type: "number-literal"

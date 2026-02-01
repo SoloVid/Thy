@@ -7,18 +7,18 @@ import {
   tReturn,
   tStatementTerminator,
   tType,
-} from "tokenizer/token-type"
+} from "tokenizer/token-type.ts"
 import type { Idea } from "tree"
-import { badParse, BadParse } from "./error"
+import { badParse, BadParse } from "./error.ts"
 import {
   parseAssignmentOrCall,
   parseModifiedAssignment,
-} from "./parse-assignment-or-call"
-import { parseReturn } from "./parse-call"
-import { parseComment } from "./parse-comment"
-import { parseLetCall } from "./parse-let-call"
-import { parseTypeAssignment } from "./parse-type-assignment"
-import type { ParserState } from "./parser-state"
+} from "./parse-assignment-or-call.ts"
+import { parseReturn } from "./parse-call.ts"
+import { parseComment } from "./parse-comment.ts"
+import { parseLetCall } from "./parse-let-call.ts"
+import { parseTypeAssignment } from "./parse-type-assignment.ts"
+import type { ParserState } from "./parser-state.ts"
 
 export function parseIdea(state: ParserState): Idea {
   const result = parseIdeaUntilBadParse(state)

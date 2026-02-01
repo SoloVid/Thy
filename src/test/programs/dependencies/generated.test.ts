@@ -3,8 +3,8 @@
 
 import { join } from "node:path"
 import { test } from "test-framework"
-import { verifyInterpreterAndCompiler } from "test/verify"
-import logic from "./output/main.thy"
+import { verifyInterpreterAndCompiler } from "test/verify.ts"
+import logic from "./output/main.thy.ts"
 
 test("dependencies verify", async () => {
   await verifyInterpreterAndCompiler({

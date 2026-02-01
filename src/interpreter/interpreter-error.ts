@@ -1,5 +1,5 @@
-import type { CompileError } from "common/compile-error"
-import type { SourcePosition } from "common/source-position"
+import type { CompileError } from "common/compile-error.ts"
+import type { SourcePosition } from "common/source-position.ts"
 import type { TreeNode } from "tree"
 
 export function makeInterpreterNodeError(node: TreeNode, message: string) {

@@ -1,5 +1,5 @@
-import { checkProgramTree, testParser } from "."
-import { returnStyle } from "../../tree/block"
+import { checkProgramTree, testParser } from "./index.ts"
+import { returnStyle } from "../../tree/block.ts"
 
 testParser("should parse empty program", () => {
   checkProgramTree("", {

@@ -1,5 +1,5 @@
-import { addThyPrismGrammarAndAwaitAvailable } from "../../editor/prism-grammar"
-import { generateApiReference, generateHtmlAll } from "./helper"
+import { addThyPrismGrammarAndAwaitAvailable } from "../../editor/prism-grammar.ts"
+import { generateApiReference, generateHtmlAll } from "./helper.ts"
 
 export async function generateHtmlFiles() {
   await addThyPrismGrammarAndAwaitAvailable()

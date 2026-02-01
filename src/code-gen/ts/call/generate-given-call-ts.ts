@@ -1,11 +1,11 @@
-import type { GeneratorFixture } from "code-gen/ts/ts-generator"
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import { fromNode } from "code-gen/utils/from-node"
+import type { GeneratorFixture } from "code-gen/ts/ts-generator.ts"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
+import { fromNode } from "code-gen/utils/from-node.ts"
 import { nodeError } from "common"
 import type { GivenCall, TreeNode } from "tree"
-import type { GeneratedSnippets } from "../../generator"
-import type { GeneratorState } from "../generator-state"
-import { generateTypeTsForFunctionSignature } from "../type/generate-type-ts-for-function-signature"
+import type { GeneratedSnippets } from "../../generator.ts"
+import type { GeneratorState } from "../generator-state.ts"
+import { generateTypeTsForFunctionSignature } from "../type/generate-type-ts-for-function-signature.ts"
 
 export function tryGenerateGivenCallTs(
   node: TreeNode,

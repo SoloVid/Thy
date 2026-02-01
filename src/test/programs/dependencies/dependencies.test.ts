@@ -1,10 +1,10 @@
-import { compileWorkspaceTs } from "compiler/workspace-ts-compiler"
-import { interpretFile } from "node-runtime/interpret-file"
+import { compileWorkspaceTs } from "compiler/workspace-ts-compiler.ts"
+import { interpretFile } from "node-runtime/interpret-file.ts"
 import assert from "node:assert"
 import { join } from "node:path"
 import { test } from "test-framework"
-import { assertDirectoriesMatch } from "test/assert-directories-match"
-import { withTempDir } from "utils/temp-dir"
+import { assertDirectoriesMatch } from "test/assert-directories-match.ts"
+import { withTempDir } from "utils/temp-dir.ts"
 
 const inputDirectory = join(__dirname, "input")
 const expectedOutputDirectory = join(__dirname, "output")

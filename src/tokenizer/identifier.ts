@@ -1,9 +1,9 @@
-import { makeSingleRegexMatcher } from "./single-regex-matcher"
+import { makeSingleRegexMatcher } from "./single-regex-matcher.ts"
 import {
   tMemberAccessOperator,
   tTypeIdentifier,
   tValueIdentifier,
-} from "./token-type"
+} from "./token-type.ts"
 
 export const matchTypeIdentifier = makeSingleRegexMatcher(
   tTypeIdentifier,

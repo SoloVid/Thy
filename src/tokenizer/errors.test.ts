@@ -1,11 +1,11 @@
 import { expect } from "expect"
-import { testTokenizer, tokenizeSource } from "./test-helper"
+import { testTokenizer, tokenizeSource } from "./test-helper.ts"
 import {
   tErrorToken,
   tMemberAccessOperator,
   tStatementTerminator,
   tValueIdentifier,
-} from "./token-type"
+} from "./token-type.ts"
 
 testTokenizer("can return error tokens and recover", () => {
   const source = "crash !$@ recover"

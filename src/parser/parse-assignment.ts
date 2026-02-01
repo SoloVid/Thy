@@ -1,4 +1,4 @@
-import { tokenError } from "common/compile-error"
+import { tokenError } from "common/compile-error.ts"
 import type { Token } from "tokenizer"
 import {
   tConstDeclAssign,
@@ -7,7 +7,7 @@ import {
   tTypeIdentifier,
   tValueIdentifier,
   tVarDeclAssign,
-} from "tokenizer/token-type"
+} from "tokenizer/token-type.ts"
 import type {
   Assignment,
   ConstantDeclaration,
@@ -17,15 +17,15 @@ import type {
   VariableDeclaration,
   VariableReassignment,
 } from "tree"
-import { addNodeError, addTokenError, badParse, BadParse } from "./error"
-import { getFirstToken } from "./helper"
-import { parseCall } from "./parse-call"
-import type { ParserState } from "./parser-state"
+import { addNodeError, addTokenError, badParse, BadParse } from "./error.ts"
+import { getFirstToken } from "./helper.ts"
+import { parseCall } from "./parse-call.ts"
+import type { ParserState } from "./parser-state.ts"
 import {
   collapseThat,
   IndeterminateValuePropertyAccess,
   TempThatNode,
-} from "./that"
+} from "./that.ts"
 
 export type PossibleAssignmentTarget =
   | ValueIdentifier

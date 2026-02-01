@@ -1,4 +1,4 @@
-export { isAssignment, isDeclaration } from "./assignment"
+export { isAssignment, isDeclaration } from "./assignment.ts"
 export type {
   Assignment,
   ConstantDeclaration,
@@ -6,32 +6,32 @@ export type {
   PropertyAssignment,
   VariableDeclaration,
   VariableReassignment,
-} from "./assignment"
-export { returnStyle } from "./block"
-export type { Block, ReturnStyle } from "./block"
-export { isCall } from "./call"
-export type { AwaitCall, Call, GivenCall, Return, ValueCall } from "./call"
+} from "./assignment.ts"
+export { returnStyle } from "./block.ts"
+export type { Block, ReturnStyle } from "./block.ts"
+export { isCall } from "./call.ts"
+export type { AwaitCall, Call, GivenCall, Return, ValueCall } from "./call.ts"
 export type {
   CallableExpression,
   Expression,
   TypeExpression,
-} from "./expression"
-export { isIdeaAsync } from "./idea"
-export type { BlankLine, Comment, Idea } from "./idea"
-export type { LetCall } from "./let-call"
+} from "./expression.ts"
+export { isIdeaAsync } from "./idea.ts"
+export type { BlankLine, Comment, Idea } from "./idea.ts"
+export type { LetCall } from "./let-call.ts"
 export type {
   SimpleTypePropertyAccess,
   SimpleValuePropertyAccess,
   TypePropertyAccess,
   ValuePropertyAccess,
-} from "./property-access"
+} from "./property-access.ts"
 export type {
   StringContent,
   StringInterpolation,
   StringLiteral,
   StringPart,
-} from "./string"
-export type { ReadSymbolTable, SymbolTable } from "./symbol-table"
+} from "./string.ts"
+export type { ReadSymbolTable, SymbolTable } from "./symbol-table.ts"
 export type {
   AwaitTerm,
   GivenTerm,
@@ -39,7 +39,7 @@ export type {
   ReturnTerm,
   TypeIdentifier,
   ValueIdentifier,
-} from "./term"
-export type { TreeNode, TypedTreeNode } from "./tree-node"
-export type { TypeAssignment } from "./type-assignment"
-export type { TypeCall, TypeGivenCall, TypeReturn } from "./type-call"
+} from "./term.ts"
+export type { TreeNode, TypedTreeNode } from "./tree-node.ts"
+export type { TypeAssignment } from "./type-assignment.ts"
+export type { TypeCall, TypeGivenCall, TypeReturn } from "./type-call.ts"

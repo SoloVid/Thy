@@ -1,8 +1,8 @@
-import type { GeneratorFixture } from "code-gen/ts/ts-generator"
+import type { GeneratorFixture } from "code-gen/ts/ts-generator.ts"
 import type { TreeNode } from "tree"
-import assert from "utils/assert"
-import type { GeneratorState } from "../generator-state"
-import { separateSnippetsWithCommas } from "../utils/comma-separated-snippets"
+import assert from "utils/assert.ts"
+import type { GeneratorState } from "../generator-state.ts"
+import { separateSnippetsWithCommas } from "../utils/comma-separated-snippets.ts"
 
 export function generateParamsTs(
   node: TreeNode,

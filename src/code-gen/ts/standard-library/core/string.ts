@@ -1,8 +1,8 @@
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import type { GeneratorForNameSpec } from "../../generator-for-name"
-import { autoTight } from "../../utils/auto-tight"
-import { addErrorForExcessArgs } from "../helpers/too-many-args-error"
-import { contextType } from "code-gen/ts/generator-context"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
+import type { GeneratorForNameSpec } from "../../generator-for-name.ts"
+import { autoTight } from "../../utils/auto-tight.ts"
+import { addErrorForExcessArgs } from "../helpers/too-many-args-error.ts"
+import { contextType } from "code-gen/ts/generator-context.ts"
 
 export const stringGenerator: GeneratorForNameSpec = {
   name: "string",

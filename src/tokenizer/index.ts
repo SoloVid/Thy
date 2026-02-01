@@ -1,5 +1,5 @@
-import { makeTopTokenizer } from "./top"
-export type { Token } from "./token"
-export type { Tokenizer } from "./tokenizer"
+import { makeTopTokenizer } from "./top.ts"
+export type { Token } from "./token.ts"
+export type { Tokenizer } from "./tokenizer.ts"
 
 export const makeTokenizer = makeTopTokenizer

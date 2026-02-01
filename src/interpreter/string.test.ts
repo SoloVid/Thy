@@ -1,15 +1,15 @@
-import type { CompileError } from "common/compile-error"
+import type { CompileError } from "common/compile-error.ts"
 import { expect } from "expect"
 import assert from "node:assert"
-import { badParse } from "parser/error"
-import { parseStringLiteral } from "parser/parse-string"
-import { makeParserState } from "parser/parser-state"
+import { badParse } from "parser/error.ts"
+import { parseStringLiteral } from "parser/parse-string.ts"
+import { makeParserState } from "parser/parser-state.ts"
 import { test } from "test-framework"
 import { makeTokenizer } from "tokenizer"
-import { InterpreterErrorWithContext } from "./interpreter-error"
-import { interpretThyString } from "./string"
-import { makeSimpleContext } from "./test-helper"
-import type { ThyBlockContext } from "./types"
+import { InterpreterErrorWithContext } from "./interpreter-error.ts"
+import { interpretThyString } from "./string.ts"
+import { makeSimpleContext } from "./test-helper.ts"
+import type { ThyBlockContext } from "./types.ts"
 
 function interpretString(context: ThyBlockContext, source: string) {
   const errors: CompileError[] = []

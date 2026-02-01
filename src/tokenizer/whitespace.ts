@@ -1,6 +1,6 @@
-import { makeSingleRegexMatcher } from "./single-regex-matcher"
-import { skipToken } from "./token-matcher"
-import { tStatementTerminator } from "./token-type"
+import { makeSingleRegexMatcher } from "./single-regex-matcher.ts"
+import { skipToken } from "./token-matcher.ts"
+import { tStatementTerminator } from "./token-type.ts"
 
 export const matchStatementTerminator = makeSingleRegexMatcher(
   tStatementTerminator,

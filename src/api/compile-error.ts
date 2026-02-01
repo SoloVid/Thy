@@ -2,8 +2,8 @@ import {
   codeFrameColumns,
   SourceLocation as CodeFrameSourceLocation,
 } from "@babel/code-frame"
-import type { CompileError as InternalError } from "common/compile-error"
-import type { SourcePosition } from "common/source-position"
+import type { CompileError as InternalError } from "../common/compile-error.ts"
+import type { SourcePosition } from "../common/source-position.ts"
 
 export interface CompileError {
   message: string

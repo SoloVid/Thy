@@ -1,53 +1,53 @@
-import { nodeToString } from "code-gen/utils/to-string"
-import { nodeError } from "common/compile-error"
+import { nodeToString } from "code-gen/utils/to-string.ts"
+import { nodeError } from "common/compile-error.ts"
 import type { TreeNode } from "tree"
 import type {
   GeneratedSnippet,
   GeneratedSnippets,
   GeneratorResult,
-} from "../generator"
-import { fromNode } from "../utils/from-node"
-import { assignmentGeneratorTs } from "./block/generate-assignment-ts"
-import { tryGenerateBlankLineTs } from "./block/generate-blank-line-ts"
-import { tryGenerateBlockTs } from "./block/generate-block-ts"
-import { tryGenerateCommentTs } from "./block/generate-comment-ts"
-import { letCallGeneratorTs } from "./block/generate-let-call-ts"
-import { tryGenerateAwaitCallTs } from "./call/generate-await-call-ts"
-import { valueCallGeneratorTs } from "./call/generate-call-ts"
-import { tryGenerateGivenCallTs } from "./call/generate-given-call-ts"
-import { tryGenerateReturnTs } from "./call/generate-return-ts"
-import { tryGenerateSpecialVanillaCallTs } from "./call/generate-special-vanilla-call-ts"
-import { tryGenerateNumberTs } from "./expression/generate-number-ts"
+} from "../generator.ts"
+import { fromNode } from "../utils/from-node.ts"
+import { assignmentGeneratorTs } from "./block/generate-assignment-ts.ts"
+import { tryGenerateBlankLineTs } from "./block/generate-blank-line-ts.ts"
+import { tryGenerateBlockTs } from "./block/generate-block-ts.ts"
+import { tryGenerateCommentTs } from "./block/generate-comment-ts.ts"
+import { letCallGeneratorTs } from "./block/generate-let-call-ts.ts"
+import { tryGenerateAwaitCallTs } from "./call/generate-await-call-ts.ts"
+import { valueCallGeneratorTs } from "./call/generate-call-ts.ts"
+import { tryGenerateGivenCallTs } from "./call/generate-given-call-ts.ts"
+import { tryGenerateReturnTs } from "./call/generate-return-ts.ts"
+import { tryGenerateSpecialVanillaCallTs } from "./call/generate-special-vanilla-call-ts.ts"
+import { tryGenerateNumberTs } from "./expression/generate-number-ts.ts"
 import {
   typePropertyAccessGeneratorTs,
   valuePropertyAccessGeneratorTs,
-} from "./expression/generate-property-access-ts"
+} from "./expression/generate-property-access-ts.ts"
 import {
   tryGenerateStringTs,
   tryGenerateStringTypeTs,
-} from "./expression/generate-string-ts"
+} from "./expression/generate-string-ts.ts"
 import {
   typeIdentifierGeneratorTs,
   typeIdentifierGeneratorTypeTs,
-} from "./expression/generate-type-identifier-ts"
-import { valueIdentifierGeneratorTs } from "./expression/generate-value-identifier-ts"
+} from "./expression/generate-type-identifier-ts.ts"
+import { valueIdentifierGeneratorTs } from "./expression/generate-value-identifier-ts.ts"
 import {
   makeGenerator,
   makeGeneratorWithFixtureSideCar,
-} from "./generate-from-options"
-import { contextType } from "./generator-context"
-import { GeneratorState, makeGeneratorState } from "./generator-state"
-import type { LibraryGeneratorCollection } from "./library-generator"
-import type { GeneratorFixture } from "./ts-generator"
-import { generateExpressionAsTypeTs } from "./type/generate-expression-as-type-ts"
-import { typeAssignmentGeneratorTs } from "./type/generate-type-assignment-ts"
+} from "./generate-from-options.ts"
+import { contextType } from "./generator-context.ts"
+import { GeneratorState, makeGeneratorState } from "./generator-state.ts"
+import type { LibraryGeneratorCollection } from "./library-generator.ts"
+import type { GeneratorFixture } from "./ts-generator.ts"
+import { generateExpressionAsTypeTs } from "./type/generate-expression-as-type-ts.ts"
+import { typeAssignmentGeneratorTs } from "./type/generate-type-assignment-ts.ts"
 import {
   typeCallGeneratorTs,
   typeCallGeneratorTypeTs,
-} from "./type/generate-type-call-ts"
-import { tryGenerateTypeGivenCallTs } from "./type/generate-type-given-call-ts"
-import { autoTightS } from "./utils/auto-tight"
-import { trace } from "./utils/debug"
+} from "./type/generate-type-call-ts.ts"
+import { tryGenerateTypeGivenCallTs } from "./type/generate-type-given-call-ts.ts"
+import { autoTightS } from "./utils/auto-tight.ts"
+import { trace } from "./utils/debug.ts"
 
 export const tsGenerator =
   (

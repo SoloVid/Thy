@@ -3,7 +3,7 @@ import {
   checkExampleProgramTokens,
   checkSourceTokens,
   testTokenizer,
-} from "./test-helper"
+} from "./test-helper.ts"
 import {
   tConstDeclAssign,
   tEndBlock,
@@ -17,7 +17,7 @@ import {
   tStatementTerminator,
   tStringText,
   tValueIdentifier,
-} from "./token-type"
+} from "./token-type.ts"
 
 testTokenizer(
   "should tokenize simple multi-line strings correctly",

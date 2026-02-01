@@ -1,4 +1,4 @@
-import { checkExampleProgramTree, testParser } from ".."
+import { checkExampleProgramTree, testParser } from "../index.ts"
 
 testParser(
   "should parse example program variables/unscoped-use.thy",

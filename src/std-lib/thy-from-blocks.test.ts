@@ -1,9 +1,9 @@
 import assert from "assert"
 import { defineTestGroup } from "test-framework"
-import { assertType } from "../utils/assert"
-import { permute } from "../utils/permute"
-import type { DebugNever } from "../utils/utility-types"
-import { makeThyFromBlocks, ThyFunction } from "./thy-from-blocks"
+import { assertType } from "../utils/assert.ts"
+import { permute } from "../utils/permute.ts"
+import type { DebugNever } from "../utils/utility-types.ts"
+import { makeThyFromBlocks, ThyFunction } from "./thy-from-blocks.ts"
 
 const testMakeThy = defineTestGroup("makeThyFromBlocks() ")
 

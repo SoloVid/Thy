@@ -1,8 +1,8 @@
 import type { JSX } from "preact"
 import { useEffect, useMemo, useRef, useState } from "preact/hooks"
 import Prism from "prismjs"
-import { addThyPrismGrammarAndAwaitAvailable } from "./prism-grammar"
-import useSize from "./hook/size"
+import { addThyPrismGrammarAndAwaitAvailable } from "./prism-grammar.ts"
+import useSize from "./hook/size.ts"
 
 export type CodeInputProps = {
   id: string

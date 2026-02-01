@@ -5,24 +5,24 @@ import {
   tPrivate,
   tType,
   tVarDeclAssign,
-} from "tokenizer/token-type"
+} from "tokenizer/token-type.ts"
 import type { Assignment } from "tree"
 import { isAssignment } from "tree"
-import assert from "utils/assert"
-import { addTokenError, badParse } from "./error"
+import assert from "utils/assert.ts"
+import { addTokenError, badParse } from "./error.ts"
 import {
   parseConstantDeclarationGivenTargetAndOperator,
   parsePropertyAssignmentGivenTargetAndOperator,
   parseVariableDeclarationGivenTargetAndOperator,
   parseVariableReassignmentGivenTargetAndOperator,
-} from "./parse-assignment"
+} from "./parse-assignment.ts"
 import {
   parseSpecialCallOrFallback,
   parseValueCallGivenTarget,
-} from "./parse-call"
-import { parseIndeterminateNamedValueExpression } from "./parse-named-expression"
-import { parseTypeAssignment } from "./parse-type-assignment"
-import type { ParserState } from "./parser-state"
+} from "./parse-call.ts"
+import { parseIndeterminateNamedValueExpression } from "./parse-named-expression.ts"
+import { parseTypeAssignment } from "./parse-type-assignment.ts"
+import type { ParserState } from "./parser-state.ts"
 
 /**
  * Parse an assignment idea beginning with export or private.

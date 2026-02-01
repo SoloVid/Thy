@@ -1,9 +1,9 @@
-import { tokenError } from "common/compile-error"
+import { tokenError } from "common/compile-error.ts"
 import type { Idea } from "tree"
 import { isAssignment } from "tree"
-import { badParse } from "./error"
-import type { ParserState } from "./parser-state"
-import type { TempThatNode } from "./that"
+import { badParse } from "./error.ts"
+import type { ParserState } from "./parser-state.ts"
+import type { TempThatNode } from "./that.ts"
 
 export function makeThatIdeaTracker(addError: ParserState["addError"]) {
   const ideas: Idea[] = []

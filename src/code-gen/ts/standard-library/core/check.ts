@@ -1,15 +1,15 @@
-import { fromComplicated } from "code-gen/utils/from-complicated"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
 import type {
   GeneratorForNameParentSpec,
   GeneratorForNameSpec,
-} from "../../generator-for-name"
-import { contextType } from "code-gen/ts/generator-context"
-import { autoTight } from "../../utils/auto-tight"
+} from "../../generator-for-name.ts"
+import { contextType } from "code-gen/ts/generator-context.ts"
+import { autoTight } from "../../utils/auto-tight.ts"
 import {
   makeLogicalFunctionGenerator,
   makeSequencedLogicalFunctionGenerator,
-} from "../helpers/logical-function-generator"
-import { addErrorForExcessArgs } from "../helpers/too-many-args-error"
+} from "../helpers/logical-function-generator.ts"
+import { addErrorForExcessArgs } from "../helpers/too-many-args-error.ts"
 
 const all = makeLogicalFunctionGenerator("all", "&&")
 const asc = makeSequencedLogicalFunctionGenerator("asc", "<")

@@ -1,4 +1,4 @@
-import { generateCodeBlock } from "./code-block"
+import { generateCodeBlock } from "./code-block.ts"
 
 type CodeComparisonProps = {
   source1: string

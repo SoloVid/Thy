@@ -1,7 +1,7 @@
 import assert from "node:assert"
 import { readFile } from "node:fs/promises"
 import { join } from "node:path"
-import { collectFiles } from "utils/collect-files"
+import { collectFiles } from "utils/collect-files.ts"
 
 export async function assertDirectoriesMatch(
   actualDirectory: string,

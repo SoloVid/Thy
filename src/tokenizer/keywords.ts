@@ -1,4 +1,4 @@
-import { makeSingleRegexMatcher } from "./single-regex-matcher"
+import { makeSingleRegexMatcher } from "./single-regex-matcher.ts"
 import {
   tAwait,
   tConstDeclAssign,
@@ -14,7 +14,7 @@ import {
   tType,
   tTypeGiven,
   tVarDeclAssign,
-} from "./token-type"
+} from "./token-type.ts"
 
 export const matchStatementContinuation = makeSingleRegexMatcher(
   tStatementContinuation,

@@ -1,9 +1,9 @@
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import { fromToken } from "code-gen/utils/from-token"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
+import { fromToken } from "code-gen/utils/from-token.ts"
 import { returnStyle, type Block } from "tree"
-import { genIndent } from "../../utils/indent"
-import type { GeneratorState } from "../generator-state"
-import { ContextType, contextType } from "../generator-context"
+import { genIndent } from "../../utils/indent.ts"
+import type { GeneratorState } from "../generator-state.ts"
+import { ContextType, contextType } from "../generator-context.ts"
 
 const allowedContexts: readonly ContextType[] = [
   contextType.blockAllowingReturn,

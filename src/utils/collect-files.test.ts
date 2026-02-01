@@ -1,6 +1,6 @@
 import assert from "node:assert"
 import { test } from "test-framework"
-import { collectFiles } from "./collect-files"
+import { collectFiles } from "./collect-files.ts"
 
 // test("collectFiles() should return recursive list of files, sorted by depth", async () => {
 //   const files = await collectFiles(testFileDir)

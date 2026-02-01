@@ -2,7 +2,7 @@ import { test } from "test-framework"
 import {
   compileAndVerifyOutput,
   tsCoreCompiler,
-} from "../../compile-valid-program.test.helper"
+} from "../../compile-valid-program.test.helper.ts"
 
 test("compile related function types", async () => {
   await compileAndVerifyOutput(

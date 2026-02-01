@@ -1,14 +1,14 @@
-import type { TokenRange } from "common/token-range"
+import type { TokenRange } from "common/token-range.ts"
 import type { Token } from "tokenizer"
-import type { tThat, tValueIdentifier } from "tokenizer/token-type"
+import type { tThat, tValueIdentifier } from "tokenizer/token-type.ts"
 import type {
   CallableExpression,
   Expression,
   TypeExpression,
-} from "./expression"
-import type { PrimitiveStringLiteral } from "./string"
-import type { AwaitTerm, GivenTerm, ReturnTerm, ThyTerm } from "./term"
-import type { TreeNode } from "./tree-node"
+} from "./expression.ts"
+import type { PrimitiveStringLiteral } from "./string.ts"
+import type { AwaitTerm, GivenTerm, ReturnTerm, ThyTerm } from "./term.ts"
+import type { TreeNode } from "./tree-node.ts"
 
 export type Call = AwaitCall | GivenCall | ThyCall | ValueCall
 

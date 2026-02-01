@@ -1,4 +1,4 @@
-import type { CompileError } from "./compile-error"
+import type { CompileError } from "./compile-error.ts"
 
 export interface CompileResults {
   files: readonly FileCompileResults[]

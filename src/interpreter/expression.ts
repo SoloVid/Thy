@@ -5,10 +5,10 @@ import type {
   ValuePropertyAccess,
 } from "tree"
 import { isCall } from "tree"
-import assert from "utils/assert"
-import { forwardWait, MayWait, NotWait, notWait } from "./async-helper"
-import { interpretThyBlockNode } from "./block"
-import { interpretThyCall } from "./call"
+import assert from "utils/assert.ts"
+import { forwardWait, MayWait, NotWait, notWait } from "./async-helper.ts"
+import { interpretThyBlockNode } from "./block.ts"
+import { interpretThyCall } from "./call.ts"
 import {
   isVoid,
   RuntimeFunction,
@@ -16,10 +16,10 @@ import {
   RuntimeValue,
   yesIThinkThisIsRuntimeObject,
   yesThisValueIsForRuntime,
-} from "./dynamic-type"
-import { makeInterpreterNodeError } from "./interpreter-error"
-import { interpretThyString } from "./string"
-import type { ThyBlockContext } from "./types"
+} from "./dynamic-type.ts"
+import { makeInterpreterNodeError } from "./interpreter-error.ts"
+import { interpretThyString } from "./string.ts"
+import type { ThyBlockContext } from "./types.ts"
 
 export type InterpretedExpression = {
   target: RuntimeReturn

@@ -1,8 +1,8 @@
-import { compileWorkspaceTs } from "compiler/workspace-ts-compiler"
-import { interpretFile } from "node-runtime/interpret-file"
+import { compileWorkspaceTs } from "compiler/workspace-ts-compiler.ts"
+import { interpretFile } from "node-runtime/interpret-file.ts"
 import assert from "node:assert"
-import { withTempDir } from "utils/temp-dir"
-import { assertDirectoriesMatch } from "./assert-directories-match"
+import { withTempDir } from "utils/temp-dir.ts"
+import { assertDirectoriesMatch } from "./assert-directories-match.ts"
 
 type Options = {
   inputDir: string

@@ -1,4 +1,4 @@
-import { tNumberLiteral, tStartBlock, tStartString } from "tokenizer/token-type"
+import { tNumberLiteral, tStartBlock, tStartString } from "tokenizer/token-type.ts"
 import type {
   Block,
   NumberLiteral,
@@ -6,19 +6,19 @@ import type {
   TypeIdentifier,
   ValueIdentifier,
 } from "tree"
-import type { BadParse } from "./error"
-import { parseBlock } from "./parse-block"
+import type { BadParse } from "./error.ts"
+import { parseBlock } from "./parse-block.ts"
 import {
   parseAnyIndeterminateNamedExpression,
   parseIndeterminateNamedValueExpression,
-} from "./parse-named-expression"
-import { parseStringLiteral } from "./parse-string"
-import type { ParserState } from "./parser-state"
+} from "./parse-named-expression.ts"
+import { parseStringLiteral } from "./parse-string.ts"
+import type { ParserState } from "./parser-state.ts"
 import {
   IndeterminateTypePropertyAccess,
   IndeterminateValuePropertyAccess,
   TempThatNode,
-} from "./that"
+} from "./that.ts"
 
 export type IndeterminateExpression =
   | Block

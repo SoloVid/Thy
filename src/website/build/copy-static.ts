@@ -1,7 +1,7 @@
 import { cp, mkdir } from "node:fs/promises"
 import { dirname, join } from "node:path"
-import { rootDir } from "root-dir"
-import { walkFiles } from "utils/walk-files"
+import { rootDir } from "@/root-dir.ts"
+import { walkFiles } from "utils/walk-files.ts"
 
 export async function copyStaticFiles() {
   const inputDir = join(rootDir, "src/website/static")

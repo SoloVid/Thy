@@ -1,5 +1,5 @@
 import type { SourcePosition } from "common"
-import type { TokenType } from "./token-type"
+import type { TokenType } from "./token-type.ts"
 
 export interface OneTokenizer {
   readonly type: TokenType

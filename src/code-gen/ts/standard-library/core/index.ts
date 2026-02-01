@@ -1,7 +1,7 @@
-import { makeLibraryGenerators } from "../../library-generator"
-import { castGenerator } from "./cast"
-import { checkGenerator } from "./check"
-import { defGenerator } from "./def"
+import { makeLibraryGenerators } from "../../library-generator.ts"
+import { castGenerator } from "./cast.ts"
+import { checkGenerator } from "./check.ts"
+import { defGenerator } from "./def.ts"
 import {
   catchGenerator,
   elseGenerator,
@@ -9,19 +9,19 @@ import {
   finallyGenerator,
   nullGenerator,
   trueGenerator,
-} from "./globals"
-import { ifGenerator } from "./if"
-import { mathGenerator } from "./math"
+} from "./globals.ts"
+import { ifGenerator } from "./if.ts"
+import { mathGenerator } from "./math.ts"
 import {
   booleanTypeGenerator,
   numberTypeGenerator,
   stringTypeGenerator,
   unknownTypeGenerator,
   voidTypeGenerator,
-} from "./primitive-types"
-import { printGenerator } from "./print"
-import { stringGenerator } from "./string"
-import { intersectionGenerator, unionGenerator } from "./transform-types"
+} from "./primitive-types.ts"
+import { printGenerator } from "./print.ts"
+import { stringGenerator } from "./string.ts"
+import { intersectionGenerator, unionGenerator } from "./transform-types.ts"
 
 /**
  * Standard library for core language functionality (e.g. control flow and math).

@@ -1,11 +1,11 @@
 import type { TreeNode, TypeCall } from "tree"
-import type { GeneratedSnippets } from "../../generator"
-import { generateCallTsInTypeContext } from "../call/generate-call-ts"
-import { makeGenerator, tryGeneratorOptions } from "../generate-from-options"
-import type { GeneratorState } from "../generator-state"
-import type { LibraryGeneratorCollection } from "../library-generator"
-import type { CodeGeneratorFunc, GeneratorFixture } from "../ts-generator"
-import { tryGenerateTypeGivenCallTs } from "./generate-type-given-call-ts"
+import type { GeneratedSnippets } from "../../generator.ts"
+import { generateCallTsInTypeContext } from "../call/generate-call-ts.ts"
+import { makeGenerator, tryGeneratorOptions } from "../generate-from-options.ts"
+import type { GeneratorState } from "../generator-state.ts"
+import type { LibraryGeneratorCollection } from "../library-generator.ts"
+import type { CodeGeneratorFunc, GeneratorFixture } from "../ts-generator.ts"
+import { tryGenerateTypeGivenCallTs } from "./generate-type-given-call-ts.ts"
 
 export function typeCallGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,

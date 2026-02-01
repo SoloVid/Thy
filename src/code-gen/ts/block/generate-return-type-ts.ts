@@ -1,8 +1,8 @@
-import type { GeneratorFixture } from "code-gen/ts/ts-generator"
+import type { GeneratorFixture } from "code-gen/ts/ts-generator.ts"
 import type { Return, TreeNode, TypeExpression, TypeReturn } from "tree"
-import type { GeneratedSnippets } from "../../generator"
-import type { GeneratorState } from "../generator-state"
-import { generateTypeTsForFunctionSignature } from "../type/generate-type-ts-for-function-signature"
+import type { GeneratedSnippets } from "../../generator.ts"
+import type { GeneratorState } from "../generator-state.ts"
+import { generateTypeTsForFunctionSignature } from "../type/generate-type-ts-for-function-signature.ts"
 
 export function tryGenerateReturnTypeTs(
   node: TreeNode,

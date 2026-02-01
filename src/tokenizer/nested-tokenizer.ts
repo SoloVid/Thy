@@ -1,8 +1,8 @@
-import type { CompileError } from "../common/compile-error"
-import type { TokenMatcher } from "./token-matcher"
-import type { tErrorToken, TokenType } from "./token-type"
-import { makeGenericTokenizer } from "./tokenizer"
-import type { TokenizerState } from "./tokenizer-state"
+import type { CompileError } from "../common/compile-error.ts"
+import type { TokenMatcher } from "./token-matcher.ts"
+import type { tErrorToken, TokenType } from "./token-type.ts"
+import { makeGenericTokenizer } from "./tokenizer.ts"
+import type { TokenizerState } from "./tokenizer-state.ts"
 
 export function makeNestedTokenizerMatcher(
   firstTokenType: Exclude<TokenType, typeof tErrorToken>,

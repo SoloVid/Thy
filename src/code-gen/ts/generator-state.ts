@@ -1,10 +1,10 @@
-import type { CompileError } from "common/compile-error"
-import type { Token } from "tokenizer/token"
+import type { CompileError } from "common/compile-error.ts"
+import type { Token } from "tokenizer/token.ts"
 import type { Block, ReadSymbolTable } from "tree"
-import type { GeneratedSnippet, GeneratedSnippets } from "../generator"
-import { ContextType, contextType } from "./generator-context"
-import type { IndependentCodeGeneratorFunc } from "./ts-generator"
-import { trace } from "./utils/debug"
+import type { GeneratedSnippet, GeneratedSnippets } from "../generator.ts"
+import { ContextType, contextType } from "./generator-context.ts"
+import type { IndependentCodeGeneratorFunc } from "./ts-generator.ts"
+import { trace } from "./utils/debug.ts"
 
 interface GeneratorStateOptions {
   readonly symbolTable?: ReadSymbolTable

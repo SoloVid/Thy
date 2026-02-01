@@ -1,7 +1,7 @@
 import type { StringLiteral } from "tree"
-import { interpretThyValueIdentifier } from "./expression"
-import { makeInterpreterNodeError } from "./interpreter-error"
-import type { ThyBlockContext } from "./types"
+import { interpretThyValueIdentifier } from "./expression.ts"
+import { makeInterpreterNodeError } from "./interpreter-error.ts"
+import type { ThyBlockContext } from "./types.ts"
 
 export function interpretThyString(
   context: ThyBlockContext,

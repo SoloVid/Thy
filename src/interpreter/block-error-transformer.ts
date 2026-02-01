@@ -2,8 +2,8 @@ import {
   dissectErrorTraceAtCloserBaseline,
   replaceErrorTraceLine,
   transformErrorTrace,
-} from "utils/error-helper"
-import { InterpreterErrorWithContext } from "./interpreter-error"
+} from "utils/error-helper.ts"
+import { InterpreterErrorWithContext } from "./interpreter-error.ts"
 
 export function throwTransformedError(
   errorCloseToCall: unknown,

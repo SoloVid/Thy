@@ -1,7 +1,7 @@
 import { ComponentChildren, createContext } from "preact"
 import { useCallback, useContext, useState } from "preact/hooks"
-import { catchReject } from "utils/promise-helper"
-import { stringifyError } from "utils/stringify-error"
+import { catchReject } from "utils/promise-helper.ts"
+import { stringifyError } from "utils/stringify-error.ts"
 
 type AlertType = "error" | "info" | "success" | "warning"
 

@@ -1,5 +1,5 @@
 import type { TreeNode } from "tree"
-import type { ErrorableTreeNode } from "./error"
+import type { ErrorableTreeNode } from "./error.ts"
 
 export function getFirstToken(node: TreeNode | ErrorableTreeNode) {
   if ("token" in node) {

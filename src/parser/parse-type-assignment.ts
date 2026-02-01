@@ -4,13 +4,13 @@ import {
   tType,
   tTypeIdentifier,
   tVarDeclAssign,
-} from "tokenizer/token-type"
+} from "tokenizer/token-type.ts"
 import type { TypeAssignment, TypeIdentifier } from "tree"
-import assert from "utils/assert"
-import { addTokenError, badParse, BadParse } from "./error"
-import { applyToSymbolTable } from "./parse-assignment"
-import { parseTypeCallOrValueCall } from "./parse-type-call"
-import type { ParserState } from "./parser-state"
+import assert from "utils/assert.ts"
+import { addTokenError, badParse, BadParse } from "./error.ts"
+import { applyToSymbolTable } from "./parse-assignment.ts"
+import { parseTypeCallOrValueCall } from "./parse-type-call.ts"
+import type { ParserState } from "./parser-state.ts"
 
 export function parseTypeAssignment(
   state: ParserState,

@@ -1,11 +1,11 @@
-import { checkSourceTokens, testTokenizer } from "./test-helper"
+import { checkSourceTokens, testTokenizer } from "./test-helper.ts"
 import {
   tComment,
   tEndBlock,
   tStartBlock,
   tStatementTerminator,
   tValueIdentifier,
-} from "./token-type"
+} from "./token-type.ts"
 
 testTokenizer("should tokenize single-line comments", () => {
   const source = `This is a comment

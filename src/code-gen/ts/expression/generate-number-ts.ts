@@ -1,9 +1,9 @@
-import { fromNode } from "code-gen/utils/from-node"
-import { fromToken } from "code-gen/utils/from-token"
+import { fromNode } from "code-gen/utils/from-node.ts"
+import { fromToken } from "code-gen/utils/from-token.ts"
 import type { TreeNode } from "tree"
-import type { GeneratedSnippets } from "../../generator"
-import { GeneratorState } from "../generator-state"
-import { contextType } from "../generator-context"
+import type { GeneratedSnippets } from "../../generator.ts"
+import { GeneratorState } from "../generator-state.ts"
+import { contextType } from "../generator-context.ts"
 
 export function tryGenerateNumberTs(
   node: TreeNode,

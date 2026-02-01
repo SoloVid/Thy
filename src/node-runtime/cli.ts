@@ -1,8 +1,8 @@
 #!/usr/env node
 
 import { readFile } from "node:fs/promises"
-import { core } from "../std-lib/core"
-import { interpretThyBlockSource } from "../interpreter/block"
+import { core } from "../std-lib/core/index.ts"
+import { interpretThyBlockSource } from "../interpreter/block.ts"
 
 const sourceFile = process.argv[2]
 

@@ -1,14 +1,14 @@
-import type { TokenRange } from "common/token-range"
+import type { TokenRange } from "common/token-range.ts"
 import type { Token } from "tokenizer"
 import type {
   tConstDeclAssign,
   tExport,
   tPrivate,
   tType,
-} from "tokenizer/token-type"
-import type { TypeIdentifier } from "./term"
-import type { Call } from "./call"
-import type { TypeCall, TypeGivenCall } from "./type-call"
+} from "tokenizer/token-type.ts"
+import type { TypeIdentifier } from "./term.ts"
+import type { Call } from "./call.ts"
+import type { TypeCall, TypeGivenCall } from "./type-call.ts"
 
 export interface TypeAssignment extends TokenRange {
   readonly type: "type-assignment"

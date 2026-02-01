@@ -1,10 +1,10 @@
-import { CompileError, tokenError } from "common/compile-error"
-import { debug } from "./debug"
-import type { Token } from "./token"
-import { makeTokenHere } from "./token-helper"
-import { skipToken, TokenMatcher } from "./token-matcher"
-import { tEndStream, tErrorToken } from "./token-type"
-import { debugState, type TokenizerState } from "./tokenizer-state"
+import { CompileError, tokenError } from "common/compile-error.ts"
+import { debug } from "./debug.ts"
+import type { Token } from "./token.ts"
+import { makeTokenHere } from "./token-helper.ts"
+import { skipToken, TokenMatcher } from "./token-matcher.ts"
+import { tEndStream, tErrorToken } from "./token-type.ts"
+import { debugState, type TokenizerState } from "./tokenizer-state.ts"
 
 export interface Tokenizer {
   getNextToken(): Token

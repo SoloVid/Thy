@@ -1,5 +1,5 @@
 import FS from "@isomorphic-git/lightning-fs"
-import type { FilesApi } from "./files-api"
+import type { FilesApi } from "./files-api.ts"
 
 export type IndexedDbFiles = FilesApi
 

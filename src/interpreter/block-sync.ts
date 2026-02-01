@@ -1,9 +1,9 @@
 import type { Block } from "tree"
-import assert from "utils/assert"
-import type { BlockOptions } from "./block-options"
-import { throwTransformedError } from "./block-error-transformer"
-import { makeHelper } from "./block-helper"
-import type { RuntimeFunction, RuntimeValue } from "./dynamic-type"
+import assert from "utils/assert.ts"
+import type { BlockOptions } from "./block-options.ts"
+import { throwTransformedError } from "./block-error-transformer.ts"
+import { makeHelper } from "./block-helper.ts"
+import type { RuntimeFunction, RuntimeValue } from "./dynamic-type.ts"
 
 export function interpretThySyncBlock(
   functionName: string,

@@ -1,6 +1,6 @@
-import { FileBrowseApi, PathFileEntry } from "utils/fs/file-browse-api"
-import { globToRegExp } from "utils/glob-match"
-import { directoriesOf } from "./directory-utils"
+import { FileBrowseApi, PathFileEntry } from "utils/fs/file-browse-api.ts"
+import { globToRegExp } from "utils/glob-match.ts"
+import { directoriesOf } from "./directory-utils.ts"
 
 export async function resolvePathSpecFromFs(
   sourceRelativePath: string,

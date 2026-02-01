@@ -2,9 +2,9 @@ import type { TreeNode } from "tree"
 import type {
   MappedGeneratedSnippet,
   UnmappedGeneratedWhitespace,
-} from "../generator"
-import { fromToken } from "./from-token"
-import { fromTokenRange } from "./from-token-range"
+} from "../generator.ts"
+import { fromToken } from "./from-token.ts"
+import { fromTokenRange } from "./from-token-range.ts"
 
 export function fromNode(
   node: TreeNode,

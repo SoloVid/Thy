@@ -1,4 +1,4 @@
-import type { TokenRange } from "common/token-range"
+import type { TokenRange } from "common/token-range.ts"
 import type { Token } from "tokenizer"
 import type {
   tConstDeclAssign,
@@ -6,11 +6,11 @@ import type {
   tNoDeclAssign,
   tPrivate,
   tVarDeclAssign,
-} from "tokenizer/token-type"
-import type { Call } from "./call"
-import type { ValuePropertyAccess } from "./property-access"
-import type { ValueIdentifier } from "./term"
-import type { TreeNode } from "./tree-node"
+} from "tokenizer/token-type.ts"
+import type { Call } from "./call.ts"
+import type { ValuePropertyAccess } from "./property-access.ts"
+import type { ValueIdentifier } from "./term.ts"
+import type { TreeNode } from "./tree-node.ts"
 
 export type Assignment =
   | ConstantDeclaration

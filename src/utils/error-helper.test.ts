@@ -6,7 +6,7 @@ import {
   getErrorTraceLinesFromStack,
   replaceErrorTraceLine,
   transformErrorTrace,
-} from "./error-helper"
+} from "./error-helper.ts"
 
 test("getErrorTraceLinesFromStack() returns only lines with file and location info (Windows Node 16)", async () => {
   const exampleStackValue = `c:\\Users\\User\\some-file.ts:15
@@ -122,8 +122,8 @@ line not a stack frame
 
 class FakeError extends Error {
   constructor(
-    public readonly message: string,
-    public readonly stack: string,
+    public override readonly message: string,
+    public override readonly stack: string,
   ) {
     super(message)
   }

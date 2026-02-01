@@ -1,10 +1,10 @@
 import type { Block, Idea } from "tree"
-import type { GeneratedSnippet, GeneratedSnippets } from "../../generator"
-import { genIndent } from "../../utils/indent"
-import type { GeneratorState } from "../generator-state"
-import type { GeneratorFixture } from "../ts-generator"
-import { generateImpliedReturnTs } from "./generate-implied-return-ts"
-import { resolvePreStatementGenerator } from "./resolve-pre-statement-generator"
+import type { GeneratedSnippet, GeneratedSnippets } from "../../generator.ts"
+import { genIndent } from "../../utils/indent.ts"
+import type { GeneratorState } from "../generator-state.ts"
+import type { GeneratorFixture } from "../ts-generator.ts"
+import { generateImpliedReturnTs } from "./generate-implied-return-ts.ts"
+import { resolvePreStatementGenerator } from "./resolve-pre-statement-generator.ts"
 
 export function generateBlockLinesTs(
   block: Block,

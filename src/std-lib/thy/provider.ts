@@ -1,5 +1,5 @@
-import { callUntyped } from "utils/call-untyped"
-import { makeThyCache, resolveThyDependency, ThyCache } from "./cache"
+import { callUntyped } from "utils/call-untyped.ts"
+import { makeThyCache, resolveThyDependency, ThyCache } from "./cache.ts"
 
 type InitDependencySpec = {
   id: string

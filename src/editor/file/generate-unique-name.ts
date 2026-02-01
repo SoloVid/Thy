@@ -1,4 +1,4 @@
-import { FilesApi } from "./files-api"
+import { FilesApi } from "./files-api.ts"
 
 export const generateUniqueName = async (
   fs: FilesApi,

@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks"
-import { AlertProvider, useAlerts } from "./alert-provider"
-import CodeInput from "./code-input"
-import { FileTree } from "./file/tree-ui/file-tree"
-import Menu from "./menu"
-import OutputContainer from "./output-container"
-import { useEditorPreferences } from "./preferences"
-import Resizer from "./resizer"
-import { useSourceCodeManager } from "./source-code/manager"
-import { makeInMemoryFiles } from "./file/in-memory-files"
+import { AlertProvider, useAlerts } from "./alert-provider.tsx"
+import CodeInput from "./code-input.tsx"
+import { FileTree } from "./file/tree-ui/file-tree.tsx"
+import Menu from "./menu.tsx"
+import OutputContainer from "./output-container.tsx"
+import { useEditorPreferences } from "./preferences.ts"
+import Resizer from "./resizer.tsx"
+import { useSourceCodeManager } from "./source-code/manager.ts"
+import { makeInMemoryFiles } from "./file/in-memory-files.ts"
 
 function PlaygroundContent() {
   useEffect(() => {

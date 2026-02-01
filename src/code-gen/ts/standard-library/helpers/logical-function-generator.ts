@@ -1,9 +1,9 @@
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import { fromNode } from "code-gen/utils/from-node"
-import type { GeneratorForNameSpec } from "../../generator-for-name"
-import { contextType } from "code-gen/ts/generator-context"
-import { autoTight } from "../../utils/auto-tight"
-import { addErrorForExcessArgs } from "./too-many-args-error"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
+import { fromNode } from "code-gen/utils/from-node.ts"
+import type { GeneratorForNameSpec } from "../../generator-for-name.ts"
+import { contextType } from "code-gen/ts/generator-context.ts"
+import { autoTight } from "../../utils/auto-tight.ts"
+import { addErrorForExcessArgs } from "./too-many-args-error.ts"
 
 export function makeLogicalFunctionGenerator(
   name: string,

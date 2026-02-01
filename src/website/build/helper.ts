@@ -1,11 +1,11 @@
 import { mkdir, writeFile } from "node:fs/promises"
 import { dirname, join } from "node:path"
-import { rootDir } from "root-dir"
-import { walkFiles } from "utils/walk-files"
-import { generateApiIndexMarkdown } from "./api-index"
-import { renderMarkdownAsHtml, renderMarkdownDocAsHtml } from "./markdown"
-import { getTemplateHtml } from "./template"
-import { profileSection } from "./time"
+import { rootDir } from "@/root-dir.ts"
+import { walkFiles } from "utils/walk-files.ts"
+import { generateApiIndexMarkdown } from "./api-index.ts"
+import { renderMarkdownAsHtml, renderMarkdownDocAsHtml } from "./markdown.ts"
+import { getTemplateHtml } from "./template.ts"
+import { profileSection } from "./time.ts"
 
 const pageOutputDir = join(rootDir, "out/website")
 

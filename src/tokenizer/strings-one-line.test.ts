@@ -1,4 +1,4 @@
-import { checkExampleProgramTokens, testTokenizer } from "./test-helper"
+import { checkExampleProgramTokens, testTokenizer } from "./test-helper.ts"
 import {
   tConstDeclAssign,
   tEndString,
@@ -8,7 +8,7 @@ import {
   tStatementTerminator,
   tStringText,
   tValueIdentifier,
-} from "./token-type"
+} from "./token-type.ts"
 
 testTokenizer("should tokenize simple one-line strings correctly", async () => {
   await checkExampleProgramTokens("strings/one-line/simple.thy", [

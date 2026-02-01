@@ -3,7 +3,7 @@ import {
   checkExampleProgramTokens,
   testTokenizer,
   tokenizeExampleProgram,
-} from "./test-helper"
+} from "./test-helper.ts"
 import {
   tComment,
   tEndString,
@@ -12,7 +12,7 @@ import {
   tStringText,
   tTypeIdentifier,
   tValueIdentifier,
-} from "./token-type"
+} from "./token-type.ts"
 
 testTokenizer("should tokenize Hello World", async () => {
   await checkExampleProgramTokens("hello-world.thy", [

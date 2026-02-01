@@ -1,7 +1,7 @@
 import assert from "node:assert"
 import { test } from "test-framework"
-import { core } from "../std-lib/core"
-import { interpretThyBlockSource } from "./block"
+import { core } from "../std-lib/core/index.ts"
+import { interpretThyBlockSource } from "./block.ts"
 
 test("interpretThyBlock() should return a function that can return a number", async () => {
   const interpreted = interpretThyBlockSource(`return 5`)

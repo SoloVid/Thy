@@ -1,10 +1,10 @@
 import { expect } from "expect"
 import { defineTestGroup } from "test-framework"
-import { makeTokenizer } from "."
-import type { CompileError } from "../common/compile-error"
-import { readExampleFile } from "../example"
-import type { Token } from "./token"
-import { tEndStream, type TokenType } from "./token-type"
+import { makeTokenizer } from "./index.ts"
+import type { CompileError } from "../common/compile-error.ts"
+import { readExampleFile } from "../example/index.ts"
+import type { Token } from "./token.ts"
+import { tEndStream, type TokenType } from "./token-type.ts"
 
 export const testTokenizer = defineTestGroup("tokenizer ")
 

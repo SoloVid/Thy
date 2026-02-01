@@ -1,12 +1,12 @@
 import type { TreeNode } from "tree"
-import type { GeneratorState } from "./generator-state"
+import type { GeneratorState } from "./generator-state.ts"
 import type {
   CodeGeneratorFunc,
   CodeGeneratorFuncNoFixture,
   DefiniteCodeGeneratorFunc,
   DefiniteCodeGeneratorFuncNoFixture,
   GeneratorFixture,
-} from "./ts-generator"
+} from "./ts-generator.ts"
 
 export function makeGenerator<InType extends TreeNode, SpecializedType>(
   transformNode: (node: InType) => SpecializedType | void,

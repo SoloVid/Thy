@@ -1,10 +1,10 @@
-import type { Token } from "tokenizer/token"
-import type { tComment, tStatementTerminator } from "tokenizer/token-type"
-import { isAssignment, type Assignment } from "./assignment"
-import type { Call, Return } from "./call"
-import type { TypeReturn } from "./type-call"
-import type { LetCall } from "./let-call"
-import type { TypeAssignment } from "./type-assignment"
+import type { Token } from "tokenizer/token.ts"
+import type { tComment, tStatementTerminator } from "tokenizer/token-type.ts"
+import { isAssignment, type Assignment } from "./assignment.ts"
+import type { Call, Return } from "./call.ts"
+import type { TypeReturn } from "./type-call.ts"
+import type { LetCall } from "./let-call.ts"
+import type { TypeAssignment } from "./type-assignment.ts"
 
 export interface BlankLine {
   readonly type: "blank-line"

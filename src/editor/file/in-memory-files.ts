@@ -1,10 +1,10 @@
-import assert from "utils/assert"
-import type { FilesApi } from "./files-api"
+import assert from "utils/assert.ts"
+import type { FilesApi } from "./files-api.ts"
 import {
   SerializedWorkspaceNode,
   SWDirectoryNode,
   SWFileNode,
-} from "./serialized-workspace"
+} from "./serialized-workspace.ts"
 
 type Now = () => number
 

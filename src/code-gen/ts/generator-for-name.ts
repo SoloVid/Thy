@@ -8,8 +8,8 @@ import type {
   ValueIdentifier,
   ValuePropertyAccess,
 } from "tree"
-import type { GeneratorState } from "./generator-state"
-import type { CodeGeneratorFunc } from "./ts-generator"
+import type { GeneratorState } from "./generator-state.ts"
+import type { CodeGeneratorFunc } from "./ts-generator.ts"
 
 export interface SimpleValuePropertyAccess extends ValuePropertyAccess {
   readonly base: ValueIdentifier

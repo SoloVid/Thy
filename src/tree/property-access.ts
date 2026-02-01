@@ -1,13 +1,13 @@
-import type { TokenRange } from "common/token-range"
+import type { TokenRange } from "common/token-range.ts"
 import type { Token } from "tokenizer"
 import type {
   tMemberAccessOperator,
   tThat,
   tTypeIdentifier,
   tValueIdentifier,
-} from "tokenizer/token-type"
-import type { Call } from "./call"
-import type { TypeIdentifier, ValueIdentifier } from "./term"
+} from "tokenizer/token-type.ts"
+import type { Call } from "./call.ts"
+import type { TypeIdentifier, ValueIdentifier } from "./term.ts"
 
 export interface ValuePropertyAccess extends TokenRange {
   readonly type: "value-property-access"

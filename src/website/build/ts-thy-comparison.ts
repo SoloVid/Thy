@@ -1,5 +1,5 @@
-import { generateTryButton } from "./button"
-import { generateCodeComparison } from "./code-comparison"
+import { generateTryButton } from "./button.ts"
+import { generateCodeComparison } from "./code-comparison.ts"
 
 export type TsThyComparisonProps = {
   ts: string

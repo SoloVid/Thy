@@ -1,18 +1,18 @@
-import { CodeGeneratorFunc, GeneratorFixture } from "code-gen/ts/ts-generator"
-import { fromTokenRange } from "code-gen/utils/from-token-range"
-import { isAssignment, type Assignment } from "../../../tree/assignment"
-import type { TreeNode } from "../../../tree/tree-node"
-import { makeGenerator } from "../generate-from-options"
-import { GeneratedSnippets } from "../../generator"
-import { GeneratorState } from "../generator-state"
-import { contextType } from "../generator-context"
-import type { LibraryGeneratorCollection } from "../library-generator"
+import { CodeGeneratorFunc, GeneratorFixture } from "code-gen/ts/ts-generator.ts"
+import { fromTokenRange } from "code-gen/utils/from-token-range.ts"
+import { isAssignment, type Assignment } from "../../../tree/assignment.ts"
+import type { TreeNode } from "../../../tree/tree-node.ts"
+import { makeGenerator } from "../generate-from-options.ts"
+import { GeneratedSnippets } from "../../generator.ts"
+import { GeneratorState } from "../generator-state.ts"
+import { contextType } from "../generator-context.ts"
+import type { LibraryGeneratorCollection } from "../library-generator.ts"
 import {
   generateGivenCallTs,
   generateGivenCallTsWithParameterName,
-} from "../call/generate-given-call-ts"
-import { trace } from "../utils/debug"
-import { nodeToString } from "code-gen/utils/to-string"
+} from "../call/generate-given-call-ts.ts"
+import { trace } from "../utils/debug.ts"
+import { nodeToString } from "code-gen/utils/to-string.ts"
 
 export function assignmentGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,

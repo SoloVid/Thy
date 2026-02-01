@@ -3,15 +3,15 @@ import {
   faFolderPlus,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useAlerts } from "editor/alert-provider"
-import { useSetIntervalWhenActive } from "editor/hook/use-set-interval-when-active"
+import { useAlerts } from "editor/alert-provider.tsx"
+import { useSetIntervalWhenActive } from "editor/hook/use-set-interval-when-active.ts"
 import { MutableRef, useEffect, useMemo, useRef, useState } from "preact/hooks"
-import { stringifyError } from "utils/stringify-error"
-import { FileEntry, FilesApi } from "../files-api"
-import { FileTreeNode } from "./file-tree-node"
-import { RenameState } from "./rename"
-import { actionStyle } from "./shared-style"
-import { generateUniqueName } from "../generate-unique-name"
+import { stringifyError } from "utils/stringify-error.ts"
+import { FileEntry, FilesApi } from "../files-api.ts"
+import { FileTreeNode } from "./file-tree-node.tsx"
+import { RenameState } from "./rename.tsx"
+import { actionStyle } from "./shared-style.ts"
+import { generateUniqueName } from "../generate-unique-name.ts"
 
 type SharedProps = {
   fs: FilesApi

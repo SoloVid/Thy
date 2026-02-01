@@ -1,6 +1,6 @@
 import { makeThyExport as _makeExport } from "thy-lang/std-lib"
 import { core as _core } from "thy-lang/std-lib"
-import _dep1 from "./a.thy"
+import _dep1 from "./a.thy.ts"
 
 const _depMap = {
   "a.thy": [

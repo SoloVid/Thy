@@ -1,5 +1,5 @@
-import { makeSingleRegexMatcher } from "./single-regex-matcher"
-import { tNumberLiteral } from "./token-type"
+import { makeSingleRegexMatcher } from "./single-regex-matcher.ts"
+import { tNumberLiteral } from "./token-type.ts"
 
 export const matchNumber = makeSingleRegexMatcher(
   tNumberLiteral,

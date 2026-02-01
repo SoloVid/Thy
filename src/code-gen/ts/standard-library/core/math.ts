@@ -1,5 +1,5 @@
-import type { GeneratorForNameParentSpec } from "../../generator-for-name"
-import { makeBinaryNumberFunctionGenerator } from "../helpers/binary-number-function-generator"
+import type { GeneratorForNameParentSpec } from "../../generator-for-name.ts"
+import { makeBinaryNumberFunctionGenerator } from "../helpers/binary-number-function-generator.ts"
 
 const mathAddGenerator = makeBinaryNumberFunctionGenerator("add", "+")
 const mathSubtractGenerator = makeBinaryNumberFunctionGenerator("subtract", "-")

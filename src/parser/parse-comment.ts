@@ -1,8 +1,8 @@
-import { tokenError } from "common/compile-error"
-import { tComment, tStatementTerminator } from "tokenizer/token-type"
+import { tokenError } from "common/compile-error.ts"
+import { tComment, tStatementTerminator } from "tokenizer/token-type.ts"
 import type { Comment } from "tree"
-import assert from "utils/assert"
-import type { ParserState } from "./parser-state"
+import assert from "utils/assert.ts"
+import type { ParserState } from "./parser-state.ts"
 
 export function parseComment(state: ParserState): Comment {
   const commentToken = state.buffer.consumeToken()

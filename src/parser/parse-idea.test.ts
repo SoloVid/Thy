@@ -3,10 +3,10 @@ import {
   tConstDeclAssign,
   tStatementTerminator,
   tValueIdentifier,
-} from "tokenizer/token-type"
-import { getNodeStructure, testParser } from "./example-test"
-import { parseIdea } from "./parse-idea"
-import { makeParserTestFixture } from "./test-helper"
+} from "tokenizer/token-type.ts"
+import { getNodeStructure, testParser } from "./example-test/index.ts"
+import { parseIdea } from "./parse-idea.ts"
+import { makeParserTestFixture } from "./test-helper.ts"
 
 testParser("parseIdea() should smooth out bad parse to comment", () => {
   const expectedFuncToken = {

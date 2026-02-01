@@ -1,7 +1,7 @@
 import type { TreeNode, TypedTreeNode } from "tree"
-import type { GeneratedSnippets } from "../generator"
-import type { GeneratorState } from "./generator-state"
-import type { LibraryGeneratorCollection } from "./library-generator"
+import type { GeneratedSnippets } from "../generator.ts"
+import type { GeneratorState } from "./generator-state.ts"
+import type { LibraryGeneratorCollection } from "./library-generator.ts"
 
 export interface GeneratorFixture {
   generate: DefiniteCodeGeneratorFuncNoFixture<TreeNode>

@@ -1,7 +1,7 @@
-import type { CompileError } from "../common/compile-error"
-import type { tErrorToken, TokenType } from "./token-type"
-import type { Tokenizer } from "./tokenizer"
-import type { TokenizerState } from "./tokenizer-state"
+import type { CompileError } from "../common/compile-error.ts"
+import type { tErrorToken, TokenType } from "./token-type.ts"
+import type { Tokenizer } from "./tokenizer.ts"
+import type { TokenizerState } from "./tokenizer-state.ts"
 
 export const skipToken = Symbol("skipToken")
 

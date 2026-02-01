@@ -1,4 +1,4 @@
-import type { GeneratorForNameSpec } from "../../generator-for-name"
+import type { GeneratorForNameSpec } from "../../generator-for-name.ts"
 
 export function makePrimitiveTypeGenerator(
   name: string,

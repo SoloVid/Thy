@@ -1,9 +1,9 @@
 import type { Expression } from "tree"
-import type { CallableExpression, TypeExpression } from "tree/expression"
-import type { PrimitiveStringLiteral } from "tree/string"
-import type { TypeReturn } from "tree/type-call"
-import assert from "utils/assert"
-import { tAwait, tGiven, tReturn, tThy } from "../tokenizer/token-type"
+import type { CallableExpression, TypeExpression } from "tree/expression.ts"
+import type { PrimitiveStringLiteral } from "tree/string.ts"
+import type { TypeReturn } from "tree/type-call.ts"
+import assert from "utils/assert.ts"
+import { tAwait, tGiven, tReturn, tThy } from "../tokenizer/token-type.ts"
 import type {
   AwaitCall,
   Call,
@@ -11,16 +11,16 @@ import type {
   Return,
   ThyCall,
   ValueCall,
-} from "../tree/call"
-import { addNodeError, addTokenError, badParse, BadParse } from "./error"
-import { getFirstToken } from "./helper"
-import { parseCallArgs } from "./parse-call-arguments"
+} from "../tree/call.ts"
+import { addNodeError, addTokenError, badParse, BadParse } from "./error.ts"
+import { getFirstToken } from "./helper.ts"
+import { parseCallArgs } from "./parse-call-arguments.ts"
 import {
   type IndeterminateExpression,
   parseIndeterminateValueExpression,
-} from "./parse-expression"
-import type { ParserState } from "./parser-state"
-import { collapseThat } from "./that"
+} from "./parse-expression.ts"
+import type { ParserState } from "./parser-state.ts"
+import { collapseThat } from "./that.ts"
 
 export function parseSpecialCallOrFallback<T>(
   state: ParserState,

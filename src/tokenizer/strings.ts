@@ -1,18 +1,18 @@
-import { debug } from "./debug"
-import { matchValueIdentifier } from "./identifier"
+import { debug } from "./debug.ts"
+import { matchValueIdentifier } from "./identifier.ts"
 import {
   makeNestedDynamicTokenizerMatcher,
   makeNestedTokenizerMatcher,
-} from "./nested-tokenizer"
-import { makeSingleRegexMatcher } from "./single-regex-matcher"
-import { skipToken, TokenMatcher } from "./token-matcher"
+} from "./nested-tokenizer.ts"
+import { makeSingleRegexMatcher } from "./single-regex-matcher.ts"
+import { skipToken, TokenMatcher } from "./token-matcher.ts"
 import {
   tEndString,
   tEndStringInterpolation,
   tStartString,
   tStartStringInterpolation,
   tStringText,
-} from "./token-type"
+} from "./token-type.ts"
 
 const matchStringInterpolationEnd = makeSingleRegexMatcher(
   tEndStringInterpolation,

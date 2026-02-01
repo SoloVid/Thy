@@ -1,7 +1,7 @@
-import { fromNode } from "code-gen/utils/from-node"
-import type { GeneratorForNameSpec } from "../../generator-for-name"
-import { addErrorForExcessArgs } from "../helpers/too-many-args-error"
-import { autoTightC } from "code-gen/ts/utils/auto-tight"
+import { fromNode } from "code-gen/utils/from-node.ts"
+import type { GeneratorForNameSpec } from "../../generator-for-name.ts"
+import { addErrorForExcessArgs } from "../helpers/too-many-args-error.ts"
+import { autoTightC } from "code-gen/ts/utils/auto-tight.ts"
 
 export const intersectionGenerator: GeneratorForNameSpec = {
   name: "All",

@@ -1,6 +1,6 @@
 import esbuild from "esbuild"
 import { join } from "node:path"
-import { rootDir } from "root-dir"
+import { rootDir } from "@/root-dir.ts"
 
 async function compile(from: string, to: string) {
   await esbuild.build({

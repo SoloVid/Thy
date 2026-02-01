@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import yargs from "yargs/yargs"
-import { compile } from "./compile"
+import { compile } from "./compile.ts"
 import chalk from "chalk"
 
 const argv = yargs(process.argv.slice(2)).options({

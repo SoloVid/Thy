@@ -1,5 +1,5 @@
 import type { Token } from "tokenizer"
-import type { TokenRange } from "./token-range"
+import type { TokenRange } from "./token-range.ts"
 import type { TreeNode } from "tree"
 
 export interface CompileError {

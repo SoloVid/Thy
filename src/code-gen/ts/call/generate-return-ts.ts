@@ -1,13 +1,13 @@
-import type { GeneratorFixture } from "code-gen/ts/ts-generator"
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import { fromNode } from "code-gen/utils/from-node"
-import { fromToken } from "code-gen/utils/from-token"
-import { nodeError } from "common/compile-error"
+import type { GeneratorFixture } from "code-gen/ts/ts-generator.ts"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
+import { fromNode } from "code-gen/utils/from-node.ts"
+import { fromToken } from "code-gen/utils/from-token.ts"
+import { nodeError } from "common/compile-error.ts"
 import type { Return, TreeNode } from "tree"
-import type { GeneratedSnippets } from "../../generator"
-import { tryGenerateReturnTypeTs } from "../block/generate-return-type-ts"
-import { contextType } from "../generator-context"
-import { type GeneratorState } from "../generator-state"
+import type { GeneratedSnippets } from "../../generator.ts"
+import { tryGenerateReturnTypeTs } from "../block/generate-return-type-ts.ts"
+import { contextType } from "../generator-context.ts"
+import { type GeneratorState } from "../generator-state.ts"
 
 export function tryGenerateReturnTs(
   node: TreeNode,

@@ -1,9 +1,9 @@
-import { interpretThyWorkspace } from "interpreter/workspace"
-import { core } from "std-lib/core"
-import { dissectErrorTraceAtCloserBaseline } from "utils/error-helper"
-import type { FileBrowseApi } from "utils/fs/file-browse-api"
-import { FilesApi, makeThyFilesApi } from "../file/files-api"
-import { makeFileManager } from "../file/local-files"
+import { interpretThyWorkspace } from "@/interpreter/workspace.ts"
+import { core } from "std-lib/core/index.ts"
+import { dissectErrorTraceAtCloserBaseline } from "utils/error-helper.ts"
+import type { FileBrowseApi } from "utils/fs/file-browse-api.ts"
+import { FilesApi, makeThyFilesApi } from "../file/files-api.ts"
+import { makeFileManager } from "../file/local-files.ts"
 
 export type Output = {
   readonly error: null | string

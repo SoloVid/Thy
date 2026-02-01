@@ -1,25 +1,25 @@
-import type { TokenRange } from "common/token-range"
+import type { TokenRange } from "common/token-range.ts"
 import type { Token } from "tokenizer"
 import {
   tStatementContinuation,
   tStatementTerminator,
   tTypeGiven,
-} from "tokenizer/token-type"
+} from "tokenizer/token-type.ts"
 import type { TypeCall, TypeGivenCall } from "tree"
-import assert from "utils/assert"
-import { addNodeError, BadParse, badParse } from "./error"
-import { getFirstToken, getLastToken } from "./helper"
+import assert from "utils/assert.ts"
+import { addNodeError, BadParse, badParse } from "./error.ts"
+import { getFirstToken, getLastToken } from "./helper.ts"
 import {
   parseSpecialCallOrFallback,
   parseValueCallGivenTarget,
-} from "./parse-call"
+} from "./parse-call.ts"
 import {
   IndeterminateExpression,
   IndeterminateTypeExpression,
   parseIndeterminateValueOrTypeExpression,
-} from "./parse-expression"
-import type { ParserState } from "./parser-state"
-import { collapseThat, collapseThats } from "./that"
+} from "./parse-expression.ts"
+import type { ParserState } from "./parser-state.ts"
+import { collapseThat, collapseThats } from "./that.ts"
 
 export function parseTypeCallOrValueCall(state: ParserState) {
   return parseSpecialCallOrFallback(state, () => {

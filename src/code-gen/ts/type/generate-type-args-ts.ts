@@ -1,10 +1,10 @@
-import type { GeneratedSnippets } from "code-gen/generator"
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import { fromNode } from "code-gen/utils/from-node"
+import type { GeneratedSnippets } from "code-gen/generator.ts"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
+import { fromNode } from "code-gen/utils/from-node.ts"
 import type { TreeNode } from "tree"
-import assert from "utils/assert"
-import type { GeneratorState } from "../generator-state"
-import { separateSnippetsWithCommas } from "../utils/comma-separated-snippets"
+import assert from "utils/assert.ts"
+import type { GeneratorState } from "../generator-state.ts"
+import { separateSnippetsWithCommas } from "../utils/comma-separated-snippets.ts"
 
 export function generateTypeArgsForBlockTs(
   node: TreeNode,

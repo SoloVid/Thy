@@ -6,16 +6,16 @@ import {
   tStartStringInterpolation,
   tStringText,
   tValueIdentifier,
-} from "tokenizer/token-type"
+} from "tokenizer/token-type.ts"
 import type {
   StringInterpolation,
   StringLiteral,
   StringPart,
   ValueIdentifier,
 } from "tree"
-import assert from "utils/assert"
-import { addTokenError, badParse, BadParse } from "./error"
-import type { ParserState } from "./parser-state"
+import assert from "utils/assert.ts"
+import { addTokenError, badParse, BadParse } from "./error.ts"
+import type { ParserState } from "./parser-state.ts"
 
 export function parseStringLiteral(
   state: ParserState,

@@ -1,6 +1,6 @@
 import { expect } from "expect"
 import { test } from "test-framework"
-import { parseSource } from "./example-test"
+import { parseSource } from "./example-test/index.ts"
 
 test("parse() should accept block that returns a number", async () => {
   const { top, errors } = parseSource(`return 5`)

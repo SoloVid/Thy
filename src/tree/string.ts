@@ -1,7 +1,7 @@
-import type { TokenRange } from "common/token-range"
+import type { TokenRange } from "common/token-range.ts"
 import type { Token } from "tokenizer"
-import type { tStringText } from "tokenizer/token-type"
-import type { ValueIdentifier } from "./term"
+import type { tStringText } from "tokenizer/token-type.ts"
+import type { ValueIdentifier } from "./term.ts"
 
 export interface PrimitiveStringLiteral extends StringLiteral {
   readonly parts: readonly StringContent[]

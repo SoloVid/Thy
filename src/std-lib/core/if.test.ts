@@ -1,6 +1,6 @@
 import assert from "assert"
 import { test } from "test-framework"
-import { ifBuiltin } from "./if"
+import { ifBuiltin } from "./if.ts"
 
 test("if() should return true case value if condition is met", async () => {
   assert.strictEqual(

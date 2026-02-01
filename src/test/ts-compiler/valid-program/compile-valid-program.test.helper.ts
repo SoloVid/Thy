@@ -1,11 +1,11 @@
-import { makeSingleFileTsGenerator } from "code-gen/ts/single-file-ts-generator"
-import { standardLibraryCore } from "code-gen/ts/standard-library/core"
+import { makeSingleFileTsGenerator } from "code-gen/ts/single-file-ts-generator.ts"
+import { standardLibraryCore } from "code-gen/ts/standard-library/core/index.ts"
 import { expect } from "expect"
 import fs from "node:fs/promises"
 import path from "node:path"
-import type { CompileError } from "../../../common/compile-error"
-import type { Compiler } from "../../../compiler/compiler"
-import { makeCompiler } from "../../../compiler/compiler"
+import type { CompileError } from "../../../common/compile-error.ts"
+import type { Compiler } from "../../../compiler/compiler.ts"
+import { makeCompiler } from "../../../compiler/compiler.ts"
 
 export const tsCoreCompiler = makeCompiler(
   makeSingleFileTsGenerator({

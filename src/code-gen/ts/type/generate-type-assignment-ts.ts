@@ -1,13 +1,13 @@
-import { fromComplicated } from "code-gen/utils/from-complicated"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
 import type { TreeNode, TypeAssignment } from "tree"
-import type { GeneratedSnippets } from "../../generator"
-import { makeGenerator } from "../generate-from-options"
-import { GeneratorState } from "../generator-state"
-import { contextType } from "../generator-context"
-import type { LibraryGeneratorCollection } from "../library-generator"
-import type { CodeGeneratorFunc, GeneratorFixture } from "../ts-generator"
-import { trace } from "../utils/debug"
-import { generateTypeGivenCallTypeTsWithParameterName } from "./generate-type-given-call-ts"
+import type { GeneratedSnippets } from "../../generator.ts"
+import { makeGenerator } from "../generate-from-options.ts"
+import { GeneratorState } from "../generator-state.ts"
+import { contextType } from "../generator-context.ts"
+import type { LibraryGeneratorCollection } from "../library-generator.ts"
+import type { CodeGeneratorFunc, GeneratorFixture } from "../ts-generator.ts"
+import { trace } from "../utils/debug.ts"
+import { generateTypeGivenCallTypeTsWithParameterName } from "./generate-type-given-call-ts.ts"
 
 export function typeAssignmentGeneratorTs(
   standardLibrary: LibraryGeneratorCollection,

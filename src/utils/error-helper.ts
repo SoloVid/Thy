@@ -1,10 +1,11 @@
-import assert from "./assert"
+import assert from "./assert.ts"
 
 const v8TraceLinePattern =
   /^(\s+at )(?:([^ ]*)(?: \())?(.+?)(?::(\d+):(\d+))?\)?$/
 const firefoxTraceLinePattern = /^(\s*)([^@]*)@(.+?)(?::(\d+):(\d+))?$/
 
 // TODO: Configure this elsewhere?
+// @ts-expect-error This used to type-check.
 Error.stackTraceLimit = 100
 
 export function getErrorTraceLinesFromStack(stack: string): string {
@@ -32,7 +33,7 @@ export function getErrorTraceLines(error: Error): string {
 
 class TransformedError extends Error {
   readonly cause: Error
-  readonly stack: string
+  override readonly stack: string
 
   constructor(error: Error, transform: (originalTraceLines: string) => string) {
     super(error.message)

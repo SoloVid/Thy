@@ -1,5 +1,5 @@
-import { debug, debugOn } from "./debug"
-import type { TokenType } from "./token-type"
+import { debug, debugOn } from "./debug.ts"
+import type { TokenType } from "./token-type.ts"
 
 export type TokenizerState = {
   readonly text: string

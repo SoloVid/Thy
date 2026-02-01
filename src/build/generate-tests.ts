@@ -1,9 +1,9 @@
 import { readFile, writeFile } from "node:fs/promises"
 import { join } from "node:path"
-import { rootDir } from "root-dir"
-import { runNodeCli } from "utils/run-node-cli"
-import { walkFiles } from "utils/walk-files"
-import { profileSection } from "website/build/time"
+import { rootDir } from "@/root-dir.ts"
+import { runNodeCli } from "utils/run-node-cli.ts"
+import { walkFiles } from "utils/walk-files.ts"
+import { profileSection } from "@/website/build/time.ts"
 
 runNodeCli(async () => {
   const inputDir = join(rootDir, "src/test/programs")
@@ -29,8 +29,8 @@ runNodeCli(async () => {
 
 import { join } from "node:path"
 import { test } from "test-framework"
-import { verifyInterpreterAndCompiler } from "test/verify"
-import logic from "./output/main.thy"
+import { verifyInterpreterAndCompiler } from "test/verify.ts"
+import logic from "./output/main.thy.ts"
 
 test("${dir} verify", async () => {
   await verifyInterpreterAndCompiler({

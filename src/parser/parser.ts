@@ -1,8 +1,8 @@
-import type { CompileError } from "common/compile-error"
+import type { CompileError } from "common/compile-error.ts"
 import type { Tokenizer } from "tokenizer"
 import type { Block } from "tree"
-import { parseBlockInner } from "./parse-block"
-import { makeParserState } from "./parser-state"
+import { parseBlockInner } from "./parse-block.ts"
+import { makeParserState } from "./parser-state.ts"
 
 export interface ParserOutput {
   top: Block

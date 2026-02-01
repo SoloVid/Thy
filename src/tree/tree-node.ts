@@ -1,10 +1,10 @@
-import type { Assignment } from "./assignment"
-import type { Block } from "./block"
-import type { Call, Return } from "./call"
-import type { BlankLine, Comment } from "./idea"
-import type { LetCall } from "./let-call"
-import type { TypePropertyAccess, ValuePropertyAccess } from "./property-access"
-import type { StringInterpolation, StringLiteral } from "./string"
+import type { Assignment } from "./assignment.ts"
+import type { Block } from "./block.ts"
+import type { Call, Return } from "./call.ts"
+import type { BlankLine, Comment } from "./idea.ts"
+import type { LetCall } from "./let-call.ts"
+import type { TypePropertyAccess, ValuePropertyAccess } from "./property-access.ts"
+import type { StringInterpolation, StringLiteral } from "./string.ts"
 import type {
   AwaitTerm,
   GivenTerm,
@@ -14,9 +14,9 @@ import type {
   TypeGivenTerm,
   TypeIdentifier,
   ValueIdentifier,
-} from "./term"
-import type { TypeAssignment } from "./type-assignment"
-import type { TypeCall, TypeGivenCall, TypeReturn } from "./type-call"
+} from "./term.ts"
+import type { TypeAssignment } from "./type-assignment.ts"
+import type { TypeCall, TypeGivenCall, TypeReturn } from "./type-call.ts"
 
 export type TreeNode =
   // Ordered from simplest to most complex.

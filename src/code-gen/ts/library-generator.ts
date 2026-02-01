@@ -8,14 +8,14 @@ import type {
   ValueIdentifier,
   ValuePropertyAccess,
 } from "tree"
-import { fromNode } from "../utils/from-node"
-import type { SpecialValueIdentifier } from "./expression/generate-value-identifier-ts"
+import { fromNode } from "../utils/from-node.ts"
+import type { SpecialValueIdentifier } from "./expression/generate-value-identifier-ts.ts"
 import type {
   GeneratorForNameParentSpec,
   GeneratorForNameSpec,
-} from "./generator-for-name"
-import { makeSpecMap, tryLookupNamedNode } from "./generator-lookup"
-import type { CodeGeneratorFunc } from "./ts-generator"
+} from "./generator-for-name.ts"
+import { makeSpecMap, tryLookupNamedNode } from "./generator-lookup.ts"
+import type { CodeGeneratorFunc } from "./ts-generator.ts"
 
 export interface LibraryGeneratorCollection {
   valueIdentifierGenerator: CodeGeneratorFunc<

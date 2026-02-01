@@ -1,13 +1,13 @@
 import type { Block } from "tree"
-import type { BlockOptions } from "./block-options"
-import { throwTransformedError } from "./block-error-transformer"
-import { makeHelper } from "./block-helper"
+import type { BlockOptions } from "./block-options.ts"
+import { throwTransformedError } from "./block-error-transformer.ts"
+import { makeHelper } from "./block-helper.ts"
 import {
   forgetThisRuntimeFunctionIsAsync,
   type RuntimeFunction,
   type RuntimeFunctionAsync,
   type RuntimeValue,
-} from "./dynamic-type"
+} from "./dynamic-type.ts"
 
 export function interpretThyAsyncBlock(
   functionName: string,

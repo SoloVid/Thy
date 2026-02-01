@@ -1,10 +1,10 @@
-import type { Compiler } from "../compiler/compiler"
-import { asyncGlob } from "../utils/async-glob"
-import type { CompileOptions } from "./compile-options"
-import type { CompileResults, FileCompileResults } from "./compile-results"
-import fs from "fs/promises"
-import path from "path"
-import { convertFromInternalError } from "./compile-error"
+import type { Compiler } from "../compiler/compiler.ts"
+import { asyncGlob } from "../utils/async-glob.ts"
+import type { CompileOptions } from "./compile-options.ts"
+import type { CompileResults, FileCompileResults } from "./compile-results.ts"
+import fs from "node:fs/promises"
+import path from "node:path"
+import { convertFromInternalError } from "./compile-error.ts"
 
 export async function compile(
   options: CompileOptions,

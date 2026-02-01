@@ -1,12 +1,12 @@
-import { debug } from "./debug"
-import type { TokenMatcherResult } from "./token-matcher"
+import { debug } from "./debug.ts"
+import type { TokenMatcherResult } from "./token-matcher.ts"
 import {
   tComment,
   tEndBlock,
   tStartBlock,
   tStatementTerminator,
-} from "./token-type"
-import type { TokenizerState } from "./tokenizer-state"
+} from "./token-type.ts"
+import type { TokenizerState } from "./tokenizer-state.ts"
 
 function isStartOfLine(state: TokenizerState): boolean {
   return [null, tStatementTerminator, tStartBlock, tEndBlock].includes(

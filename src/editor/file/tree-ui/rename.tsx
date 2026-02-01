@@ -1,7 +1,7 @@
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useEffect, useRef, useState } from "preact/hooks"
-import { css } from "../../component/css"
+import { css } from "../../component/css.ts"
 
 export type RenameState = {
   path: string

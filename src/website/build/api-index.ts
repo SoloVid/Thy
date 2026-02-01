@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises"
 import { basename, join } from "node:path"
-import { rootDir } from "root-dir"
-import { collectFiles } from "utils/collect-files"
+import { rootDir } from "@/root-dir.ts"
+import { collectFiles } from "utils/collect-files.ts"
 
 export async function generateApiIndexMarkdown(directory: string) {
   const inputDir = join(rootDir, "docs", directory)

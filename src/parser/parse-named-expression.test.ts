@@ -5,14 +5,14 @@ import {
   tThat,
   tTypeIdentifier,
   tValueIdentifier,
-} from "tokenizer/token-type"
-import { getNodeStructure, testParser } from "./example-test"
+} from "tokenizer/token-type.ts"
+import { getNodeStructure, testParser } from "./example-test/index.ts"
 import {
   parseAnyIndeterminateNamedExpression,
   parseIndeterminateNamedValueExpression,
-} from "./parse-named-expression"
-import { makeParserTestFixture } from "./test-helper"
-import { badParse } from "./error"
+} from "./parse-named-expression.ts"
+import { makeParserTestFixture } from "./test-helper.ts"
+import { badParse } from "./error.ts"
 
 testParser(
   "parseIndeterminateNamedValueExpression() should parse value",

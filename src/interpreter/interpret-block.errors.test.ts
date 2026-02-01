@@ -1,8 +1,8 @@
 import assert from "node:assert"
 import { test } from "test-framework"
-import { delay } from "utils/delay"
-import { getErrorTraceLines } from "utils/error-helper"
-import { interpretThyBlockSource } from "./block"
+import { delay } from "utils/delay.ts"
+import { getErrorTraceLines } from "utils/error-helper.ts"
+import { interpretThyBlockSource } from "./block.ts"
 
 // Wallaby messes with stack traces in ways that make some of these tests fail.
 function nonWallabyTest(

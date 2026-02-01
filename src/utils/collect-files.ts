@@ -1,4 +1,4 @@
-import { walkFiles } from "./walk-files"
+import { walkFiles } from "./walk-files.ts"
 
 export async function collectFiles(directory: string) {
   const files: string[] = []

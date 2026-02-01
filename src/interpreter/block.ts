@@ -1,12 +1,12 @@
-import type { CompileError } from "common/compile-error"
-import { parse } from "parser/parser"
+import type { CompileError } from "common/compile-error.ts"
+import { parse } from "parser/parser.ts"
 import { makeTokenizer } from "tokenizer"
 import type { Block } from "tree"
-import { interpretThyAsyncBlock } from "./block-async"
-import { interpretThySyncBlock } from "./block-sync"
-import { RuntimeFunction, RuntimeReturn, RuntimeValue } from "./dynamic-type"
-import { makeInterpreterCompileError } from "./interpreter-error"
-import { BlockOptions } from "./block-options"
+import { interpretThyAsyncBlock } from "./block-async.ts"
+import { interpretThySyncBlock } from "./block-sync.ts"
+import { RuntimeFunction, RuntimeReturn, RuntimeValue } from "./dynamic-type.ts"
+import { makeInterpreterCompileError } from "./interpreter-error.ts"
+import { BlockOptions } from "./block-options.ts"
 
 export type ApiUnknownFunction = (...args: readonly unknown[]) => unknown
 

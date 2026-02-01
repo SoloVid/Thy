@@ -1,4 +1,4 @@
-import type { elseBuiltin } from "./globals"
+import type { elseBuiltin } from "./globals.ts"
 
 export const ifBuiltin = <T>(
   condition: boolean,

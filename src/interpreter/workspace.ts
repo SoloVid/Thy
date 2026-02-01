@@ -1,8 +1,8 @@
-import { parseAll } from "compiler/parse-workspace"
-import { FileBrowseApi } from "utils/fs/file-browse-api"
-import { BlockOptions } from "./block-options"
-import { makeInterpreterCompileError } from "./interpreter-error"
-import { makeThyResolver } from "./thy-resolver"
+import { parseAll } from "compiler/parse-workspace.ts"
+import { FileBrowseApi } from "utils/fs/file-browse-api.ts"
+import { BlockOptions } from "./block-options.ts"
+import { makeInterpreterCompileError } from "./interpreter-error.ts"
+import { makeThyResolver } from "./thy-resolver.ts"
 
 export async function interpretThyWorkspace(
   workspaceBrowser: FileBrowseApi,

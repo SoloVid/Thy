@@ -1,12 +1,12 @@
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import { fromNode } from "code-gen/utils/from-node"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
+import { fromNode } from "code-gen/utils/from-node.ts"
 import type { TypedTreeNode } from "tree"
-import type { GeneratedSnippets } from "../../generator"
-import type { GeneratorState } from "../generator-state"
-import type { GeneratorFixture } from "../ts-generator"
-import { trace } from "../utils/debug"
-import { contextType } from "../generator-context"
-import { nodeToString } from "code-gen/utils/to-string"
+import type { GeneratedSnippets } from "../../generator.ts"
+import type { GeneratorState } from "../generator-state.ts"
+import type { GeneratorFixture } from "../ts-generator.ts"
+import { trace } from "../utils/debug.ts"
+import { contextType } from "../generator-context.ts"
+import { nodeToString } from "code-gen/utils/to-string.ts"
 
 export function generateExpressionAsTypeTs(
   node: TypedTreeNode,

@@ -1,8 +1,8 @@
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import type { GeneratorForNameSpec } from "../../generator-for-name"
-import { contextType } from "code-gen/ts/generator-context"
-import { autoTight } from "../../utils/auto-tight"
-import { addErrorForExcessArgs } from "./too-many-args-error"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
+import type { GeneratorForNameSpec } from "../../generator-for-name.ts"
+import { contextType } from "code-gen/ts/generator-context.ts"
+import { autoTight } from "../../utils/auto-tight.ts"
+import { addErrorForExcessArgs } from "./too-many-args-error.ts"
 
 export function makeBinaryNumberFunctionGenerator(
   name: string,

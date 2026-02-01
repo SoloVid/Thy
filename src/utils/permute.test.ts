@@ -1,6 +1,6 @@
 import assert from "assert"
 import { test } from "test-framework"
-import { permute } from "./permute"
+import { permute } from "./permute.ts"
 
 test("permute()", async () => {
   const permutations = permute([1, 2, 3])

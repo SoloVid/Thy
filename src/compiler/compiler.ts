@@ -1,8 +1,8 @@
 import { makeTokenizer } from "tokenizer"
-import type { CodeGenerator } from "../code-gen/generator"
-import type { CompileError } from "../common/compile-error"
-import { parse } from "../parser/parser"
-import type { Block } from "../tree/block"
+import type { CodeGenerator } from "../code-gen/generator.ts"
+import type { CompileError } from "../common/compile-error.ts"
+import { parse } from "../parser/parser.ts"
+import type { Block } from "../tree/block.ts"
 
 export interface CompileResult {
   output: string

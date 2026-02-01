@@ -1,1 +1,1 @@
-export { callUntyped } from "../utils/call-untyped"
+export { callUntyped } from "../utils/call-untyped.ts"

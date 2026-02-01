@@ -1,6 +1,6 @@
-import { makeSymbolTable } from "tree/symbol-table"
-import { RuntimeValue } from "./dynamic-type"
-import type { ThyBlockContext } from "./types"
+import { makeSymbolTable } from "tree/symbol-table.ts"
+import { RuntimeValue } from "./dynamic-type.ts"
+import type { ThyBlockContext } from "./types.ts"
 
 type TestContextOptions = {
   readonly argsToUse: unknown[]

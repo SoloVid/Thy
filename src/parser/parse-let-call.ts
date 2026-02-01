@@ -1,9 +1,9 @@
-import { tLet, tStatementTerminator } from "tokenizer/token-type"
+import { tLet, tStatementTerminator } from "tokenizer/token-type.ts"
 import type { LetCall } from "tree"
-import assert from "utils/assert"
-import { badParse, BadParse } from "./error"
-import { parseCall } from "./parse-call"
-import type { ParserState } from "./parser-state"
+import assert from "utils/assert.ts"
+import { badParse, BadParse } from "./error.ts"
+import { parseCall } from "./parse-call.ts"
+import type { ParserState } from "./parser-state.ts"
 
 export function parseLetCall(state: ParserState): LetCall | BadParse {
   const letToken = state.buffer.consumeToken()

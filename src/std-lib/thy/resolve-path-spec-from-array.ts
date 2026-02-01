@@ -1,5 +1,5 @@
-import { globMatchAll } from "utils/glob-match"
-import { directoriesOf } from "./directory-utils"
+import { globMatchAll } from "utils/glob-match.ts"
+import { directoriesOf } from "./directory-utils.ts"
 
 export function resolvePathSpecFromArray(
   sourceRelativePath: string,

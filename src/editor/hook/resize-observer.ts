@@ -5,7 +5,7 @@
 
 import type { RefObject } from "preact"
 import { useLayoutEffect } from "preact/hooks"
-import useLatest from "./latest"
+import useLatest from "./latest.ts"
 
 /**
  * A React hook that fires a callback whenever ResizeObserver detects a change to its size

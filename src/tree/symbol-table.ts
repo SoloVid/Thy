@@ -1,5 +1,5 @@
 import type { Token } from "tokenizer"
-import type { tTypeIdentifier, tValueIdentifier } from "tokenizer/token-type"
+import type { tTypeIdentifier, tValueIdentifier } from "tokenizer/token-type.ts"
 
 export interface ReadSymbolTable {
   readonly localSymbols: Readonly<Map<string, SymbolInfo>>

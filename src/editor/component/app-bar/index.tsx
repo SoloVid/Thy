@@ -1,5 +1,5 @@
 import { ComponentChildren } from "preact"
-import { css, styled } from "../css"
+import { css, styled } from "../css.ts"
 
 // Define styles (optional, or replace with your preferred method)
 const appBarStyle = css`

@@ -2,19 +2,19 @@ import {
   ContextType,
   contextType,
   isExpressionContext,
-} from "code-gen/ts/generator-context"
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import { fromNode } from "code-gen/utils/from-node"
+} from "code-gen/ts/generator-context.ts"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
+import { fromNode } from "code-gen/utils/from-node.ts"
 import { nodeError } from "common"
 import { Block, returnStyle, ValueCall } from "tree"
-import assert from "utils/assert"
-import { GeneratedSnippets } from "../../../generator"
-import { genIndent, makeIndent } from "../../../utils/indent"
-import { generateBlockLinesTs } from "../../block/generate-block-lines-ts"
-import type { GeneratorForNameSpec } from "../../generator-for-name"
-import { GeneratorState } from "../../generator-state"
-import { GeneratorFixture } from "../../ts-generator"
-import { addErrorForExcessArgs } from "../helpers/too-many-args-error"
+import assert from "utils/assert.ts"
+import { GeneratedSnippets } from "../../../generator.ts"
+import { genIndent, makeIndent } from "../../../utils/indent.ts"
+import { generateBlockLinesTs } from "../../block/generate-block-lines-ts.ts"
+import type { GeneratorForNameSpec } from "../../generator-for-name.ts"
+import { GeneratorState } from "../../generator-state.ts"
+import { GeneratorFixture } from "../../ts-generator.ts"
+import { addErrorForExcessArgs } from "../helpers/too-many-args-error.ts"
 
 export const ifGenerator: GeneratorForNameSpec = {
   name: "if",

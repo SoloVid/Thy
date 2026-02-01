@@ -1,5 +1,5 @@
 import { test } from "test-framework"
-import { relative } from "./relative-paths"
+import { relative } from "./relative-paths.ts"
 import assert from "node:assert"
 
 test("relative() should resolve self (top-level)", () => {

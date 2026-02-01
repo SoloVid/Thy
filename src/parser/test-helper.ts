@@ -1,8 +1,8 @@
-import type { CompileError } from "common/compile-error"
+import type { CompileError } from "common/compile-error.ts"
 import type { Token, Tokenizer } from "tokenizer"
-import { tEndStream, TokenType } from "tokenizer/token-type"
-import type { ParserContext, ParserState } from "./parser-state"
-import { makeTokenBuffer } from "./token-buffer"
+import { tEndStream, TokenType } from "tokenizer/token-type.ts"
+import type { ParserContext, ParserState } from "./parser-state.ts"
+import { makeTokenBuffer } from "./token-buffer.ts"
 
 export function makeMockTokenizer(
   tokens: readonly (TokenType | Partial<Token>)[],

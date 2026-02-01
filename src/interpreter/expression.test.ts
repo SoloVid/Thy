@@ -1,15 +1,15 @@
-import type { CompileError } from "common/compile-error"
+import type { CompileError } from "common/compile-error.ts"
 import { expect } from "expect"
 import assert from "node:assert"
-import { parseBlockInner } from "parser/parse-block"
-import { makeParserState } from "parser/parser-state"
+import { parseBlockInner } from "parser/parse-block.ts"
+import { makeParserState } from "parser/parser-state.ts"
 import { test } from "test-framework"
 import { makeTokenizer } from "tokenizer"
 import { isCall } from "tree"
-import { interpretThyExpression } from "./expression"
-import { InterpreterErrorWithContext } from "./interpreter-error"
-import { makeSimpleContext } from "./test-helper"
-import type { ThyBlockContext } from "./types"
+import { interpretThyExpression } from "./expression.ts"
+import { InterpreterErrorWithContext } from "./interpreter-error.ts"
+import { makeSimpleContext } from "./test-helper.ts"
+import type { ThyBlockContext } from "./types.ts"
 
 const testLocation = {
   line: 1,

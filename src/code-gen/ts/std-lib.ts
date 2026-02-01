@@ -1,5 +1,5 @@
-import { LibraryGeneratorCollection } from "./library-generator"
-import { standardLibraryCore } from "./standard-library/core"
+import { LibraryGeneratorCollection } from "./library-generator.ts"
+import { standardLibraryCore } from "./standard-library/core/index.ts"
 
 export type CodeGenTsStdLib = {
   importPath: string

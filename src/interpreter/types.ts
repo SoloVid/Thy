@@ -1,5 +1,5 @@
-import type { ReadSymbolTable } from "tree/symbol-table"
-import type { RuntimeReturn, RuntimeValue } from "./dynamic-type"
+import type { ReadSymbolTable } from "tree/symbol-table.ts"
+import type { RuntimeReturn, RuntimeValue } from "./dynamic-type.ts"
 
 export type ThyBlockContext = {
   readonly argsToUse: RuntimeValue[]

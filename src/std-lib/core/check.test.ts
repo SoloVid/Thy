@@ -7,7 +7,7 @@ import {
   equalBuiltin,
   notBuiltin,
   someBuiltin,
-} from "./check"
+} from "./check.ts"
 
 function testCheckFunction<T>(
   f: (a: T, b?: T, c?: T, d?: T) => boolean,

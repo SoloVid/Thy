@@ -1,6 +1,6 @@
 import Prism from "prismjs"
 import "prismjs/components/prism-typescript"
-import { addThyPrismGrammarAndAwaitAvailable } from "../../editor/prism-grammar"
+import { addThyPrismGrammarAndAwaitAvailable } from "../../editor/prism-grammar.ts"
 
 export type CodeBlockProps = {
   source: string

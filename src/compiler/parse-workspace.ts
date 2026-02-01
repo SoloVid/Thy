@@ -1,10 +1,10 @@
 import { CompileError } from "common"
-import { parse } from "parser/parser"
-import { resolvePathSpecFromFs } from "std-lib/thy/resolve-path-spec-from-fs"
+import { parse } from "parser/parser.ts"
+import { resolvePathSpecFromFs } from "std-lib/thy/resolve-path-spec-from-fs.ts"
 import { makeTokenizer } from "tokenizer"
 import { Block } from "tree"
-import { FileBrowseApi } from "utils/fs/file-browse-api"
-import { relative } from "utils/relative-paths"
+import { FileBrowseApi } from "utils/fs/file-browse-api.ts"
+import { relative } from "utils/relative-paths.ts"
 
 type DependencySpec = {
   id: string

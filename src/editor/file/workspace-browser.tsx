@@ -5,12 +5,12 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useAlerts } from "../alert-provider"
+import { useAlerts } from "../alert-provider.tsx"
 import { useEffect, useState } from "preact/hooks"
-import { SerializedWorkspace } from "./serialized-workspace"
-import { FilesApi } from "./files-api"
-import { generateUID } from "../../utils/uid"
-import { actionStyle } from "./tree-ui/shared-style"
+import { SerializedWorkspace } from "./serialized-workspace.ts"
+import { FilesApi } from "./files-api.ts"
+import { generateUID } from "../../utils/uid.ts"
+import { actionStyle } from "./tree-ui/shared-style.ts"
 
 type WorkspaceBrowserProps = {
   isOpen: boolean

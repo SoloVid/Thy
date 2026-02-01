@@ -1,12 +1,12 @@
-import type { CompileError } from "../common/compile-error"
-import { matchComment, matchMultilineComment } from "./comment"
-import { debug } from "./debug"
+import type { CompileError } from "../common/compile-error.ts"
+import { matchComment, matchMultilineComment } from "./comment.ts"
+import { debug } from "./debug.ts"
 import {
   matchMemberAccessOperator,
   matchTypeIdentifier,
   matchValueIdentifier,
-} from "./identifier"
-import { makeIndentMatchers } from "./indent"
+} from "./identifier.ts"
+import { makeIndentMatchers } from "./indent.ts"
 import {
   matchAwait,
   matchConstDeclAssign,
@@ -22,18 +22,18 @@ import {
   matchType,
   matchTypeGiven,
   matchVarDeclAssign,
-} from "./keywords"
-import { matchNumber } from "./number"
+} from "./keywords.ts"
+import { matchNumber } from "./number.ts"
 import {
   matchMultiLineStringLiteral,
   matchSimpleStringLiteral,
-} from "./strings"
-import { makeTokenHere } from "./token-helper"
-import type { TokenMatcher } from "./token-matcher"
-import { tEndBlock, tEndStream, tStatementTerminator } from "./token-type"
-import { makeGenericTokenizer, Tokenizer } from "./tokenizer"
-import { makeTokenizerState } from "./tokenizer-state"
-import { matchStatementTerminator, matchWhitespace } from "./whitespace"
+} from "./strings.ts"
+import { makeTokenHere } from "./token-helper.ts"
+import type { TokenMatcher } from "./token-matcher.ts"
+import { tEndBlock, tEndStream, tStatementTerminator } from "./token-type.ts"
+import { makeGenericTokenizer, Tokenizer } from "./tokenizer.ts"
+import { makeTokenizerState } from "./tokenizer-state.ts"
+import { matchStatementTerminator, matchWhitespace } from "./whitespace.ts"
 
 export function makeTopTokenizer(
   source: string,

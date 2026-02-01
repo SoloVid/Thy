@@ -1,4 +1,4 @@
-import { ThyBlockContext } from "./types"
+import { ThyBlockContext } from "./types.ts"
 
 export type BlockOptions = {
   closure: Record<string, unknown>

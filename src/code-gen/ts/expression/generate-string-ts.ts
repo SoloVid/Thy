@@ -1,9 +1,9 @@
-import { fromComplicated } from "code-gen/utils/from-complicated"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
 import type { TreeNode } from "tree"
-import type { GeneratedSnippets } from "../../generator"
-import { GeneratorState } from "../generator-state"
-import { contextType } from "../generator-context"
-import { fromNode } from "code-gen/utils/from-node"
+import type { GeneratedSnippets } from "../../generator.ts"
+import { GeneratorState } from "../generator-state.ts"
+import { contextType } from "../generator-context.ts"
+import { fromNode } from "code-gen/utils/from-node.ts"
 
 export function tryGenerateStringTs(
   node: TreeNode,

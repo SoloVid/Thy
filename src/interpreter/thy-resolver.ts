@@ -1,10 +1,10 @@
-import { resolvePathSpecFromArray } from "std-lib/thy/resolve-path-spec-from-array"
-import { resolveThyDependency, ThyCache } from "std-lib/thy/cache"
+import { resolvePathSpecFromArray } from "std-lib/thy/resolve-path-spec-from-array.ts"
+import { resolveThyDependency, ThyCache } from "std-lib/thy/cache.ts"
 import type { Block } from "tree"
-import assert from "utils/assert"
-import { interpretThyBlockNode } from "./block"
-import { BlockOptions } from "./block-options"
-import { runtimeVoid, yesThisValueIsForRuntime } from "./dynamic-type"
+import assert from "utils/assert.ts"
+import { interpretThyBlockNode } from "./block.ts"
+import { BlockOptions } from "./block-options.ts"
+import { runtimeVoid, yesThisValueIsForRuntime } from "./dynamic-type.ts"
 
 export function makeThyResolver(
   parseMap: Map<string, Readonly<Block>>,

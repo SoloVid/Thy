@@ -1,10 +1,10 @@
-import { SerializedWorkspace } from "editor/file/serialized-workspace"
+import { SerializedWorkspace } from "editor/file/serialized-workspace.ts"
 import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks"
-import { catchReject } from "utils/promise-helper"
-import { generateUID } from "utils/uid"
-import { InMemoryFiles, makeInMemoryFiles } from "../file/in-memory-files"
-import { getPersistedWorkspace } from "./persisted-workspace"
-import { makeRunner, Output } from "./runner"
+import { catchReject } from "utils/promise-helper.ts"
+import { generateUID } from "utils/uid.ts"
+import { InMemoryFiles, makeInMemoryFiles } from "../file/in-memory-files.ts"
+import { getPersistedWorkspace } from "./persisted-workspace.ts"
+import { makeRunner, Output } from "./runner.ts"
 
 export type SourceFile = {
   readonly path: string

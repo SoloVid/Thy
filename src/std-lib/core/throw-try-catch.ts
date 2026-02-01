@@ -1,4 +1,4 @@
-import { catchBuiltin, finallyBuiltin } from "./globals"
+import { catchBuiltin, finallyBuiltin } from "./globals.ts"
 
 export const throwBuiltin = (_message: string) => {
   throw new Error(_message)

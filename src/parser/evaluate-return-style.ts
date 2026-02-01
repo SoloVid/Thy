@@ -1,7 +1,7 @@
-import { tokenError } from "common/compile-error"
+import { tokenError } from "common/compile-error.ts"
 import type { Idea, ReturnStyle } from "tree"
 import { isAssignment, returnStyle } from "tree"
-import type { ParserState } from "./parser-state"
+import type { ParserState } from "./parser-state.ts"
 
 export function evaluateReturnStyle(
   state: ParserState,

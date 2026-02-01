@@ -6,14 +6,14 @@ import {
   faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useAlerts } from "editor/alert-provider"
+import { useAlerts } from "editor/alert-provider.tsx"
 import { useMemo, useState } from "preact/hooks"
-import { stringifyError } from "utils/stringify-error"
-import { css } from "../../component/css"
-import { FileTreeNodeList, FileTreeNodeProps } from "./file-tree"
-import { generateUniqueName } from "../generate-unique-name"
-import { InlineRename } from "./rename"
-import { actionStyle } from "./shared-style"
+import { stringifyError } from "utils/stringify-error.ts"
+import { css } from "../../component/css.ts"
+import { FileTreeNodeList, FileTreeNodeProps } from "./file-tree.tsx"
+import { generateUniqueName } from "../generate-unique-name.ts"
+import { InlineRename } from "./rename.tsx"
+import { actionStyle } from "./shared-style.ts"
 
 export const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
   const [isHovering, setIsHovering] = useState(false)

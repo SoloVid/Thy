@@ -1,17 +1,17 @@
-import type { GeneratorFixture } from "code-gen/ts/ts-generator"
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import { nodeToString } from "code-gen/utils/to-string"
+import type { GeneratorFixture } from "code-gen/ts/ts-generator.ts"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
+import { nodeToString } from "code-gen/utils/to-string.ts"
 import type { TreeNode } from "tree"
-import { ThyCall } from "tree/call"
-import type { GeneratedSnippets } from "../../generator"
-import { type GeneratorState } from "../generator-state"
-import { generateTypeArgsTs } from "../type/generate-type-args-ts"
-import { separateSnippetsWithCommas } from "../utils/comma-separated-snippets"
-import { trace } from "../utils/debug"
+import { ThyCall } from "tree/call.ts"
+import type { GeneratedSnippets } from "../../generator.ts"
+import { type GeneratorState } from "../generator-state.ts"
+import { generateTypeArgsTs } from "../type/generate-type-args-ts.ts"
+import { separateSnippetsWithCommas } from "../utils/comma-separated-snippets.ts"
+import { trace } from "../utils/debug.ts"
 import {
   generateCallTsInTypeContext,
   generateValueCallPartsTs,
-} from "./generate-call-ts"
+} from "./generate-call-ts.ts"
 
 export type SpecialVanillaCall = ThyCall
 

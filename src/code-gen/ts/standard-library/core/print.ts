@@ -1,8 +1,8 @@
-import { contextType } from "code-gen/ts/generator-context"
-import { fromComplicated } from "code-gen/utils/from-complicated"
-import { fromNode } from "code-gen/utils/from-node"
-import type { GeneratorForNameSpec } from "../../generator-for-name"
-import { addErrorForExcessArgs } from "../helpers/too-many-args-error"
+import { contextType } from "code-gen/ts/generator-context.ts"
+import { fromComplicated } from "code-gen/utils/from-complicated.ts"
+import { fromNode } from "code-gen/utils/from-node.ts"
+import type { GeneratorForNameSpec } from "../../generator-for-name.ts"
+import { addErrorForExcessArgs } from "../helpers/too-many-args-error.ts"
 
 export const printGenerator: GeneratorForNameSpec = {
   name: "print",

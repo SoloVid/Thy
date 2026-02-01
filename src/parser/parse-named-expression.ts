@@ -1,20 +1,20 @@
-import { tokenError } from "common/compile-error"
+import { tokenError } from "common/compile-error.ts"
 import type { Token } from "tokenizer"
 import {
   tMemberAccessOperator,
   tThat,
   tTypeIdentifier,
   tValueIdentifier,
-} from "tokenizer/token-type"
+} from "tokenizer/token-type.ts"
 import type { TypeIdentifier, ValueIdentifier, ValuePropertyAccess } from "tree"
-import { addNodeError, addTokenError, badParse, BadParse } from "./error"
-import type { ParserState } from "./parser-state"
+import { addNodeError, addTokenError, badParse, BadParse } from "./error.ts"
+import type { ParserState } from "./parser-state.ts"
 import {
   IndeterminateTypePropertyAccess,
   IndeterminateValuePropertyAccess,
   TempThatNode,
   UnsafeIndeterminateValuePropertyAccess,
-} from "./that"
+} from "./that.ts"
 
 export type IndeterminateNamedValueExpression =
   | ValueIdentifier

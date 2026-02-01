@@ -1,4 +1,4 @@
-import type { FileManager } from "./local-files"
+import type { FileManager } from "./local-files.ts"
 
 export type FileEntry = {
   kind: "directory" | "file"

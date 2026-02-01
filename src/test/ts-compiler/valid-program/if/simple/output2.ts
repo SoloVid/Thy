@@ -1,4 +1,4 @@
-import { ThyCache } from "std-lib/thy/cache"
+import { ThyCache } from "std-lib/thy/cache.ts"
 import type { Core } from "thy-lang/std-lib"
 import { callUntyped } from "thy-lang/utils"
 

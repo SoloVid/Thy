@@ -1,5 +1,5 @@
-import type { GeneratedSnippets } from "code-gen/generator"
-import { fromNode } from "code-gen/utils/from-node"
+import type { GeneratedSnippets } from "code-gen/generator.ts"
+import { fromNode } from "code-gen/utils/from-node.ts"
 import type { TreeNode } from "tree"
 
 export function separateSnippetsWithCommas(

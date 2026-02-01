@@ -1,5 +1,5 @@
-import { makeCompiler } from "../../compiler/compiler"
-import { tsGenerator } from "./generate-ts"
-import { standardLibraryCore } from "./standard-library/core"
+import { makeCompiler } from "../../compiler/compiler.ts"
+import { tsGenerator } from "./generate-ts.ts"
+import { standardLibraryCore } from "./standard-library/core/index.ts"
 
 // export const tsCoreCompiler = makeCompiler(tsGenerator(standardLibraryCore))

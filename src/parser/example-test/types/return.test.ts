@@ -1,5 +1,5 @@
-import { checkExampleProgramTree, testParser } from ".."
-import { returnStyle } from "../../../tree/block"
+import { checkExampleProgramTree, testParser } from "../index.ts"
+import { returnStyle } from "../../../tree/block.ts"
 
 testParser("should parse example program types/return.thy", async () => {
   await checkExampleProgramTree("types/return.thy", {

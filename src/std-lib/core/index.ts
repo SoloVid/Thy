@@ -1,9 +1,9 @@
-import { arrayBuiltin, getBuiltin, setBuiltin, tupleBuiltin } from "./array"
-import { castBuiltin } from "./cast"
-import { check } from "./check"
-import { defBuiltin } from "./def"
-import { delayBuiltin } from "./delay"
-import { doBuiltin } from "./do"
+import { arrayBuiltin, getBuiltin, setBuiltin, tupleBuiltin } from "./array.ts"
+import { castBuiltin } from "./cast.ts"
+import { check } from "./check.ts"
+import { defBuiltin } from "./def.ts"
+import { delayBuiltin } from "./delay.ts"
+import { doBuiltin } from "./do.ts"
 import {
   catchBuiltin,
   elseBuiltin,
@@ -11,29 +11,29 @@ import {
   finallyBuiltin,
   nullBuiltin,
   trueBuiltin,
-} from "./globals"
-import { ifBuiltin } from "./if"
-import { intersectionBuiltin } from "./intersection"
-import { json } from "./json"
+} from "./globals.ts"
+import { ifBuiltin } from "./if.ts"
+import { intersectionBuiltin } from "./intersection.ts"
+import { json } from "./json.ts"
 import {
   loopElementsBuiltin,
   loopForeverBuiltin,
   loopTimesBuiltin,
-} from "./loop"
+} from "./loop.ts"
 import {
   loopAsyncElementsBuiltin,
   loopAsyncForeverBuiltin,
   loopAsyncTimesBuiltin,
-} from "./loop-async"
-import { mutableMapBuiltin } from "./map"
-import { math } from "./math"
-import { numberBuiltin } from "./number"
-import { printBuiltin } from "./print"
-import { regexBuiltin } from "./regex"
-import { stringBuiltin } from "./string"
-import { switchBuiltin } from "./switch"
-import { throwBuiltin, tryBuiltin } from "./throw-try-catch"
-import { unionBuiltin } from "./union"
+} from "./loop-async.ts"
+import { mutableMapBuiltin } from "./map.ts"
+import { math } from "./math.ts"
+import { numberBuiltin } from "./number.ts"
+import { printBuiltin } from "./print.ts"
+import { regexBuiltin } from "./regex.ts"
+import { stringBuiltin } from "./string.ts"
+import { switchBuiltin } from "./switch.ts"
+import { throwBuiltin, tryBuiltin } from "./throw-try-catch.ts"
+import { unionBuiltin } from "./union.ts"
 
 export const core = {
   tuple: tupleBuiltin,

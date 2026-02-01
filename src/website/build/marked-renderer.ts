@@ -1,14 +1,14 @@
-import { addThyPrismGrammarAndAwaitAvailable } from "editor/prism-grammar"
-import { playgroundBaseUrl } from "website/build/links"
+import { addThyPrismGrammarAndAwaitAvailable } from "editor/prism-grammar.ts"
+import { playgroundBaseUrl } from "@/website/build/links.ts"
 import { Marked, Renderer } from "marked"
 import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 import Prism from "prismjs"
 import "prismjs/components/prism-typescript"
-import { rootDir } from "root-dir"
-import { generateTryButton } from "./button"
-import { generateCodeComparison } from "./code-comparison"
-import { profileSection } from "./time"
+import { rootDir } from "@/root-dir.ts"
+import { generateTryButton } from "./button.ts"
+import { generateCodeComparison } from "./code-comparison.ts"
+import { profileSection } from "./time.ts"
 
 type Options = {
   noTry?: boolean

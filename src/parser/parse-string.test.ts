@@ -7,11 +7,11 @@ import {
   tStringText,
   tTypeIdentifier,
   tValueIdentifier,
-} from "tokenizer/token-type"
-import { badParse } from "./error"
-import { getNodeStructure, testParser } from "./example-test"
-import { parseStringInterpolation, parseStringLiteral } from "./parse-string"
-import { makeParserTestFixture } from "./test-helper"
+} from "tokenizer/token-type.ts"
+import { badParse } from "./error.ts"
+import { getNodeStructure, testParser } from "./example-test/index.ts"
+import { parseStringInterpolation, parseStringLiteral } from "./parse-string.ts"
+import { makeParserTestFixture } from "./test-helper.ts"
 
 testParser("parseStringLiteral() should parse basic string", () => {
   const { errors, state } = makeParserTestFixture([

@@ -1,6 +1,6 @@
-import { debug } from "./debug"
-import type { skipToken, TokenMatcher } from "./token-matcher"
-import type { tErrorToken, TokenType } from "./token-type"
+import { debug } from "./debug.ts"
+import type { skipToken, TokenMatcher } from "./token-matcher.ts"
+import type { tErrorToken, TokenType } from "./token-type.ts"
 
 export function makeSingleRegexMatcher(
   type: Exclude<TokenType, typeof tErrorToken> | typeof skipToken,

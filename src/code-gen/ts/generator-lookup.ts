@@ -5,7 +5,7 @@ import {
   GeneratorForNameSpec,
   isLeaf,
   isParent,
-} from "./generator-for-name"
+} from "./generator-for-name.ts"
 
 export type GeneratorForNameSpecWithRequiredMethod<
   RequiredMethod extends keyof GeneratorForNameSpec,

@@ -1,6 +1,6 @@
-import type { TokenRange } from "common/token-range"
-import type { Expression, TypeExpression } from "./expression"
-import type { ReturnTerm, TypeGivenTerm } from "./term"
+import type { TokenRange } from "common/token-range.ts"
+import type { Expression, TypeExpression } from "./expression.ts"
+import type { ReturnTerm, TypeGivenTerm } from "./term.ts"
 
 export interface TypeCall extends TokenRange {
   readonly type: "type-call"

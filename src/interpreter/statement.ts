@@ -1,14 +1,14 @@
 import { Assignment, Call, isCall, isDeclaration } from "tree"
-import { forwardWait, MayWait, notWait, yesWait } from "./async-helper"
-import { interpretThyCall } from "./call"
+import { forwardWait, MayWait, notWait, yesWait } from "./async-helper.ts"
+import { interpretThyCall } from "./call.ts"
 import {
   isVoid,
   RuntimeObject,
   yesIThinkThisIsRuntimeObject,
-} from "./dynamic-type"
-import { interpretThyValuePropertyAccessExceptLeaf } from "./expression"
-import { makeInterpreterNodeError } from "./interpreter-error"
-import type { ThyBlockContext } from "./types"
+} from "./dynamic-type.ts"
+import { interpretThyValuePropertyAccessExceptLeaf } from "./expression.ts"
+import { makeInterpreterNodeError } from "./interpreter-error.ts"
+import type { ThyBlockContext } from "./types.ts"
 
 export function interpretThyStatement(
   context: ThyBlockContext,

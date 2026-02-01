@@ -1,8 +1,8 @@
 import type { Block, Idea } from "tree"
 import { returnStyle } from "tree"
-import { forwardWait, MayWait, notWait } from "./async-helper"
-import type { BlockOptions } from "./block-options"
-import { interpretThyCall } from "./call"
+import { forwardWait, MayWait, notWait } from "./async-helper.ts"
+import type { BlockOptions } from "./block-options.ts"
+import { interpretThyCall } from "./call.ts"
 import {
   assertNotVoid,
   isVoid,
@@ -11,11 +11,11 @@ import {
   runtimeVoid,
   yesIThinkThisIsRuntimeObject,
   yesThisValueIsForRuntime,
-} from "./dynamic-type"
-import { interpretThyExpression } from "./expression"
-import { interpretThyStatement } from "./statement"
-import type { ThyBlockContext } from "./types"
-import { makeInterpreterNodeError } from "./interpreter-error"
+} from "./dynamic-type.ts"
+import { interpretThyExpression } from "./expression.ts"
+import { interpretThyStatement } from "./statement.ts"
+import type { ThyBlockContext } from "./types.ts"
+import { makeInterpreterNodeError } from "./interpreter-error.ts"
 
 export function makeHelper(
   block: Block,

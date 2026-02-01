@@ -1,19 +1,19 @@
 import { TokenRange } from "common"
-import assert from "utils/assert"
+import assert from "utils/assert.ts"
 import {
   tStatementContinuation,
   tStatementTerminator,
-} from "../tokenizer/token-type"
-import type { Call } from "../tree/call"
-import { addNodeError, BadParse, badParse } from "./error"
-import { getLastToken } from "./helper"
+} from "../tokenizer/token-type.ts"
+import type { Call } from "../tree/call.ts"
+import { addNodeError, BadParse, badParse } from "./error.ts"
+import { getLastToken } from "./helper.ts"
 import {
   IndeterminateExpression,
   IndeterminateTypeExpression,
   parseIndeterminateValueOrTypeExpression,
-} from "./parse-expression"
-import type { ParserState } from "./parser-state"
-import { collapseThats } from "./that"
+} from "./parse-expression.ts"
+import type { ParserState } from "./parser-state.ts"
+import { collapseThats } from "./that.ts"
 
 export interface Args extends TokenRange {
   typeArgs: Call["typeArgs"]

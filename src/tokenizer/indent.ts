@@ -1,13 +1,13 @@
-import assert from "../utils/assert"
-import { debug } from "./debug"
-import { skipToken, TokenMatcher } from "./token-matcher"
+import assert from "../utils/assert.ts"
+import { debug } from "./debug.ts"
+import { skipToken, TokenMatcher } from "./token-matcher.ts"
 import {
   tEndBlock,
   tErrorToken,
   tStartBlock,
   tStatementTerminator,
-} from "./token-type"
-import type { TokenizerState } from "./tokenizer-state"
+} from "./token-type.ts"
+import type { TokenizerState } from "./tokenizer-state.ts"
 
 export interface IndentTokenizers {
   matchIndent: TokenMatcher

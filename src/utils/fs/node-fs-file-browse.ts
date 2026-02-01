@@ -1,7 +1,7 @@
 import assert from "node:assert"
 import { readdir, readFile } from "node:fs/promises"
 import path from "node:path"
-import { FileBrowseApi } from "./file-browse-api"
+import { FileBrowseApi } from "./file-browse-api.ts"
 
 // From https://stackoverflow.com/a/45242825/4639640
 function isPathInside(rootDirectory: string, otherPath: string) {

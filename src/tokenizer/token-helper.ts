@@ -1,6 +1,6 @@
-import type { Token } from "./token"
-import type { TokenType } from "./token-type"
-import type { TokenizerState } from "./tokenizer-state"
+import type { Token } from "./token.ts"
+import type { TokenType } from "./token-type.ts"
+import type { TokenizerState } from "./tokenizer-state.ts"
 
 export function makeTokenHere(
   state: TokenizerState,

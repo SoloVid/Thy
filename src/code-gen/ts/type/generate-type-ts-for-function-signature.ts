@@ -1,10 +1,10 @@
 import type { TreeNode } from "tree"
-import assert from "utils/assert"
-import type { GeneratedSnippets } from "../../generator"
-import type { GeneratorState } from "../generator-state"
-import type { GeneratorFixture } from "../ts-generator"
-import { makeParameterTypePackage } from "./parameter-type-package"
-import { contextType } from "../generator-context"
+import assert from "utils/assert.ts"
+import type { GeneratedSnippets } from "../../generator.ts"
+import type { GeneratorState } from "../generator-state.ts"
+import type { GeneratorFixture } from "../ts-generator.ts"
+import { makeParameterTypePackage } from "./parameter-type-package.ts"
+import { contextType } from "../generator-context.ts"
 
 export function generateTypeTsForFunctionSignature(
   node: TreeNode,

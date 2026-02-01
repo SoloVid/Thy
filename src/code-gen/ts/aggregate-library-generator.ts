@@ -1,4 +1,4 @@
-import type { LibraryGeneratorCollection } from "./library-generator"
+import type { LibraryGeneratorCollection } from "./library-generator.ts"
 
 export function aggregateLibrary(
   libraries: readonly LibraryGeneratorCollection[],
