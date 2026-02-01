@@ -70,8 +70,8 @@ function resolveBlock(context: ThyBlockContext, block: Block): RuntimeValue {
       })
     }
     for (const key of Object.keys(context.variablesInBlock)) {
-      const isImmutable =
-        context.symbolTable.getSymbolInfo(key)?.isConstant ?? false
+      const isImmutable = context.symbolTable.getSymbolInfo(key)?.isConstant ??
+        false
       Object.defineProperty(childClosure, key, {
         enumerable: true,
         get() {

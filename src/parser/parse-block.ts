@@ -74,8 +74,9 @@ export function parseBlockInner(state: ParserState): Block {
     }
 
     const ideas = thatIdeaTracker.ideas
-    const lastToken =
-      ideas.length > 0 ? getLastToken(ideas[ideas.length - 1]) : firstToken
+    const lastToken = ideas.length > 0
+      ? getLastToken(ideas[ideas.length - 1])
+      : firstToken
     return {
       type: "block",
       symbolTable: context.symbolTable,

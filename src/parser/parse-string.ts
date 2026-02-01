@@ -14,7 +14,7 @@ import type {
   ValueIdentifier,
 } from "tree"
 import assert from "utils/assert.ts"
-import { addTokenError, badParse, BadParse } from "./error.ts"
+import { addTokenError, BadParse, badParse } from "./error.ts"
 import type { ParserState } from "./parser-state.ts"
 
 export function parseStringLiteral(

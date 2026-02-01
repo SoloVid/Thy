@@ -53,8 +53,9 @@ export default function CodeInput({
   const textareaSize = useSize($textarea)
 
   const highlightedHtml = useMemo(() => {
-    const valueToHighlight =
-      value[value.length - 1] == "\n" ? value + " " : value
+    const valueToHighlight = value[value.length - 1] == "\n"
+      ? value + " "
+      : value
     return Prism.highlight(
       valueToHighlight,
       Prism.languages[language] ?? Prism.languages.text,
@@ -138,10 +139,9 @@ export default function CodeInput({
         const endIndex = element.selectionEnd
         const textAfter = value.substring(endIndex)
         const nextNewlineRelative = textAfter.indexOf("\n")
-        const nextNewline =
-          nextNewlineRelative < 0
-            ? value.length
-            : endIndex + nextNewlineRelative
+        const nextNewline = nextNewlineRelative < 0
+          ? value.length
+          : endIndex + nextNewlineRelative
         const textUpToEnd = value.substring(0, endIndex)
         const indexOfEndLineStart = textUpToEnd.lastIndexOf("\n") + 1
         const endLine = value.substring(indexOfEndLineStart, nextNewline)
@@ -152,8 +152,7 @@ export default function CodeInput({
         const modifiedLines = event.shiftKey
           ? selectedLines.replace(/^  /gm, "")
           : selectedLines.replace(/^/gm, "  ")
-        const newValue =
-          value.substring(0, indexOfLineStart) +
+        const newValue = value.substring(0, indexOfLineStart) +
           modifiedLines +
           value.substring(indexOfLineStart + selectedLines.length)
         element.value = newValue
@@ -188,8 +187,7 @@ export default function CodeInput({
       )
       if (/^(  )+$/.test(lineUpToHere)) {
         event.preventDefault()
-        const newValue =
-          textUpToHere.substring(0, indexOfLineStart) +
+        const newValue = textUpToHere.substring(0, indexOfLineStart) +
           lineUpToHere.substring(0, lineUpToHere.length - 2) +
           textAfter
         element.value = newValue
@@ -219,10 +217,9 @@ export default function CodeInput({
     const currentLine = textUpToHere.substring(indexOfLineStart)
     const currentLineIndent = /^ */.exec(currentLine)![0]
     const isIntoLineContent = currentIndex > indexOfLineStart
-    const indentToRemove =
-      pasteLines.length === 1 || !isIntoLineContent
-        ? /^ */.exec(pasteLines[0])![0]
-        : /^ */.exec(pasteLines[1])![0]
+    const indentToRemove = pasteLines.length === 1 || !isIntoLineContent
+      ? /^ */.exec(pasteLines[0])![0]
+      : /^ */.exec(pasteLines[1])![0]
     const alteredPasteText = pasteLines
       .map((l, i) => {
         if (i === 0 && (currentLine.trim() === "" || isIntoLineContent)) {
@@ -234,8 +231,8 @@ export default function CodeInput({
         return l.replace(new RegExp(`^${indentToRemove}`), currentLineIndent)
       })
       .join("\n")
-    const newValue =
-      textUpToHere + alteredPasteText + value.substring(currentIndex)
+    const newValue = textUpToHere + alteredPasteText +
+      value.substring(currentIndex)
     $textarea.current.value = newValue
     update(newValue)
     const newIndex = currentIndex + alteredPasteText.length
@@ -281,7 +278,9 @@ export default function CodeInput({
           {value}
         </textarea>
         <div
-          style={`position:absolute;width:${textareaSize[0] ?? 9999}px;height:${textareaSize[1] ?? 9999}px;overflow:hidden;`}
+          style={`position:absolute;width:${textareaSize[0] ?? 9999}px;height:${
+            textareaSize[1] ?? 9999
+          }px;overflow:hidden;`}
         >
           {/* <div style={`position:relative;width:100px;height:100px;overflow:hidden;`}> */}
           <pre

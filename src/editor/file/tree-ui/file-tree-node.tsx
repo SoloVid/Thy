@@ -21,8 +21,8 @@ export const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
   const alerts = useAlerts()
 
   // Check if this directory is expanded
-  const isExpanded =
-    node.kind === "directory" && restProps.expandedDirs.has(node.path)
+  const isExpanded = node.kind === "directory" &&
+    restProps.expandedDirs.has(node.path)
 
   const handleClick = (e: MouseEvent) => {
     e.stopPropagation()
@@ -132,13 +132,9 @@ export const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
   const icon = useMemo(
     () => (
       <FontAwesomeIcon
-        icon={
-          node.kind === "directory"
-            ? isExpanded
-              ? faFolderOpen
-              : faFolder
-            : faFile
-        }
+        icon={node.kind === "directory"
+          ? isExpanded ? faFolderOpen : faFolder
+          : faFile}
         fixedWidth
       />
     ),
@@ -158,52 +154,59 @@ export const FileTreeNode = ({ fs, node, ...restProps }: FileTreeNodeProps) => {
   return (
     <div class={nodeStyles}>
       <div
-        class={`${nodeHeaderContainerStyles} ${restProps.selectedPath === node.path ? nodeHeaderContainerSelectedStyles : ""}`}
+        class={`${nodeHeaderContainerStyles} ${
+          restProps.selectedPath === node.path
+            ? nodeHeaderContainerSelectedStyles
+            : ""
+        }`}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        {restProps.renameState && restProps.renameState.path === node.path ? (
-          <div class={nodeHeaderStyles}>
-            {icon}
-            <InlineRename
-              initialName={restProps.renameState.name}
-              onSave={handleSaveRename}
-              onCancel={handleCancelRename}
-            />
-          </div>
-        ) : (
-          <>
-            <div class={nodeHeaderStyles} onClick={handleClick}>
+        {restProps.renameState && restProps.renameState.path === node.path
+          ? (
+            <div class={nodeHeaderStyles}>
               {icon}
-              <span class={nodeTextStyles}>{node.name}</span>
+              <InlineRename
+                initialName={restProps.renameState.name}
+                onSave={handleSaveRename}
+                onCancel={handleCancelRename}
+              />
             </div>
-            {isHovering && (
-              <div class={entryActionContainerStyles}>
-                <FontAwesomeIcon
-                  className={actionStyle}
-                  title="Rename"
-                  icon={faWandMagicSparkles}
-                  fixedWidth
-                  onClick={handleStartRename}
-                />
-                <FontAwesomeIcon
-                  className={actionStyle}
-                  title="Delete"
-                  icon={faTrash}
-                  fixedWidth
-                  onClick={handleDelete}
-                />
+          )
+          : (
+            <>
+              <div class={nodeHeaderStyles} onClick={handleClick}>
+                {icon}
+                <span class={nodeTextStyles}>{node.name}</span>
               </div>
-            )}
-          </>
-        )}
+              {isHovering && (
+                <div class={entryActionContainerStyles}>
+                  <FontAwesomeIcon
+                    className={actionStyle}
+                    title="Rename"
+                    icon={faWandMagicSparkles}
+                    fixedWidth
+                    onClick={handleStartRename}
+                  />
+                  <FontAwesomeIcon
+                    className={actionStyle}
+                    title="Delete"
+                    icon={faTrash}
+                    fixedWidth
+                    onClick={handleDelete}
+                  />
+                </div>
+              )}
+            </>
+          )}
       </div>
       {childrenContainer}
     </div>
   )
 }
 
-const nodeStyles = css``
+const nodeStyles = css`
+`
 
 const nodeHeaderContainerStyles = css`
   display: flex;

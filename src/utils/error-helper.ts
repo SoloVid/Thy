@@ -93,8 +93,8 @@ export function dissectErrorTraceAtBaseline(
       matches: 0,
     },
   )
-  const baselineTraceLineCount =
-    matchCalculations.matches + 1 + additionalOffsetFromBaseline
+  const baselineTraceLineCount = matchCalculations.matches + 1 +
+    additionalOffsetFromBaseline
   // const baselineTraceLineCount = baselineTraceLines.length
   return {
     delta: traceLines.slice(0, -baselineTraceLineCount).join("\n"),
@@ -125,7 +125,7 @@ export function dissectErrorTraceAtCloserBaseline(
     )
     if (
       altErrorDissectedHere.shared.split("\n").length >
-      errorDissectedHere.shared.split("\n").length
+        errorDissectedHere.shared.split("\n").length
     ) {
       // console.log("choosing alt error here instead because better match")
       return altErrorDissectedHere

@@ -1,6 +1,6 @@
 import {
-  test as utsTest,
   defineTestGroup as utsDefineTestGroup,
+  test as utsTest,
 } from "under-the-sun"
 
 // function test(

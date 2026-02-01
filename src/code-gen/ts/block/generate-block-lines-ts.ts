@@ -31,7 +31,7 @@ export function generateBlockExplicitLinesTs(
     })
     const primaryGeneratedLine = fixture.generate(idea, lineState)
     const preGeneratedLines = lineState.preStatementGenerators.map((g) =>
-      resolvePreStatementGenerator(g, state, fixture),
+      resolvePreStatementGenerator(g, state, fixture)
     )
     const allGeneratedLines = [
       ...preGeneratedLines.flat(1),
@@ -50,11 +50,10 @@ export function generateBlockExplicitLinesTs(
       const collapsedLine: GeneratedSnippet[] = [l].flat(
         Infinity as 1,
       ) as GeneratedSnippet[]
-      const maybeNewLine =
-        idea.type !== "blank-line" ||
-        ideas.slice(i + 1).some((idea2) => idea2.type !== "blank-line")
-          ? { text: "\n" }
-          : { text: "" }
+      const maybeNewLine = idea.type !== "blank-line" ||
+          ideas.slice(i + 1).some((idea2) => idea2.type !== "blank-line")
+        ? { text: "\n" }
+        : { text: "" }
       if (collapsedLine.length === 0) {
         return [maybeNewLine]
       }

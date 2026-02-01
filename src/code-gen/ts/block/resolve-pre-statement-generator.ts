@@ -23,7 +23,7 @@ export function resolvePreStatementGenerator(
     return [directSnippet]
   }
   const resolvedPreStatements = lineState.preStatementGenerators.map((g) =>
-    resolvePreStatementGenerator(g, state, fixture),
+    resolvePreStatementGenerator(g, state, fixture)
   )
   return [...resolvedPreStatements.flat(1), directSnippet]
 }

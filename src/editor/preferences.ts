@@ -37,7 +37,7 @@ export function usePreferences<T>(
   defaultPreferences: T,
 ): [T, (transform: (before: T) => T) => void] {
   const [prefsInMemory, setPrefsInMemory] = useState(() =>
-    getPreferences(id, defaultPreferences),
+    getPreferences(id, defaultPreferences)
   )
   const [storedId, setStoredId] = useState(id)
   useEffect(() => {

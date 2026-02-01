@@ -37,8 +37,7 @@ function preprocessComparisons(markdown: string): string {
     .replace(
       /```(\w+)\n([\s\S]*?)```\n+vs\.\n+```(\w+)\n([\s\S]*?)```/g,
       (_, language1, source1, language2, source2) => {
-        const comparison =
-          "\n\n" +
+        const comparison = "\n\n" +
           generateCodeComparison({
             source1,
             language1,
@@ -46,8 +45,11 @@ function preprocessComparisons(markdown: string): string {
             language2,
           }) +
           "\n\n"
-        const thySource =
-          language1 === "thy" ? source1 : language2 === "thy" ? source2 : null
+        const thySource = language1 === "thy"
+          ? source1
+          : language2 === "thy"
+          ? source2
+          : null
         if (thySource) {
           const button = generateTryButton({
             playgroundUrl: playgroundBaseUrl,

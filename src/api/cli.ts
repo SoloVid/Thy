@@ -36,7 +36,9 @@ async function run() {
       errorCount++
       // console.error(e)
       console.error(
-        `${chalk.cyan(f.filePath)}:${chalk.yellow(e.start.line + 1)}:${chalk.yellow(e.start.column + 1)} - ${chalk.red("error")} ${chalk.gray("THY1234")}: ${e.message}`,
+        `${chalk.cyan(f.filePath)}:${chalk.yellow(e.start.line + 1)}:${
+          chalk.yellow(e.start.column + 1)
+        } - ${chalk.red("error")} ${chalk.gray("THY1234")}: ${e.message}`,
       )
       console.error()
       console.error(e.contextualizedErrorMessage)

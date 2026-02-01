@@ -44,7 +44,7 @@ export function makeThyResolver(
           resolveThy: resolveFunction,
         })
         return interpreted(yesThisValueIsForRuntime(globals))
-      }),
+      })
     )
     if (resolvedValues.length === 1) {
       return resolvedValues[0]

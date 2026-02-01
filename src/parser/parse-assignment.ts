@@ -17,7 +17,7 @@ import type {
   VariableDeclaration,
   VariableReassignment,
 } from "tree"
-import { addNodeError, addTokenError, badParse, BadParse } from "./error.ts"
+import { addNodeError, addTokenError, BadParse, badParse } from "./error.ts"
 import { getFirstToken } from "./helper.ts"
 import { parseCall } from "./parse-call.ts"
 import type { ParserState } from "./parser-state.ts"
@@ -222,7 +222,7 @@ export function applyToSymbolTable(
     modifier === null
       ? "bare"
       : modifier.type === tExport
-        ? "export"
-        : "private",
+      ? "export"
+      : "private",
   )
 }

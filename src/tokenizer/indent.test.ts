@@ -1,5 +1,9 @@
 import { expect } from "expect"
-import { checkSourceTokens, testTokenizer, tokenizeSource } from "./test-helper.ts"
+import {
+  checkSourceTokens,
+  testTokenizer,
+  tokenizeSource,
+} from "./test-helper.ts"
 import {
   tEndBlock,
   tErrorToken,

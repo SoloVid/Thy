@@ -12,8 +12,7 @@ export async function generateApiIndexMarkdown(directory: string) {
   const apiFilesContents = await Promise.all(
     apiFiles.map((f) => readFile(join(inputDir, f))),
   )
-  const tableOfContents =
-    `## On this page\n\n` +
+  const tableOfContents = `## On this page\n\n` +
     apiFiles
       .map((f) => {
         const title = basename(f, ".md")

@@ -49,91 +49,89 @@ import { tryGenerateTypeGivenCallTs } from "./type/generate-type-given-call-ts.t
 import { autoTightS } from "./utils/auto-tight.ts"
 import { trace } from "./utils/debug.ts"
 
-export const tsGenerator =
-  (
-    standardLibrary: LibraryGeneratorCollection,
-    preludeContent: string,
-    endingContent: string,
-    indent: boolean = false,
-  ) =>
-  (node: TreeNode): GeneratorResult => {
-    const rootState = makeGeneratorState(undefined, {
-      context: contextType.looseExpression,
-      increaseIndent: indent,
-    })
+export const tsGenerator = (
+  standardLibrary: LibraryGeneratorCollection,
+  preludeContent: string,
+  endingContent: string,
+  indent: boolean = false,
+) =>
+(node: TreeNode): GeneratorResult => {
+  const rootState = makeGeneratorState(undefined, {
+    context: contextType.looseExpression,
+    increaseIndent: indent,
+  })
 
-    function generateTsWithSelfFixture(node: TreeNode, state: GeneratorState) {
-      const fixture: GeneratorFixture = {
-        generate: generateTsWithSelfFixture,
-        generateAsType: makeGeneratorWithFixtureSideCar(
-          () => fixture,
-          (node) => node,
-          (node, state) => {
-            trace(`generateAsType() <= ${nodeToString(node)}`)
-            // console.log(state)
-            return generateExpressionAsTypeTs(node, state, fixture)
-          },
-          [
-            tryGenerateStringTypeTs,
-            typeIdentifierGeneratorTypeTs(standardLibrary),
-            typeCallGeneratorTypeTs(standardLibrary),
-            tryGenerateTypeGivenCallTs,
-          ],
-        ),
-        standardLibrary,
-      }
-      return generateTs(node, state, fixture) as GeneratedSnippets
+  function generateTsWithSelfFixture(node: TreeNode, state: GeneratorState) {
+    const fixture: GeneratorFixture = {
+      generate: generateTsWithSelfFixture,
+      generateAsType: makeGeneratorWithFixtureSideCar(
+        () => fixture,
+        (node) => node,
+        (node, state) => {
+          trace(`generateAsType() <= ${nodeToString(node)}`)
+          // console.log(state)
+          return generateExpressionAsTypeTs(node, state, fixture)
+        },
+        [
+          tryGenerateStringTypeTs,
+          typeIdentifierGeneratorTypeTs(standardLibrary),
+          typeCallGeneratorTypeTs(standardLibrary),
+          tryGenerateTypeGivenCallTs,
+        ],
+      ),
+      standardLibrary,
     }
-
-    const generateTs = makeGenerator(
-      (node) => node,
-      (node, state) => {
-        // It *should* be impossible to hit this case if all specializations
-        // are all correctly implemented and added to the specialization list.
-        state.addError(
-          nodeError(
-            node,
-            `No code generation available for node of kind ${node.type}`,
-          ),
-        )
-        return fromNode(node, autoTightS(state, `void ${JSON.stringify(node)}`))
-      },
-      [
-        // Ordered from simplest to most complex.
-        tryGenerateBlankLineTs,
-        tryGenerateCommentTs,
-        tryGenerateNumberTs,
-        tryGenerateStringTs,
-        valueIdentifierGeneratorTs(standardLibrary),
-        valuePropertyAccessGeneratorTs(standardLibrary),
-        typeIdentifierGeneratorTs(standardLibrary),
-        typePropertyAccessGeneratorTs(standardLibrary),
-        tryGenerateAwaitCallTs,
-        tryGenerateGivenCallTs,
-        tryGenerateSpecialVanillaCallTs,
-        valueCallGeneratorTs(standardLibrary),
-        typeCallGeneratorTs(standardLibrary),
-        tryGenerateTypeGivenCallTs,
-        tryGenerateReturnTs,
-        letCallGeneratorTs(standardLibrary),
-        assignmentGeneratorTs(standardLibrary),
-        typeAssignmentGeneratorTs(standardLibrary),
-        tryGenerateBlockTs,
-      ],
-    )
-
-    // There's an open issue in TS 4.7 about typing this correctly. https://github.com/microsoft/TypeScript/issues/49280
-    const output: GeneratedSnippet[] = [
-      generateTsWithSelfFixture(node, rootState),
-    ].flat(Infinity as 1) as GeneratedSnippet[]
-    return {
-      output:
-        preludeContent +
-        output
-          .map((s) => s.text)
-          .join("")
-          .trimEnd() +
-        endingContent,
-      errors: rootState.errors,
-    }
+    return generateTs(node, state, fixture) as GeneratedSnippets
   }
+
+  const generateTs = makeGenerator(
+    (node) => node,
+    (node, state) => {
+      // It *should* be impossible to hit this case if all specializations
+      // are all correctly implemented and added to the specialization list.
+      state.addError(
+        nodeError(
+          node,
+          `No code generation available for node of kind ${node.type}`,
+        ),
+      )
+      return fromNode(node, autoTightS(state, `void ${JSON.stringify(node)}`))
+    },
+    [
+      // Ordered from simplest to most complex.
+      tryGenerateBlankLineTs,
+      tryGenerateCommentTs,
+      tryGenerateNumberTs,
+      tryGenerateStringTs,
+      valueIdentifierGeneratorTs(standardLibrary),
+      valuePropertyAccessGeneratorTs(standardLibrary),
+      typeIdentifierGeneratorTs(standardLibrary),
+      typePropertyAccessGeneratorTs(standardLibrary),
+      tryGenerateAwaitCallTs,
+      tryGenerateGivenCallTs,
+      tryGenerateSpecialVanillaCallTs,
+      valueCallGeneratorTs(standardLibrary),
+      typeCallGeneratorTs(standardLibrary),
+      tryGenerateTypeGivenCallTs,
+      tryGenerateReturnTs,
+      letCallGeneratorTs(standardLibrary),
+      assignmentGeneratorTs(standardLibrary),
+      typeAssignmentGeneratorTs(standardLibrary),
+      tryGenerateBlockTs,
+    ],
+  )
+
+  // There's an open issue in TS 4.7 about typing this correctly. https://github.com/microsoft/TypeScript/issues/49280
+  const output: GeneratedSnippet[] = [
+    generateTsWithSelfFixture(node, rootState),
+  ].flat(Infinity as 1) as GeneratedSnippet[]
+  return {
+    output: preludeContent +
+      output
+        .map((s) => s.text)
+        .join("")
+        .trimEnd() +
+      endingContent,
+    errors: rootState.errors,
+  }
+}

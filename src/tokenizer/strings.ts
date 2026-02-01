@@ -50,18 +50,17 @@ export const matchMultiLineStringLiteral = makeNestedDynamicTokenizerMatcher(
       "gm",
     )
     nextLineWithSignificantWhitespaceRegex.lastIndex = state.offset
-    const significantWhitespaceMatch =
-      nextLineWithSignificantWhitespaceRegex.exec(state.text)
+    const significantWhitespaceMatch = nextLineWithSignificantWhitespaceRegex
+      .exec(state.text)
     debug(
       "match next line with significant whitespace:",
       significantWhitespaceMatch,
       nextLineWithSignificantWhitespaceRegex,
     )
-    let textContentIndent =
-      significantWhitespaceMatch === null
-        ? parentIndent
-        : (significantWhitespaceMatch[1] || significantWhitespaceMatch[2] || "")
-            .length
+    let textContentIndent = significantWhitespaceMatch === null
+      ? parentIndent
+      : (significantWhitespaceMatch[1] || significantWhitespaceMatch[2] || "")
+        .length
     // Some logic falls apart if no indent is found.
     if (textContentIndent <= parentIndent) {
       textContentIndent = parentIndent + 1
@@ -121,10 +120,9 @@ export function makeMultiLineStringNewLineContentMatcher(
       // part of the multi-line string opener, not content.
       // We don't just consume the new-line as part of the start string token
       // because it is needed for the statement terminator matcher.
-      type:
-        state.lastTokenType === tStartString && !state.lastTokenSkipped
-          ? skipToken
-          : tStringText,
+      type: state.lastTokenType === tStartString && !state.lastTokenSkipped
+        ? skipToken
+        : tStringText,
       text: result[0],
     }
   }

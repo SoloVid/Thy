@@ -3,7 +3,10 @@ import type { Block } from "./block.ts"
 import type { Call, Return } from "./call.ts"
 import type { BlankLine, Comment } from "./idea.ts"
 import type { LetCall } from "./let-call.ts"
-import type { TypePropertyAccess, ValuePropertyAccess } from "./property-access.ts"
+import type {
+  TypePropertyAccess,
+  ValuePropertyAccess,
+} from "./property-access.ts"
 import type { StringInterpolation, StringLiteral } from "./string.ts"
 import type {
   AwaitTerm,

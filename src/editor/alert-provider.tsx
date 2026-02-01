@@ -49,20 +49,26 @@ const maybeConsole = (message: string, type: AlertType = "error") => {
 }
 
 export function AlertProvider({ children }: AlertProviderProps) {
-  const [alert, setAlert] = useState<{
-    message: string
-    type: AlertType
-  } | null>(null)
+  const [alert, setAlert] = useState<
+    {
+      message: string
+      type: AlertType
+    } | null
+  >(null)
   const [toasts, setToasts] = useState<Toast[]>([])
-  const [confirmDialog, setConfirmDialog] = useState<{
-    message: string
-    resolve: (value: boolean) => void
-  } | null>(null)
-  const [promptDialog, setPromptDialog] = useState<{
-    message: string
-    defaultValue: string
-    resolve: (value: string | null) => void
-  } | null>(null)
+  const [confirmDialog, setConfirmDialog] = useState<
+    {
+      message: string
+      resolve: (value: boolean) => void
+    } | null
+  >(null)
+  const [promptDialog, setPromptDialog] = useState<
+    {
+      message: string
+      defaultValue: string
+      resolve: (value: string | null) => void
+    } | null
+  >(null)
 
   const [nextId, setNextId] = useState(1)
 
@@ -178,7 +184,10 @@ export function AlertProvider({ children }: AlertProviderProps) {
 
       {/* Confirmation Dialog */}
       {confirmDialog && (
-        <div className="alert-overlay" onClick={() => handleConfirm(false)}>
+        <div
+          className="alert-overlay"
+          onClick={() => handleConfirm(false)}
+        >
           <div className="alert-dialog">
             <div className="alert-content">
               <p>{confirmDialog.message}</p>
@@ -227,7 +236,12 @@ export function AlertProvider({ children }: AlertProviderProps) {
           {toasts.map((toast) => (
             <div key={toast.id} className={`toast toast-${toast.type}`}>
               <span>{toast.message}</span>
-              <button onClick={() => removeToast(toast.id)}>×</button>
+              <button
+                onClick={() =>
+                  removeToast(toast.id)}
+              >
+                ×
+              </button>
             </div>
           ))}
         </div>

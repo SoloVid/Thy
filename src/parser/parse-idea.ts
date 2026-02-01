@@ -9,7 +9,7 @@ import {
   tType,
 } from "tokenizer/token-type.ts"
 import type { Idea } from "tree"
-import { badParse, BadParse } from "./error.ts"
+import { BadParse, badParse } from "./error.ts"
 import {
   parseAssignmentOrCall,
   parseModifiedAssignment,

@@ -85,10 +85,9 @@ function tryGenerateIfTs(
   // UPDATE: I believe mightReturn could be false if there is an empty let
   // in both blocks and no other let/return.
   // const mightReturn = true
-  const mightReturn =
-    (trueCaseNode !== null &&
-      trueCaseNode.type === "block" &&
-      mightAffectReturn(trueCaseNode)) ||
+  const mightReturn = (trueCaseNode !== null &&
+    trueCaseNode.type === "block" &&
+    mightAffectReturn(trueCaseNode)) ||
     (elseCaseNode !== null &&
       elseCaseNode.type === "block" &&
       mightAffectReturn(elseCaseNode))

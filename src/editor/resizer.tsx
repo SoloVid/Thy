@@ -49,14 +49,16 @@ export default function Resizer({ resizeType, onResize }: ResizerProps) {
       <div
         className="horizontal-resize-bar"
         onMouseDown={onlyLeft(trackResize, true)}
-      ></div>
+      >
+      </div>
     )
   } else {
     return (
       <div
         className="vertical-resize-bar"
         onMouseDown={onlyLeft(trackResize, true)}
-      ></div>
+      >
+      </div>
     )
   }
 }

@@ -13,13 +13,17 @@ export function nodeToString(node: TreeNode): string {
     return `${nodeToString(node.func)}()`
   }
   if (isAssignment(node) || node.type === "type-assignment") {
-    return `${nodeToString(node.variable)} ${node.operator.text} ${nodeToString(node.call)}`
+    return `${nodeToString(node.variable)} ${node.operator.text} ${
+      nodeToString(node.call)
+    }`
   }
   if (
     node.type === "value-property-access" ||
     node.type === "type-property-access"
   ) {
-    return `${node.baseToken.text}.${node.propertyAccesses.map((pa) => pa.propertyToken.text).join(".")}`
+    return `${node.baseToken.text}.${
+      node.propertyAccesses.map((pa) => pa.propertyToken.text).join(".")
+    }`
   }
   return `<${node.type}>`
 }

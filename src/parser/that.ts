@@ -20,21 +20,25 @@ export type TempThatNode = {
   readonly token: Token<typeof tThat>
 }
 
-export type IndeterminateTypePropertyAccess = Omit<
-  TypePropertyAccess,
-  "type" | "base"
-> & {
-  type: "indeterminate-type-property-access"
-  base: TypeIdentifier | ValueIdentifier | TempThatNode
-}
+export type IndeterminateTypePropertyAccess =
+  & Omit<
+    TypePropertyAccess,
+    "type" | "base"
+  >
+  & {
+    type: "indeterminate-type-property-access"
+    base: TypeIdentifier | ValueIdentifier | TempThatNode
+  }
 
-export type IndeterminateValuePropertyAccess = Omit<
-  ValuePropertyAccess,
-  "type" | "base"
-> & {
-  type: "indeterminate-value-property-access"
-  base: ValueIdentifier | TempThatNode
-}
+export type IndeterminateValuePropertyAccess =
+  & Omit<
+    ValuePropertyAccess,
+    "type" | "base"
+  >
+  & {
+    type: "indeterminate-value-property-access"
+    base: ValueIdentifier | TempThatNode
+  }
 export type UnsafeIndeterminateValuePropertyAccess = Omit<
   IndeterminateTypePropertyAccess,
   "type"
@@ -47,14 +51,10 @@ type Indeterminate =
 type Determined<T extends Indeterminate> = T extends
   | IndeterminateTypePropertyAccess
   | IndeterminateValuePropertyAccess
-  | TempThatNode
-  ? T extends TempThatNode
-    ? Expression
-    : T extends IndeterminateTypePropertyAccess
-      ? TypePropertyAccess
-      : T extends IndeterminateValuePropertyAccess
-        ? ValuePropertyAccess
-        : never
+  | TempThatNode ? T extends TempThatNode ? Expression
+  : T extends IndeterminateTypePropertyAccess ? TypePropertyAccess
+  : T extends IndeterminateValuePropertyAccess ? ValuePropertyAccess
+  : never
   : T
 
 export function collapseThats<T extends Indeterminate>(
@@ -85,10 +85,9 @@ export function collapseThat<T extends Indeterminate>(
     return state.context.takeThat(input) as Determined<T>
   }
   if (input.type === "indeterminate-type-property-access") {
-    const base =
-      input.base.type === "that"
-        ? state.context.takeThat(input.base)
-        : input.base
+    const base = input.base.type === "that"
+      ? state.context.takeThat(input.base)
+      : input.base
     if (base === badParse) return badParse
     const mapped: TypePropertyAccess = {
       type: "type-property-access",
@@ -101,10 +100,9 @@ export function collapseThat<T extends Indeterminate>(
     return mapped as Determined<T>
   }
   if (input.type === "indeterminate-value-property-access") {
-    const base =
-      input.base.type === "that"
-        ? state.context.takeThat(input.base)
-        : input.base
+    const base = input.base.type === "that"
+      ? state.context.takeThat(input.base)
+      : input.base
     if (base === badParse) return badParse
     const mapped: ValuePropertyAccess = {
       type: "value-property-access",

@@ -44,8 +44,7 @@ function pathInSrc(libPath: string): string {
   const libIndex = libRootPath.lastIndexOf(searchFor)
   let srcRootPath = libRootPath
   if (libIndex >= 0) {
-    srcRootPath =
-      libRootPath.substring(0, libIndex) +
+    srcRootPath = libRootPath.substring(0, libIndex) +
       replaceWith +
       libRootPath.substring(libIndex + searchFor.length)
   }

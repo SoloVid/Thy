@@ -46,8 +46,9 @@ export function parseAssignmentOrCall(
   state: ParserState,
   modifier: Assignment["modifier"] | null,
 ) {
-  const callOrAssignment = parseSpecialCallOrFallback(state, (s) =>
-    parseAssignmentOrValueCall(s, modifier),
+  const callOrAssignment = parseSpecialCallOrFallback(
+    state,
+    (s) => parseAssignmentOrValueCall(s, modifier),
   )
   if (callOrAssignment === badParse) {
     return badParse

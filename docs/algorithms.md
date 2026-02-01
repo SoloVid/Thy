@@ -11,11 +11,13 @@ demonstrates basic looping and printing, as well as using JavaScript
 functionality (`.repeat()` in this case).
 
 ```typescript
-for (var i = 0; i < 10; i++)
+for (var i = 0; i < 10; i++) {
   console.log(" ".repeat(10 - i) + "*".repeat(i * 2 + 1))
+}
 
-for (var i = 10; -1 < i; i--)
+for (var i = 10; -1 < i; i--) {
   console.log(" ".repeat(10 - i) + "*".repeat(i * 2 + 1))
+}
 ```
 
 vs.

@@ -42,7 +42,7 @@ async function walkFilesRequired(
     ...tighterListing
       .filter((e) => e.isDir)
       .map((directory) =>
-        walkFiles({ rootDir, dir: directory.path, ignorePattern }, handler),
+        walkFiles({ rootDir, dir: directory.path, ignorePattern }, handler)
       ),
   ])
 }

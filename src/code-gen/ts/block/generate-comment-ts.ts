@@ -34,7 +34,7 @@ export function generateCommentTs(
     "// " +
       lines
         .map((l) =>
-          l.replace(leadingSpaceRegex, makeIndent(state.indentLevel) + "// "),
+          l.replace(leadingSpaceRegex, makeIndent(state.indentLevel) + "// ")
         )
         .join("\n"),
   )

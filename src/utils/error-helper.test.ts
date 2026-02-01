@@ -55,7 +55,8 @@ Error: f bad
 })
 
 test("getErrorTraceLinesFromStack() returns only lines with file and location info (Vivaldi 6.2)", async () => {
-  const exampleStackValue = `Error: Cannot access split on input because input has no value
+  const exampleStackValue =
+    `Error: Cannot access split on input because input has no value
     at assert (http://localhost:8089/editor-client.js:1667:13)
     at interpretThyIdentifier (http://localhost:8089/editor-client.js:1934:7)
     at interpretThyExpression (http://localhost:8089/editor-client.js:1870:12)
@@ -90,7 +91,8 @@ test("getErrorTraceLinesFromStack() returns only lines with file and location in
 })
 
 test("getErrorTraceLinesFromStack() gracefully degrades with lines including unexpected (Vivaldi 6.2)", async () => {
-  const exampleStackValue = `Error: Cannot access split on input because input has no value
+  const exampleStackValue =
+    `Error: Cannot access split on input because input has no value
     at assert (http://localhost:8089/editor-client.js:1667:13)
     line not a stack frame
     at async run (http://localhost:8089/editor-client.js:3081:23)`

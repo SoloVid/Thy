@@ -1,7 +1,10 @@
 import { fromNode } from "code-gen/utils/from-node.ts"
 import { nodeError } from "common/compile-error.ts"
 import { TreeNode } from "tree"
-import { CodeGeneratorFunc, DefiniteCodeGeneratorFunc } from "../ts-generator.ts"
+import {
+  CodeGeneratorFunc,
+  DefiniteCodeGeneratorFunc,
+} from "../ts-generator.ts"
 import { autoTightS } from "./auto-tight.ts"
 
 export function makeGeneratorForced<T extends TreeNode>(

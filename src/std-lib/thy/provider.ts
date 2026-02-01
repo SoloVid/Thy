@@ -14,7 +14,6 @@ type DependencyMapBase = Record<string, readonly DependencySpec[]>
 
 type ThyDependencyLib<DependencyMap extends DependencyMapBase> = {
   /**
-   *
    * @param reference ID of dependency as appears in source (relative)
    * @returns
    */
@@ -23,18 +22,15 @@ type ThyDependencyLib<DependencyMap extends DependencyMapBase> = {
   ) => DependencySpecValueIfOnlyOne<DependencyMap[Reference]>
 }
 
-type DependencySpecValue<T extends DependencySpec> =
-  T extends InitDependencySpec
-    ? ReturnType<T["init"]>
-    : T extends SingletonDependencySpec
-      ? T["value"]
-      : never
+type DependencySpecValue<T extends DependencySpec> = T extends
+  InitDependencySpec ? ReturnType<T["init"]>
+  : T extends SingletonDependencySpec ? T["value"]
+  : never
 type DependencySpecValueIfOnlyOne<T extends readonly DependencySpec[]> =
-  [] extends T
-    ? void
+  [] extends T ? void
     : T extends readonly [DependencySpec, DependencySpec, ...DependencySpec[]]
       ? void
-      : DependencySpecValue<T[0]>
+    : DependencySpecValue<T[0]>
 
 const makeThyDependencyLib = <DependencyMap extends DependencyMapBase>(
   dependencyMap: DependencyMap,
@@ -53,8 +49,10 @@ const makeThyDependencyLib = <DependencyMap extends DependencyMapBase>(
         if ("value" in dep) {
           return dep.value as ThyDepReturnType
         }
-        return resolveThyDependency(dep.id, cache, (cache) =>
-          dep.init(cache),
+        return resolveThyDependency(
+          dep.id,
+          cache,
+          (cache) => dep.init(cache),
         ) as ThyDepReturnType
       }
       for (const dep of dependencies) {

@@ -30,8 +30,13 @@ export async function compileWorkspaceTs(options: Options) {
             .map((dependencies) =>
               dependencies.map(
                 (dep) =>
-                  `import ${dep.suggestedName} from "./${relative(dirname(join(options.inputDirectory, name)), join(options.inputDirectory, dep.id))}.ts"`,
-              ),
+                  `import ${dep.suggestedName} from "./${
+                    relative(
+                      dirname(join(options.inputDirectory, name)),
+                      join(options.inputDirectory, dep.id),
+                    )
+                  }.ts"`,
+              )
             )
             .flat(),
           ``,
@@ -46,7 +51,7 @@ export async function compileWorkspaceTs(options: Options) {
                     `      id: "${dep.id}",`,
                     `      init: ${dep.suggestedName},`,
                     `    },`,
-                  ].join("\n"),
+                  ].join("\n")
                 ),
                 `  ],`,
               ].join("\n"),

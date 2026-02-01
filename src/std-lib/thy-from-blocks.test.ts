@@ -78,7 +78,9 @@ const permutations3 = permute([0, 1, 2])
 
 for (const perm of permutations3) {
   testMakeThy(
-    `function should allow accessing exported member (order ${JSON.stringify(perm)})`,
+    `function should allow accessing exported member (order ${
+      JSON.stringify(perm)
+    })`,
     async () => {
       const provider1 = () => ({ a: 1 as const, b: 2 })
       const provider2 = () => ({ c: "3" })
@@ -113,7 +115,9 @@ for (const perm of permutations3) {
   )
 
   testMakeThy(
-    `function should allow components to access each other (order ${JSON.stringify(perm)})`,
+    `function should allow components to access each other (order ${
+      JSON.stringify(perm)
+    })`,
     async () => {
       const provider1 = () => ({ a: "A" as const })
       const provider2 = ({ thy }: { thy: Thy }) => {

@@ -15,9 +15,9 @@ export async function checkExampleProgramTokens(
   tokens: readonly (
     | TokenType
     | readonly [
-        TokenType,
-        string | { asymmetricMatch(other: unknown): boolean },
-      ]
+      TokenType,
+      string | { asymmetricMatch(other: unknown): boolean },
+    ]
   )[],
 ) {
   const { errors, outputs } = await tokenizeExampleProgram(exampleProgramName)
@@ -37,9 +37,9 @@ export function checkSourceTokens(
   tokens: readonly (
     | TokenType
     | readonly [
-        TokenType,
-        string | { asymmetricMatch(other: unknown): boolean },
-      ]
+      TokenType,
+      string | { asymmetricMatch(other: unknown): boolean },
+    ]
   )[],
 ) {
   const { errors, outputs } = tokenizeSource(source)

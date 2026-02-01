@@ -1,6 +1,6 @@
 import { fromComplicated } from "code-gen/utils/from-complicated.ts"
 import { fromToken } from "code-gen/utils/from-token.ts"
-import { returnStyle, type Block } from "tree"
+import { type Block, returnStyle } from "tree"
 import { genIndent } from "../../utils/indent.ts"
 import type { GeneratorState } from "../generator-state.ts"
 import { ContextType, contextType } from "../generator-context.ts"
@@ -19,14 +19,13 @@ export function generateImpliedReturnTs(block: Block, state: GeneratorState) {
   const localSymbolEntries = [
     ...(state.symbolTable?.localSymbols.entries() ?? []),
   ]
-  const symbolEntriesToExport =
-    block.returnStyle === returnStyle.explicitExport
-      ? localSymbolEntries.filter(
-          ([, symbolInfo]) => symbolInfo.visibility === "export",
-        )
-      : localSymbolEntries.filter(
-          ([, symbolInfo]) => symbolInfo.visibility !== "private",
-        )
+  const symbolEntriesToExport = block.returnStyle === returnStyle.explicitExport
+    ? localSymbolEntries.filter(
+      ([, symbolInfo]) => symbolInfo.visibility === "export",
+    )
+    : localSymbolEntries.filter(
+      ([, symbolInfo]) => symbolInfo.visibility !== "private",
+    )
   const impliedReturn = symbolEntriesToExport.map(
     ([symbolName, symbolInfo]) => {
       const ind = genIndent(state.indentLevel + 1)

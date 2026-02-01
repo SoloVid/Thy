@@ -1,7 +1,7 @@
 import { tLet, tStatementTerminator } from "tokenizer/token-type.ts"
 import type { LetCall } from "tree"
 import assert from "utils/assert.ts"
-import { badParse, BadParse } from "./error.ts"
+import { BadParse, badParse } from "./error.ts"
 import { parseCall } from "./parse-call.ts"
 import type { ParserState } from "./parser-state.ts"
 

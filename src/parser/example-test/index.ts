@@ -5,7 +5,7 @@ import { defineTestGroup } from "test-framework"
 import { makeTokenizer } from "tokenizer"
 import type { TreeNode } from "tree"
 import type { DeepPartial } from "utils/utility-types.ts"
-import { badParse, BadParse, ErrorableTreeNode } from "../error.ts"
+import { BadParse, badParse, ErrorableTreeNode } from "../error.ts"
 import { parse } from "../parser.ts"
 
 export const testParser = defineTestGroup("parser ")

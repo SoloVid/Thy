@@ -25,7 +25,7 @@ export function tryGenerateStringTs(
       ...node.parts.map((part) =>
         part.type === "string-content"
           ? part.token.text
-          : fromComplicated(part, ["${", part.value.token.text, "}"]),
+          : fromComplicated(part, ["${", part.value.token.text, "}"])
       ),
       "`",
       maybeAsConst,
@@ -46,7 +46,7 @@ export function tryGenerateStringTypeTs(
       ...node.parts.map((part) =>
         part.type === "string-content"
           ? part.token.text
-          : fromComplicated(part, ["${typeof ", part.value.token.text, "}"]),
+          : fromComplicated(part, ["${typeof ", part.value.token.text, "}"])
       ),
       "`",
     ])

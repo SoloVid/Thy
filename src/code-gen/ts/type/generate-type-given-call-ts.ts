@@ -48,26 +48,24 @@ export function generateTypeGivenCallTypeTsWithParameterName(
     return fromNode(node, "undefined")
   }
   const extendsTypeNode = node.args[0]
-  const extendsTypeSnippets =
-    extendsTypeNode === undefined
-      ? fromNode(node, "unknown")
-      : generateTypeTsForFunctionSignature(
-          extendsTypeNode,
-          state,
-          fixture,
-          parameterName,
-        )
+  const extendsTypeSnippets = extendsTypeNode === undefined
+    ? fromNode(node, "unknown")
+    : generateTypeTsForFunctionSignature(
+      extendsTypeNode,
+      state,
+      fixture,
+      parameterName,
+    )
 
   const defaultTypeNode = node.args[1]
-  const defaultTypeSnippets =
-    defaultTypeNode === undefined
-      ? extendsTypeSnippets
-      : generateTypeTsForFunctionSignature(
-          defaultTypeNode,
-          state,
-          fixture,
-          `${parameterName}_Default`,
-        )
+  const defaultTypeSnippets = defaultTypeNode === undefined
+    ? extendsTypeSnippets
+    : generateTypeTsForFunctionSignature(
+      defaultTypeNode,
+      state,
+      fixture,
+      `${parameterName}_Default`,
+    )
 
   state.block.typeParametersSoFar.push({
     name: parameterName,

@@ -25,7 +25,6 @@ type ThyCacheInheritanceRule = {
 export type ThyCacheInit<T> = (cache: ThyCache) => T
 
 /**
- *
  * @param id Canonical ID of dependency.
  * @param cache
  * @param init Initialization function for obtaining the dependency.

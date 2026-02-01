@@ -7,7 +7,7 @@ import {
   tValueIdentifier,
 } from "tokenizer/token-type.ts"
 import type { TypeIdentifier, ValueIdentifier, ValuePropertyAccess } from "tree"
-import { addNodeError, addTokenError, badParse, BadParse } from "./error.ts"
+import { addNodeError, addTokenError, BadParse, badParse } from "./error.ts"
 import type { ParserState } from "./parser-state.ts"
 import {
   IndeterminateTypePropertyAccess,
@@ -38,13 +38,10 @@ export function parseIndeterminateNamedValueExpression(
 
 type NamedNode<
   T extends typeof tThat | typeof tTypeIdentifier | typeof tValueIdentifier,
-> = T extends typeof tThat
-  ? TempThatNode
-  : T extends typeof tTypeIdentifier
-    ? TypeIdentifier
-    : T extends typeof tValueIdentifier
-      ? ValueIdentifier
-      : never
+> = T extends typeof tThat ? TempThatNode
+  : T extends typeof tTypeIdentifier ? TypeIdentifier
+  : T extends typeof tValueIdentifier ? ValueIdentifier
+  : never
 
 function makeNamedNode<
   T extends typeof tThat | typeof tTypeIdentifier | typeof tValueIdentifier,

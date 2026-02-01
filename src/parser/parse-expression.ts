@@ -1,4 +1,8 @@
-import { tNumberLiteral, tStartBlock, tStartString } from "tokenizer/token-type.ts"
+import {
+  tNumberLiteral,
+  tStartBlock,
+  tStartString,
+} from "tokenizer/token-type.ts"
 import type {
   Block,
   NumberLiteral,

@@ -20,7 +20,7 @@ export function makeLogicalFunctionGenerator(
         context: contextType.looseExpression,
       })
       const generatedChildren = node.args.map((a) =>
-        fixture.generate(a, childState),
+        fixture.generate(a, childState)
       )
       const separatedChildren = generatedChildren.map((c, i) => {
         if (i === 0) {

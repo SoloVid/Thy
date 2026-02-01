@@ -12,7 +12,7 @@ import type {
   ThyCall,
   ValueCall,
 } from "../tree/call.ts"
-import { addNodeError, addTokenError, badParse, BadParse } from "./error.ts"
+import { addNodeError, addTokenError, BadParse, badParse } from "./error.ts"
 import { getFirstToken } from "./helper.ts"
 import { parseCallArgs } from "./parse-call-arguments.ts"
 import {
@@ -157,10 +157,9 @@ function parseGivenCall(state: ParserState): GivenCall | BadParse {
   )
   const args = parseCallArgs(state)
   if (args === badParse) return badParse
-  const validTypeArgs =
-    args.typeArgs.length > 0
-      ? ([args.typeArgs[0] as TypeExpression] as const)
-      : ([] as const)
+  const validTypeArgs = args.typeArgs.length > 0
+    ? ([args.typeArgs[0] as TypeExpression] as const)
+    : ([] as const)
   for (let i = 1; i < args.typeArgs.length; i++) {
     addNodeError(
       state,
@@ -168,10 +167,9 @@ function parseGivenCall(state: ParserState): GivenCall | BadParse {
       `"given" call should not receive more than one type argument`,
     )
   }
-  const validArgs =
-    args.valueArgs.length > 0
-      ? ([args.valueArgs[0] as Expression] as const)
-      : ([] as const)
+  const validArgs = args.valueArgs.length > 0
+    ? ([args.valueArgs[0] as Expression] as const)
+    : ([] as const)
   for (let i = 1; i < args.valueArgs.length; i++) {
     addNodeError(
       state,
@@ -202,10 +200,9 @@ export function parseReturn(
   )
   const args = parseCallArgs(state)
   if (args === badParse) return badParse
-  const validTypeArgs =
-    args.typeArgs.length > 0
-      ? ([args.typeArgs[0] as TypeExpression] as const)
-      : ([] as const)
+  const validTypeArgs = args.typeArgs.length > 0
+    ? ([args.typeArgs[0] as TypeExpression] as const)
+    : ([] as const)
   for (let i = 1; i < args.typeArgs.length; i++) {
     addNodeError(
       state,

@@ -45,19 +45,18 @@ export function generateGivenCallTsWithParameterName(
   const defaultValueNode = node.args[0]
 
   const parameterNameSnippet = fromNode(node, parameterName)
-  const parameterSnippets =
-    typeNode === undefined
-      ? parameterNameSnippet
-      : fromComplicated(node, [
-          parameterNameSnippet,
-          ": ",
-          generateTypeTsForFunctionSignature(
-            typeNode,
-            state,
-            fixture,
-            parameterName,
-          ),
-        ])
+  const parameterSnippets = typeNode === undefined
+    ? parameterNameSnippet
+    : fromComplicated(node, [
+      parameterNameSnippet,
+      ": ",
+      generateTypeTsForFunctionSignature(
+        typeNode,
+        state,
+        fixture,
+        parameterName,
+      ),
+    ])
   state.block.parametersSoFar.push({
     inlineSnippet: parameterSnippets,
   })
@@ -66,6 +65,8 @@ export function generateGivenCallTsWithParameterName(
     return fromNode(givenTerm, parameterName)
   }
   return fromComplicated(node, [
-    `${parameterName} === undefined ? ${fixture.generate(defaultValueNode, state)} : ${parameterName}`,
+    `${parameterName} === undefined ? ${
+      fixture.generate(defaultValueNode, state)
+    } : ${parameterName}`,
   ])
 }

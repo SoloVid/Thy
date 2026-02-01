@@ -37,7 +37,7 @@ export function generateExpressionAsTypeTs(
         }),
       ),
       ` }`,
-    ]),
+    ])
   )
   return fromComplicated(node, [`ReturnType<typeof ${name}>`])
 }

@@ -113,7 +113,9 @@ export function makeIndentMatchers(): IndentTokenizers {
       return {
         type: skipToken,
         text: "",
-        error: `invalid outdent at offset: ${state.offset} (line ${state.line + lines.length + 1})`,
+        error: `invalid outdent at offset: ${state.offset} (line ${
+          state.line + lines.length + 1
+        })`,
       } as const
     }
 

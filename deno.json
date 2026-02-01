@@ -64,7 +64,6 @@
     "npm-run-all": "npm:npm-run-all@^4.1.5",
     "nyc": "npm:nyc@^15.1.0",
     "preact": "npm:preact@^10",
-    "prettier": "npm:prettier@~3.3",
     "prop-types": "npm:prop-types@^15.8.1",
     "styled-components": "npm:styled-components@^6.1.13",
     "tmp-promise": "npm:tmp-promise@^3.0.3",
@@ -76,10 +75,12 @@
   },
   "fmt": {
     "semiColons": false,
+    "proseWrap": "preserve",
     "exclude": [
       "**/output.ts",
       "**/output/",
       "**/*.html",
+      "**/*.svg",
       "**/generated.test.ts"
     ]
   },

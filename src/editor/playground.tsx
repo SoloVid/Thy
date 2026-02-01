@@ -124,7 +124,8 @@ function PlaygroundContent() {
                   value={scm.sourceOpen.contents}
                   setValue={onSourceUpdate}
                   runCode={() => alerts.catch(scm.run())}
-                ></CodeInput>
+                >
+                </CodeInput>
               </>
             )}
           </div>

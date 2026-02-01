@@ -90,8 +90,7 @@ export function makeGeneratorState(
   options: GeneratorStateOptions = {},
 ): GeneratorState {
   let nextVar = 1
-  const getUniqueVariableName =
-    parent?.getUniqueVariableName ??
+  const getUniqueVariableName = parent?.getUniqueVariableName ??
     (() => {
       trace(`getUniqueVariableName() => ${nextVar}`)
       return `_${nextVar++}`
@@ -103,42 +102,37 @@ export function makeGeneratorState(
       ? []
       : (parent?.preStatementGenerators ?? []),
     indentLevel: options.increaseIndent
-      ? parent
-        ? parent.indentLevel + 1
-        : 1
+      ? parent ? parent.indentLevel + 1 : 1
       : parent
-        ? parent.indentLevel
-        : 0,
-    isTypeContext:
-      options.isTypeContext !== undefined
-        ? options.isTypeContext
-        : (parent?.isTypeContext ?? false),
-    assignmentContextName:
-      options.assignmentContextName !== undefined
-        ? options.assignmentContextName
-        : (parent?.assignmentContextName ?? null),
+      ? parent.indentLevel
+      : 0,
+    isTypeContext: options.isTypeContext !== undefined
+      ? options.isTypeContext
+      : (parent?.isTypeContext ?? false),
+    assignmentContextName: options.assignmentContextName !== undefined
+      ? options.assignmentContextName
+      : (parent?.assignmentContextName ?? null),
     getUniqueVariableName,
     symbolTable: options.symbolTable ?? parent?.symbolTable ?? null,
     block: options.block ?? parent?.block ?? null,
-    context:
-      options.context !== undefined
-        ? options.context
-        : (contextType.looseExpression as ContextType),
+    context: options.context !== undefined
+      ? options.context
+      : (contextType.looseExpression as ContextType),
     parent: parent ?? null,
     implicitArguments: options.newImplicitArguments
       ? {
-          get variableName() {
-            if (cachedImplicitArgumentsVariableName === null) {
-              cachedImplicitArgumentsVariableName = getUniqueVariableName()
-            }
-            return cachedImplicitArgumentsVariableName
-          },
-          used: false,
-          markImplicitArgumentUsed() {
-            this.used = true
-            parent?.implicitArguments?.markImplicitArgumentUsed()
-          },
-        }
+        get variableName() {
+          if (cachedImplicitArgumentsVariableName === null) {
+            cachedImplicitArgumentsVariableName = getUniqueVariableName()
+          }
+          return cachedImplicitArgumentsVariableName
+        },
+        used: false,
+        markImplicitArgumentUsed() {
+          this.used = true
+          parent?.implicitArguments?.markImplicitArgumentUsed()
+        },
+      }
       : (parent?.implicitArguments ?? null),
     addError(error: CompileError) {
       this.errors.push(error)

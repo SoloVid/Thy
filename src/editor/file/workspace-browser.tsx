@@ -1,7 +1,7 @@
 import {
+  faFloppyDisk,
   faFolder,
   faFolderOpen,
-  faFloppyDisk,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -60,10 +60,9 @@ export function WorkspaceBrowser({
       const list = await indexedDbFs.list(directory)
       const dirPath = directory.endsWith("/") ? directory : `${directory}/`
       const mappedEntries: WorkspaceEntry[] = list.map((entry) => ({
-        path:
-          directory === "/"
-            ? `/${entry.name}${entry.kind === "directory" ? "/" : ""}`
-            : `${dirPath}${entry.name}${entry.kind === "directory" ? "/" : ""}`,
+        path: directory === "/"
+          ? `/${entry.name}${entry.kind === "directory" ? "/" : ""}`
+          : `${dirPath}${entry.name}${entry.kind === "directory" ? "/" : ""}`,
         name: entry.name,
         isDirectory: entry.kind === "directory",
       }))
@@ -145,10 +144,9 @@ export function WorkspaceBrowser({
       const dirPath = currentDirectory.endsWith("/")
         ? currentDirectory
         : `${currentDirectory}/`
-      savePath =
-        dirPath === "/"
-          ? `/${newWorkspaceName}`
-          : `${dirPath}${newWorkspaceName}`
+      savePath = dirPath === "/"
+        ? `/${newWorkspaceName}`
+        : `${dirPath}${newWorkspaceName}`
     }
 
     // Ensure .json extension
@@ -201,8 +199,9 @@ export function WorkspaceBrowser({
     const dirPath = currentDirectory.endsWith("/")
       ? currentDirectory
       : `${currentDirectory}/`
-    const folderPath =
-      currentDirectory === "/" ? `/${folderName}/` : `${dirPath}${folderName}/`
+    const folderPath = currentDirectory === "/"
+      ? `/${folderName}/`
+      : `${dirPath}${folderName}/`
 
     try {
       await indexedDbFs.mkdir(folderPath)
@@ -272,32 +271,34 @@ export function WorkspaceBrowser({
         </div>
 
         <div style="flex-grow: 1; overflow-y: auto; padding: 10px;">
-          {entries.length === 0 ? (
-            <div style="text-align: center; padding: 20px;">
-              No workspaces found in this directory
-            </div>
-          ) : (
-            entries.map((entry) => (
-              <div
-                key={entry.path}
-                style={`display: flex; align-items: center; padding: 5px; cursor: pointer; ${
-                  selectedEntry === entry.path
-                    ? "background-color: #444;"
-                    : "hover:background-color: #333;"
-                }`}
-                onClick={() => handleEntryClick(entry)}
-                onDblClick={() => handleDoubleClick(entry)}
-              >
-                <FontAwesomeIcon
-                  icon={entry.isDirectory ? faFolderOpen : faFloppyDisk}
-                  style={{ "margin-right": "10px" }}
-                />
-                <span style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                  {entry.name}
-                </span>
+          {entries.length === 0
+            ? (
+              <div style="text-align: center; padding: 20px;">
+                No workspaces found in this directory
               </div>
-            ))
-          )}
+            )
+            : (
+              entries.map((entry) => (
+                <div
+                  key={entry.path}
+                  style={`display: flex; align-items: center; padding: 5px; cursor: pointer; ${
+                    selectedEntry === entry.path
+                      ? "background-color: #444;"
+                      : "hover:background-color: #333;"
+                  }`}
+                  onClick={() => handleEntryClick(entry)}
+                  onDblClick={() => handleDoubleClick(entry)}
+                >
+                  <FontAwesomeIcon
+                    icon={entry.isDirectory ? faFolderOpen : faFloppyDisk}
+                    style={{ "margin-right": "10px" }}
+                  />
+                  <span style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    {entry.name}
+                  </span>
+                </div>
+              ))
+            )}
         </div>
 
         {mode === "save" && (

@@ -5,8 +5,8 @@ import {
   MayWait,
   NotWait,
   notWait,
-  yesWait,
   YesWait,
+  yesWait,
 } from "./async-helper.ts"
 import {
   isVoid,

@@ -1,12 +1,16 @@
-import type { DebugNever, DefaultNever, NoInfer } from "../utils/utility-types.ts"
+import type {
+  DebugNever,
+  DefaultNever,
+  NoInfer,
+} from "../utils/utility-types.ts"
 
 type BaseBlock = (args: { thy: ThyFunction<{}> }) => unknown
 type BaseBlockMap = Record<string, BaseBlock>
 type Block<BlockMap extends BaseBlockMap> =
   | BlockMap[keyof BlockMap]
   | ((args: {
-      thy: PartialThyFunction<BlockMap, string & keyof BlockMap>
-    }) => undefined | void | Record<string, never>)
+    thy: PartialThyFunction<BlockMap, string & keyof BlockMap>
+  }) => undefined | void | Record<string, never>)
 
 type ThyFunctionParameters<
   BlockMap extends BaseBlockMap,
@@ -16,12 +20,14 @@ type ThyFunctionOutput<
   BlockMap extends BaseBlockMap,
   OutputKey extends (string & keyof BlockMap) | void,
 > = DefaultNever<
-  OutputKey extends void
-    ? void
+  OutputKey extends void ? void
     : DefiniteReturnType<BlockMap, Exclude<OutputKey, void>>,
   DebugNever<
     [
-      `"${Exclude<OutputKey, void>}" is not a valid key from provider with keys`,
+      `"${Exclude<
+        OutputKey,
+        void
+      >}" is not a valid key from provider with keys`,
       keyof ReturnType<BlockMap[Exclude<OutputKey, void>]>,
     ]
   >

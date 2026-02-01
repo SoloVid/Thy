@@ -67,8 +67,8 @@ export function generateCallTsInTypeContext(
   callName = callName
     ? `_${callName}`
     : state.assignmentContextName
-      ? `_${state.assignmentContextName}`
-      : state.getUniqueVariableName()
+    ? `_${state.assignmentContextName}`
+    : state.getUniqueVariableName()
   const { functionSnippet, typeArgSnippets, argSnippets } = generateCallPartsTs(
     call,
     state,
@@ -87,12 +87,12 @@ export function generateCallTsInTypeContext(
       functionSnippet,
       generateTypeArgsTs(call, typeArgSnippets),
       ` }`,
-    ]),
+    ])
   )
   state.addPreStatementGenerator((s, f) =>
     fromComplicated(call, [
       `type ${restParamsTypeName} = ReturnType<typeof ${wrappedValueFuncName}> extends (${argsAsUnknown}...rest: infer U) => unknown ? U : []`,
-    ]),
+    ])
   )
   return fromComplicated(call, [
     `${wrappedValueFuncName}()(`,

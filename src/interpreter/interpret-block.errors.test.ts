@@ -302,7 +302,9 @@ ${traceLinesString}
   assert.strictEqual(
     actualLine,
     expectedLine,
-    `Line ${actualErrorLineIndex + 1} of actual error should match line ${expectedErrorLineIndex + 1} of expected error
+    `Line ${actualErrorLineIndex + 1} of actual error should match line ${
+      expectedErrorLineIndex + 1
+    } of expected error
 Actual: ${JSON.stringify(actualLine)}
 Expected: ${JSON.stringify(expectedLine)}
 

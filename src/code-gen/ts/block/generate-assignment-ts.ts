@@ -1,6 +1,9 @@
-import { CodeGeneratorFunc, GeneratorFixture } from "code-gen/ts/ts-generator.ts"
+import {
+  CodeGeneratorFunc,
+  GeneratorFixture,
+} from "code-gen/ts/ts-generator.ts"
 import { fromTokenRange } from "code-gen/utils/from-token-range.ts"
-import { isAssignment, type Assignment } from "../../../tree/assignment.ts"
+import { type Assignment, isAssignment } from "../../../tree/assignment.ts"
 import type { TreeNode } from "../../../tree/tree-node.ts"
 import { makeGenerator } from "../generate-from-options.ts"
 import { GeneratedSnippets } from "../../generator.ts"

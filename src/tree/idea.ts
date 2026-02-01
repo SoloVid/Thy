@@ -1,6 +1,6 @@
 import type { Token } from "tokenizer/token.ts"
 import type { tComment, tStatementTerminator } from "tokenizer/token-type.ts"
-import { isAssignment, type Assignment } from "./assignment.ts"
+import { type Assignment, isAssignment } from "./assignment.ts"
 import type { Call, Return } from "./call.ts"
 import type { TypeReturn } from "./type-call.ts"
 import type { LetCall } from "./let-call.ts"

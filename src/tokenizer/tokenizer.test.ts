@@ -48,8 +48,10 @@ testTokenizer("should correctly track token locations", async () => {
   )
   expect(errors).toEqual([])
   const outputsWithNoFinnickyWhitespace = JSON.parse(
-    JSON.stringify(outputs, (key, value) =>
-      key === "text" && /^[ \r\n]*$/.test(value) ? undefined : value,
+    JSON.stringify(
+      outputs,
+      (key, value) =>
+        key === "text" && /^[ \r\n]*$/.test(value) ? undefined : value,
     ),
   )
   expect(outputsWithNoFinnickyWhitespace).toEqual([

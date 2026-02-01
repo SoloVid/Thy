@@ -17,7 +17,7 @@ export async function compile(
         cwd: options.rootDir,
         root: options.rootDir,
         nodir: true,
-      }),
+      })
     ),
   )
   const files = files2Level.flat()

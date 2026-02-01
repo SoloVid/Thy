@@ -77,7 +77,9 @@ export function makeTokenizerState(source: string): TokenizerState {
 export function debugState(state: TokenizerState) {
   if (debugOn) {
     debug(
-      `finding at ${state.offset} (${JSON.stringify(state.text.substring(state.offset, state.offset + 10))})`,
+      `finding at ${state.offset} (${
+        JSON.stringify(state.text.substring(state.offset, state.offset + 10))
+      })`,
     )
   }
 }

@@ -1,4 +1,7 @@
-import { CodeGeneratorFunc, GeneratorFixture } from "code-gen/ts/ts-generator.ts"
+import {
+  CodeGeneratorFunc,
+  GeneratorFixture,
+} from "code-gen/ts/ts-generator.ts"
 import { fromComplicated } from "code-gen/utils/from-complicated.ts"
 import type { LetCall } from "../../../tree/let-call.ts"
 import type { TreeNode } from "../../../tree/tree-node.ts"

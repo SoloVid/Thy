@@ -30,11 +30,10 @@ export function convertFromInternalError(
     end: {
       offset: internalError.end.offset + internalError.end.text.length,
       line: internalError.end.line + newlineCountInEndText,
-      column:
-        newlineCountInEndText === 0
-          ? internalError.end.column + internalError.end.text.length
-          : internalError.end.text.length -
-            (internalError.end.text.lastIndexOf("\n") + 1),
+      column: newlineCountInEndText === 0
+        ? internalError.end.column + internalError.end.text.length
+        : internalError.end.text.length -
+          (internalError.end.text.lastIndexOf("\n") + 1),
     },
   }
   const locationForCodeFrame: CodeFrameSourceLocation = {

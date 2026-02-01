@@ -14,7 +14,9 @@ export function addErrorForExcessArgs(
       state.addError(
         nodeError(
           arg,
-          `${functionName} cannot take more than ${maxTypeArgs} type argument${maxTypeArgs === 1 ? `` : `s`}`,
+          `${functionName} cannot take more than ${maxTypeArgs} type argument${
+            maxTypeArgs === 1 ? `` : `s`
+          }`,
         ),
       )
     }
@@ -23,7 +25,9 @@ export function addErrorForExcessArgs(
     state.addError(
       nodeError(
         arg,
-        `${functionName} cannot take more than ${maxArgs} argument${maxArgs === 1 ? `` : `s`}`,
+        `${functionName} cannot take more than ${maxArgs} argument${
+          maxArgs === 1 ? `` : `s`
+        }`,
       ),
     )
   }
