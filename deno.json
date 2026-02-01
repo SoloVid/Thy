@@ -84,6 +84,20 @@
       "**/generated.test.ts"
     ]
   },
+  "lint": {
+    "exclude": [
+      "**/output*.ts",
+      "**/output/"
+    ],
+    "rules": {
+      "exclude": [
+        "jsx-button-has-type",
+        "no-regex-spaces",
+        "no-unused-vars",
+        "require-await"
+      ]
+    }
+  },
   "compilerOptions": {
     "lib": ["es2021"],
     "strict": true,

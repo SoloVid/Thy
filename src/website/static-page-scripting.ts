@@ -38,7 +38,7 @@ document.addEventListener("click", (e) => {
   }
 })
 
-window.addEventListener("load", () => {
+globalThis.addEventListener("load", () => {
   if (!location.hash.startsWith("#")) return
   const id = location.hash.slice(1)
   if (id) {

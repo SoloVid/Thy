@@ -73,7 +73,7 @@ export function parseAnyIndeterminateNamedExpression(
   | ValueIdentifier
   | IndeterminateValuePropertyAccess
   | BadParse {
-  let baseToken = state.buffer.consumeToken()
+  const baseToken = state.buffer.consumeToken()
   if (
     baseToken.type !== tThat &&
     baseToken.type !== tTypeIdentifier &&

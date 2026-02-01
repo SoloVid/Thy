@@ -9,6 +9,7 @@ function nonWallabyTest(
   description: string,
   exercise: () => void | PromiseLike<void>,
 ) {
+  // deno-lint-ignore no-process-global
   if (!process?.env?.WALLABY) {
     test(description, exercise)
   }

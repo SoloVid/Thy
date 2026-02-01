@@ -17,7 +17,7 @@ export function makeRunner() {
   async function run(fs: FilesApi, entrypoint: string): Promise<Output> {
     let error: null | string = null
     let returnValue: unknown = undefined
-    let printedLines: string[] = []
+    const printedLines: string[] = []
     const errorHere = new Error()
     try {
       const playgroundLib = {

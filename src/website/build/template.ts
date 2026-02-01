@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 
 const templateHtmlMutex = new Mutex()
+// deno-lint-ignore prefer-const
 let templateHtml: string | null = null
 export async function getTemplateHtml() {
   return await readFile(join(__dirname, "template.html"), "utf-8")

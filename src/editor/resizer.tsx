@@ -25,8 +25,8 @@ export default function Resizer({ resizeType, onResize }: ResizerProps) {
         return { x: e.clientX, y: e.clientY }
       })
     }
-    window.addEventListener("mousemove", listener)
-    return () => window.removeEventListener("mousemove", listener)
+    globalThis.addEventListener("mousemove", listener)
+    return () => globalThis.removeEventListener("mousemove", listener)
   }, [trackingResize])
 
   useEffect(() => {
@@ -34,8 +34,8 @@ export default function Resizer({ resizeType, onResize }: ResizerProps) {
       const listener = () => {
         setTrackingResize(false)
       }
-      window.addEventListener("mouseup", listener)
-      return () => window.removeEventListener("mouseup", listener)
+      globalThis.addEventListener("mouseup", listener)
+      return () => globalThis.removeEventListener("mouseup", listener)
     }
   }, [trackingResize])
 

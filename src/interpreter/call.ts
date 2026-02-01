@@ -1,5 +1,6 @@
 import { getFirstToken } from "parser/helper.ts"
 import type { AwaitCall, Call, GivenCall, TreeNode, ValueCall } from "tree"
+import { ThyCall } from "tree/call.ts"
 import {
   forwardWait,
   MayWait,
@@ -20,7 +21,6 @@ import {
   makeInterpreterNodeError,
 } from "./interpreter-error.ts"
 import type { ThyBlockContext } from "./types.ts"
-import { ThyCall } from "tree/call.ts"
 
 export function interpretThyCall(
   context: ThyBlockContext,
@@ -76,7 +76,7 @@ export function interpretThyCall(
   checkFunction(functionName, f, call.func)
   try {
     if (ie.thisValue !== undefined) {
-      return notWait(f.call(ie.thisValue, ...callArgs))
+      return notWait(f.call(ie.thisValue, ...callArgs) as RuntimeReturn)
     }
     return notWait(f(...callArgs))
   } catch (e) {
@@ -156,7 +156,7 @@ function checkFunction(
   functionName: string,
   f: unknown,
   node: TreeNode,
-): asserts f is Function {
+): asserts f is (...args: readonly unknown[]) => unknown {
   if (!(typeof f === "function")) {
     throw makeInterpreterNodeError(
       node,
@@ -205,7 +205,7 @@ export async function interpretThyValueCallAsync(
   checkFunction(functionName, f, call.func)
   try {
     if (ie.thisValue !== undefined) {
-      return f.call(ie.thisValue, ...callArgs)
+      return f.call(ie.thisValue, ...callArgs) as RuntimeReturn
     }
     return f(...callArgs)
   } catch (e) {

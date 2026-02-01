@@ -13,8 +13,8 @@ export function useSourceCodePopStateListener(
       const state = getDataFromHistory()
       setState(state)
     }
-    window.addEventListener("popstate", listener)
-    return () => window.removeEventListener("popstate", listener)
+    globalThis.addEventListener("popstate", listener)
+    return () => globalThis.removeEventListener("popstate", listener)
   })
 }
 
@@ -38,7 +38,7 @@ export function saveCodeInHistory(
         fileName: fileName,
       },
       "",
-      window.location.pathname + window.location.search,
+      globalThis.location.pathname + globalThis.location.search,
     )
   } catch (e) {
     // MDN warns that an exception could be thrown if the data is too big.
@@ -48,7 +48,7 @@ export function saveCodeInHistory(
     history.replaceState(
       null,
       "",
-      window.location.pathname + window.location.search,
+      globalThis.location.pathname + globalThis.location.search,
     )
   }
 }
@@ -58,7 +58,7 @@ export function extractCodeFromHistoryState() {
     return getDataFromHistory()
   } catch (e) {
     console.error(e)
-    window.alert(`Error parsing source in history state: ${e}`)
+    globalThis.alert(`Error parsing source in history state: ${e}`)
   }
   return null
 }

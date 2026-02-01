@@ -92,7 +92,7 @@ export function makeTopTokenizer(
 
   return {
     getNextToken() {
-      let token = innerTokenizer.getNextToken()
+      const token = innerTokenizer.getNextToken()
       if (token.type === tEndStream) {
         if (closingTerminators === null) {
           closingTerminators = indentation.currentIndentLevels + 1

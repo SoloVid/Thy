@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "preact/hooks"
 
-const useLatest = <T extends any>(current: T) => {
+const useLatest = <T extends unknown>(current: T) => {
   const storedValue = useRef(current)
   useEffect(() => {
     storedValue.current = current

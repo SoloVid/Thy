@@ -1,4 +1,4 @@
-import assert from "assert"
+import assert from "node:assert"
 import { defBuiltin } from "std-lib/core/def.ts"
 import { math } from "std-lib/core/math.ts"
 import { test } from "test-framework"
@@ -20,7 +20,7 @@ test("interpretThyBlock() can return a function that can pass a multiline string
   const interpreted = interpretThyBlockSource(
     `f """\n  yo\n  sup\n\nf """\n  again`,
   )
-  let calledWith: unknown[] = []
+  const calledWith: unknown[] = []
   const f = (arg: unknown) => calledWith.push(arg)
   interpreted({ f })
   assert.deepStrictEqual(calledWith, ["yo\nsup", "again"])

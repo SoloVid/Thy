@@ -11,7 +11,7 @@ const workspaceParam = "w"
 
 function getUrlHashParam(param: string): string | null {
   const regex = new RegExp(`${param}=([^&]+)`)
-  const paramUrlMatch = regex.exec(window.location.hash)
+  const paramUrlMatch = regex.exec(globalThis.location.hash)
   if (paramUrlMatch !== null) {
     return paramUrlMatch[1]
   }
@@ -48,18 +48,18 @@ export function extractWorkspaceFromUrl(): SerializedWorkspace | null {
   } catch (e) {
     // TODO: Surface error better.
     console.error(e)
-    window.alert(`Error parsing source in URL: ${e}`)
+    globalThis.alert(`Error parsing source in URL: ${e}`)
   }
   return null
 }
 
 export function makeShareUrl(workspace: SerializedWorkspace) {
   return (
-    window.location.protocol +
+    globalThis.location.protocol +
     "//" +
-    window.location.host +
-    window.location.pathname +
-    window.location.search +
+    globalThis.location.host +
+    globalThis.location.pathname +
+    globalThis.location.search +
     `#${workspaceParam}=` +
     compressLz(JSON.stringify(workspace))
   )

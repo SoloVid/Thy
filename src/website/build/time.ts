@@ -1,3 +1,5 @@
+import process from "node:process"
+
 export function profileSection<T>(label: string, fn: () => T): T {
   const start = process.hrtime.bigint()
   function printDuration() {

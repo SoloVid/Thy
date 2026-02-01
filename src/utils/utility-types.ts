@@ -23,6 +23,7 @@ export type Expand<T> = T extends
   | null
   | void
   | symbol
+  // deno-lint-ignore ban-types
   | Function
   | Date ? T
   : { [K in keyof T]: T[K] }

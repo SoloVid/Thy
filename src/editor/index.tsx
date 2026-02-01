@@ -3,7 +3,7 @@ import "preact/debug"
 import { render } from "preact"
 import Playground from "./playground.tsx"
 
-window.onbeforeunload = function () {
+globalThis.onbeforeunload = function () {
   return true
 }
 

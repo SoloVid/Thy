@@ -1,5 +1,4 @@
-/* eslint-disable no-return-assign */
-/* eslint-disable no-underscore-dangle */
+// deno-lint-ignore-file no-explicit-any
 
 // Implementation from https://github.com/jaredLunde/react-hook/blob/472fc4797dbd5a85fd87cb69a9c1ed8816367bf1/packages/resize-observer/src/index.tsx
 
@@ -49,11 +48,11 @@ function createResizeObserver(polyfill?: any) {
 
   const callbacks: Map<any, Array<UseResizeObserverCallback>> = new Map()
 
-  const observer = new (polyfill || window.ResizeObserver)(
+  const observer = new (polyfill || globalThis.ResizeObserver)(
     (entries: ResizeObserverEntry[], obs: ResizeObserver) => {
       allEntries = allEntries.concat(entries)
       if (!ticking) {
-        window.requestAnimationFrame(() => {
+        globalThis.requestAnimationFrame(() => {
           const triggered = new Set<Element>()
           for (let i = 0; i < allEntries.length; i++) {
             if (triggered.has(allEntries[i].target)) continue

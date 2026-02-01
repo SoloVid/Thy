@@ -66,6 +66,7 @@ export async function checkExampleProgramTree(
   //   }
   //   return value
   // }, 2))
+  // deno-lint-ignore no-explicit-any
   expect(top).toMatchObject(expectedOutput as any)
 }
 
@@ -82,6 +83,7 @@ export function checkProgramTree(
   const { errors, top } = parseSource(source)
   // console.log(errors)
   expect(errors).toMatchObject(expectedErrors)
+  // deno-lint-ignore no-explicit-any
   expect(top).toMatchObject(expectedOutput as any)
 }
 

@@ -32,6 +32,7 @@ function mochaDefineTestGroup(groupDescriptionPrefix: string) {
   }
 }
 
+// deno-lint-ignore no-process-global
 const useMocha = !!process?.env?.MOCHA || !!process?.env?.WALLABY
 
 export const test = useMocha ? mochaTest : utsTest

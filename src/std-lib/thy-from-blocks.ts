@@ -4,7 +4,10 @@ import type {
   NoInfer,
 } from "../utils/utility-types.ts"
 
-type BaseBlock = (args: { thy: ThyFunction<{}> }) => unknown
+// TODO: This used to be ThyFunction<{}>. What should it be?
+type BaseBlock = (
+  args: { thy: ThyFunction<Record<string, BaseBlock>> },
+) => unknown
 type BaseBlockMap = Record<string, BaseBlock>
 type Block<BlockMap extends BaseBlockMap> =
   | BlockMap[keyof BlockMap]

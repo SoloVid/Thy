@@ -184,6 +184,7 @@ testParser(
       expectedErrorToken,
       tEndStringInterpolation,
     ])
+    // deno-lint-ignore no-explicit-any
     const result = parseStringInterpolation(state, firstToken as any)
     expect(errors).toEqual([
       {
@@ -213,6 +214,7 @@ testParser(
       expectedErrorToken,
       tEndStringInterpolation,
     ])
+    // deno-lint-ignore no-explicit-any
     const result = parseStringInterpolation(state, firstToken as any)
     expect(errors).toEqual([
       {
@@ -243,6 +245,7 @@ testParser(
       tValueIdentifier,
       tValueIdentifier,
     ])
+    // deno-lint-ignore no-explicit-any
     expect(() => parseStringInterpolation(state, null as any)).toThrow()
   },
 )

@@ -2,6 +2,7 @@
 import yargs from "yargs/yargs"
 import { compile } from "./compile.ts"
 import chalk from "chalk"
+import process from "node:process"
 
 const argv = yargs(process.argv.slice(2)).options({
   target: {

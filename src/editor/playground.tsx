@@ -13,15 +13,15 @@ function PlaygroundContent() {
   useEffect(() => {
     document.title = "Thy Playground"
   }, [])
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight)
+  const [windowHeight, setWindowHeight] = useState(globalThis.innerHeight)
   useEffect(() => {
     const listener = () => {
-      setWindowHeight(window.innerHeight)
+      setWindowHeight(globalThis.innerHeight)
     }
     const intervalHandle = setInterval(listener, 500)
-    window.addEventListener("resize", listener)
+    globalThis.addEventListener("resize", listener)
     return () => {
-      window.removeEventListener("resize", listener)
+      globalThis.removeEventListener("resize", listener)
       clearInterval(intervalHandle)
     }
   })

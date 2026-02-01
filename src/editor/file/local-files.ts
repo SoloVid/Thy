@@ -79,8 +79,8 @@ export function useLocalFiles(implementation: FileManager) {
   const files = implementation.getFilesList().sort()
 
   function saveAsNew(sourceCode: string) {
-    const name = window.prompt("File name?")
-    if (!!name) {
+    const name = globalThis.prompt("File name?")
+    if (name) {
       implementation.saveFile(name, sourceCode)
     }
     bumpVersion()
@@ -97,7 +97,7 @@ export function useLocalFiles(implementation: FileManager) {
   }
 
   function deleteFile(name: string) {
-    if (!window.confirm(`Delete ${name}?`)) {
+    if (!globalThis.confirm(`Delete ${name}?`)) {
       return
     }
     implementation.deleteFile(name)

@@ -1,4 +1,4 @@
-import assert from "assert"
+import assert from "node:assert"
 import { defineTestGroup } from "test-framework"
 import { assertType } from "../utils/assert.ts"
 import { permute } from "../utils/permute.ts"
@@ -21,8 +21,8 @@ testMakeThy("should not run passed functions on construction", async () => {
 })
 
 testMakeThy("function should run all passed functions", async () => {
-  let calledFlags = [false, false, false]
-  let functions = calledFlags.map((e, i) => () => {
+  const calledFlags = [false, false, false]
+  const functions = calledFlags.map((e, i) => () => {
     calledFlags[i] = true
   })
   const thy = makeThyFromBlocks({
@@ -36,8 +36,8 @@ testMakeThy("function should run all passed functions", async () => {
 })
 
 testMakeThy("function should run all functions once", async () => {
-  let calledTimes = [0, 0]
-  let functions = calledTimes.map((e, i) => () => {
+  const calledTimes = [0, 0]
+  const functions = calledTimes.map((e, i) => () => {
     calledTimes[i]++
   })
   const thy = makeThyFromBlocks({

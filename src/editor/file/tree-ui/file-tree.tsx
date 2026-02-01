@@ -213,7 +213,9 @@ const FileTreeNodeListSync = ({
 
   return (
     <>
-      {sortedNodes.map((child) => <FileTreeNode {...restProps} node={child} />)}
+      {sortedNodes.map((child) => (
+        <FileTreeNode key={child.path} {...restProps} node={child} />
+      ))}
     </>
   )
 }

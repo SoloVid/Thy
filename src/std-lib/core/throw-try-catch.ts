@@ -23,6 +23,7 @@ export const tryBuiltin = <_T>(
     if (catchOrFinally === finallyBuiltin) {
       const finallyResult = secondBlock(null)
       if (finallyResult !== undefined) {
+        // deno-lint-ignore no-unsafe-finally
         return finallyResult
       }
     }

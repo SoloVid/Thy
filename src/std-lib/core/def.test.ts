@@ -1,4 +1,4 @@
-import assert from "assert"
+import assert from "node:assert"
 import { test } from "test-framework"
 import { defBuiltin } from "./def.ts"
 

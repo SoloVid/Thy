@@ -12,11 +12,11 @@ export function useSetIntervalWhenActive(
   useEffect(() => {
     const move = () => (lastMouse.current = getNow())
     const out = () => (lastMouse.current = 0)
-    window.addEventListener("mousemove", move)
-    window.addEventListener("mouseout", out)
+    globalThis.addEventListener("mousemove", move)
+    globalThis.addEventListener("mouseout", out)
     return () => {
-      window.removeEventListener("mousemove", move)
-      window.removeEventListener("mouseout", out)
+      globalThis.removeEventListener("mousemove", move)
+      globalThis.removeEventListener("mouseout", out)
     }
   }, inputs)
 

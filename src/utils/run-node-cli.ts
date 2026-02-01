@@ -1,3 +1,4 @@
+import process from "node:process"
 export function runNodeCli(logic: () => PromiseLike<void>) {
   logic().then(
     () => {

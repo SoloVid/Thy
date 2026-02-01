@@ -128,7 +128,7 @@ export default function CodeInput({
       )
     }
 
-    let code = element.value
+    const code = element.value
     const tabValue = "  "
     if (event.key === "Tab") {
       if (element.selectionStart === element.selectionEnd && !event.shiftKey) {
