@@ -4,10 +4,10 @@ import assert from "node:assert"
 import { join } from "node:path"
 import { test } from "test-framework"
 import { assertDirectoriesMatch } from "test/assert-directories-match.ts"
-import { withTempDir } from "utils/temp-dir.ts"
+import { withTestTempDir } from "utils/temp-dir.ts"
 
-const inputDirectory = join(__dirname, "input")
-const expectedOutputDirectory = join(__dirname, "output")
+const inputDirectory = join(import.meta.dirname!, "input")
+const expectedOutputDirectory = join(import.meta.dirname!, "output")
 
 test("interpretFile() should process inter-file dependencies", async () => {
   const interpreted = await interpretFile(inputDirectory, "main.thy")
@@ -15,7 +15,7 @@ test("interpretFile() should process inter-file dependencies", async () => {
 })
 
 test("compileWorkspaceTs() should process inter-file dependencies", async () => {
-  await withTempDir(async (tempDir) => {
+  await withTestTempDir(async (tempDir) => {
     const results = await compileWorkspaceTs({
       entrypoint: "main.thy",
       inputDirectory: inputDirectory,

@@ -1,7 +1,7 @@
 import { compileWorkspaceTs } from "compiler/workspace-ts-compiler.ts"
 import { interpretFile } from "node-runtime/interpret-file.ts"
 import assert from "node:assert"
-import { withTempDir } from "utils/temp-dir.ts"
+import { withTestTempDir } from "utils/temp-dir.ts"
 import { assertDirectoriesMatch } from "./assert-directories-match.ts"
 
 type Options = {
@@ -16,7 +16,7 @@ export async function verifyInterpreterAndCompiler(options: Options) {
   const interpreted = await interpretFile(options.inputDir, "main.thy")
   assert.strictEqual(interpreted, options.expectedValue)
 
-  await withTempDir(async (tempDir) => {
+  await withTestTempDir(async (tempDir) => {
     const results = await compileWorkspaceTs({
       entrypoint: "main.thy",
       inputDirectory: options.inputDir,

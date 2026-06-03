@@ -40,7 +40,7 @@ async function readFile(libDir: string, relativePath: string): Promise<string> {
 function pathInSrc(libPath: string): string {
   const searchFor = "lib"
   const replaceWith = "src"
-  const libRootPath = path.resolve(path.join(__dirname, "..", "..", ".."))
+  const libRootPath = path.resolve(path.join(import.meta.dirname!, "..", "..", ".."))
   const libIndex = libRootPath.lastIndexOf(searchFor)
   let srcRootPath = libRootPath
   if (libIndex >= 0) {

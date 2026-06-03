@@ -1,3 +1,3 @@
 import { join } from "node:path/posix"
 
-export const rootDir = join(__dirname, "..")
+export const rootDir = join(import.meta.dirname!, "..")

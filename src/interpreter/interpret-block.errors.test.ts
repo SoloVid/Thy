@@ -7,7 +7,7 @@ import { interpretThyBlockSource } from "./block.ts"
 // Wallaby messes with stack traces in ways that make some of these tests fail.
 function nonWallabyTest(
   description: string,
-  exercise: () => void | PromiseLike<void>,
+  exercise: () => void | Promise<void>,
 ) {
   // deno-lint-ignore no-process-global
   if (!process?.env?.WALLABY) {

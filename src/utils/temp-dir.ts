@@ -1,14 +1,17 @@
-import { withDir } from "tmp-promise"
+import { join } from "node:path"
+import { rootDir } from "@/root-dir.ts"
+import { randomUUID } from "node:crypto"
+import { mkdir, rm } from "node:fs/promises"
 
-export function withTempDir<T>(
+export async function withTestTempDir<T>(
   exercise: (dir: string) => PromiseLike<T>,
-): PromiseLike<T> {
-  return withDir(
-    async (o) => {
-      return exercise(o.path)
-    },
-    {
-      unsafeCleanup: true,
-    },
-  )
+): Promise<T> {
+  const uuid = randomUUID()
+  const dirPath = join(rootDir, ".temp", uuid)
+  try {
+    await mkdir(dirPath)
+    return exercise(dirPath)
+  } finally {
+    await rm(dirPath, { recursive: true, force: true })
+  }
 }

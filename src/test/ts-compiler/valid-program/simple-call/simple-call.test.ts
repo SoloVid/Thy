@@ -7,7 +7,7 @@ import {
 test("compile simple call", async () => {
   await compileAndVerifyOutput(
     tsCoreCompiler,
-    __dirname,
+    import.meta.dirname!,
     "input.thy",
     "output.ts",
   )

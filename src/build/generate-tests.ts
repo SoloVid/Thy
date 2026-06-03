@@ -34,9 +34,9 @@ import logic from "./output/main.thy.ts"
 
 test("${dir} verify", async () => {
   await verifyInterpreterAndCompiler({
-    inputDir: join(__dirname, "input"),
+    inputDir: join(import.meta.dirname!, "input"),
     logic: logic,
-    outputDir: join(__dirname, "output"),
+    outputDir: join(import.meta.dirname!, "output"),
     expectedValue: ${expectedValue},
   })
 })

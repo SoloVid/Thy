@@ -14,7 +14,7 @@ export function makeInterpreterCompileError(error: CompileError) {
 }
 
 export class InterpreterErrorWithContext extends Error {
-  readonly cause: unknown
+  override readonly cause: unknown
   readonly sourceLocation: { line: number; column: number }
   constructor(
     cause: unknown,

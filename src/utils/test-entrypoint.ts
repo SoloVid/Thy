@@ -1,41 +1,30 @@
+/// <reference lib="deno.ns" />
+import { testBackend } from "@/utils/test-entrypoint-config.ts"
 import {
-  defineTestGroup as utsDefineTestGroup,
-  test as utsTest,
+  test as utsTest
 } from "under-the-sun"
 
-// function test(
-//   description: string,
-//   exercise: () => void | PromiseLike<void>,
-// ) {
-//   utsTest(description, exercise)
-// }
+export function test(
+  description: string,
+  exercise: () => void | PromiseLike<void>,
+) {
+  switch (testBackend) {
+    case "deno":
+      Deno.test(description, async () => exercise())
+      break
+    case "uts":
+      utsTest(description, exercise)
+      break
+    default:
+      throw new Error(`Unknown test backend: ${testBackend}`)
+  }
+}
 
-// export function defineTestGroup(groupDescriptionPrefix: string) {
-//   return function groupTest(
-//     description: string,
-//     exercise: () => void | PromiseLike<void>,
-//   ) {
-//     test(groupDescriptionPrefix + description, exercise)
-//   }
-// }
-
-import { describe, it as mochaTest } from "mocha"
-
-function mochaDefineTestGroup(groupDescriptionPrefix: string) {
+export function defineTestGroup(groupDescriptionPrefix: string) {
   return function groupTest(
     description: string,
     exercise: () => void | PromiseLike<void>,
   ) {
-    describe(groupDescriptionPrefix, () => {
-      mochaTest(description, exercise)
-    })
+    test(groupDescriptionPrefix + description, exercise)
   }
 }
-
-// deno-lint-ignore no-process-global
-const useMocha = !!process?.env?.MOCHA || !!process?.env?.WALLABY
-
-export const test = useMocha ? mochaTest : utsTest
-export const defineTestGroup = useMocha
-  ? mochaDefineTestGroup
-  : utsDefineTestGroup

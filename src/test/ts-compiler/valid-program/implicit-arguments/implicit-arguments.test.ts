@@ -7,7 +7,7 @@ import {
 test("implicit arguments", async () => {
   await compileAndVerifyOutput(
     tsCoreCompiler,
-    __dirname,
+    import.meta.dirname!,
     "input.thy",
     "output.ts",
   )
