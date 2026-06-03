@@ -10,7 +10,7 @@ export async function withTestTempDir<T>(
   const dirPath = join(rootDir, ".temp", uuid)
   try {
     await mkdir(dirPath)
-    return exercise(dirPath)
+    return await exercise(dirPath)
   } finally {
     await rm(dirPath, { recursive: true, force: true })
   }
