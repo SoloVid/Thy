@@ -1,0 +1,62 @@
+{
+  "permissions": {
+    "tests": {
+      "read": ["."],
+      "write": [".temp"],
+      "env": true,
+      "sys": true
+    }
+  },
+  "tasks": {
+    "TODOgenerate-tests": "deno --allow-read=src/ --allow-write=src/test/programs/ src/test/utils/generate-tests.ts",
+    "test": {
+      "command": "deno -P=tests src/all-tests.x.ts",
+      "dependencies": ["write-all-tests"]
+    },
+    "test:coverage": {
+      "command": "deno -P=tests --coverage src/all-tests.x.ts && deno coverage --html coverage/",
+      "dependencies": ["write-all-tests"]
+    },
+    "write-all-tests": "deno --allow-read=src/ --allow-write=src/all-tests.x.ts src/test/utils/write-all-tests.x.ts",
+    "TODOwrite-all-tests:uts": "deno --allow-read=src/ npm:under-the-sun --print-imports --import-base .. src > src/all-tests.ts"
+  },
+  "imports": {
+    "@/": "./src/",
+    "test-framework": "./src/test/utils/test-entrypoint.ts",
+    "expect": "npm:expect@^28.1.3",
+    "under-the-sun": "npm:under-the-sun@^2.2"
+  },
+  "fmt": {
+    "semiColons": false,
+    "proseWrap": "preserve",
+    "exclude": [
+      "**/output.ts",
+      "**/output/",
+      "**/*.html",
+      "**/*.svg",
+      "**/generated.test.ts"
+    ]
+  },
+  "lint": {
+    "exclude": [
+      "**/output*.ts",
+      "**/output/"
+    ],
+    "rules": {
+      "exclude": [
+        "jsx-button-has-type",
+        "no-regex-spaces",
+        "no-unused-vars",
+        "require-await"
+      ]
+    }
+  },
+  "compilerOptions": {
+    "lib": ["es2021"],
+    "strict": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "baseUrl": "src"
+  }
+}
