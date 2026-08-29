@@ -52,7 +52,7 @@
     }
   },
   "compilerOptions": {
-    "lib": ["es2021"],
+    "lib": ["deno.window", "es2021"],
     "strict": true,
     "skipLibCheck": true,
     "jsx": "react-jsx",
