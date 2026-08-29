@@ -1,0 +1,6 @@
+# Normalize files as LF
+*.json text eol=lf
+*.md text eol=lf
+*.thy text eol=lf
+*.ts text eol=lf
+*.yml text eol=lf
