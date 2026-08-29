@@ -1,6 +1,4 @@
-import type {
-  Expression
-} from "./expression.ts"
+import type { Expression } from "./expression.ts"
 
 export interface ReturnTerm {
   readonly type: "return-term"

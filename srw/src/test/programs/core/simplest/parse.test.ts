@@ -7,12 +7,19 @@ import { TreeNode } from "@/tree/node.ts"
 import { Block } from "@/tree/block.ts"
 
 test("core/simplest parser", async () => {
-  const source = await readFile(join(import.meta.dirname!, "source/main.thy"), "utf-8")
+  const source = await readFile(
+    join(import.meta.dirname!, "source/main.thy"),
+    "utf-8",
+  )
   const expectedReturn: Block = {
     type: "block",
     ideas: [
-
-    ]
+      {
+        type: "return",
+        func: { type: "return-term" },
+        args: [{ type: "number-literal" }],
+      },
+    ],
   }
   const actualReturn = await parse(source)
   expect(actualReturn).toStrictEqual(expectedReturn)
