@@ -1,3 +1,5 @@
 import "./golden.test.ts"
 import "./utils/walk-files.test.ts"
 import "./test/utils/find-all-test-files.test.ts"
+import "./test/programs/core/simplest/interpret.test.ts"
+import "./test/programs/core/simplest/parse.test.ts"
