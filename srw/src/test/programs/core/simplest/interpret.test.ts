@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 import { test } from "test-framework"
 
-test("core/simplest interpreter", async () => {
+test("core/simplest interpret", async () => {
   const source = await readFile(
     join(import.meta.dirname!, "source/main.thy"),
     "utf-8",

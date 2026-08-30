@@ -5,22 +5,29 @@ import { join } from "node:path"
 import { test } from "test-framework"
 import { TreeNode } from "@/tree/node.ts"
 import { Block } from "@/tree/block.ts"
+import { lex } from "@/lex/lex.ts"
+import { LexResult } from "@/lex/generic/result.ts"
+import { tNumber, tReturn } from "@/lex/token-kind.ts"
 
-test("core/simplest parse", async () => {
+test("core/simplest lex", async () => {
   const source = await readFile(
     join(import.meta.dirname!, "source/main.thy"),
     "utf-8",
   )
-  const expectedReturn: Block = {
-    type: "block",
-    ideas: [
+  const expectedReturn: LexResult = {
+    tokens: [
       {
-        type: "return",
-        func: { type: "return-term" },
-        args: [{ type: "number-literal" }],
+        kind: tReturn,
+        position: 0,
+        length: 6,
       },
-    ],
+      {
+        kind: tNumber,
+        position: 7,
+        length: 1,
+      }
+    ]
   }
-  const actualReturn = parse(source)
+  const actualReturn = lex(source)
   expect(actualReturn).toStrictEqual(expectedReturn)
 })
