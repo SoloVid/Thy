@@ -21,7 +21,10 @@
     "TODOwrite-all-tests:uts": "deno --allow-read=src/ npm:under-the-sun --print-imports --import-base .. src > src/all-tests.ts"
   },
   "imports": {
-    "@/": "./src/",
+    "@/lex/token-kind.ts": "./src/lex/token-kind.ts",
+    "@/root-dir.ts": "./src/root-dir.ts",
+    "@/test/": "./src/test/",
+    "@/utils/": "./src/utils/",
     "test-framework": "./src/test/utils/test-entrypoint.ts",
     "expect": "npm:expect@^28.1.3",
     "under-the-sun": "npm:under-the-sun@^2.2"
@@ -56,7 +59,6 @@
     "strict": true,
     "skipLibCheck": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "preact",
-    "baseUrl": "src"
+    "jsxImportSource": "preact"
   }
 }

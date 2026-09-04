@@ -1,17 +1,6 @@
-import { interpret } from "@/interpret/interpret.ts"
-import { expect } from "expect"
-import { readFile } from "node:fs/promises"
-import { join } from "node:path"
+import { expectInterpret } from "@/test/common/expect-interpret.ts"
 import { test } from "test-framework"
 
 test("core/simplest interpret", async () => {
-  const source = await readFile(
-    join(import.meta.dirname!, "source/main.thy"),
-    "utf-8",
-  )
-  const expectedReturn = JSON.parse(
-    await readFile(join(import.meta.dirname!, "return.json"), "utf-8"),
-  )
-  const actualReturn = await interpret(source)
-  expect(actualReturn).toStrictEqual(expectedReturn)
+  await expectInterpret(import.meta.dirname, "source/main.thy", "return.json")
 })

@@ -23,7 +23,10 @@ export function makeGenericLexer(
       if (!match) {
         return null
       }
-      assertTODO(match, "Need to handle the case where none of the matchers match")
+      assertTODO(
+        match,
+        "Need to handle the case where none of the matchers match",
+      )
       const token: Token = {
         kind: match.kind,
         offset: state.offset,
@@ -31,6 +34,6 @@ export function makeGenericLexer(
       }
       state.offset += match.length
       return token
-    }
+    },
   }
 }

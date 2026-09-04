@@ -1,17 +1,8 @@
-import { parse } from "@/parse/parse.ts"
-import { expect } from "expect"
-import { readFile } from "node:fs/promises"
-import { join } from "node:path"
+import { expectParse } from "@/test/common/expect-parse.ts"
 import { test } from "test-framework"
-import { TreeNode } from "@/tree/node.ts"
-import { Block } from "@/tree/block.ts"
 
 test("core/simplest parse", async () => {
-  const source = await readFile(
-    join(import.meta.dirname!, "source/main.thy"),
-    "utf-8",
-  )
-  const expectedReturn: Block = {
+  await expectParse(import.meta.dirname, "source/main.thy", {
     type: "block",
     ideas: [
       {
@@ -20,7 +11,5 @@ test("core/simplest parse", async () => {
         args: [{ type: "number-literal" }],
       },
     ],
-  }
-  const actualReturn = parse(source)
-  expect(actualReturn).toStrictEqual(expectedReturn)
+  })
 })
