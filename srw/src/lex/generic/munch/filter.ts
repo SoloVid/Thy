@@ -1,7 +1,7 @@
 import { TokenKind } from "@/lex/token-kind.ts"
 import { Muncher } from "./muncher.ts"
 
-export function makeFilterMuncher(
+export function filterMuncher(
   innerMuncher: Muncher,
   tokenKindWhiteList: readonly TokenKind[],
 ): Muncher {

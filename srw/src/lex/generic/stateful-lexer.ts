@@ -1,5 +1,5 @@
 import { Lexer } from "./lexer.ts"
-import { Muncher } from "./muncher.ts"
+import { Muncher } from "./munch/muncher.ts"
 import { LexState } from "./state.ts"
 
 export function makeStatefulLexer(

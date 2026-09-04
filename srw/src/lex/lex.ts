@@ -1,7 +1,7 @@
 import { tNumber, tReturn } from "@/lex/token-kind.ts"
-import { makeAggregateMatcher } from "./generic/aggregate-matcher.ts"
-import { makeFilterMuncher } from "./generic/filter-muncher.ts"
-import { makeMuncher } from "./generic/muncher.ts"
+import { combineMatchers } from "./generic/match/combine.ts"
+import { filterMuncher } from "./generic/munch/filter.ts"
+import { makeMuncher } from "./generic/munch/muncher.ts"
 import type { LexResult } from "./generic/result.ts"
 import { makeStatefulLexer } from "./generic/stateful-lexer.ts"
 import { allMatchers } from "./thy/all.ts"
@@ -10,7 +10,7 @@ import { Token } from "./token.ts"
 export function lex(source: string): LexResult {
   const lexer = makeStatefulLexer(
     source,
-    makeFilterMuncher(makeMuncher(makeAggregateMatcher(allMatchers)), [
+    filterMuncher(makeMuncher(combineMatchers(allMatchers)), [
       tReturn,
       tNumber,
     ]),
