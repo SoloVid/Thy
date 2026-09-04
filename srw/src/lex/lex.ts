@@ -1,30 +1,25 @@
-import { makeGenericLexer } from "./generic/lexer.ts"
+import { tNumber, tReturn } from "@/lex/token-kind.ts"
+import { makeAggregateMatcher } from "./generic/aggregate-matcher.ts"
+import { makeFilterMuncher } from "./generic/filter-muncher.ts"
+import { makeMuncher } from "./generic/muncher.ts"
 import type { LexResult } from "./generic/result.ts"
+import { makeStatefulLexer } from "./generic/stateful-lexer.ts"
 import { allMatchers } from "./thy/all.ts"
-import { tNumber, tReturn } from "./token-kind.ts"
 import { Token } from "./token.ts"
 
 export function lex(source: string): LexResult {
-  const lexer = makeGenericLexer(source, allMatchers)
+  const lexer = makeStatefulLexer(
+    source,
+    makeFilterMuncher(makeMuncher(makeAggregateMatcher(allMatchers)), [
+      tReturn,
+      tNumber,
+    ]),
+  )
   const tokens: Token[] = []
-  let nextToken: Token | null
-  while (nextToken = lexer.getNextToken()) {
+  let nextToken = lexer.getNextToken()
+  while (nextToken) {
     tokens.push(nextToken)
+    nextToken = lexer.getNextToken()
   }
-  // TODO: Uncomment this and fill out tests.
-  // return { tokens }
-  return {
-    tokens: [
-      {
-        kind: tReturn,
-        position: 0,
-        length: 6,
-      },
-      {
-        kind: tNumber,
-        position: 7,
-        length: 1,
-      },
-    ],
-  }
+  return { tokens }
 }

@@ -9,5 +9,5 @@ export type TokenMatcherResultNotNull = {
 export type TokenMatcherResult = TokenMatcherResultNotNull | null
 
 export type TokenMatcher = (
-  state: LexState,
+  state: Readonly<LexState>,
 ) => TokenMatcherResult

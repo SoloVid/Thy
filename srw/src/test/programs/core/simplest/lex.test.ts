@@ -7,12 +7,12 @@ test("core/simplest lex", async () => {
     tokens: [
       {
         kind: tReturn,
-        position: 0,
+        offset: 0,
         length: 6,
       },
       {
         kind: tNumber,
-        position: 7,
+        offset: 7,
         length: 1,
       },
     ],

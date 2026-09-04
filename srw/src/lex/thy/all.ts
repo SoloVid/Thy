@@ -1,8 +1,9 @@
 import { keywordMatchers } from "./keywords.ts"
-import { makeSimpleRegexMatcher as m } from "../generic/matcher/simple-regex.ts"
-import { tNumber } from "@/lex/token-kind.ts"
+import { numberMatcher } from "./number.ts"
+import { whitespaceMatcher } from "./whitespace.ts"
 
 export const allMatchers = [
+  whitespaceMatcher,
   ...keywordMatchers,
-  m(tNumber, /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/),
+  numberMatcher,
 ] as const
