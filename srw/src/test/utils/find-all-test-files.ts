@@ -9,5 +9,5 @@ export async function findAllTestFiles() {
       files.push(f)
     }
   })
-  return files
+  return files.sort()
 }

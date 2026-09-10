@@ -4,9 +4,9 @@ import { combineMatchers } from "./combine.ts"
 import { TokenMatcher, TokenMatcherResult } from "./matcher.ts"
 
 const simpleResult: TokenMatcherResult = {
-    kind: "r",
-    length: 6,
-  }
+  kind: "r",
+  length: 6,
+}
 
 test("combineMatchers() matches nothing if no input", () => {
   const matcher = combineMatchers([])

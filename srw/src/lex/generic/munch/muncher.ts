@@ -23,7 +23,10 @@ export function makeMuncher<TokenKind extends string = string>(
   }
 }
 
-function munchToken<TokenKind extends string = never>(state: LexState, match: TokenMatcherResultNotNull<TokenKind>) {
+function munchToken<TokenKind extends string = never>(
+  state: LexState,
+  match: TokenMatcherResultNotNull<TokenKind>,
+) {
   const token: Token<TokenKind> = {
     kind: match.kind,
     offset: state.offset,

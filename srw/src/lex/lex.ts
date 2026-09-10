@@ -1,14 +1,9 @@
+import { lex as lexGeneric } from "./generic/lex.ts"
 import type { LexResult } from "./generic/result.ts"
 import { makeThyLexer } from "./thy/lexer.ts"
-import { Token } from "./generic/token.ts"
+import type { TokenKind } from "./thy/token-kind.ts"
 
-export function lex(source: string): LexResult {
+export function lex(source: string): LexResult<TokenKind> {
   const lexer = makeThyLexer(source)
-  const tokens: Token[] = []
-  let nextToken = lexer.getNextToken()
-  while (nextToken) {
-    tokens.push(nextToken)
-    nextToken = lexer.getNextToken()
-  }
-  return { tokens }
+  return lexGeneric(lexer)
 }

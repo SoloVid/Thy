@@ -12,9 +12,12 @@ import { allMatchers } from "./match/all.ts"
 export function makeThyLexer(source: string): Lexer<TokenKind> {
   return makeStatefulLexer(
     source,
-    filterMuncher(makeMuncher(combineMatchers(allMatchers)), [
-      tReturn,
-      tNumber,
-    ] as const),
+    filterMuncher(
+      makeMuncher(combineMatchers(allMatchers)),
+      [
+        tReturn,
+        tNumber,
+      ] as const,
+    ),
   )
 }

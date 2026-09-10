@@ -9,7 +9,9 @@ import { makeMuncher } from "./muncher.ts"
 const returnMatcher = makeSimpleRegexMatcher("ret", /\breturn\b/)
 const numberMatcher = makeSimpleRegexMatcher("num", /\b\d+\b/)
 const spaceMatcher = makeSimpleRegexMatcher("space", / /)
-const innerMuncher = makeMuncher(combineMatchers([returnMatcher, numberMatcher, spaceMatcher]))
+const innerMuncher = makeMuncher(
+  combineMatchers([returnMatcher, numberMatcher, spaceMatcher]),
+)
 
 function makeState(): LexState {
   return {
