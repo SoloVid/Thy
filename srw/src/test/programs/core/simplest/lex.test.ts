@@ -1,4 +1,4 @@
-import { tNumber, tReturn } from "@/lex/token-kind.ts"
+import { tNumber, tReturn } from "@/lex/thy/token-kind.ts"
 import { expectLex } from "@/test/common/expect-lex.ts"
 import { test } from "test-framework"
 

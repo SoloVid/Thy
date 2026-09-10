@@ -1,5 +1,5 @@
-import { Token } from "../token.ts"
+import { Token } from "./token.ts"
 
-export interface Lexer {
-  getNextToken(): Token | null
+export interface Lexer<TokenKind extends string = string> {
+  getNextToken(): Token<TokenKind> | null
 }

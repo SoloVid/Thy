@@ -1,5 +1,5 @@
-import { Token } from "../token.ts"
+import { Token } from "./token.ts"
 
-export type LexResult = {
-  tokens: Token[]
+export type LexResult<TokenKind extends string = string> = {
+  tokens: Token<TokenKind>[]
 }

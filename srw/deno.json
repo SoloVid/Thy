@@ -21,7 +21,7 @@
     "TODOwrite-all-tests:uts": "deno --allow-read=src/ npm:under-the-sun --print-imports --import-base .. src > src/all-tests.ts"
   },
   "imports": {
-    "@/lex/token-kind.ts": "./src/lex/token-kind.ts",
+    "@/lex/thy/token-kind.ts": "./src/lex/thy/token-kind.ts",
     "@/root-dir.ts": "./src/root-dir.ts",
     "@/test/": "./src/test/",
     "@/utils/": "./src/utils/",

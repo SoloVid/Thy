@@ -1,10 +1,9 @@
-import { TokenKind } from "../../token-kind.ts"
 import { TokenMatcher } from "./matcher.ts"
 
-export function makeSimpleRegexMatcher<Kind extends TokenKind>(
-  kind: Kind,
+export function makeSimpleRegexMatcher<TokenKind extends string = string>(
+  kind: TokenKind,
   regex: RegExp,
-): TokenMatcher {
+): TokenMatcher<TokenKind> {
   const statefulRegex = new RegExp(regex, "my")
   return (state) => {
     statefulRegex.lastIndex = state.offset

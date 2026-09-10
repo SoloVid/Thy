@@ -1,15 +1,15 @@
 import { assertTODO } from "@/utils/assert-todo.ts"
-import { Token } from "../../token.ts"
+import { Token } from "../token.ts"
 import { TokenMatcher, TokenMatcherResultNotNull } from "../match/matcher.ts"
 import { LexState } from "../state.ts"
 
-export type Muncher = (
+export type Muncher<TokenKind extends string = never> = (
   state: LexState,
-) => Token | null
+) => Token<TokenKind> | null
 
-export function makeMuncher(
-  matcher: TokenMatcher,
-): Muncher {
+export function makeMuncher<TokenKind extends string = string>(
+  matcher: TokenMatcher<TokenKind>,
+): Muncher<TokenKind> {
   return (state) => {
     const match = matcher(state)
     if (!match) {
@@ -23,8 +23,8 @@ export function makeMuncher(
   }
 }
 
-function munchToken(state: LexState, match: TokenMatcherResultNotNull) {
-  const token: Token = {
+function munchToken<TokenKind extends string = never>(state: LexState, match: TokenMatcherResultNotNull<TokenKind>) {
+  const token: Token<TokenKind> = {
     kind: match.kind,
     offset: state.offset,
     length: match.length,

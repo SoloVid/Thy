@@ -1,14 +1,13 @@
 import { expect } from "expect"
 import { test } from "test-framework"
-import { tReturn } from "../../token-kind.ts"
 import { TokenMatcherResult } from "./matcher.ts"
 import { makeSimpleRegexMatcher } from "./simple-regex.ts"
 
-const matcher = makeSimpleRegexMatcher(tReturn, /\breturn\b/)
+const matcher = makeSimpleRegexMatcher("r", /\breturn\b/)
 
 test("makeSimpleRegexMatcher() matches exact text", () => {
   const expectedResult: TokenMatcherResult = {
-    kind: tReturn,
+    kind: "r",
     length: 6,
   }
   const actualResult = matcher({
@@ -20,7 +19,7 @@ test("makeSimpleRegexMatcher() matches exact text", () => {
 
 test("makeSimpleRegexMatcher() matches beginning of text", () => {
   const expectedResult: TokenMatcherResult = {
-    kind: tReturn,
+    kind: "r",
     length: 6,
   }
   const actualResult = matcher({
@@ -32,7 +31,7 @@ test("makeSimpleRegexMatcher() matches beginning of text", () => {
 
 test("makeSimpleRegexMatcher() matches middle of text", () => {
   const expectedResult: TokenMatcherResult = {
-    kind: tReturn,
+    kind: "r",
     length: 6,
   }
   const actualResult = matcher({

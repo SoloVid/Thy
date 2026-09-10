@@ -1,6 +1,6 @@
 import { test } from "test-framework"
 import { expect } from "expect"
-import { tReturn } from "../../token-kind.ts"
+import { tReturn } from "../../thy/token-kind.ts"
 import { makeSimpleRegexMatcher } from "../match/simple-regex.ts"
 import { makeMuncher } from "./muncher.ts"
 import { LexState } from "../state.ts"

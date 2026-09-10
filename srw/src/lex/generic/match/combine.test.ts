@@ -1,11 +1,10 @@
 import { expect } from "expect"
 import { test } from "test-framework"
-import { tReturn } from "../../token-kind.ts"
 import { combineMatchers } from "./combine.ts"
 import { TokenMatcher, TokenMatcherResult } from "./matcher.ts"
 
 const simpleResult: TokenMatcherResult = {
-    kind: tReturn,
+    kind: "r",
     length: 6,
   }
 
