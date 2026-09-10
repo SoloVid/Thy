@@ -1,4 +1,4 @@
 export type LexState = {
-  text: string
+  readonly text: string
   offset: number
 }

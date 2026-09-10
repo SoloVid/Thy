@@ -1,6 +1,6 @@
 import { assertTODO } from "@/utils/assert-todo.ts"
 import { Token } from "../../token.ts"
-import { TokenMatcher } from "../match/matcher.ts"
+import { TokenMatcher, TokenMatcherResultNotNull } from "../match/matcher.ts"
 import { LexState } from "../state.ts"
 
 export type Muncher = (
@@ -19,12 +19,16 @@ export function makeMuncher(
       match,
       "Need to handle the case where none of the matchers match but there is still input left",
     )
-    const token: Token = {
-      kind: match.kind,
-      offset: state.offset,
-      length: match.length,
-    }
-    state.offset += match.length
-    return token
+    return munchToken(state, match)
   }
+}
+
+function munchToken(state: LexState, match: TokenMatcherResultNotNull) {
+  const token: Token = {
+    kind: match.kind,
+    offset: state.offset,
+    length: match.length,
+  }
+  state.offset += match.length
+  return token
 }
