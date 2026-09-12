@@ -1,4 +1,5 @@
 import "./golden.test.ts"
+import "./lex/generic/lex.test.ts"
 import "./lex/generic/match/combine.test.ts"
 import "./lex/generic/match/simple-regex.test.ts"
 import "./lex/generic/munch/filter.test.ts"

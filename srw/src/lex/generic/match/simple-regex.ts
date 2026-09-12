@@ -4,7 +4,7 @@ export function makeSimpleRegexMatcher<TokenKind extends string = string>(
   kind: TokenKind,
   regex: RegExp,
 ): TokenMatcher<TokenKind> {
-  const statefulRegex = new RegExp(regex, "my")
+  const statefulRegex = new RegExp(regex, "y")
   return (state) => {
     statefulRegex.lastIndex = state.offset
     const result = statefulRegex.exec(state.text)

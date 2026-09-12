@@ -56,3 +56,29 @@ test("makeSimpleRegexMatcher() does not match earlier text", () => {
   })
   expect(actualResult).toStrictEqual(null)
 })
+
+test("makeSimpleRegexMatcher() can match newlines", () => {
+  const expectedResult: TokenMatcherResult = {
+    kind: "lf",
+    length: 1,
+  }
+  const newlineMatcher = makeSimpleRegexMatcher("lf", /\n/)
+  const actualResult = newlineMatcher({
+    text: "return 5\nreturn 6",
+    offset: 8,
+  })
+  expect(actualResult).toStrictEqual(expectedResult)
+})
+
+test("makeSimpleRegexMatcher() can match CRLF", () => {
+  const expectedResult: TokenMatcherResult = {
+    kind: "crlf",
+    length: 2,
+  }
+  const newlineMatcher = makeSimpleRegexMatcher("crlf", /\r\n/)
+  const actualResult = newlineMatcher({
+    text: "return 5\r\nreturn 6",
+    offset: 8,
+  })
+  expect(actualResult).toStrictEqual(expectedResult)
+})
