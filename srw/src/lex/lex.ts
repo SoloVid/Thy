@@ -6,7 +6,7 @@ import { type TokenKind, tStatementTerminator } from "./thy/token-kind.ts"
 export function lex(source: string): LexResult<TokenKind> {
   const muncher = makeThyMuncher()
   const result = lexGeneric(source, muncher)
-  result.tokens.push({
+  result.push({
     kind: tStatementTerminator,
     offset: source.length,
     length: 0,
